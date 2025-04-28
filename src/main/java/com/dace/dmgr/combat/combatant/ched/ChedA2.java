@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.combatant.ched;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -25,7 +25,7 @@ public final class ChedA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(ChedP1Info.getInstance()).isDurationFinished();
     }
 
     @Override

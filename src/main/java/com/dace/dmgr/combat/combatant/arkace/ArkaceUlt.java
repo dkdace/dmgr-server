@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public final class ArkaceUlt extends UltimateSkill implements HasBonusScore {
 
         setDuration();
 
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
     }

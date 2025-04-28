@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.entity.temporary.dummy;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import com.dace.dmgr.util.LocationUtil;
 import lombok.NonNull;

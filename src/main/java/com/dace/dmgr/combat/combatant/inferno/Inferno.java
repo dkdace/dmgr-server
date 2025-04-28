@@ -8,8 +8,8 @@ import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -123,7 +123,7 @@ public final class Inferno extends Vanguard {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -133,7 +133,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 
         InfernoUltInfo.Sounds.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
@@ -145,13 +145,13 @@ public final class Inferno extends Vanguard {
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
         super.onKill(attacker, victim, score, isFinalHit);
 
-        if (victim.isGoalTarget() && !attacker.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (victim.isGoalTarget() && !attacker.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(InfernoA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

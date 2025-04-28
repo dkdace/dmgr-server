@@ -9,6 +9,8 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
@@ -50,8 +52,9 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -60,7 +63,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
         entityModule.disposeEntity();

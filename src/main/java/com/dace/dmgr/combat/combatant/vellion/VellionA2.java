@@ -9,7 +9,12 @@ import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -72,8 +77,9 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && !actionManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override

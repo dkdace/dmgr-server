@@ -4,10 +4,10 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -36,7 +36,7 @@ public final class SiliaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -46,7 +46,7 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.setGlobalCooldown(SiliaA1Info.DURATION);
         combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.setCooldown(Timespan.ZERO);
         weapon.setVisible(false);
 
@@ -88,7 +88,7 @@ public final class SiliaA1 extends ActiveSkill {
         else
             setCooldown(Timespan.ZERO);
 
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     private final class SiliaA1Attack extends Hitscan<Damageable> {

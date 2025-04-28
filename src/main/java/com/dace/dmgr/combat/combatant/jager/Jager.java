@@ -6,8 +6,9 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -119,18 +120,19 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        return attacker.getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
+        return attacker.getActionManager().getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getActionManager().getWeapon()).getAimModule().isAiming();
     }
 
     @Override

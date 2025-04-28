@@ -7,7 +7,8 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -120,22 +121,24 @@ public final class Magritta extends Scuffler {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

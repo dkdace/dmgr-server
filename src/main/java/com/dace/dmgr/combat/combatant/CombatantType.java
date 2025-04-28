@@ -13,7 +13,7 @@ import com.dace.dmgr.combat.combatant.palas.Palas;
 import com.dace.dmgr.combat.combatant.quaker.Quaker;
 import com.dace.dmgr.combat.combatant.silia.Silia;
 import com.dace.dmgr.combat.combatant.vellion.Vellion;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;

@@ -4,7 +4,12 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.AccessLevel;
@@ -151,7 +156,8 @@ public abstract class Combatant {
     public final String getActionBarString(@NonNull CombatUser combatUser) {
         ArrayList<String> texts = new ArrayList<>();
 
-        Weapon weapon = combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        Weapon weapon = actionManager.getWeapon();
         String weaponText = weapon.getActionBarString();
         if (weaponText != null) {
             texts.add(weaponText);
@@ -167,7 +173,7 @@ public abstract class Combatant {
         }
 
         for (SkillInfo<?> skillInfo : getSkillInfos()) {
-            String actionBarString = combatUser.getSkill(skillInfo).getActionBarString();
+            String actionBarString = actionManager.getSkill(skillInfo).getActionBarString();
             if (actionBarString != null)
                 texts.add(actionBarString);
         }

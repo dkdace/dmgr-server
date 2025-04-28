@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.TextHologram;

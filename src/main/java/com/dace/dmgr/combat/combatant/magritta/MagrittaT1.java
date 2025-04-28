@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;

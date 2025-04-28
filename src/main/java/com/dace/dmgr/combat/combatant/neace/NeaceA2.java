@@ -5,9 +5,9 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.VectorUtil;
@@ -50,7 +50,7 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         setDuration();
-        combatUser.getWeapon().setGlowing(true);
+        combatUser.getActionManager().getWeapon().setGlowing(true);
 
         NeaceA2Info.Sounds.USE.play(combatUser.getLocation());
 
@@ -64,7 +64,7 @@ public final class NeaceA2 extends ActiveSkill {
     @Override
     protected void onDurationFinished() {
         super.onDurationFinished();
-        combatUser.getWeapon().setGlowing(false);
+        combatUser.getActionManager().getWeapon().setGlowing(false);
     }
 
     @Override

@@ -7,10 +7,10 @@ import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
@@ -61,7 +61,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getActionManager().getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

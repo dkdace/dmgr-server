@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.entity.temporary;
 
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;

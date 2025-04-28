@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.FreeCombat;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;

@@ -7,7 +7,8 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -110,7 +111,7 @@ public final class Metar extends Guardian {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (combatUser.getEntity().isSneaking())
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -120,7 +121,8 @@ public final class Metar extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return ((MetarWeapon) combatUser.getWeapon()).canSprint() && combatUser.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return ((MetarWeapon) actionManager.getWeapon()).canSprint() && actionManager.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

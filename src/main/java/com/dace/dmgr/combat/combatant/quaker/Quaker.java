@@ -6,7 +6,8 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -132,7 +133,7 @@ public final class Quaker extends Guardian {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        if (!combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished())
+        if (!combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
 
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
@@ -145,14 +146,19 @@ public final class Quaker extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return actionManager.getSkill(QuakerA1Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(QuakerA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return actionManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

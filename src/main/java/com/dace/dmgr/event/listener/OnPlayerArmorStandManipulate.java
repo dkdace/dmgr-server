@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
@@ -30,6 +30,6 @@ public final class OnPlayerArmorStandManipulate extends EventListener<PlayerArmo
             return;
 
         event.setCancelled(true);
-        combatUser.useAction(ActionKey.RIGHT_CLICK);
+        combatUser.getActionManager().useAction(ActionKey.RIGHT_CLICK);
     }
 }

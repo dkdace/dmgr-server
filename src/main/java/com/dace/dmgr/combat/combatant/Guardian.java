@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;

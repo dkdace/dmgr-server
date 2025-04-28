@@ -4,7 +4,11 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -33,7 +37,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

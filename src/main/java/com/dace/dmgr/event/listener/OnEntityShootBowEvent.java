@@ -3,7 +3,8 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.ched.ChedWeapon;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
@@ -34,8 +35,9 @@ public final class OnEntityShootBowEvent extends EventListener<EntityShootBowEve
         event.setCancelled(true);
 
         if (combatUser.getCombatantType() == CombatantType.CHED) {
-            ((ChedWeapon) combatUser.getWeapon()).setPower(event.getForce());
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            ActionManager actionManager = combatUser.getActionManager();
+            ((ChedWeapon) actionManager.getWeapon()).setPower(event.getForce());
+            actionManager.useAction(ActionKey.PERIODIC_1);
         }
     }
 }

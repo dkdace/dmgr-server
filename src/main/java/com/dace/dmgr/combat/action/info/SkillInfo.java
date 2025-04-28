@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.action.info;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.action.skill.Skill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
 import org.bukkit.Material;

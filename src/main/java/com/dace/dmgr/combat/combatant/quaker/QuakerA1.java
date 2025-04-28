@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -62,7 +62,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
 
         if (!isDurationFinished()) {
             cancel();

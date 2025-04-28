@@ -4,7 +4,8 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.LocationUtil;
@@ -32,8 +33,9 @@ public final class InfernoUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(InfernoA2Info.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && actionManager.getSkill(InfernoA1Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(InfernoA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -41,9 +43,11 @@ public final class InfernoUlt extends UltimateSkill {
         super.onUse(actionKey);
 
         setDuration();
-        combatUser.getSkill(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
 
-        InfernoWeapon weapon = (InfernoWeapon) combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        actionManager.getSkill(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
+
+        InfernoWeapon weapon = (InfernoWeapon) actionManager.getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 

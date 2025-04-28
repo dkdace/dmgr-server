@@ -5,7 +5,12 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -37,7 +42,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -55,7 +60,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             SiliaWeaponInfo.Sounds.USE.play(combatUser.getLocation());
         }
 
-        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
     }
 
     @Override
@@ -67,13 +72,14 @@ public final class SiliaWeapon extends AbstractWeapon {
      * 일격을 사용한다.
      */
     private void useStrike() {
-        if (!combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
+        ActionManager actionManager = combatUser.getActionManager();
+        if (!actionManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
             setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
         combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
         combatUser.playMeleeAttackAnimation(-2, Timespan.ofTicks(6), isOpposite ? MainHand.LEFT : MainHand.RIGHT);
 
-        combatUser.getWeapon().setVisible(false);
+        actionManager.getWeapon().setVisible(false);
 
         HashSet<Damageable> targets = new HashSet<>();
 
@@ -116,7 +122,7 @@ public final class SiliaWeapon extends AbstractWeapon {
     void setStrike(boolean isStrike) {
         this.isStrike = isStrike;
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.setGlowing(isStrike);
         weapon.setDurability(isStrike ? SiliaWeaponInfo.Resource.EXTENDED : SiliaWeaponInfo.Resource.DEFAULT);
     }
@@ -229,7 +235,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                             ((Movable) target).getMoveModule().knockback(dir);
                         }
 
-                        if (combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
+                        if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 

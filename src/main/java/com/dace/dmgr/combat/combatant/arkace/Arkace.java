@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -121,7 +121,7 @@ public final class Arkace extends Marksman {
         super.onTick(combatUser, i);
 
         if (combatUser.getEntity().isSprinting())
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override

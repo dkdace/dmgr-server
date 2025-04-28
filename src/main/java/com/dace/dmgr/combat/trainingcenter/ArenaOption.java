@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.trainingcenter;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;

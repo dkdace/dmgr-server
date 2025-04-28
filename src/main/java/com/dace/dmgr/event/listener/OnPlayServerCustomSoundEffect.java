@@ -3,7 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.comphenix.packetwrapper.WrapperPlayServerCustomSoundEffect;
 import com.comphenix.protocol.events.PacketEvent;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
 import lombok.Getter;

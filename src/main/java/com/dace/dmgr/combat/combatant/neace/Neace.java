@@ -9,9 +9,9 @@ import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
@@ -121,12 +121,12 @@ public final class Neace extends Support {
         new NeaceTarget(combatUser).shot();
 
         if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        victim.getSkill(NeaceP1Info.getInstance()).cancel();
+        victim.getActionManager().getSkill(NeaceP1Info.getInstance()).cancel();
     }
 
     @Override
@@ -139,7 +139,7 @@ public final class Neace extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = combatUser.getSkill(NeaceUltInfo.getInstance());
+        NeaceUlt skill4 = combatUser.getActionManager().getSkill(NeaceUltInfo.getInstance());
         return skill4.isDurationFinished() || skill4.isEnabled();
     }
 

@@ -7,7 +7,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.Target;
@@ -47,7 +51,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -80,7 +84,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                     blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.Heal.BLOCK_RESET_DELAY);
 
                 String title = MessageFormat.format("{0} : {1}§e{2}",
-                        (combatUser.getSkill(NeaceA2Info.getInstance()).isDurationFinished()
+                        (combatUser.getActionManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished()
                                 ? MessageFormat.format("§a{0} §f치유 중", TextIcon.HEAL)
                                 : MessageFormat.format("§b{0} §f강화 중", TextIcon.DAMAGE_INCREASE)),
                         (target instanceof CombatUser ? ((CombatUser) target).getCombatantType().getCombatant().getIcon() + " " : ""),
@@ -104,7 +108,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
      * @param target 치유 대상
      */
     void healTarget(@NonNull Healable target) {
-        NeaceA2 skill2 = combatUser.getSkill(NeaceA2Info.getInstance());
+        NeaceA2 skill2 = combatUser.getActionManager().getSkill(NeaceA2Info.getInstance());
         boolean isAmplifying = !skill2.isDurationFinished();
 
         if (isAmplifying)

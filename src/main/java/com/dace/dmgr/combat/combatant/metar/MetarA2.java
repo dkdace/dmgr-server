@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.skill.MultiSummonable;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
 import com.dace.dmgr.combat.action.skill.module.MultiEntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;

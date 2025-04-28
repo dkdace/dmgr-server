@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.LocationUtil;
@@ -40,7 +41,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         super.onUse(actionKey);
 
         setCooldown();
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);

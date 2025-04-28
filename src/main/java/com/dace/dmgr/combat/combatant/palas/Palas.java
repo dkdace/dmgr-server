@@ -8,9 +8,9 @@ import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
@@ -140,7 +140,7 @@ public final class Palas extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((PalasWeapon) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((PalasWeapon) combatUser.getActionManager().getWeapon()).getAimModule().isAiming();
     }
 
     @Override

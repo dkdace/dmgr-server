@@ -6,7 +6,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -64,7 +68,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA3Info.READY_DURATION);
 
         MetarA3Info.Sounds.USE.play(combatUser.getLocation());

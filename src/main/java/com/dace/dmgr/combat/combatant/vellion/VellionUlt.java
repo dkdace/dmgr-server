@@ -6,10 +6,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
@@ -57,7 +57,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && isDurationFinished()
+                && !combatUser.getActionManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -69,7 +70,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        combatUser.getSkill(VellionP1Info.getInstance()).cancel();
+        combatUser.getActionManager().getSkill(VellionP1Info.getInstance()).cancel();
 
         VellionUltInfo.Sounds.USE.play(combatUser.getLocation());
 
