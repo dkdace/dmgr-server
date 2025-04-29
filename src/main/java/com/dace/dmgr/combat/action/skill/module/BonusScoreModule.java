@@ -40,17 +40,17 @@ public final class BonusScoreModule {
     /**
      * 적 처치 시 실행할 작업으로, 제한시간 안에 적을 처치하면 보너스 점수를 지급한다.
      *
-     * @param victim 피격자
-     * @param score  처치 기여 점수
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
      */
-    public void onKill(@NonNull Damageable victim, int score) {
-        if (skill.isAssistMode() && score >= 100)
+    public void onKill(@NonNull Damageable victim, double contributionScore) {
+        if (skill.isAssistMode() && contributionScore >= 1)
             return;
 
         Timestamp expiration = timeLimitTimestampMap.get(victim);
 
         if (expiration != null && expiration.isAfter(Timestamp.now())) {
-            skill.getCombatUser().addScore(scoreContext, (skill.isAssistMode() ? bonusScore : bonusScore * score / 100.0));
+            skill.getCombatUser().addScore(scoreContext, (skill.isAssistMode() ? bonusScore : bonusScore * contributionScore));
             timeLimitTimestampMap.remove(victim);
         }
     }

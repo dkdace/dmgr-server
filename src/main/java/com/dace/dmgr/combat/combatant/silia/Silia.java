@@ -144,14 +144,14 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
+        super.onKill(attacker, victim, contributionScore, isFinalHit);
 
         if (!victim.isGoalTarget())
             return;
 
-        if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributorElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
-            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
+        if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributionElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
+            attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
 
         ActionManager actionManager = attacker.getActionManager();
 
@@ -162,7 +162,7 @@ public final class Silia extends Scuffler {
         SiliaUlt skillUlt = actionManager.getSkill(SiliaUltInfo.getInstance());
         if (!skillUlt.isDurationFinished()) {
             skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
-            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * score / 100.0);
+            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * contributionScore);
         }
     }
 

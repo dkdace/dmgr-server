@@ -160,14 +160,14 @@ public final class ActionManager {
     /**
      * 적 처치 시 스킬의 보너스 점수 지급을 처리한다.
      *
-     * @param victim 피격자
-     * @param score  처치 기여 점수
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
      */
-    void handleBonusScoreSkill(@NonNull Damageable victim, int score) {
+    void handleBonusScoreSkill(@NonNull Damageable victim, double contributionScore) {
         for (SkillInfo<?> skillInfo : combatUser.getCombatantType().getCombatant().getSkillInfos()) {
             Skill skill = getSkill(skillInfo);
             if (skill instanceof HasBonusScore)
-                ((HasBonusScore) skill).getBonusScoreModule().onKill(victim, score);
+                ((HasBonusScore) skill).getBonusScoreModule().onKill(victim, contributionScore);
         }
     }
 

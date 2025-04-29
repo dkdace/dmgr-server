@@ -47,7 +47,7 @@ public abstract class Vanguard extends Combatant {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         if (victim.isGoalTarget())
             attacker.getStatusEffectModule().clear(false);
     }

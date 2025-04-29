@@ -285,13 +285,13 @@ public abstract class Combatant {
     /**
      * 전투원이 다른 엔티티를 죽였을 때 실행될 작업.
      *
-     * @param attacker   공격자
-     * @param victim     피격자
-     * @param score      처치 기여 점수
-     * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
+     * @param attacker          공격자
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
+     * @param isFinalHit        결정타 여부. 마지막 공격으로 처치 시 결정타
      * @see Combatant#onDeath(CombatUser, Attacker)
      */
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         // 미사용
     }
 
@@ -300,7 +300,7 @@ public abstract class Combatant {
      *
      * @param victim   피격자
      * @param attacker 공격자
-     * @see Combatant#onKill(CombatUser, Damageable, int, boolean)
+     * @see Combatant#onKill(CombatUser, Damageable, double, boolean)
      */
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
         // 미사용

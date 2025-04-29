@@ -34,10 +34,7 @@ import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -129,11 +126,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final CoreManager coreManager;
-
-    /** 처치 기여자별 누적 피해량 관리 인스턴스 */
-    private final KillContributorManager killContributorManager = new KillContributorManager();
+    /** 처치 기여자 관리 인스턴스 */
+    private final KillContributorManager killContributorManager;
     /** 처치 지원자 관리 인스턴스 */
-    private final KillHelperManager killHelperManager = new KillHelperManager();
+    private final KillHelperManager killHelperManager;
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<String, Double>() {
         @Override
@@ -221,6 +217,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.game = gameUser == null ? null : gameUser.getGame();
         this.team = gameUser == null ? null : gameUser.getTeam();
         this.coreManager = new CoreManager(this);
+        this.killContributorManager = new KillContributorManager(this);
+        this.killHelperManager = new KillHelperManager();
+
         this.combatantType = combatantType;
         this.combatant = combatantType.getCombatant();
         this.actionManager = new ActionManager(this);
@@ -469,6 +468,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
+    public int getScore() {
+        return 100;
+    }
+
+    @Override
     public boolean canJump() {
         return combatant.canJump(this);
     }
@@ -532,8 +536,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             attacker = ((SummonEntity<?>) attacker).getOwner();
 
         if (attacker != null && this != attacker) {
-            if (attacker instanceof CombatUser)
-                killContributorManager.addDamage((CombatUser) attacker, damage);
+            if (attacker instanceof CombatUser) {
+                killContributorManager.addContributor((CombatUser) attacker, damage);
+                ((CombatUser) attacker).killHelperManager.onAttack(this, damage);
+            }
 
             if (gameUser != null)
                 gameUser.addDefend(reducedDamage);
@@ -576,21 +582,42 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         playKillEffect();
 
-        int score = victim instanceof CombatUser ? ((CombatUser) victim).killContributorManager.getScore(this) : victim.getScore();
-        int contributeScore = victim instanceof CombatUser ? score : 100;
+        double contributionScore = victim instanceof CombatUser
+                ? ((CombatUser) victim).killContributorManager.getContributionScore(this)
+                : 1;
+        combatant.onKill(this, victim, contributionScore, true);
 
-        combatant.onKill(this, victim, contributeScore, true);
+        int score = victim instanceof CombatUser
+                ? ((CombatUser) victim).killContributorManager.getScore(this)
+                : victim.getScore();
         addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), score);
 
-        if (!victim.isGoalTarget())
-            return;
+        if (victim.isGoalTarget())
+            onKillGoalTarget(victim, contributionScore);
+    }
 
+    /**
+     * 엔티티를 처치했을 때 효과를 재생한다.
+     */
+    private void playKillEffect() {
+        user.sendTitle("", "§c" + TextIcon.POISON, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
+        addTask(new DelayTask(() -> Sounds.KILL.play(entity), 2));
+    }
+
+    /**
+     * 목표 처치 대상을 죽였을 때 실행할 작업.
+     *
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
+     */
+    private void onKillGoalTarget(@NonNull Damageable victim, double contributionScore) {
         addScore("결정타", FINAL_HIT_SCORE);
 
-        actionManager.handleBonusScoreSkill(victim, contributeScore);
+        actionManager.handleBonusScoreSkill(victim, contributionScore);
 
         if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
             killStreak = 0;
+
         killStreakTimeLimitTimestamp = Timestamp.now().plus(KILL_STREAK_TIME_LIMIT);
         if (killStreak++ > 0)
             addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
@@ -610,44 +637,25 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 엔티티를 처치했을 때 효과를 재생한다.
-     */
-    private void playKillEffect() {
-        user.sendTitle("", "§c" + TextIcon.POISON, Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
-        addTask(new DelayTask(() -> Sounds.KILL.play(entity), 2));
-    }
-
-    /**
-     * 사망 시 킬로그 보스바를 표시한다.
-     */
-    private void broadcastPlayerKillBossBar() {
-        if (game == null)
-            return;
-
-        String attackerNames = killContributorManager.getDamageMap().keySet().stream()
-                .map(CombatUser::getPlayerKillBossBarName)
-                .collect(Collectors.joining(", "));
-        String victimName = getPlayerKillBossBarName();
-        BossBarDisplay killBossBar = new BossBarDisplay(MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName));
-
-        game.addBossBar(killBossBar);
-
-        new DelayTask(() -> {
-            if (!game.isFinished())
-                game.removeBossBar(killBossBar);
-        }, KILL_LOG_DISPLAY_DURATION.toTicks());
-    }
-
-    /**
-     * 킬로그 보스바에 사용되는 플레이어의 이름을 반환한다.
+     * 적 플레이어의 처치를 기여했을 때 실행할 작업.
      *
-     * @return 이름
+     * @param victim 피격자
      */
-    @NonNull
-    private String getPlayerKillBossBarName() {
-        ChatColor color = team == null ? ChatColor.WHITE : team.getType().getColor();
+    private void onAssist(@NonNull CombatUser victim) {
+        if (victim.fallZoneTimestamp.isAfter(Timestamp.now()))
+            addScore("추락사", FALL_ZONE_KILL_SCORE);
 
-        return MessageFormat.format("§f{0}{1}§l {2}", combatant.getIcon(), color, name);
+        int score = victim.killContributorManager.getScore(this);
+
+        combatant.onKill(this, victim, score, false);
+
+        addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
+        actionManager.handleBonusScoreSkill(victim, score);
+
+        playKillEffect();
+
+        if (gameUser != null)
+            gameUser.onKill(false);
     }
 
     /**
@@ -693,32 +701,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         combatant.getSpecies().getReaction().onDeath(this);
         combatant.onDeath(this, attacker);
 
-        killContributorManager.getDamageMap().keySet().forEach(target -> {
-            target.killHelperManager.getScoreInfoMap().forEach((targetAttacker, scoreInfo) -> {
-                for (double score : scoreInfo.getScores())
-                    targetAttacker.addScore("처치 지원", score);
-            });
+        broadcastKillLogBossBar();
+        killContributorManager.onDeath(attacker);
 
-            if (fallZoneTimestamp.isAfter(Timestamp.now()))
-                target.addScore("추락사", FALL_ZONE_KILL_SCORE);
-
-            if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
-                int score = killContributorManager.getScore(target);
-
-                target.combatant.onKill(target, this, score, false);
-                target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-                target.getActionManager().handleBonusScoreSkill(this, score);
-
-                target.playKillEffect();
-
-                if (target.getGameUser() != null)
-                    target.getGameUser().onKill(false);
-            }
-        });
-
-        broadcastPlayerKillBossBar();
-
-        killContributorManager.clear();
         statusEffectModule.clear();
         damageModule.setHealth(damageModule.getMaxHealth());
         damageModule.clearShields();
@@ -729,6 +714,37 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             gameUser.onDeath();
 
         respawn();
+    }
+
+    /**
+     * 사망 시 킬로그 보스바를 표시한다.
+     */
+    private void broadcastKillLogBossBar() {
+        if (game == null)
+            return;
+
+        String attackerNames = killContributorManager.getDamageInfoMap().keySet().stream()
+                .map(CombatUser::getKillLogPlayerName)
+                .collect(Collectors.joining(", "));
+        String victimName = getKillLogPlayerName();
+        BossBarDisplay killBossBar = new BossBarDisplay(MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName));
+
+        game.addBossBar(killBossBar);
+
+        new DelayTask(() -> {
+            if (!game.isFinished())
+                game.removeBossBar(killBossBar);
+        }, KILL_LOG_DISPLAY_DURATION.toTicks());
+    }
+
+    /**
+     * 킬로그 보스바에 사용되는 플레이어의 이름을 반환한다.
+     *
+     * @return 이름
+     */
+    @NonNull
+    private String getKillLogPlayerName() {
+        return MessageFormat.format("§f{0}{1}§l {2}", combatant.getIcon(), Validate.notNull(team).getType().getColor(), name);
     }
 
     /**
@@ -777,7 +793,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @return 첫 공격 후 경과한 시간
      */
     @NonNull
-    public Timespan getKillContributorElapsedTime(@NonNull CombatUser attacker) {
+    public Timespan getKillContributionElapsedTime(@NonNull CombatUser attacker) {
         return killContributorManager.getElapsedTime(attacker);
     }
 
@@ -1161,35 +1177,30 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 처치 기여자별 누적 피해량을 관리하는 클래스.
+     * 처치 기여자를 관리하는 클래스.
      */
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static final class KillContributorManager {
-        /** 처치 지원 점수 비율 */
-        private static final double KILL_ASSIST_SCORE_RATIO = 0.2;
-        /** 킬 기여자별 누적 피해량 목록. 처치 점수 분배에 사용함 (킬 기여자 : 누적 피해량 정보) */
-        private final WeakHashMap<CombatUser, DamageInfo> damageMap = new WeakHashMap<>();
+        /** 플레이어 인스턴스 */
+        private final CombatUser combatUser;
+        /** 처치 기여자별 누적 피해량 목록. 처치 점수 분배에 사용함 (처치 기여자 : 누적 피해량 정보) */
+        private final WeakHashMap<CombatUser, DamageInfo> damageInfoMap = new WeakHashMap<>();
 
         @NonNull
-        private WeakHashMap<CombatUser, DamageInfo> getDamageMap() {
-            damageMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
-            return damageMap;
+        private WeakHashMap<CombatUser, DamageInfo> getDamageInfoMap() {
+            damageInfoMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
+            return damageInfoMap;
         }
 
         /**
-         * 지정한 공격자의 누적 피해량을 추가한다.
+         * 지정한 공격자를 처치 기여자로 추가한다.
          *
          * @param attacker 공격자
          * @param damage   피해량
          */
-        private void addDamage(@NonNull CombatUser attacker, double damage) {
-            DamageInfo damageInfo = getDamageMap().computeIfAbsent(attacker, k -> new DamageInfo());
+        private void addContributor(@NonNull CombatUser attacker, double damage) {
+            DamageInfo damageInfo = getDamageInfoMap().computeIfAbsent(attacker, k -> new DamageInfo());
             damageInfo.damage += damage;
-
-            attacker.killHelperManager.getScoreInfoMap().keySet().forEach(target -> {
-                DamageInfo targetDamageInfo = damageMap.computeIfAbsent(attacker, k -> new DamageInfo());
-                targetDamageInfo.damage += damage * KILL_ASSIST_SCORE_RATIO;
-            });
         }
 
         /**
@@ -1200,28 +1211,47 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          */
         @NonNull
         private Timespan getElapsedTime(@NonNull CombatUser attacker) {
-            DamageInfo damageInfo = getDamageMap().get(attacker);
+            DamageInfo damageInfo = getDamageInfoMap().get(attacker);
             return damageInfo == null ? Timespan.ZERO : damageInfo.startTime.until(Timestamp.now());
+        }
+
+        /**
+         * 지정한 공격자의 처치 기여도를 반환한다.
+         *
+         * @param attacker 공격자
+         * @return {@code attacker}의 점수 / 모든 공격자의 점수 합
+         */
+        private double getContributionScore(@NonNull CombatUser attacker) {
+            DamageInfo damageInfo = getDamageInfoMap().get(attacker);
+            double total = damageInfoMap.values().stream().mapToDouble(targetDamageInfo -> targetDamageInfo.damage).sum();
+
+            return damageInfo == null ? 0 : damageInfo.damage / total;
         }
 
         /**
          * 지정한 공격자의 처치 기여 점수를 반환한다.
          *
          * @param attacker 공격자
-         * @return {@code attacker}의 점수 / 모든 공격자의 점수 합×100
+         * @return {@link KillContributorManager#getContributionScore(CombatUser)} × {@link CombatUser#getScore()}
          */
         private int getScore(@NonNull CombatUser attacker) {
-            DamageInfo damageInfo = getDamageMap().get(attacker);
-            double total = damageMap.values().stream().mapToDouble(targetDamageInfo -> targetDamageInfo.damage).sum();
-
-            return (int) Math.round(damageInfo == null ? 0 : (damageInfo.damage / total * 100));
+            return (int) Math.round(getContributionScore(attacker) * combatUser.getScore());
         }
 
         /**
-         * 킬 기여자 목록을 초기화한다.
+         * 사망 시 처치 기여자들의 처치 기여를 처리한다.
+         *
+         * @param attacker 공격자
          */
-        private void clear() {
-            damageMap.clear();
+        private void onDeath(@Nullable Attacker attacker) {
+            getDamageInfoMap().keySet().forEach(target -> {
+                target.killHelperManager.onAssist();
+
+                if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker))
+                    target.onAssist(combatUser);
+            });
+
+            damageInfoMap.clear();
         }
 
         /**
@@ -1252,6 +1282,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NoArgsConstructor
     private static final class KillHelperManager {
+        /** 처치 지원 점수 비율 */
+        private static final double ASSIST_SCORE_RATIO = 0.2;
         /** 처치 지원자별 지원 점수 목록 (지원자 : 지원 점수 정보) */
         private final WeakHashMap<CombatUser, ScoreInfo> scoreInfoMap = new WeakHashMap<>();
 
@@ -1262,7 +1294,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         /**
-         * 지정한 처치 지원자의 지원 점수를 추가한다.
+         * 지정한 플레이어를 처치 지원자로 추가한다.
          *
          * @param helper     지원자
          * @param action     사용한 동작
@@ -1272,6 +1304,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private void addHelper(@NonNull CombatUser helper, @NonNull Action action, double score, @NonNull Timestamp expiration) {
             ScoreInfo scoreInfo = scoreInfoMap.computeIfAbsent(helper, k -> new ScoreInfo());
             scoreInfo.scoreMap.put(action, Pair.of(score, expiration));
+        }
+
+        /**
+         * 공격 시 지원자들을 적(피격자)의 처치 기여자로 추가한다.
+         *
+         * @param victim 피격자
+         * @param damage 피해량
+         */
+        private void onAttack(@NonNull CombatUser victim, double damage) {
+            getScoreInfoMap().keySet().forEach(target -> victim.killContributorManager.addContributor(target, damage * ASSIST_SCORE_RATIO));
+        }
+
+        /**
+         * 적 처치 기여 시 지원자들에게 점수를 지급한다.
+         */
+        private void onAssist() {
+            getScoreInfoMap().forEach((targetAttacker, scoreInfo) -> {
+                for (double score : scoreInfo.getScores())
+                    targetAttacker.addScore("처치 지원", score);
+            });
         }
 
         /**
