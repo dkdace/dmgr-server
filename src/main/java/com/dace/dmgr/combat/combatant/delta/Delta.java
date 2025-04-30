@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.delta;
 
 import com.dace.dmgr.combat.action.info.*;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Controller;
 import com.dace.dmgr.combat.combatant.Role;
+import com.dace.dmgr.combat.combatant.arkace.ArkaceUltInfo;
 import com.dace.dmgr.combat.combatant.vellion.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,7 +25,7 @@ public final class Delta extends Controller {
     private static final Delta instance = new Delta();
 
     private Delta() {
-        super(Role.CONTROLLER, "델타", "데이드리머", "DVDelta", '\u32DA', 5, 1024, 1.0, 1.0);
+        super(Role.CONTROLLER, "델타", "데이드리머", "DVDelta", Species.ROBOT, '\u32DA', 5, 1024, 1.0, 1.0);
     }
 
     @Override
@@ -73,7 +73,7 @@ public final class Delta extends Controller {
     }
 
     @Override
-    public @NonNull String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public @NonNull String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
 //            case NO_7:    // todo
 //                return new String[] {
@@ -94,7 +94,7 @@ public final class Delta extends Controller {
     }
 
     @Override
-    public @NonNull String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public @NonNull String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
 //            case NO_7:
             case METAR:
@@ -106,11 +106,6 @@ public final class Delta extends Controller {
                         "두고 보시죠. 저는 계속 학습하고 있습니다."
                 };
         }
-    }
-
-    @Override
-    public @NonNull Combatant.Species getSpecies() {
-        return Species.ROBOT;
     }
 
     @Override
@@ -138,6 +133,6 @@ public final class Delta extends Controller {
 
     @Override
     public @NonNull UltimateSkillInfo<?> getUltimateSkillInfo() {
-        return null;
+        return ArkaceUltInfo.getInstance(); // todo
     }
 }
