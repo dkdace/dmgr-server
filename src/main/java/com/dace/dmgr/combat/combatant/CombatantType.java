@@ -4,6 +4,7 @@ import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.combatant.arkace.Arkace;
 import com.dace.dmgr.combat.combatant.ched.Ched;
+import com.dace.dmgr.combat.combatant.delta.Delta;
 import com.dace.dmgr.combat.combatant.inferno.Inferno;
 import com.dace.dmgr.combat.combatant.jager.Jager;
 import com.dace.dmgr.combat.combatant.magritta.Magritta;
@@ -51,7 +52,8 @@ public enum CombatantType {
     NEACE(Neace.getInstance()),
     PALAS(Palas.getInstance()),
 
-    VELLION(Vellion.getInstance());
+    VELLION(Vellion.getInstance()),
+    DELTA(Delta.getInstance());
 
     /** 전투원 정보 */
     @NonNull

@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
+import com.dace.dmgr.combat.combatant.delta.DeltaT1;
 import com.dace.dmgr.combat.combatant.jager.JagerT1;
 import com.dace.dmgr.combat.combatant.magritta.MagrittaT1;
 import com.dace.dmgr.combat.combatant.neace.NeaceA1;
@@ -52,6 +53,8 @@ public abstract class ValueStatusEffect extends StatusEffect {
         public static final Type<JagerT1.FreezeValue> FREEZE;
         /** 파쇄 */
         public static final Type<MagrittaT1.ShreddingValue> SHREDDING;
+        /** 글리치 */
+        public static final Type<DeltaT1.GlitchValue> GLITCH;
         /** 상태 변수 종류 목록 */
         private static final Type<?>[] values = new Type[3];
 
@@ -59,6 +62,7 @@ public abstract class ValueStatusEffect extends StatusEffect {
             HEALING_MARK = new Type<>(0, NeaceA1.NeaceA1Mark::new);
             FREEZE = new Type<>(1, JagerT1.FreezeValue::new);
             SHREDDING = new Type<>(2, MagrittaT1.ShreddingValue::new);
+            GLITCH = new Type<>(3, DeltaT1.GlitchValue::new);
         }
 
         /** 상태 효과 반환에 실행할 작업 */
