@@ -38,7 +38,9 @@ public final class DeltaWeaponInfo extends WeaponInfo<DeltaWeapon> {
                         new ActionInfoLore.NamedSection("광자 투사기", ActionInfoLore.Section
                                 .builder("바라보는 적에게 광선을 고정하여 지속적으로 <:DAMAGE:고정 피해>를 입히고 글리치를 충전합니다. " +
                                         "글리치에 비례하여 피해량이 증가합니다.")
-                                .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, BASE_DAMAGE_PER_SECOND)   // todo: variable per seconds
+                                .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_PER_SECOND,
+                                        BASE_DAMAGE_PER_SECOND,
+                                        BASE_DAMAGE_PER_SECOND + DeltaT1Info.MAX * GLITCH_DAMAGE_AMPLIFIER)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build())));
 

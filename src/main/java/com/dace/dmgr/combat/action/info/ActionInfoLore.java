@@ -300,7 +300,9 @@ public final class ActionInfoLore {
             /** 시간 및 시간당 값. 지속시간과 초당 피해량 등 */
             TIME_WITH_PER_SECOND("{0}초 / {1}/초"),
             /** 가변 시간 및 시간당 값. 거리별 지속시간과 초당 피해량 등 */
-            VARIABLE_TIME_WITH_PER_SECOND("{0}초 ~ {1}초 / {2}/초");
+            VARIABLE_TIME_WITH_PER_SECOND("{0}초 ~ {1}초 / {2}/초"),
+            /** 가변 시간당 값 */
+            VARIABLE_PER_SECOND("{0}/초 ~ {1}/초");
 
             /** 문자열 패턴 */
             private final String pattern;
