@@ -467,14 +467,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
-        isUlt = combatant.onAttack(this, victim, damage, isCrit) && isUlt;
+        combatant.onAttack(this, victim, damage, isCrit);
+
         if (this == victim)
             return;
 
         playAttackEffect(isCrit);
 
         if (victim.isGoalTarget()) {
-            if (isUlt)
+            if (isUlt && combatant.canChargeUlt(this))
                 addUltGauge(damage);
 
             if (coreManager.has(Core.HEALTH_DRAIN))
@@ -532,10 +533,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
-        isUlt = combatant.onGiveHeal(this, target, amount) && actionManager.getSkill(combatant.getUltimateSkillInfo()).isDurationFinished()
-                && isUlt;
+        combatant.onGiveHeal(this, target, amount);
 
-        if (isUlt) {
+        if (isUlt && combatant.canChargeUlt(this)) {
             double ultAmount = amount;
             if (target instanceof CombatUser && ((CombatUser) target).selfHarmDamage > 0)
                 ultAmount = Math.max(0, amount - ((CombatUser) target).selfHarmDamage);

@@ -65,11 +65,9 @@ public abstract class Support extends Combatant {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target)
             provider.getActionManager().getTrait(RoleTrait2Info.instance).lastGiveHealTimestamp = Timestamp.now();
-
-        return true;
     }
 
     @Override

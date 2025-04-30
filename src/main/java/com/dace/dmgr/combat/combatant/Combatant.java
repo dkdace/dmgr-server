@@ -305,11 +305,10 @@ public abstract class Combatant {
      * @param victim   피격자
      * @param damage   피해량
      * @param isCrit   치명타 여부
-     * @return 궁극기 충전 여부
      * @see Combatant#onDamage(CombatUser, Attacker, double, Location, boolean)
      */
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        return true;
+    public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
+        // 미사용
     }
 
     /**
@@ -334,11 +333,10 @@ public abstract class Combatant {
      * @param provider 제공자
      * @param target   수급자
      * @param amount   치유량
-     * @return 궁극기 충전 여부
      * @see Combatant#onTakeHeal(CombatUser, Healer, double)
      */
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        return true;
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        // 미사용
     }
 
     /**
@@ -424,6 +422,16 @@ public abstract class Combatant {
      * @return 점프 가능 여부
      */
     public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    /**
+     * 전투원이 공격 및 치유를 통해 궁극기 게이지를 충전할 수 있는지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 궁극기 충전 가능 여부
+     */
+    public boolean canChargeUlt(@NonNull CombatUser combatUser) {
         return true;
     }
 

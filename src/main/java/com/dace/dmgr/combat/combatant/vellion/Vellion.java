@@ -116,22 +116,19 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (attacker != victim && victim.isCreature()) {
-            ActionManager actionManager = attacker.getActionManager();
-            actionManager.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
-            actionManager.useAction(ActionKey.PERIODIC_1);
-        }
+    public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
+        if (attacker == victim || !victim.isCreature())
+            return;
 
-        return true;
+        ActionManager actionManager = attacker.getActionManager();
+        actionManager.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
+        actionManager.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target && target.isGoalTarget())
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
-
-        return true;
     }
 
     @Override
