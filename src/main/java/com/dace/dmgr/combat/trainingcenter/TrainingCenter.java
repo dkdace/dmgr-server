@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.trainingcenter;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.FunctionalBlock;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CooldownBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.*;
 import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.MovingBehavior;
@@ -118,7 +118,7 @@ public final class TrainingCenter {
     /**
      * 디버프 실험 블록 클래스.
      */
-    private static final class EffectTestBlock extends FunctionalBlock.CooldownBlock {
+    private static final class EffectTestBlock extends CooldownBlock {
         /** 디버프 실험 블록 설정 */
         private static final GeneralConfig.TrainingConfig.EffectTestBlockConfig CONFIG = TrainingCenter.CONFIG.getEffectTestBlockConfig();
         /** 블록 위치별 디버프 적용에 실행할 작업의 목록 (위치 : 디버프 적용에 실행할 작업) */

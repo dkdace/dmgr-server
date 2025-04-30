@@ -4,7 +4,6 @@ import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.*;
 import com.dace.dmgr.combat.FreeCombat;
-import com.dace.dmgr.combat.FunctionalBlock;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.SkillInfo;
