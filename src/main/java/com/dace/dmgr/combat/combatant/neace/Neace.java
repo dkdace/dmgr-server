@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -35,7 +34,7 @@ public final class Neace extends Support {
     private static final Neace instance = new Neace();
 
     private Neace() {
-        super(null, "니스", "평화주의자", "DVNis", '\u32D5', 1, 1000, 1.0, 1.0);
+        super(null, "니스", "평화주의자", "DVNis", Species.HUMAN, '\u32D5', 1, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -109,12 +108,6 @@ public final class Neace extends Support {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -126,11 +119,14 @@ public final class Neace extends Support {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
+        super.onDamage(victim, attacker, damage, location, isCrit);
         victim.getActionManager().getSkill(NeaceP1Info.getInstance()).cancel();
     }
 
     @Override
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        super.onGiveHeal(provider, target, amount);
+
         if (provider != target && target.isGoalTarget())
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 

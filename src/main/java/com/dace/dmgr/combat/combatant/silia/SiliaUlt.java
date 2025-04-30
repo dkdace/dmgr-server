@@ -60,8 +60,7 @@ public final class SiliaUlt extends UltimateSkill {
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
             actionManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
-
-            weapon.setStrike(true);
+            actionManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
             weapon.setVisible(true);
 
             SiliaUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
@@ -75,7 +74,7 @@ public final class SiliaUlt extends UltimateSkill {
         isEnabled = false;
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        ((SiliaWeapon) combatUser.getActionManager().getWeapon()).setStrike(false);
+        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
     }
 
     @Override

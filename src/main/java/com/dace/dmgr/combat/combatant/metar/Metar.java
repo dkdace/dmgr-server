@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
@@ -33,7 +32,7 @@ public final class Metar extends Guardian {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7).pitch(0.85).pitchVariance(0.1).build());
 
     private Metar() {
-        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "DVMetar", '\u32DA', 2, 2500, 0.8, 1.8);
+        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "DVMetar", Species.ROBOT, '\u32DA', 2, 2500, 0.8, 1.8);
     }
 
     @Override
@@ -103,13 +102,9 @@ public final class Metar extends Guardian {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.ROBOT;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (combatUser.getEntity().isSneaking())
             combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }

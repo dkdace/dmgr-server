@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
@@ -26,7 +25,7 @@ public final class Magritta extends Scuffler {
     private static final Magritta instance = new Magritta();
 
     private Magritta() {
-        super(null, "마그리타", "방화광", "DVMagrita", '\u32D8', 2, 1200, 1.0, 1.0);
+        super(null, "마그리타", "방화광", "DVMagrita", Species.HUMAN, '\u32D8', 2, 1200, 1.0, 1.0);
     }
 
     @Override
@@ -113,13 +112,9 @@ public final class Magritta extends Scuffler {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
             combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }

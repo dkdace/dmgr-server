@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -25,7 +24,7 @@ public final class Arkace extends Marksman {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super(null, "아케이스", "슈퍼 솔저", "DVArkace", '\u32D0', 1, 1000, 1.0, 1.0);
+        super(null, "아케이스", "슈퍼 솔저", "DVArkace", Species.HUMAN, '\u32D0', 1, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -108,12 +107,6 @@ public final class Arkace extends Marksman {
                 "운수 한 번... 안 좋은 날이군...",
                 "여기서... 끝인 건가..."
         };
-    }
-
-    @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
     }
 
     @Override

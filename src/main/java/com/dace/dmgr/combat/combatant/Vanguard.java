@@ -27,15 +27,16 @@ public abstract class Vanguard extends Combatant {
      * @param name             이름
      * @param nickname         별명
      * @param skinName         스킨 이름
+     * @param species          종족 유형
      * @param icon             전투원 아이콘
      * @param difficulty       난이도
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty,
-                       int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, nickname, skinName, Role.VANGUARD, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
+    protected Vanguard(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, @NonNull Species species,
+                       char icon, int difficulty, int health, double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.VANGUARD, subRole, species, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
@@ -59,7 +60,7 @@ public abstract class Vanguard extends Combatant {
     }
 
     /**
-     * 특성 1번 클래스.
+     * 특성 1번 정보 클래스.
      */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 상태 효과 저항 */
@@ -80,7 +81,7 @@ public abstract class Vanguard extends Combatant {
     }
 
     /**
-     * 특성 2번 클래스.
+     * 특성 2번 정보 클래스.
      */
     private static final class RoleTrait2Info extends TraitInfo {
         private static final RoleTrait2Info instance = new RoleTrait2Info();

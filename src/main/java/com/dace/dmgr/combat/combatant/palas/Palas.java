@@ -4,7 +4,6 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
@@ -32,7 +31,7 @@ public final class Palas extends Support {
     private static final Palas instance = new Palas();
 
     private Palas() {
-        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", '\u32D9', 4, 1000, 1.0, 1.0);
+        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", Species.HUMAN, '\u32D9', 4, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -118,12 +117,6 @@ public final class Palas extends Support {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -132,6 +125,8 @@ public final class Palas extends Support {
 
     @Override
     public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        super.onGiveHeal(provider, target, amount);
+
         if (provider != target && target.isGoalTarget())
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
 

@@ -3,7 +3,10 @@ package com.dace.dmgr.combat.entity.combatuser;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.MeleeAttackAction;
+import com.dace.dmgr.combat.action.Trait;
+import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.action.info.SkillInfo;
+import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
@@ -32,6 +35,8 @@ public final class ActionManager {
 
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작 목록) */
     private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
+    /** 동적 특성 목록 (동적 특성 정보 : 특성) */
+    private final HashMap<DynamicTraitInfo<?>, Trait> dynamicTraitMap = new HashMap<>();
     /** 스킬 목록 (스킬 정보 : 스킬) */
     private final HashMap<SkillInfo<?>, Skill> skillMap = new HashMap<>();
     /** 플레이어 인스턴스 */
@@ -59,6 +64,13 @@ public final class ActionManager {
         for (ActionKey actionKey : weapon.getDefaultActionKeys())
             actionMap.get(actionKey).add(weapon);
 
+        for (TraitInfo traitInfo : combatant.getTraitInfos()) {
+            if (traitInfo instanceof DynamicTraitInfo) {
+                Trait trait = ((DynamicTraitInfo<?>) traitInfo).createTrait(combatUser);
+                dynamicTraitMap.put((DynamicTraitInfo<?>) traitInfo, trait);
+            }
+        }
+
         for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
             Skill skill = skillInfo.createSkill(combatUser);
             skillMap.put(skillInfo, skill);
@@ -66,6 +78,20 @@ public final class ActionManager {
             for (ActionKey actionKey : skill.getDefaultActionKeys())
                 actionMap.get(actionKey).add(skill);
         }
+    }
+
+    /**
+     * 지정한 동적 특성 정보에 해당하는 특성을 반환한다.
+     *
+     * @param dynamicTraitInfo 동적 특성 정보
+     * @param <T>              {@link Trait}을 상속받는 스킬
+     * @return 특성 인스턴스
+     * @throws NullPointerException 해당하는 특성이 존재하지 않으면 발생
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public <T extends Trait> T getTrait(@NonNull DynamicTraitInfo<T> dynamicTraitInfo) {
+        return Validate.notNull((T) dynamicTraitMap.get(dynamicTraitInfo), "일치하는 특성이 존재하지 않음");
     }
 
     /**

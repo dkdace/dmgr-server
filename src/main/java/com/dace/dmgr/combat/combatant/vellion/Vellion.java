@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Controller;
 import com.dace.dmgr.combat.combatant.Role;
@@ -33,7 +32,7 @@ public final class Vellion extends Controller {
     private static final Vellion instance = new Vellion();
 
     private Vellion() {
-        super(Role.SUPPORT, "벨리온", "흑마법사", "DVVellion", '\u32D6', 3, 1000, 1.0, 1.0);
+        super(Role.SUPPORT, "벨리온", "흑마법사", "DVVellion", Species.HUMAN, '\u32D6', 3, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -114,12 +113,6 @@ public final class Vellion extends Controller {
                 "안돼... 안돼, 아직 계획이..!",
                 "망할...이 무식한 자식들!"
         };
-    }
-
-    @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
     }
 
     @Override

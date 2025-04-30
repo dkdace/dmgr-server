@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
@@ -55,6 +56,9 @@ public abstract class Combatant {
     /** 부 역할군 */
     @Nullable
     private final Role subRole;
+    /** 종족 유형 */
+    @NonNull
+    private final Species species;
     /** 전투원 아이콘 */
     private final char icon;
     /** 난이도 */
@@ -262,14 +266,6 @@ public abstract class Combatant {
     }
 
     /**
-     * 전투원의 종족 유형을 반환한다.
-     *
-     * @return 종족 유형
-     */
-    @NonNull
-    public abstract Combatant.Species getSpecies();
-
-    /**
      * 전투원을 선택했을 때 실행할 작업.
      *
      * @param combatUser 대상 플레이어
@@ -284,8 +280,10 @@ public abstract class Combatant {
      * @param combatUser 대상 플레이어
      * @param i          인덱스
      */
+    @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        // 미사용
+        if (!combatUser.isDead() && combatUser.getDamageModule().isLowHealth())
+            species.getReaction().onTickLowHealth(combatUser);
     }
 
     /**
@@ -324,8 +322,10 @@ public abstract class Combatant {
      * @param isCrit   치명타 여부
      * @see Combatant#onAttack(CombatUser, Damageable, double, boolean)
      */
+    @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        // 미사용
+        if (victim.getDamageModule().getTotalShield() == 0)
+            species.getReaction().onDamage(victim, damage, location);
     }
 
     /**
@@ -382,8 +382,9 @@ public abstract class Combatant {
      * @param attacker 공격자
      * @see Combatant#onKill(CombatUser, Damageable, double, boolean)
      */
+    @MustBeInvokedByOverriders
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
-        // 미사용
+        species.getReaction().onDeath(victim);
     }
 
     /**
@@ -499,7 +500,7 @@ public abstract class Combatant {
      */
     @AllArgsConstructor
     @Getter
-    public enum Species {
+    protected enum Species {
         /** 인간 */
         HUMAN(new HumanReaction()),
         /** 로봇 */
@@ -512,7 +513,7 @@ public abstract class Combatant {
         /**
          * 종족별 공통된 이벤트 반응을 처리하는 인터페이스.
          */
-        public interface Reaction {
+        private interface Reaction {
             /**
              * 치명상일 때 매 틱마다 실행할 작업.
              *

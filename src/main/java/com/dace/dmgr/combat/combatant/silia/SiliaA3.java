@@ -77,7 +77,7 @@ public final class SiliaA3 extends ChargeableSkill {
         }, this::cancel, 1));
 
         addActionTask(new DelayTask(() -> {
-            ((SiliaWeapon) combatUser.getActionManager().getWeapon()).setStrike(true);
+            combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(true);
             SiliaA3Info.Sounds.ACTIVATE.play(combatUser.getEntity());
         }, SiliaA3Info.ACTIVATE_DURATION.toTicks()));
     }
@@ -94,7 +94,7 @@ public final class SiliaA3 extends ChargeableSkill {
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         damage = 0;
 
-        ((SiliaWeapon) combatUser.getActionManager().getWeapon()).setStrike(false);
+        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
 
         SiliaA3Info.Sounds.DISABLE.play(combatUser.getLocation());
     }

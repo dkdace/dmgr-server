@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
@@ -151,7 +152,7 @@ public interface Action {
      *
      * @return 강제 취소 가능 여부
      * @implSpec {@code true}
-     * @see CombatUser#cancelAction(CombatUser)
+     * @see ActionManager#cancelAction(CombatUser)
      */
     default boolean isCancellable() {
         return true;

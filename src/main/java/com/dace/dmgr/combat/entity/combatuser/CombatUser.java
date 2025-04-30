@@ -183,14 +183,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     @Setter
     private Timestamp fallZoneTimestamp = Timestamp.now();
-    /** 마지막 피격 시점 */
-    @NonNull
-    @Getter
-    private Timestamp lastDamageTimestamp = Timestamp.now();
-    /** 마지막 치유 시점 */
-    @NonNull
-    @Getter
-    private Timestamp lastGiveHealTimestamp = Timestamp.now();
     /** 적 타격 효과음 타임스탬프 */
     private Timestamp hitSoundTimestamp = Timestamp.now();
     /** 연속 처치 제한시간 타임스탬프 */
@@ -374,9 +366,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         FunctionalBlock.use(getLocation().subtract(0, 0.5, 0), this);
         handleFootstep();
 
-        if (damageModule.isLowHealth())
-            combatant.getSpecies().getReaction().onTickLowHealth(this);
-
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
@@ -525,11 +514,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == attacker || attacker == null)
             selfHarmDamage += damage;
 
-        if (damageModule.getTotalShield() == 0)
-            combatant.getSpecies().getReaction().onDamage(this, damage, location);
         combatant.onDamage(this, attacker, damage, location, isCrit);
-
-        lastDamageTimestamp = Timestamp.now();
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
@@ -549,9 +534,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
         isUlt = combatant.onGiveHeal(this, target, amount) && actionManager.getSkill(combatant.getUltimateSkillInfo()).isDurationFinished()
                 && isUlt;
-
-        if (this != target)
-            lastGiveHealTimestamp = Timestamp.now();
 
         if (isUlt) {
             double ultAmount = amount;
@@ -695,7 +677,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         isDead = true;
 
-        combatant.getSpecies().getReaction().onDeath(this);
         combatant.onDeath(this, attacker);
 
         broadcastKillLogBossBar();
@@ -1196,8 +1177,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          * @param damage   피해량
          */
         private void addContributor(@NonNull CombatUser attacker, double damage) {
-            DamageInfo damageInfo = getDamageInfoMap().computeIfAbsent(attacker, k -> new DamageInfo());
-            damageInfo.damage += damage;
+            getDamageInfoMap().computeIfAbsent(attacker, k -> new DamageInfo()).update(damage);
         }
 
         /**
@@ -1256,12 +1236,25 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          */
         @NoArgsConstructor
         private static final class DamageInfo {
+            /** 처치 기여 제한시간 */
+            private static final Timespan KILL_CONTRIBUTION_TIME_LIMIT = Timespan.ofSeconds(10);
+
             /** 시작 시점 */
             private final Timestamp startTime = Timestamp.now();
             /** 종료 시점 */
-            private final Timestamp expiration = startTime.plus(Timespan.ofSeconds(10));
+            private Timestamp expiration = Timestamp.now();
             /** 누적 피해량 */
             private double damage = 0;
+
+            /**
+             * 처치 기여 제한시간과 누적 피해량을 업데이트한다.
+             *
+             * @param damage 피해량
+             */
+            private void update(double damage) {
+                this.expiration = startTime.plus(KILL_CONTRIBUTION_TIME_LIMIT);
+                this.damage += damage;
+            }
 
             /**
              * 처치 기여 제한시간이 끝났는지 확인한다.

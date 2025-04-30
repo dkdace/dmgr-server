@@ -6,7 +6,7 @@ import lombok.NonNull;
 /**
  * 특성 정보를 관리하는 클래스.
  */
-public class TraitInfo extends ActionInfo {
+public abstract class TraitInfo extends ActionInfo {
     /** 특성 이름의 접두사 */
     private static final String PREFIX = "§b§l[특성] §3";
 

@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -35,7 +34,7 @@ public final class Inferno extends Vanguard {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build());
 
     private Inferno() {
-        super(null, "인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
+        super(null, "인페르노", "화염 돌격병", "DVInferno", Species.HUMAN, '\u32D7', 1, 2000, 0.9, 1.4);
     }
 
     @Override
@@ -115,13 +114,9 @@ public final class Inferno extends Vanguard {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
             combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
@@ -133,6 +128,8 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
+        super.onDamage(victim, attacker, damage, location, isCrit);
+
         if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 

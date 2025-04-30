@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.ched;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
@@ -26,7 +25,7 @@ public final class Ched extends Marksman {
     private static final Ched instance = new Ched();
 
     private Ched() {
-        super(null, "체드", "화염 궁수", "DVChed", '\u32D4', 4, 1000, 1.1, 1.0);
+        super(null, "체드", "화염 궁수", "DVChed", Species.HUMAN, '\u32D4', 4, 1000, 1.1, 1.0);
     }
 
     @Override
@@ -112,12 +111,6 @@ public final class Ched extends Marksman {
                         "이걸로 끝인가..."
                 };
         }
-    }
-
-    @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
     }
 
     @Override

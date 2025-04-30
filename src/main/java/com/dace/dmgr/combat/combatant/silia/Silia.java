@@ -5,7 +5,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -38,7 +37,7 @@ public final class Silia extends Scuffler {
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super(null, "실리아", "고요한 폭풍", "DVSilia", '\u32D1', 4, 1000, 1.0, 1.0);
+        super(null, "실리아", "고요한 폭풍", "DVSilia", Species.HUMAN, '\u32D1', 4, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -117,12 +116,6 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
         if (attacker != victim && victim.isGoalTarget() && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
@@ -132,6 +125,8 @@ public final class Silia extends Scuffler {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
+        super.onDamage(victim, attacker, damage, location, isCrit);
+
         SiliaA3 skill3 = victim.getActionManager().getSkill(SiliaA3Info.getInstance());
         if (skill3.isDurationFinished())
             return;

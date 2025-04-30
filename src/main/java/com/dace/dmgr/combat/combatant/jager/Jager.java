@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.jager;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -28,7 +27,7 @@ public final class Jager extends Marksman {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super(null, "예거", "혹한의 사냥꾼", "DVJager", '\u32D2', 3, 1000, 1.0, 1.0);
+        super(null, "예거", "혹한의 사냥꾼", "DVJager", Species.HUMAN, '\u32D2', 3, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -110,12 +109,6 @@ public final class Jager extends Marksman {
                         "뒤를...부탁하지."
                 };
         }
-    }
-
-    @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
     }
 
     @Override

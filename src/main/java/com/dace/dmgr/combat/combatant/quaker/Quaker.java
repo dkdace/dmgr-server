@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.quaker;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
@@ -34,7 +33,7 @@ public final class Quaker extends Guardian {
             SoundEffect.SoundInfo.builder("new.entity.ravager.step").volume(0.2).pitch(0.8).pitchVariance(0.1).build());
 
     private Quaker() {
-        super(null, "퀘이커", "불굴의 방패", "DVQuaker", '\u32D3', 1, 2500, 0.85, 1.8);
+        super(null, "퀘이커", "불굴의 방패", "DVQuaker", Species.HUMAN, '\u32D3', 1, 2500, 0.85, 1.8);
     }
 
     @Override
@@ -117,12 +116,6 @@ public final class Quaker extends Guardian {
                         "죽어도 항복은 없다!"
                 };
         }
-    }
-
-    @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
     }
 
     @Override
