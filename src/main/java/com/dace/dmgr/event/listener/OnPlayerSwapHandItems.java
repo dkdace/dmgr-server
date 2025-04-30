@@ -3,7 +3,7 @@ package com.dace.dmgr.event.listener;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.combatant.SelectChar;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.trainingcenter.Arena;
 import com.dace.dmgr.combat.trainingcenter.ArenaOption;
 import com.dace.dmgr.combat.trainingcenter.TrainingCenter;
@@ -46,7 +46,7 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
                 return;
             }
 
-            combatUser.useAction(ActionKey.SWAP_HAND);
+            combatUser.getActionManager().useAction(ActionKey.SWAP_HAND);
             return;
         }
 

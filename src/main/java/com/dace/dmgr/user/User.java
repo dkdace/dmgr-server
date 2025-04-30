@@ -1,7 +1,7 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.*;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.listener.OnAsyncPlayerChat;

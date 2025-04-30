@@ -8,7 +8,12 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -59,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && !combatUser.getActionManager().getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -74,7 +79,7 @@ public final class JagerA3 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -108,7 +113,7 @@ public final class JagerA3 extends ActiveSkill {
         isEnabled = false;
 
         setDuration(Timespan.ZERO);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -117,7 +122,7 @@ public final class JagerA3 extends ActiveSkill {
     private void onThrow() {
         forceCancel();
 
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(2));
+        combatUser.getActionManager().getWeapon().setCooldown(Timespan.ofTicks(2));
 
         Location loc = combatUser.getArmLocation(MainHand.RIGHT);
         new JagerA3Projectile().shot(loc);
@@ -233,8 +238,9 @@ public final class JagerA3 extends ActiveSkill {
                 if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
-                    combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
-                    combatUser.useAction(ActionKey.PERIODIC_1);
+                    ActionManager actionManager = combatUser.getActionManager();
+                    actionManager.getSkill(JagerP1Info.getInstance()).setTarget(target);
+                    actionManager.useAction(ActionKey.PERIODIC_1);
 
                     if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);

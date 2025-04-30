@@ -6,10 +6,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
@@ -49,9 +50,10 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
+        ActionManager actionManager = combatUser.getActionManager();
         return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
-                && combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+                && actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -196,7 +198,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);
 
                     if (isUlt && target.isGoalTarget())
-                        combatUser.getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule().addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
+                        combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule()
+                                .addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
                 MagrittaWeaponInfo.Particles.HIT_ENTITY.play(location);

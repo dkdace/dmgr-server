@@ -1,8 +1,8 @@
 package com.dace.dmgr.menu;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.entity.combatuser.Core;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;

@@ -4,13 +4,13 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Controller;
 import com.dace.dmgr.combat.combatant.Role;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -32,7 +32,7 @@ public final class Vellion extends Controller {
     private static final Vellion instance = new Vellion();
 
     private Vellion() {
-        super(Role.SUPPORT, "벨리온", "흑마법사", "DVVellion", '\u32D6', 3, 1000, 1.0, 1.0);
+        super(Role.SUPPORT, "벨리온", "흑마법사", "DVVellion", Species.HUMAN, '\u32D6', 3, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{
@@ -108,7 +108,7 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "안돼... 안돼, 아직 계획이..!",
                 "망할...이 무식한 자식들!"
@@ -116,32 +116,24 @@ public final class Vellion extends Controller {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
+    public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
+        if (attacker == victim || !victim.isCreature())
+            return;
+
+        ActionManager actionManager = attacker.getActionManager();
+        actionManager.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
+        actionManager.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (attacker != victim && victim.isCreature()) {
-            attacker.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
-            attacker.useAction(ActionKey.PERIODIC_1);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target && target.isGoalTarget())
             provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
-
-        return true;
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+        return !combatUser.getActionManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -151,16 +143,20 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        VellionP1 skillp1 = combatUser.getSkill(VellionP1Info.getInstance());
-        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]) && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        VellionP1 skillp1 = actionManager.getSkill(VellionP1Info.getInstance());
+
+        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]) && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        VellionA2 skill2 = combatUser.getSkill(VellionA2Info.getInstance());
-        return combatUser.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled())
-                && combatUser.getSkill(VellionA3Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        VellionA2 skill2 = actionManager.getSkill(VellionA2Info.getInstance());
+
+        return actionManager.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled())
+                && actionManager.getSkill(VellionA3Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

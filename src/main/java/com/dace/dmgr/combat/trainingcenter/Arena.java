@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.trainingcenter;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.dummy.ArenaMeleeDummyBehavior;
 import com.dace.dmgr.combat.entity.temporary.dummy.ArenaRangedDummyBehavior;
 import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;

@@ -4,7 +4,12 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.AccessLevel;
@@ -12,12 +17,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 /**
@@ -48,6 +56,9 @@ public abstract class Combatant {
     /** 부 역할군 */
     @Nullable
     private final Role subRole;
+    /** 종족 유형 */
+    @NonNull
+    private final Species species;
     /** 전투원 아이콘 */
     private final char icon;
     /** 난이도 */
@@ -65,7 +76,7 @@ public abstract class Combatant {
      * @return 치료 요청 대사
      */
     @NonNull
-    public abstract String getReqHealMentLow();
+    protected abstract String getReqHealMentLow();
 
     /**
      * 체력이 절반 이하일 때의 치료 요청 대사를 반환한다.
@@ -73,7 +84,7 @@ public abstract class Combatant {
      * @return 치료 요청 대사
      */
     @NonNull
-    public abstract String getReqHealMentHalf();
+    protected abstract String getReqHealMentHalf();
 
     /**
      * 체력이 충분할 때의 치료 요청 대사를 반환한다.
@@ -81,7 +92,31 @@ public abstract class Combatant {
      * @return 치료 요청 대사
      */
     @NonNull
-    public abstract String getReqHealMentNormal();
+    protected abstract String getReqHealMentNormal();
+
+    /**
+     * 현재 체력에 따른 치료 요청 대사를 반환한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 치료 요청 대사
+     */
+    @NonNull
+    public final String getReqHealMent(@NonNull CombatUser combatUser) {
+        String state;
+        String ment;
+        if (combatUser.getDamageModule().isLowHealth()) {
+            state = "치명상";
+            ment = getReqHealMentLow();
+        } else if (combatUser.getDamageModule().isHalfHealth()) {
+            state = "체력 낮음";
+            ment = getReqHealMentHalf();
+        } else {
+            state = "치료 요청";
+            ment = getReqHealMentNormal();
+        }
+
+        return MessageFormat.format("§7[{0}] §f{1}", state, ment);
+    }
 
     /**
      * 궁극기 게이지가 0~89%일 때의 궁극기 상태 대사를 반환한다.
@@ -89,7 +124,7 @@ public abstract class Combatant {
      * @return 궁극기 상태 대사
      */
     @NonNull
-    public abstract String getUltStateMentLow();
+    protected abstract String getUltStateMentLow();
 
     /**
      * 궁극기 게이지가 90~99%일 때의 궁극기 상태 대사를 반환한다.
@@ -97,7 +132,7 @@ public abstract class Combatant {
      * @return 궁극기 상태 대사
      */
     @NonNull
-    public abstract String getUltStateMentNearFull();
+    protected abstract String getUltStateMentNearFull();
 
     /**
      * 궁극기 게이지가 충전 상태일 때의 궁극기 상태 대사를 반환한다.
@@ -105,7 +140,26 @@ public abstract class Combatant {
      * @return 궁극기 상태 대사
      */
     @NonNull
-    public abstract String getUltStateMentFull();
+    protected abstract String getUltStateMentFull();
+
+    /**
+     * 현재 궁극기 게이지에 따른 궁극기 상태 대사를 반환한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 궁극기 상태 대사
+     */
+    @NonNull
+    public final String getUltStateMent(@NonNull CombatUser combatUser) {
+        String ment;
+        if (combatUser.getUltGaugePercent() < 0.9)
+            ment = getUltStateMentLow();
+        else if (combatUser.getUltGaugePercent() < 1)
+            ment = getUltStateMentNearFull();
+        else
+            ment = getUltStateMentFull();
+
+        return MessageFormat.format("§7[궁극기 {0}%] §f{1}", Math.floor(combatUser.getUltGaugePercent() * 100), ment);
+    }
 
     /**
      * 집결 요청 대사 목록을 반환한다.
@@ -113,7 +167,18 @@ public abstract class Combatant {
      * @return 집결 요청 대사 목록
      */
     @NonNull
-    public abstract String @NonNull [] getReqRallyMents();
+    protected abstract String @NonNull [] getReqRallyMents();
+
+    /**
+     * 무작위 집결 요청 대사를 반환한다.
+     *
+     * @return 집결 요청 대사
+     */
+    @NonNull
+    public final String getReqRallyMent() {
+        String[] ments = getReqRallyMents();
+        return MessageFormat.format("§7[집결 요청] §f{0}", ments[RandomUtils.nextInt(0, ments.length)]);
+    }
 
     /**
      * 궁극기 사용 대사를 반환한다.
@@ -130,7 +195,19 @@ public abstract class Combatant {
      * @return 전투원 처치 대사 목록
      */
     @NonNull
-    public abstract String @NonNull [] getKillMent(@NonNull CombatantType combatantType);
+    protected abstract String @NonNull [] getKillMents(@NonNull CombatantType combatantType);
+
+    /**
+     * 전투원 처치 시 무작위 대사 목록을 반환한다.
+     *
+     * @param combatantType 피격자의 전투원 종류
+     * @return 전투원 처치 대사
+     */
+    @NonNull
+    public final String getKillMent(@NonNull CombatantType combatantType) {
+        String[] ments = getKillMents(combatantType);
+        return ments[RandomUtils.nextInt(0, ments.length)];
+    }
 
     /**
      * 사망 시 대사 목록을 반환한다.
@@ -139,7 +216,19 @@ public abstract class Combatant {
      * @return 전투원 사망 대사 목록
      */
     @NonNull
-    public abstract String @NonNull [] getDeathMent(@NonNull CombatantType combatantType);
+    protected abstract String @NonNull [] getDeathMents(@NonNull CombatantType combatantType);
+
+    /**
+     * 사망 시 무작위 대사 목록을 반환한다.
+     *
+     * @param combatantType 공격자의 전투원 종류
+     * @return 전투원 사망 대사
+     */
+    @NonNull
+    public final String getDeathMent(@NonNull CombatantType combatantType) {
+        String[] ments = getDeathMents(combatantType);
+        return ments[RandomUtils.nextInt(0, ments.length)];
+    }
 
     /**
      * 액션바에 무기 및 스킬 상태를 표시하기 위한 문자열을 반환한다.
@@ -151,7 +240,8 @@ public abstract class Combatant {
     public final String getActionBarString(@NonNull CombatUser combatUser) {
         ArrayList<String> texts = new ArrayList<>();
 
-        Weapon weapon = combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        Weapon weapon = actionManager.getWeapon();
         String weaponText = weapon.getActionBarString();
         if (weaponText != null) {
             texts.add(weaponText);
@@ -167,21 +257,13 @@ public abstract class Combatant {
         }
 
         for (SkillInfo<?> skillInfo : getSkillInfos()) {
-            String actionBarString = combatUser.getSkill(skillInfo).getActionBarString();
+            String actionBarString = actionManager.getSkill(skillInfo).getActionBarString();
             if (actionBarString != null)
                 texts.add(actionBarString);
         }
 
         return String.join("    ", texts);
     }
-
-    /**
-     * 전투원의 종족 유형을 반환한다.
-     *
-     * @return 종족 유형
-     */
-    @NonNull
-    public abstract Combatant.Species getSpecies();
 
     /**
      * 전투원을 선택했을 때 실행할 작업.
@@ -198,8 +280,10 @@ public abstract class Combatant {
      * @param combatUser 대상 플레이어
      * @param i          인덱스
      */
+    @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
-        // 미사용
+        if (!combatUser.isDead() && combatUser.getDamageModule().isLowHealth())
+            species.getReaction().onTickLowHealth(combatUser);
     }
 
     /**
@@ -221,11 +305,10 @@ public abstract class Combatant {
      * @param victim   피격자
      * @param damage   피해량
      * @param isCrit   치명타 여부
-     * @return 궁극기 충전 여부
      * @see Combatant#onDamage(CombatUser, Attacker, double, Location, boolean)
      */
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        return true;
+    public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
+        // 미사용
     }
 
     /**
@@ -238,8 +321,10 @@ public abstract class Combatant {
      * @param isCrit   치명타 여부
      * @see Combatant#onAttack(CombatUser, Damageable, double, boolean)
      */
+    @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        // 미사용
+        if (victim.getDamageModule().getTotalShield() == 0)
+            species.getReaction().onDamage(victim, damage, location);
     }
 
     /**
@@ -248,11 +333,10 @@ public abstract class Combatant {
      * @param provider 제공자
      * @param target   수급자
      * @param amount   치유량
-     * @return 궁극기 충전 여부
      * @see Combatant#onTakeHeal(CombatUser, Healer, double)
      */
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        return true;
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        // 미사용
     }
 
     /**
@@ -279,13 +363,13 @@ public abstract class Combatant {
     /**
      * 전투원이 다른 엔티티를 죽였을 때 실행될 작업.
      *
-     * @param attacker   공격자
-     * @param victim     피격자
-     * @param score      처치 기여 점수
-     * @param isFinalHit 결정타 여부. 마지막 공격으로 처치 시 결정타
+     * @param attacker          공격자
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
+     * @param isFinalHit        결정타 여부. 마지막 공격으로 처치 시 결정타
      * @see Combatant#onDeath(CombatUser, Attacker)
      */
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         // 미사용
     }
 
@@ -294,10 +378,11 @@ public abstract class Combatant {
      *
      * @param victim   피격자
      * @param attacker 공격자
-     * @see Combatant#onKill(CombatUser, Damageable, int, boolean)
+     * @see Combatant#onKill(CombatUser, Damageable, double, boolean)
      */
+    @MustBeInvokedByOverriders
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
-        // 미사용
+        species.getReaction().onDeath(victim);
     }
 
     /**
@@ -337,6 +422,16 @@ public abstract class Combatant {
      * @return 점프 가능 여부
      */
     public boolean canJump(@NonNull CombatUser combatUser) {
+        return true;
+    }
+
+    /**
+     * 전투원이 공격 및 치유를 통해 궁극기 게이지를 충전할 수 있는지 확인한다.
+     *
+     * @param combatUser 대상 플레이어
+     * @return 궁극기 충전 가능 여부
+     */
+    public boolean canChargeUlt(@NonNull CombatUser combatUser) {
         return true;
     }
 
@@ -413,7 +508,7 @@ public abstract class Combatant {
      */
     @AllArgsConstructor
     @Getter
-    public enum Species {
+    protected enum Species {
         /** 인간 */
         HUMAN(new HumanReaction()),
         /** 로봇 */
@@ -426,7 +521,7 @@ public abstract class Combatant {
         /**
          * 종족별 공통된 이벤트 반응을 처리하는 인터페이스.
          */
-        public interface Reaction {
+        private interface Reaction {
             /**
              * 치명상일 때 매 틱마다 실행할 작업.
              *

@@ -6,10 +6,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
@@ -45,7 +45,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -56,7 +56,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 

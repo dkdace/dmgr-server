@@ -1,7 +1,7 @@
 package com.dace.dmgr.command.test;
 
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.command.CommandHandler;
 import com.dace.dmgr.user.User;
 import lombok.Getter;

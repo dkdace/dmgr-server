@@ -9,7 +9,12 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.LocationUtil;
@@ -249,11 +254,12 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                    PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
+                    ActionManager actionManager = combatUser.getActionManager();
+                    PalasP1 skillp1 = actionManager.getSkill(PalasP1Info.getInstance());
                     skillp1.setHealAmount(PalasWeaponInfo.HEAL);
                     skillp1.setTarget((Healable) target);
 
-                    combatUser.useAction(ActionKey.PERIODIC_1);
+                    actionManager.useAction(ActionKey.PERIODIC_1);
 
                     ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 

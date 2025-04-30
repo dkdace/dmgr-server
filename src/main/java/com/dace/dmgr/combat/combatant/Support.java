@@ -4,11 +4,14 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.action.Trait;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
+import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -28,20 +31,23 @@ public abstract class Support extends Combatant {
      * @param name             이름
      * @param nickname         별명
      * @param skinName         스킨 이름
+     * @param species          종족 유형
      * @param icon             전투원 아이콘
      * @param difficulty       난이도
      * @param health           체력
      * @param speedMultiplier  이동속도 배수
      * @param hitboxMultiplier 히트박스 크기 배수
      */
-    protected Support(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, char icon, int difficulty,
-                      int health, double speedMultiplier, double hitboxMultiplier) {
-        super(name, nickname, skinName, Role.SUPPORT, subRole, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
+    protected Support(@Nullable Role subRole, @NonNull String name, @NonNull String nickname, @NonNull String skinName, @NonNull Species species,
+                      char icon, int difficulty, int health, double speedMultiplier, double hitboxMultiplier) {
+        super(name, nickname, skinName, Role.SUPPORT, subRole, species, icon, difficulty, health, speedMultiplier, hitboxMultiplier);
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0) {
             boolean isActive = !CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
                     .and(combatEntity -> combatEntity.isGoalTarget()
@@ -54,8 +60,14 @@ public abstract class Support extends Combatant {
                 combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         }
 
-        if (combatUser.getLastGiveHealTimestamp().plus(RoleTrait2Info.DURATION).isAfter(Timestamp.now()))
-            combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
+        combatUser.getActionManager().getTrait(RoleTrait2Info.instance).onUse();
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        if (provider != target)
+            provider.getActionManager().getTrait(RoleTrait2Info.instance).lastGiveHealTimestamp = Timestamp.now();
     }
 
     @Override
@@ -65,7 +77,7 @@ public abstract class Support extends Combatant {
     }
 
     /**
-     * 특성 1번 클래스.
+     * 특성 1번 정보 클래스.
      */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 이동속도 증가량 */
@@ -86,9 +98,9 @@ public abstract class Support extends Combatant {
     }
 
     /**
-     * 특성 2번 클래스.
+     * 특성 2번 정보 클래스.
      */
-    private static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends DynamicTraitInfo<RoleTrait2> {
         /** 초당 치유량 */
         private static final int HEAL_PER_SECOND = 50;
         /** 지속시간 */
@@ -97,12 +109,29 @@ public abstract class Support extends Combatant {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 지원 - 2",
+            super(RoleTrait2.class, "역할: 지원 - 2",
                     new ActionInfoLore(ActionInfoLore.Section
                             .builder("아군을 치유하면 일정 시간동안 <:HEAL:회복>합니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
                             .build()));
+        }
+    }
+
+    /**
+     * 특성 2번 클래스.
+     */
+    private static final class RoleTrait2 extends Trait {
+        /** 마지막 치유 시점 */
+        private Timestamp lastGiveHealTimestamp = Timestamp.now();
+
+        public RoleTrait2(@NonNull CombatUser combatUser) {
+            super(combatUser, RoleTrait2Info.instance);
+        }
+
+        private void onUse() {
+            if (lastGiveHealTimestamp.plus(RoleTrait2Info.DURATION).isAfter(Timestamp.now()))
+                combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
         }
     }
 }

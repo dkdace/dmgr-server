@@ -4,7 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.combatant.quaker.QuakerWeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -13,7 +13,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
-public final class SiliaT2Info extends TraitInfo {
+public final class SiliaT2Info extends DynamicTraitInfo<SiliaT2> {
     /** 전역 쿨타임 */
     public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.3);
     /** 피해량 */
@@ -32,7 +32,7 @@ public final class SiliaT2Info extends TraitInfo {
     private static final SiliaT2Info instance = new SiliaT2Info();
 
     private SiliaT2Info() {
-        super("일격",
+        super(SiliaT2.class, "일격",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("특수 공격으로, 칼을 휘둘러 근거리에 <:DAMAGE:광역 피해>를 입히고 <:KNOCKBACK:밀쳐냅니다>.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)

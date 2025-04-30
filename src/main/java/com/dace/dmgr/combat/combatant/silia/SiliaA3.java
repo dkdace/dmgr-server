@@ -4,7 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -53,7 +53,7 @@ public final class SiliaA3 extends ChargeableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class SiliaA3 extends ChargeableSkill {
         }, this::cancel, 1));
 
         addActionTask(new DelayTask(() -> {
-            ((SiliaWeapon) combatUser.getWeapon()).setStrike(true);
+            combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(true);
             SiliaA3Info.Sounds.ACTIVATE.play(combatUser.getEntity());
         }, SiliaA3Info.ACTIVATE_DURATION.toTicks()));
     }
@@ -94,7 +94,7 @@ public final class SiliaA3 extends ChargeableSkill {
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
         damage = 0;
 
-        ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
+        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
 
         SiliaA3Info.Sounds.DISABLE.play(combatUser.getLocation());
     }

@@ -4,7 +4,8 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -84,7 +85,8 @@ public final class ChedP1 extends AbstractSkill {
         setDuration();
         combatUser.addYawAndPitch(0, 0);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        ChedWeapon weapon = (ChedWeapon) actionManager.getWeapon();
         weapon.setVisible(false);
 
         Location location = combatUser.getEntity().getEyeLocation();
@@ -108,8 +110,8 @@ public final class ChedP1 extends AbstractSkill {
 
             weapon.setCanShoot(false);
 
-            combatUser.getSkill(ChedA3Info.getInstance()).cancel();
-            combatUser.getSkill(ChedUltInfo.getInstance()).cancel();
+            actionManager.getSkill(ChedA3Info.getInstance()).cancel();
+            actionManager.getSkill(ChedUltInfo.getInstance()).cancel();
 
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);
@@ -152,7 +154,7 @@ public final class ChedP1 extends AbstractSkill {
             ChedP1Info.Sounds.DISABLE_HANG.play(combatUser.getLocation());
             ChedP1Info.Particles.USE_HANG.play(combatUser.getLocation());
         } else
-            combatUser.getWeapon().setVisible(true);
+            combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -211,6 +213,6 @@ public final class ChedP1 extends AbstractSkill {
         combatUser.getEntity().setGravity(!isHanging);
 
         if (!isDurationFinished())
-            combatUser.getWeapon().setVisible(isHanging);
+            combatUser.getActionManager().getWeapon().setVisible(isHanging);
     }
 }

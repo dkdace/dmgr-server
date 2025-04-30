@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant;
 
-import com.dace.dmgr.combat.Core;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.Core;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.user.User;
 import lombok.NonNull;
@@ -32,7 +32,7 @@ public final class SelectCore extends ChestGUI {
         int i = 0;
         for (Iterator<Core> iterator = cores.iterator(); iterator.hasNext(); i++) {
             Core core = iterator.next();
-            if (!combatUser.hasCore(core))
+            if (!combatUser.getCoreManager().has(core))
                 set(i, core.getSelectItem());
         }
     }

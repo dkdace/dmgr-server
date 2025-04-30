@@ -6,7 +6,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
@@ -49,7 +49,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
         if (target != null) {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
             return targetCombatUser != null && targetCombatUser.getCombatantType() == CombatantType.SILIA
-                    && !targetCombatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()
+                    && !targetCombatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished()
                     && sound.toString().endsWith("_STEP") && soundCategory == EnumWrappers.SoundCategory.PLAYERS;
         }
 

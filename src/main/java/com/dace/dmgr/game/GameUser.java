@@ -3,9 +3,12 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
@@ -16,7 +19,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -363,45 +365,14 @@ public final class GameUser {
      */
     private enum CommunicationItem {
         /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", 9, targetCombatUser -> {
-            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
-            String state;
-            String ment;
-
-            if (targetCombatUser.getDamageModule().isLowHealth()) {
-                state = "치명상";
-                ment = combatant.getReqHealMentLow();
-            } else if (targetCombatUser.getDamageModule().isHalfHealth()) {
-                state = "체력 낮음";
-                ment = combatant.getReqHealMentHalf();
-            } else {
-                state = "치료 요청";
-                ment = combatant.getReqHealMentNormal();
-            }
-
-            return MessageFormat.format("§7[{0}] §e{1}", state, ment);
-        }),
+        REQ_HEAL("§a치료 요청", 9, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getReqHealMent(targetCombatUser)),
         /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", 10, targetCombatUser -> {
-            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
-            String ment;
-
-            if (targetCombatUser.getUltGaugePercent() < 0.9)
-                ment = combatant.getUltStateMentLow();
-            else if (targetCombatUser.getUltGaugePercent() < 1)
-                ment = combatant.getUltStateMentNearFull();
-            else
-                ment = combatant.getUltStateMentFull();
-
-            return MessageFormat.format("§7[궁극기 {0}%] §e{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
-        }),
+        SHOW_ULT("§a궁극기 상태", 10, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getUltStateMent(targetCombatUser)),
         /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", 11, targetCombatUser -> {
-            String[] ments = targetCombatUser.getCombatantType().getCombatant().getReqRallyMents();
-            String ment = ments[RandomUtils.nextInt(0, ments.length)];
-
-            return MessageFormat.format("§7[집결 요청] §e{0}", ment);
-        });
+        REQ_RALLY("§a집결 요청", 11, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getReqRallyMent());
 
         /** 인벤토리 칸 번호 */
         private final int slotIndex;

@@ -1,8 +1,8 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.*;
-import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.entity.combatuser.Core;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.menu.ChatSoundOption;

@@ -1,26 +1,18 @@
-package com.dace.dmgr.combat.entity;
+package com.dace.dmgr.combat.entity.combatuser;
 
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.*;
-import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.FreeCombat;
-import com.dace.dmgr.combat.FunctionalBlock;
 import com.dace.dmgr.combat.action.Action;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.MeleeAttackAction;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.SkillInfo;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.Skill;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
+import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
@@ -41,12 +33,8 @@ import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -72,33 +60,18 @@ import java.util.stream.Collectors;
  * 전투 시스템의 플레이어 정보를 관리하는 클래스.
  */
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Movable {
-    /** 궁극기 차단 점수 */
-    private static final int ULT_BLOCK_KILL_SCORE = 50;
     /** 결정타 점수 */
     private static final int FINAL_HIT_SCORE = 20;
     /** 추락사 점수 */
     private static final int FALL_ZONE_KILL_SCORE = 30;
     /** 연속 처치 점수 */
     private static final int KILLSTREAK_SCORE = 25;
-    /** 코어 장착 인벤토리 슬롯 목록 */
-    private static final int[] CORE_INVENTORY_SLOT = {27, 28, 29};
     /** 연속 처치 제한시간 */
     private static final Timespan KILL_STREAK_TIME_LIMIT = Timespan.ofSeconds(8);
     /** 획득 점수 표시 유지시간 */
     private static final Timespan SCORE_DISPLAY_DURATION = Timespan.ofSeconds(5);
     /** 킬 로그 표시 유지시간 */
     private static final Timespan KILL_LOG_DISPLAY_DURATION = Timespan.ofSeconds(4);
-
-    /** 힘의 코어 수정자 */
-    private static final AbilityStatus.Modifier CORE_STRENGTH_MODIFIER = new AbilityStatus.Modifier(Core.STRENGTH.getValue());
-    /** 저항의 코어 수정자 */
-    private static final AbilityStatus.Modifier CORE_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(Core.RESISTANCE.getValue());
-    /** 신속의 코어 수정자 */
-    private static final AbilityStatus.Modifier CORE_SPEED_MODIFIER = new AbilityStatus.Modifier(Core.SPEED.getValue());
-    /** 치유의 코어 수정자 */
-    private static final AbilityStatus.Modifier CORE_HEALING_MODIFIER = new AbilityStatus.Modifier(Core.HEALING.getValue());
-    /** 강인함의 코어 수정자 */
-    private static final AbilityStatus.Modifier CORE_ENDURANCE_MODIFIER = new AbilityStatus.Modifier(Core.ENDURANCE.getValue());
 
     /** 메뉴 아이템 */
     private static final DefinedItem MENU_ITEM = new DefinedItem(new ItemBuilder(
@@ -147,14 +120,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final Team team;
-    /** 처치 기여자별 누적 피해량 관리 인스턴스 */
-    private final KillContributorManager killContributorManager = new KillContributorManager();
+    /** 코어 관리 인스턴스 */
+    @NonNull
+    @Getter
+    private final CoreManager coreManager;
+    /** 처치 기여자 관리 인스턴스 */
+    private final KillContributorManager killContributorManager;
     /** 처치 지원자 관리 인스턴스 */
-    private final KillHelperManager killHelperManager = new KillHelperManager();
-    /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작 목록) */
-    private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
-    /** 스킬 목록 (스킬 정보 : 스킬) */
-    private final HashMap<SkillInfo<? extends Skill>, Skill> skillMap = new HashMap<>();
+    private final KillHelperManager killHelperManager;
     /** 획득 점수 목록 (항목 : 획득 점수) */
     private final LinkedHashMap<String, Double> scoreMap = new LinkedHashMap<String, Double>() {
         @Override
@@ -162,8 +135,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return size() > 10;
         }
     };
-    /** 장착한 코어 목록 */
-    private final EnumSet<Core> cores = EnumSet.noneOf(Core.class);
+
     /** 현재 히트박스 목록 */
     private Hitbox[] currentHitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용 */
@@ -187,10 +159,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private CombatantType combatantType;
     /** 선택한 전투원 */
     private Combatant combatant;
-    /** 무기 인스턴스 */
+    /** 동작 관리 인스턴스 */
     @NonNull
     @Getter
-    private Weapon weapon;
+    private ActionManager actionManager;
     /** 사망 대사 홀로그램 */
     @Nullable
     private TextHologram deathMentHologram;
@@ -210,14 +182,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Getter
     @Setter
     private Timestamp fallZoneTimestamp = Timestamp.now();
-    /** 마지막 피격 시점 */
-    @NonNull
-    @Getter
-    private Timestamp lastDamageTimestamp = Timestamp.now();
-    /** 마지막 치유 시점 */
-    @NonNull
-    @Getter
-    private Timestamp lastGiveHealTimestamp = Timestamp.now();
     /** 적 타격 효과음 타임스탬프 */
     private Timestamp hitSoundTimestamp = Timestamp.now();
     /** 연속 처치 제한시간 타임스탬프 */
@@ -242,9 +206,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.gameUser = gameUser;
         this.game = gameUser == null ? null : gameUser.getGame();
         this.team = gameUser == null ? null : gameUser.getTeam();
+        this.coreManager = new CoreManager(this);
+        this.killContributorManager = new KillContributorManager(this);
+        this.killHelperManager = new KillHelperManager();
+
         this.combatantType = combatantType;
         this.combatant = combatantType.getCombatant();
-        this.weapon = combatant.getWeaponInfo().createWeapon(this);
+        this.actionManager = new ActionManager(this);
 
         this.attackModule = new AttackModule();
         this.healerModule = new HealerModule();
@@ -397,14 +365,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         FunctionalBlock.use(getLocation().subtract(0, 0.5, 0), this);
         handleFootstep();
 
-        if (damageModule.isLowHealth())
-            combatant.getSpecies().getReaction().onTickLowHealth(this);
-
         if (i % 10 == 0)
             addUltGauge(GeneralConfig.getCombatConfig().getIdleUltChargePerSecond() / 2.0);
 
         if (i % 20 == 0) {
-            if (hasCore(Core.REGENERATION))
+            if (coreManager.has(Core.REGENERATION))
                 damageModule.heal((Healer) null, damageModule.getMaxHealth() * Core.REGENERATION.getValue() / 100.0, false);
 
             if (gameUser != null && !gameUser.isInSpawn())
@@ -424,7 +389,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             footstepDistance += oldLoc.distance(loc);
             if (!entity.isOnGround() || footstepDistance <= 1.6 || combatantType == CombatantType.SILIA
-                    && !getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+                    && !actionManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
                 return;
 
             footstepDistance = 0;
@@ -490,23 +455,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     @Override
+    public int getScore() {
+        return 100;
+    }
+
+    @Override
     public boolean canJump() {
         return combatant.canJump(this);
     }
 
     @Override
     public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
-        isUlt = combatant.onAttack(this, victim, damage, isCrit) && isUlt;
+        combatant.onAttack(this, victim, damage, isCrit);
+
         if (this == victim)
             return;
 
         playAttackEffect(isCrit);
 
         if (victim.isGoalTarget()) {
-            if (isUlt)
+            if (isUlt && combatant.canChargeUlt(this))
                 addUltGauge(damage);
 
-            if (hasCore(Core.HEALTH_DRAIN))
+            if (coreManager.has(Core.HEALTH_DRAIN))
                 damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValue() / 100.0, false);
 
             if (gameUser != null && victim instanceof CombatUser)
@@ -543,18 +514,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (this == attacker || attacker == null)
             selfHarmDamage += damage;
 
-        if (damageModule.getTotalShield() == 0)
-            combatant.getSpecies().getReaction().onDamage(this, damage, location);
         combatant.onDamage(this, attacker, damage, location, isCrit);
-
-        lastDamageTimestamp = Timestamp.now();
 
         if (attacker instanceof SummonEntity)
             attacker = ((SummonEntity<?>) attacker).getOwner();
 
         if (attacker != null && this != attacker) {
-            if (attacker instanceof CombatUser)
-                killContributorManager.addDamage((CombatUser) attacker, damage);
+            if (attacker instanceof CombatUser) {
+                killContributorManager.addContributor((CombatUser) attacker, damage);
+                ((CombatUser) attacker).killHelperManager.onAttack(this, damage);
+            }
 
             if (gameUser != null)
                 gameUser.addDefend(reducedDamage);
@@ -563,12 +532,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
     @Override
     public void onGiveHeal(@NonNull Healable target, double amount, boolean isUlt) {
-        isUlt = combatant.onGiveHeal(this, target, amount) && getSkill(combatant.getUltimateSkillInfo()).isDurationFinished() && isUlt;
+        combatant.onGiveHeal(this, target, amount);
 
-        if (this != target)
-            lastGiveHealTimestamp = Timestamp.now();
-
-        if (isUlt) {
+        if (isUlt && combatant.canChargeUlt(this)) {
             double ultAmount = amount;
             if (target instanceof CombatUser && ((CombatUser) target).selfHarmDamage > 0)
                 ultAmount = Math.max(0, amount - ((CombatUser) target).selfHarmDamage);
@@ -596,37 +562,18 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         playKillEffect();
 
-        int score = victim instanceof CombatUser ? ((CombatUser) victim).killContributorManager.getScore(this) : victim.getScore();
-        int contributeScore = victim instanceof CombatUser ? score : 100;
+        double contributionScore = victim instanceof CombatUser
+                ? ((CombatUser) victim).killContributorManager.getContributionScore(this)
+                : 1;
+        combatant.onKill(this, victim, contributionScore, true);
 
-        combatant.onKill(this, victim, contributeScore, true);
+        int score = victim instanceof CombatUser
+                ? ((CombatUser) victim).killContributorManager.getScore(this)
+                : victim.getScore();
         addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), score);
 
-        if (!victim.isGoalTarget())
-            return;
-
-        addScore("결정타", FINAL_HIT_SCORE);
-
-        handleBonusScoreSkill(victim, contributeScore);
-
-        if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
-            killStreak = 0;
-        killStreakTimeLimitTimestamp = Timestamp.now().plus(KILL_STREAK_TIME_LIMIT);
-        if (killStreak++ > 0)
-            addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
-
-        if (victim instanceof CombatUser) {
-            CombatUser combatUserVictim = (CombatUser) victim;
-
-            if (!(combatUserVictim.getSkill(combatUserVictim.getCombatantType().getCombatant().getUltimateSkillInfo()).isDurationFinished()))
-                addScore("궁극기 차단", ULT_BLOCK_KILL_SCORE);
-
-            sendPlayerKillMent(combatUserVictim);
-            combatUserVictim.sendPlayerDeathMent(this);
-
-            if (gameUser != null)
-                gameUser.onKill(true);
-        }
+        if (victim.isGoalTarget())
+            onKillGoalTarget(victim, contributionScore);
     }
 
     /**
@@ -638,36 +585,57 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 사망 시 킬로그 보스바를 표시한다.
+     * 목표 처치 대상을 죽였을 때 실행할 작업.
+     *
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
      */
-    private void broadcastPlayerKillBossBar() {
-        if (game == null)
-            return;
+    private void onKillGoalTarget(@NonNull Damageable victim, double contributionScore) {
+        addScore("결정타", FINAL_HIT_SCORE);
 
-        String attackerNames = killContributorManager.getDamageMap().keySet().stream()
-                .map(CombatUser::getPlayerKillBossBarName)
-                .collect(Collectors.joining(", "));
-        String victimName = getPlayerKillBossBarName();
-        BossBarDisplay killBossBar = new BossBarDisplay(MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName));
+        actionManager.handleBonusScoreSkill(victim, contributionScore);
 
-        game.addBossBar(killBossBar);
+        if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
+            killStreak = 0;
 
-        new DelayTask(() -> {
-            if (!game.isFinished())
-                game.removeBossBar(killBossBar);
-        }, KILL_LOG_DISPLAY_DURATION.toTicks());
+        killStreakTimeLimitTimestamp = Timestamp.now().plus(KILL_STREAK_TIME_LIMIT);
+        if (killStreak++ > 0)
+            addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
+
+        if (victim instanceof CombatUser) {
+            CombatUser combatUserVictim = (CombatUser) victim;
+
+            if (!(combatUserVictim.getActionManager().getSkill(combatUserVictim.combatant.getUltimateSkillInfo()).isDurationFinished()))
+                addScore("궁극기 차단", ActionManager.ULT_BLOCK_SCORE);
+
+            sendPlayerKillMent(combatUserVictim);
+            combatUserVictim.sendPlayerDeathMent(this);
+
+            if (gameUser != null)
+                gameUser.onKill(true);
+        }
     }
 
     /**
-     * 킬로그 보스바에 사용되는 플레이어의 이름을 반환한다.
+     * 적 플레이어의 처치를 기여했을 때 실행할 작업.
      *
-     * @return 이름
+     * @param victim 피격자
      */
-    @NonNull
-    private String getPlayerKillBossBarName() {
-        ChatColor color = team == null ? ChatColor.WHITE : team.getType().getColor();
+    private void onAssist(@NonNull CombatUser victim) {
+        if (victim.fallZoneTimestamp.isAfter(Timestamp.now()))
+            addScore("추락사", FALL_ZONE_KILL_SCORE);
 
-        return MessageFormat.format("§f{0}{1}§l {2}", combatant.getIcon(), color, name);
+        int score = victim.killContributorManager.getScore(this);
+
+        combatant.onKill(this, victim, score, false);
+
+        addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
+        actionManager.handleBonusScoreSkill(victim, score);
+
+        playKillEffect();
+
+        if (gameUser != null)
+            gameUser.onKill(false);
     }
 
     /**
@@ -676,8 +644,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      */
     private void sendPlayerKillMent(@NonNull CombatUser victim) {
-        String[] ments = combatant.getKillMent(victim.getCombatantType());
-        String ment = ments[RandomUtils.nextInt(0, ments.length)];
+        String ment = combatant.getKillMent(victim.getCombatantType());
 
         sendMentMessage(this, ment);
         sendMentMessage(victim, ment);
@@ -692,8 +659,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      */
     private void sendPlayerDeathMent(@NonNull CombatUser attacker) {
-        String[] ments = combatant.getDeathMent(attacker.getCombatantType());
-        String ment = ments[RandomUtils.nextInt(0, ments.length)];
+        String ment = combatant.getDeathMent(attacker.getCombatantType());
 
         sendMentMessage(this, ment);
         sendMentMessage(attacker, ment);
@@ -710,45 +676,52 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         isDead = true;
 
-        combatant.getSpecies().getReaction().onDeath(this);
         combatant.onDeath(this, attacker);
 
-        killContributorManager.getDamageMap().keySet().forEach(target -> {
-            target.killHelperManager.getScoreInfoMap().forEach((targetAttacker, scoreInfo) -> {
-                for (double score : scoreInfo.getScores())
-                    targetAttacker.addScore("처치 지원", score);
-            });
+        broadcastKillLogBossBar();
+        killContributorManager.onDeath(attacker);
 
-            if (fallZoneTimestamp.isAfter(Timestamp.now()))
-                target.addScore("추락사", FALL_ZONE_KILL_SCORE);
-
-            if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker)) {
-                int score = killContributorManager.getScore(target);
-
-                target.combatant.onKill(target, this, score, false);
-                target.addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-                target.handleBonusScoreSkill(this, score);
-
-                target.playKillEffect();
-
-                if (target.getGameUser() != null)
-                    target.getGameUser().onKill(false);
-            }
-        });
-
-        broadcastPlayerKillBossBar();
-
-        killContributorManager.clear();
         statusEffectModule.clear();
         damageModule.setHealth(damageModule.getMaxHealth());
         damageModule.clearShields();
         selfHarmDamage = 0;
-        cancelAction(null);
+        actionManager.cancelAction(null);
 
         if (gameUser != null)
             gameUser.onDeath();
 
         respawn();
+    }
+
+    /**
+     * 사망 시 킬로그 보스바를 표시한다.
+     */
+    private void broadcastKillLogBossBar() {
+        if (game == null)
+            return;
+
+        String attackerNames = killContributorManager.getDamageInfoMap().keySet().stream()
+                .map(CombatUser::getKillLogPlayerName)
+                .collect(Collectors.joining(", "));
+        String victimName = getKillLogPlayerName();
+        BossBarDisplay killBossBar = new BossBarDisplay(MessageFormat.format("{0} §4§l➡ {1}", attackerNames, victimName));
+
+        game.addBossBar(killBossBar);
+
+        new DelayTask(() -> {
+            if (!game.isFinished())
+                game.removeBossBar(killBossBar);
+        }, KILL_LOG_DISPLAY_DURATION.toTicks());
+    }
+
+    /**
+     * 킬로그 보스바에 사용되는 플레이어의 이름을 반환한다.
+     *
+     * @return 이름
+     */
+    @NonNull
+    private String getKillLogPlayerName() {
+        return MessageFormat.format("§f{0}{1}§l {2}", combatant.getIcon(), Validate.notNull(team).getType().getColor(), name);
     }
 
     /**
@@ -761,7 +734,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         Timespan duration = GeneralConfig.getCombatConfig().getRespawnTime();
         if (gameUser == null)
             duration = Timespan.ofSeconds(1);
-        else if (hasCore(Core.RESURRECTION))
+        else if (coreManager.has(Core.RESURRECTION))
             duration = duration.multiply((100 - Core.RESURRECTION.getValue()) / 100.0);
 
         long durationTicks = duration.toTicks();
@@ -780,10 +753,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             isDead = false;
 
             statusEffectModule.clear();
+            actionManager.reset();
             entity.setGameMode(GameMode.SURVIVAL);
-
-            weapon.reset();
-            skillMap.values().forEach(Skill::reset);
 
             if (deathMentHologram != null) {
                 deathMentHologram.remove();
@@ -793,27 +764,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 적 처치 시 스킬의 보너스 점수 지급을 처리한다.
-     *
-     * @param victim 피격자
-     * @param score  처치 기여 점수
-     */
-    private void handleBonusScoreSkill(@NonNull Damageable victim, int score) {
-        for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
-            Skill skill = getSkill(skillInfo);
-            if (skill instanceof HasBonusScore)
-                ((HasBonusScore) skill).getBonusScoreModule().onKill(victim, score);
-        }
-    }
-
-    /**
      * 공격자의 첫 공격 후 경과한 시간을 반환한다.
      *
      * @param attacker 공격자
      * @return 첫 공격 후 경과한 시간
      */
     @NonNull
-    public Timespan getKillContributorElapsedTime(@NonNull CombatUser attacker) {
+    public Timespan getKillContributionElapsedTime(@NonNull CombatUser attacker) {
         return killContributorManager.getElapsedTime(attacker);
     }
 
@@ -827,20 +784,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public Location getArmLocation(@NonNull MainHand hand) {
         return LocationUtil.getLocationFromOffset(entity.getEyeLocation().subtract(0, 0.4, 0),
                 hand == MainHand.RIGHT ? 0.2 : -0.2, 0, 0);
-    }
-
-    /**
-     * 지정한 스킬 정보에 해당하는 스킬을 반환한다.
-     *
-     * @param skillInfo 스킬 정보
-     * @param <T>       {@link Skill}을 상속받는 스킬
-     * @return 스킬 인스턴스
-     * @throws NullPointerException 해당하는 스킬이 존재하지 않으면 발생
-     */
-    @NonNull
-    @SuppressWarnings("unchecked")
-    public <T extends Skill> T getSkill(@NonNull SkillInfo<T> skillInfo) {
-        return Validate.notNull((T) skillMap.get(skillInfo), "일치하는 스킬이 존재하지 않음");
     }
 
     /**
@@ -890,7 +833,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         int cooldownTicks = (int) Math.min(Integer.MAX_VALUE, cooldown.toTicks());
         entity.setCooldown(SkillInfo.MATERIAL, cooldownTicks);
-        if (cooldown.compareTo(weapon.getCooldown()) > 0)
+        if (cooldown.compareTo(actionManager.getWeapon().getCooldown()) > 0)
             entity.setCooldown(WeaponInfo.MATERIAL, cooldownTicks);
     }
 
@@ -962,7 +905,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (value == 1) {
             value = 0.999;
-            UltimateSkill skill = getSkill(combatant.getUltimateSkillInfo());
+            UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
             if (!skill.isCooldownFinished())
                 skill.setCooldown(Timespan.ZERO);
         }
@@ -978,7 +921,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGaugePercent(double value) {
-        UltimateSkill skill = getSkill(combatant.getUltimateSkillInfo());
+        UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
         if (skill.isDurationFinished())
             setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
@@ -990,9 +933,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGauge(double value) {
-        UltimateSkill skill = getSkill(combatant.getUltimateSkillInfo());
+        UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
         int cost = skill.getCost();
-        if (hasCore(Core.ULTIMATE))
+        if (coreManager.has(Core.ULTIMATE))
             cost = (int) (cost * (100 - Core.ULTIMATE.getValue()) / 100.0);
 
         addUltGaugePercent(value / cost);
@@ -1014,7 +957,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         moveModule.getSpeedStatus().setBaseValue(GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
 
         resetHitboxes();
-        initActions();
+        actionManager = new ActionManager(this);
 
         combatant.onSet(this);
 
@@ -1035,6 +978,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setGameMode(GameMode.SURVIVAL);
 
         fovValue = 0;
+        selfHarmDamage = 0;
         damageModule.clearShields();
         statusEffectModule.clear();
         setUltGaugePercent(0);
@@ -1045,34 +989,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         healerModule.getHealMultiplierStatus().clearModifiers();
         damageModule.getDefenseMultiplierStatus().clearModifiers();
         moveModule.getSpeedStatus().clearModifiers();
-        clearCores();
-
-        weapon.remove();
-        skillMap.values().forEach(Skill::remove);
-        skillMap.clear();
-        actionMap.clear();
-    }
-
-    /**
-     * 플레이어의 동작 설정을 초기화한다.
-     */
-    private void initActions() {
-        for (ActionKey actionKey : ActionKey.values())
-            actionMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
-
-        actionMap.get(ActionKey.SWAP_HAND).add(new MeleeAttackAction(this));
-
-        weapon = combatant.getWeaponInfo().createWeapon(this);
-        for (ActionKey actionKey : weapon.getDefaultActionKeys())
-            actionMap.get(actionKey).add(weapon);
-
-        for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
-            Skill skill = skillInfo.createSkill(this);
-            skillMap.put(skillInfo, skill);
-
-            for (ActionKey actionKey : skill.getDefaultActionKeys())
-                actionMap.get(actionKey).add(skill);
-        }
+        coreManager.clear();
+        actionManager.remove();
     }
 
     /**
@@ -1081,164 +999,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public void resetHitboxes() {
         setHitboxes(Hitbox.createDefaultPlayerHitboxes(combatant.getHitboxMultiplier()));
         currentHitboxes = hitboxes;
-    }
-
-    /**
-     * 지정한 동작 사용 키에 해당하는 동작을 사용한다.
-     *
-     * @param actionKey 동작 사용 키
-     */
-    public void useAction(@NonNull ActionKey actionKey) {
-        actionMap.get(actionKey).forEach(action -> {
-            if (isDead || action == null || statusEffectModule.hasRestriction(CombatRestriction.USE_ACTION))
-                return;
-
-            if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
-                action.onUse(actionKey);
-                return;
-            }
-
-            Weapon realWeapon = weapon;
-            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().isSwapped())
-                realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
-
-            if (action instanceof Weapon)
-                handleUseWeapon(actionKey, realWeapon);
-            else if (action instanceof Skill)
-                handleUseSkill(actionKey, (Skill) action);
-        });
-    }
-
-    /**
-     * 무기 사용 로직을 처리한다.
-     *
-     * @param actionKey 동작 사용 키
-     * @param weapon    무기
-     */
-    private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
-        if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
-            ((FullAuto) weapon).getFullAutoModule().use();
-        else if (weapon.canUse(actionKey))
-            weapon.onUse(actionKey);
-    }
-
-    /**
-     * 스킬 사용 로직을 처리한다.
-     *
-     * @param actionKey 동작 사용 키
-     * @param skill     스킬
-     */
-    private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (skill.canUse(actionKey))
-            skill.onUse(actionKey);
-    }
-
-    /**
-     * 사용 중인 모든 동작을 강제로 취소시킨다.
-     *
-     * @param attacker 공격자
-     */
-    public void cancelAction(@Nullable CombatUser attacker) {
-        weapon.cancel();
-        cancelSkill(attacker);
-    }
-
-    /**
-     * 사용 중인 모든 스킬을 강제로 취소시킨다.
-     *
-     * @param attacker 공격자
-     */
-    public void cancelSkill(@Nullable CombatUser attacker) {
-        skillMap.values().forEach(skill -> {
-            if (!skill.cancel())
-                return;
-
-            if (attacker != null && !isDead && skill instanceof UltimateSkill)
-                attacker.addScore("궁극기 차단", CombatUser.ULT_BLOCK_KILL_SCORE);
-        });
-    }
-
-    /**
-     * 지정한 코어를 장착한 상태인지 확인한다.
-     *
-     * @param core 확인할 코어
-     * @return 장착하고 있으면 {@code true} 반환
-     */
-    public boolean hasCore(@NonNull Core core) {
-        return cores.contains(core);
-    }
-
-    /**
-     * 지정한 코어를 장착한 코어 목록에 추가한다.
-     *
-     * @param core 추가할 코어
-     * @return 추가 성공 시 {@code true} 반환
-     */
-    public boolean addCore(@NonNull Core core) {
-        if (cores.size() >= CORE_INVENTORY_SLOT.length || !cores.add(core))
-            return false;
-
-        for (int i : CORE_INVENTORY_SLOT) {
-            if (user.getGui().get(i) == null) {
-                user.getGui().set(i, core.getSelectItem());
-                break;
-            }
-        }
-
-        if (core == Core.STRENGTH)
-            attackModule.getDamageMultiplierStatus().addModifier(CORE_STRENGTH_MODIFIER);
-        if (core == Core.RESISTANCE)
-            damageModule.getDefenseMultiplierStatus().addModifier(CORE_RESISTANCE_MODIFIER);
-        if (core == Core.SPEED)
-            moveModule.getSpeedStatus().addModifier(CORE_SPEED_MODIFIER);
-        if (core == Core.HEALING)
-            healerModule.getHealMultiplierStatus().addModifier(CORE_HEALING_MODIFIER);
-        if (core == Core.ENDURANCE)
-            statusEffectModule.getResistanceStatus().addModifier(CORE_ENDURANCE_MODIFIER);
-
-        return true;
-    }
-
-    /**
-     * 지정한 코어를 장착한 코어 목록에서 제거한다.
-     *
-     * @param core 제거할 코어
-     * @return 제거 성공 시 {@code true} 반환
-     */
-    public boolean removeCore(@NonNull Core core) {
-        if (cores.isEmpty() || !cores.remove(core))
-            return false;
-
-        for (int i : CORE_INVENTORY_SLOT) {
-            DefinedItem definedItem = user.getGui().get(i);
-            if (definedItem == core.getSelectItem()) {
-                user.getGui().remove(i);
-                break;
-            }
-        }
-
-        if (core == Core.STRENGTH)
-            attackModule.getDamageMultiplierStatus().removeModifier(CORE_STRENGTH_MODIFIER);
-        if (core == Core.RESISTANCE)
-            damageModule.getDefenseMultiplierStatus().removeModifier(CORE_RESISTANCE_MODIFIER);
-        if (core == Core.SPEED)
-            moveModule.getSpeedStatus().removeModifier(CORE_SPEED_MODIFIER);
-        if (core == Core.HEALING)
-            healerModule.getHealMultiplierStatus().removeModifier(CORE_HEALING_MODIFIER);
-        if (core == Core.ENDURANCE)
-            statusEffectModule.getResistanceStatus().removeModifier(CORE_ENDURANCE_MODIFIER);
-
-        return true;
-    }
-
-    /**
-     * 장착한 코어 목록을 초기화한다.
-     */
-    private void clearCores() {
-        cores.clear();
-
-        for (int i : CORE_INVENTORY_SLOT)
-            user.getGui().remove(i);
     }
 
     /**
@@ -1344,10 +1104,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NonNull
     public String getFormattedChatMessage(@NonNull String message) {
-        return MessageFormat.format("§f<{0}§l[§f{1} {0}{2}]§f{3}> {4}",
+        return MessageFormat.format("§f<{0}§l[§f{1} {0}§l{2}]§f{3}> {4}",
                 (team == null ? ChatColor.YELLOW : team.getType().getColor()),
                 combatant.getIcon(),
-                "§l" + combatant.getName(),
+                combatant.getName(),
                 entity.getName(),
                 message);
     }
@@ -1359,7 +1119,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param message  메시지
      */
     public void sendMentMessage(@NonNull CombatUser receiver, @NonNull String message) {
-        receiver.getEntity().sendMessage(getFormattedChatMessage("§e" + message));
+        receiver.getEntity().sendMessage(getFormattedChatMessage(message));
     }
 
     /**
@@ -1394,35 +1154,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 처치 기여자별 누적 피해량을 관리하는 클래스.
+     * 처치 기여자를 관리하는 클래스.
      */
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static final class KillContributorManager {
-        /** 처치 지원 점수 비율 */
-        private static final double KILL_ASSIST_SCORE_RATIO = 0.2;
-        /** 킬 기여자별 누적 피해량 목록. 처치 점수 분배에 사용함 (킬 기여자 : 누적 피해량 정보) */
-        private final WeakHashMap<CombatUser, DamageInfo> damageMap = new WeakHashMap<>();
+        /** 플레이어 인스턴스 */
+        private final CombatUser combatUser;
+        /** 처치 기여자별 누적 피해량 목록. 처치 점수 분배에 사용함 (처치 기여자 : 누적 피해량 정보) */
+        private final WeakHashMap<CombatUser, DamageInfo> damageInfoMap = new WeakHashMap<>();
 
         @NonNull
-        private WeakHashMap<CombatUser, DamageInfo> getDamageMap() {
-            damageMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
-            return damageMap;
+        private WeakHashMap<CombatUser, DamageInfo> getDamageInfoMap() {
+            damageInfoMap.entrySet().removeIf(entry -> entry.getKey().isRemoved() || entry.getValue().isExpired());
+            return damageInfoMap;
         }
 
         /**
-         * 지정한 공격자의 누적 피해량을 추가한다.
+         * 지정한 공격자를 처치 기여자로 추가한다.
          *
          * @param attacker 공격자
          * @param damage   피해량
          */
-        private void addDamage(@NonNull CombatUser attacker, double damage) {
-            DamageInfo damageInfo = getDamageMap().computeIfAbsent(attacker, k -> new DamageInfo());
-            damageInfo.damage += damage;
-
-            attacker.killHelperManager.getScoreInfoMap().keySet().forEach(target -> {
-                DamageInfo targetDamageInfo = damageMap.computeIfAbsent(attacker, k -> new DamageInfo());
-                targetDamageInfo.damage += damage * KILL_ASSIST_SCORE_RATIO;
-            });
+        private void addContributor(@NonNull CombatUser attacker, double damage) {
+            getDamageInfoMap().computeIfAbsent(attacker, k -> new DamageInfo()).update(damage);
         }
 
         /**
@@ -1433,28 +1187,47 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          */
         @NonNull
         private Timespan getElapsedTime(@NonNull CombatUser attacker) {
-            DamageInfo damageInfo = getDamageMap().get(attacker);
+            DamageInfo damageInfo = getDamageInfoMap().get(attacker);
             return damageInfo == null ? Timespan.ZERO : damageInfo.startTime.until(Timestamp.now());
+        }
+
+        /**
+         * 지정한 공격자의 처치 기여도를 반환한다.
+         *
+         * @param attacker 공격자
+         * @return {@code attacker}의 점수 / 모든 공격자의 점수 합
+         */
+        private double getContributionScore(@NonNull CombatUser attacker) {
+            DamageInfo damageInfo = getDamageInfoMap().get(attacker);
+            double total = damageInfoMap.values().stream().mapToDouble(targetDamageInfo -> targetDamageInfo.damage).sum();
+
+            return damageInfo == null ? 0 : damageInfo.damage / total;
         }
 
         /**
          * 지정한 공격자의 처치 기여 점수를 반환한다.
          *
          * @param attacker 공격자
-         * @return {@code attacker}의 점수 / 모든 공격자의 점수 합×100
+         * @return {@link KillContributorManager#getContributionScore(CombatUser)} × {@link CombatUser#getScore()}
          */
         private int getScore(@NonNull CombatUser attacker) {
-            DamageInfo damageInfo = getDamageMap().get(attacker);
-            double total = damageMap.values().stream().mapToDouble(targetDamageInfo -> targetDamageInfo.damage).sum();
-
-            return (int) Math.round(damageInfo == null ? 0 : (damageInfo.damage / total * 100));
+            return (int) Math.round(getContributionScore(attacker) * combatUser.getScore());
         }
 
         /**
-         * 킬 기여자 목록을 초기화한다.
+         * 사망 시 처치 기여자들의 처치 기여를 처리한다.
+         *
+         * @param attacker 공격자
          */
-        private void clear() {
-            damageMap.clear();
+        private void onDeath(@Nullable Attacker attacker) {
+            getDamageInfoMap().keySet().forEach(target -> {
+                target.killHelperManager.onAssist();
+
+                if (target != (attacker instanceof SummonEntity ? ((SummonEntity<?>) attacker).getOwner() : attacker))
+                    target.onAssist(combatUser);
+            });
+
+            damageInfoMap.clear();
         }
 
         /**
@@ -1462,12 +1235,25 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
          */
         @NoArgsConstructor
         private static final class DamageInfo {
+            /** 처치 기여 제한시간 */
+            private static final Timespan KILL_CONTRIBUTION_TIME_LIMIT = Timespan.ofSeconds(10);
+
             /** 시작 시점 */
             private final Timestamp startTime = Timestamp.now();
             /** 종료 시점 */
-            private final Timestamp expiration = startTime.plus(Timespan.ofSeconds(10));
+            private Timestamp expiration = Timestamp.now();
             /** 누적 피해량 */
             private double damage = 0;
+
+            /**
+             * 처치 기여 제한시간과 누적 피해량을 업데이트한다.
+             *
+             * @param damage 피해량
+             */
+            private void update(double damage) {
+                this.expiration = startTime.plus(KILL_CONTRIBUTION_TIME_LIMIT);
+                this.damage += damage;
+            }
 
             /**
              * 처치 기여 제한시간이 끝났는지 확인한다.
@@ -1485,6 +1271,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NoArgsConstructor
     private static final class KillHelperManager {
+        /** 처치 지원 점수 비율 */
+        private static final double ASSIST_SCORE_RATIO = 0.2;
         /** 처치 지원자별 지원 점수 목록 (지원자 : 지원 점수 정보) */
         private final WeakHashMap<CombatUser, ScoreInfo> scoreInfoMap = new WeakHashMap<>();
 
@@ -1495,7 +1283,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
 
         /**
-         * 지정한 처치 지원자의 지원 점수를 추가한다.
+         * 지정한 플레이어를 처치 지원자로 추가한다.
          *
          * @param helper     지원자
          * @param action     사용한 동작
@@ -1505,6 +1293,26 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private void addHelper(@NonNull CombatUser helper, @NonNull Action action, double score, @NonNull Timestamp expiration) {
             ScoreInfo scoreInfo = scoreInfoMap.computeIfAbsent(helper, k -> new ScoreInfo());
             scoreInfo.scoreMap.put(action, Pair.of(score, expiration));
+        }
+
+        /**
+         * 공격 시 지원자들을 적(피격자)의 처치 기여자로 추가한다.
+         *
+         * @param victim 피격자
+         * @param damage 피해량
+         */
+        private void onAttack(@NonNull CombatUser victim, double damage) {
+            getScoreInfoMap().keySet().forEach(target -> victim.killContributorManager.addContributor(target, damage * ASSIST_SCORE_RATIO));
+        }
+
+        /**
+         * 적 처치 기여 시 지원자들에게 점수를 지급한다.
+         */
+        private void onAssist() {
+            getScoreInfoMap().forEach((targetAttacker, scoreInfo) -> {
+                for (double score : scoreInfo.getScores())
+                    targetAttacker.addScore("처치 지원", score);
+            });
         }
 
         /**

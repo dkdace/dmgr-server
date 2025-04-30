@@ -3,10 +3,10 @@ package com.dace.dmgr.combat.combatant.ched;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -25,7 +25,7 @@ public final class Ched extends Marksman {
     private static final Ched instance = new Ched();
 
     private Ched() {
-        super(null, "체드", "화염 궁수", "DVChed", '\u32D4', 4, 1000, 1.1, 1.0);
+        super(null, "체드", "화염 궁수", "DVChed", Species.HUMAN, '\u32D4', 4, 1000, 1.1, 1.0);
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case VELLION:
                 return new String[]{"...불충을 용서하십시오."};
@@ -98,7 +98,7 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case VELLION:
                 return new String[]{"모시게 되어... 영광이었습니다."};
@@ -114,19 +114,15 @@ public final class Ched extends Marksman {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(ChedA3Info.getInstance()).isDurationFinished() && combatUser.getSkill(ChedUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return actionManager.getSkill(ChedA3Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(ChedUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        ChedA2 skill2 = combatUser.getSkill(ChedA2Info.getInstance());
+        ChedA2 skill2 = combatUser.getActionManager().getSkill(ChedA2Info.getInstance());
         return skill2.canUse(skill2.getDefaultActionKeys()[1]);
     }
 

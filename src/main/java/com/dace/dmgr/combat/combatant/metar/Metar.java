@@ -4,10 +4,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -32,7 +32,7 @@ public final class Metar extends Guardian {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7).pitch(0.85).pitchVariance(0.1).build());
 
     private Metar() {
-        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "DVMetar", '\u32DA', 2, 2500, 0.8, 1.8);
+        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "DVMetar", Species.ROBOT, '\u32DA', 2, 2500, 0.8, 1.8);
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "적대적 개체를 제거합니다.",
                 "위협 요소를 제거했습니다."
@@ -97,20 +97,16 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{"위험 상황. 심각한 기체 손상이 발생했습니다.",};
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.ROBOT;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (combatUser.getEntity().isSneaking())
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -120,7 +116,8 @@ public final class Metar extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return ((MetarWeapon) combatUser.getWeapon()).canSprint() && combatUser.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return ((MetarWeapon) actionManager.getWeapon()).canSprint() && actionManager.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

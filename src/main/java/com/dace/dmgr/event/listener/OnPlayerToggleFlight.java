@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
@@ -22,6 +22,6 @@ public final class OnPlayerToggleFlight extends EventListener<PlayerToggleFlight
         CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(event.getPlayer()));
 
         if (combatUser != null)
-            combatUser.useAction(ActionKey.SPACE);
+            combatUser.getActionManager().useAction(ActionKey.SPACE);
     }
 }

@@ -4,7 +4,12 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
@@ -28,8 +33,9 @@ public final class SiliaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && actionManager.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -37,7 +43,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
-        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
 
         SiliaA2Info.Sounds.USE.play(combatUser.getLocation());
 

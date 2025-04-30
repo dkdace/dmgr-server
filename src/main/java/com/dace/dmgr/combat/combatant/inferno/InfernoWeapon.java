@@ -8,7 +8,11 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -69,7 +73,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
 
-                if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
                 InfernoWeaponInfo.Sounds.USE.play(combatUser.getLocation());
@@ -86,7 +90,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponLProjectile().shot();
 
-                if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
                 CombatUtil.sendRecoil(combatUser, InfernoWeaponInfo.Fireball.Recoil.UP, InfernoWeaponInfo.Fireball.Recoil.SIDE,

@@ -5,6 +5,7 @@ import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.TextHologram;
