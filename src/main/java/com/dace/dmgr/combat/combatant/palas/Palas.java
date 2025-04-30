@@ -89,7 +89,7 @@ public final class Palas extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{"어째서...어째서 너가..!"};
@@ -104,7 +104,7 @@ public final class Palas extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{"괜찮아...해야할 게 있..잖아..?"};

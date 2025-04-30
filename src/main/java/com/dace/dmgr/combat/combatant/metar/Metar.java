@@ -89,7 +89,7 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "적대적 개체를 제거합니다.",
                 "위협 요소를 제거했습니다."
@@ -98,7 +98,7 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{"위험 상황. 심각한 기체 손상이 발생했습니다.",};
     }
 

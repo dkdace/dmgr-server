@@ -84,7 +84,7 @@ public final class Jager extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"망할 녀석...역시 제법이군."};
@@ -99,7 +99,7 @@ public final class Jager extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"미안..하다..."};

@@ -81,7 +81,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
             case CHED:
@@ -102,7 +102,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "제법..이군..",
                 "운수 한 번... 안 좋은 날이군...",

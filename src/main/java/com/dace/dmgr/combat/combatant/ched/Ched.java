@@ -82,7 +82,7 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case VELLION:
                 return new String[]{"...불충을 용서하십시오."};
@@ -99,7 +99,7 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case VELLION:
                 return new String[]{"모시게 되어... 영광이었습니다."};

@@ -95,7 +95,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             default:
                 return new String[]{
@@ -108,7 +108,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "으... 눈이... 감겨..",
                 "피곤해... 잠시 쉬어야겠어...",

@@ -36,7 +36,6 @@ import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.*;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -664,8 +663,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param victim 피격자
      */
     private void sendPlayerKillMent(@NonNull CombatUser victim) {
-        String[] ments = combatant.getKillMent(victim.getCombatantType());
-        String ment = ments[RandomUtils.nextInt(0, ments.length)];
+        String ment = combatant.getKillMent(victim.getCombatantType());
 
         sendMentMessage(this, ment);
         sendMentMessage(victim, ment);
@@ -680,8 +678,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param attacker 공격자
      */
     private void sendPlayerDeathMent(@NonNull CombatUser attacker) {
-        String[] ments = combatant.getDeathMent(attacker.getCombatantType());
-        String ment = ments[RandomUtils.nextInt(0, ments.length)];
+        String ment = combatant.getDeathMent(attacker.getCombatantType());
 
         sendMentMessage(this, ment);
         sendMentMessage(attacker, ment);
@@ -1127,10 +1124,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     @NonNull
     public String getFormattedChatMessage(@NonNull String message) {
-        return MessageFormat.format("§f<{0}§l[§f{1} {0}{2}]§f{3}> {4}",
+        return MessageFormat.format("§f<{0}§l[§f{1} {0}§l{2}]§f{3}> {4}",
                 (team == null ? ChatColor.YELLOW : team.getType().getColor()),
                 combatant.getIcon(),
-                "§l" + combatant.getName(),
+                combatant.getName(),
                 entity.getName(),
                 message);
     }
@@ -1142,7 +1139,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param message  메시지
      */
     public void sendMentMessage(@NonNull CombatUser receiver, @NonNull String message) {
-        receiver.getEntity().sendMessage(getFormattedChatMessage("§e" + message));
+        receiver.getEntity().sendMessage(getFormattedChatMessage(message));
     }
 
     /**

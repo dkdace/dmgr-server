@@ -91,7 +91,7 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "살짝 겁만 주려 했는데...",
                 "내가...내 손으로...",
@@ -101,7 +101,7 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "어떻게 이런 짓을...",
                 "이런 야만적인..."

@@ -91,7 +91,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"머리 좀 식혀, 멍청아."};
@@ -106,7 +106,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "뭐... 이런 날도 있는거지.",
                 "바닥은... 조금 차갑네.",

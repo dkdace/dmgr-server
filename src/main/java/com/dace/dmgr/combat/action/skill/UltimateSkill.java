@@ -66,6 +66,6 @@ public abstract class UltimateSkill extends ActiveSkill {
         ULTIMATE_USE_SOUND.play(combatUser.getLocation());
 
         CombatUtil.getCombatEntities(combatUser.getEntity().getWorld(), EntityCondition.of(CombatUser.class))
-                .forEach(target -> combatUser.sendMentMessage(target, combatUser.getCombatantType().getCombatant().getUltUseMent()));
+                .forEach(target -> combatUser.sendMentMessage(target, "§e" + combatUser.getCombatantType().getCombatant().getUltUseMent()));
     }
 }

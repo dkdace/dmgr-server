@@ -89,7 +89,7 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{
@@ -109,7 +109,7 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "안돼... 안돼, 아직 계획이..!",
                 "망할...이 무식한 자식들!"

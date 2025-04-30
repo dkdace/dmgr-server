@@ -90,7 +90,7 @@ public final class Quaker extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case ARKACE:
                 return new String[]{"조국의 방패는 납덩어리에 굴복하지 않는다!"};
@@ -107,7 +107,7 @@ public final class Quaker extends Guardian {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case CHED:
                 return new String[]{"정정당당하게 싸워라! 비겁자들!"};

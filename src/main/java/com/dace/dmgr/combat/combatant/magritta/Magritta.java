@@ -82,7 +82,7 @@ public final class Magritta extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"어라? 나잖아?"};
@@ -98,7 +98,7 @@ public final class Magritta extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"넌 뭐야!"};
