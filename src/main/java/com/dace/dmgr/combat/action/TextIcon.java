@@ -79,7 +79,12 @@ public enum TextIcon {
     /** 생명력 증가 */
     HEALTH_INCREASE('\u4DE1', ChatColor.GREEN),
     /** 생명력 감소 */
-    HEALTH_DECREASE('\u4DE2', ChatColor.RED);
+    HEALTH_DECREASE('\u4DE2', ChatColor.RED),
+    /** 글리치 (델타 고유 자원) */
+    GLITCH('\u4DE3', ChatColor.GREEN),
+    /** 글리치 감소 */
+    GLITCH_DECREASE('\u4DE4', ChatColor.GREEN)
+    ;
 
     /** 아이콘 문자 */
     private final char icon;

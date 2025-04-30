@@ -4,6 +4,8 @@ import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Controller;
 import com.dace.dmgr.combat.combatant.Role;
+import com.dace.dmgr.combat.combatant.arkace.ArkaceA1Info;
+import com.dace.dmgr.combat.combatant.arkace.ArkaceA2Info;
 import com.dace.dmgr.combat.combatant.arkace.ArkaceUltInfo;
 import com.dace.dmgr.combat.combatant.vellion.*;
 import lombok.Getter;
@@ -25,7 +27,7 @@ public final class Delta extends Controller {
     private static final Delta instance = new Delta();
 
     private Delta() {
-        super(Role.CONTROLLER, "델타", "데이드리머", "DVDelta", Species.ROBOT, '\u32DA', 5, 1024, 1.0, 1.0);
+        super(null, "델타", "데이드리머", "DVDelta", Species.ROBOT, '\u32DA', 5, 1024, 1.0, 1.0);
     }
 
     @Override
@@ -128,7 +130,11 @@ public final class Delta extends Controller {
 
     @Override
     public @NonNull ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[0];
+        return new ActiveSkillInfo[] {      // todo
+                ArkaceA1Info.getInstance(),
+                ArkaceA2Info.getInstance(),
+                getUltimateSkillInfo()
+        };
     }
 
     @Override
