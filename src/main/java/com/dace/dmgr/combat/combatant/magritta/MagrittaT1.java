@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.effect.TextHologram;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;

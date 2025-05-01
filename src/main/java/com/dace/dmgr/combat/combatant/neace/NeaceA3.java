@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;

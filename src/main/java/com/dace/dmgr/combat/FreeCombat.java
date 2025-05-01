@@ -4,7 +4,7 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

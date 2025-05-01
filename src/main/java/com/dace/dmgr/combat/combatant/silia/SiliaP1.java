@@ -4,7 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;

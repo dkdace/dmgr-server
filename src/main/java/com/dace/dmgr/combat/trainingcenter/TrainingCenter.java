@@ -12,7 +12,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;

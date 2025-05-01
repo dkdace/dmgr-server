@@ -1,11 +1,11 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.GlobalLocation;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

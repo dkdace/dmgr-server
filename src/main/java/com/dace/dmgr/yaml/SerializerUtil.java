@@ -1,8 +1,10 @@
 package com.dace.dmgr.yaml;
 
-import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.user.UserData;
+import com.dace.dmgr.util.location.BlockRegion;
+import com.dace.dmgr.util.location.CuboidRegion;
+import com.dace.dmgr.util.location.GlobalLocation;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -34,6 +36,8 @@ public final class SerializerUtil {
         SERIALIZER_MAP.put(Timespan.class, Timespan.TimespanSerializer.getInstance());
         SERIALIZER_MAP.put(GlobalLocation.class, GlobalLocation.GlobalLocationSerializer.getInstance());
         SERIALIZER_MAP.put(UserData.class, UserData.UserDataSerializer.getInstance());
+        SERIALIZER_MAP.put(CuboidRegion.class, CuboidRegion.CuboidRegionSerializer.getInstance());
+        SERIALIZER_MAP.put(BlockRegion.class, BlockRegion.BlockRegionSerializer.getInstance());
     }
 
     @NonNull
@@ -87,13 +91,27 @@ public final class SerializerUtil {
      * @throws NullPointerException 해당하는 Serializer가 존재하지 않으면 발생
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    static <T, R> Serializer<T, R> getDefaultSerializer(@NonNull Class<T> rawType, @NonNull TypeToken<T> typeToken) {
+    public static <T, R> Serializer<T, R> getDefaultSerializer(@NonNull Class<T> rawType, @NonNull TypeToken<T> typeToken) {
         if (List.class.isAssignableFrom(rawType))
             return getListSerializer((TypeToken) typeToken);
         else if (Enum.class.isAssignableFrom(rawType))
             return getEnumSerializer((TypeToken) typeToken);
 
         return (Serializer<T, R>) Validate.notNull(SERIALIZER_MAP.get(rawType), "%s에 대한 Serializer가 존재하지 않음", rawType.getName());
+    }
+
+    /**
+     * 지정한 타입에 대한 기본 직렬화 처리기를 반환한다.
+     *
+     * @param rawType 원시 타입 (클래스)
+     * @param <T>     역직렬화된 데이터 타입
+     * @param <R>     Yaml 파일에 저장할 직렬화된 데이터 타입
+     * @return 직렬화 처리기
+     * @throws NullPointerException 해당하는 Serializer가 존재하지 않으면 발생
+     */
+    public static <T, R> Serializer<T, R> getDefaultSerializer(@NonNull Class<T> rawType) {
+        return getDefaultSerializer(rawType, new TypeToken<T>() {
+        });
     }
 
     @NoArgsConstructor

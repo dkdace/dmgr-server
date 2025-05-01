@@ -30,7 +30,7 @@ import com.dace.dmgr.user.GlowingManager;
 import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.*;

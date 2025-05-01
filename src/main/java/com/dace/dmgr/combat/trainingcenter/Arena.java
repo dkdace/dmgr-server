@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.DummyBehavior;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.*;
 import org.apache.commons.lang3.RandomUtils;

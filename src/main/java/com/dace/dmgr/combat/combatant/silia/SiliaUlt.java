@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

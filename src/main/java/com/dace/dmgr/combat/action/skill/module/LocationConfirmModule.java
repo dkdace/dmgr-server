@@ -5,7 +5,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;

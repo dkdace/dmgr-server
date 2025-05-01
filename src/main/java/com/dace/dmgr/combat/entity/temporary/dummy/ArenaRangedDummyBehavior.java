@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.entity.temporary.dummy;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Location;

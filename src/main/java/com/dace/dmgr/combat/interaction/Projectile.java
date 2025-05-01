@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Builder;
 import lombok.Getter;

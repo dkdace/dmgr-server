@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
