@@ -1,5 +1,6 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
@@ -24,7 +25,7 @@ public final class OnPlayerMove extends EventListener<PlayerMoveEvent> {
         User user = User.fromPlayer(player);
         CombatUser combatUser = CombatUser.fromUser(user);
 
-        if (combatUser != null && FreeCombat.getInstance().isInFreeCombatWarp(player))
+        if (combatUser != null && GeneralConfig.getFreeCombatConfig().getWarpRegion().isIn(player))
             FreeCombat.getInstance().teleportRandom(player);
     }
 }

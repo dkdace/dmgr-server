@@ -110,7 +110,7 @@ public final class SerializerUtil {
      * @throws NullPointerException 해당하는 Serializer가 존재하지 않으면 발생
      */
     public static <T, R> Serializer<T, R> getDefaultSerializer(@NonNull Class<T> rawType) {
-        return getDefaultSerializer(rawType, new TypeToken<T>() {
+        return getDefaultSerializer(rawType, new TypeToken<T>(rawType) {
         });
     }
 

@@ -1,16 +1,11 @@
 package com.dace.dmgr.util.location;
 
 import com.dace.dmgr.util.VectorUtil;
-import com.sk89q.worldguard.bukkit.WGBukkit;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
 
@@ -263,42 +258,5 @@ public final class LocationUtil {
     @NonNull
     public static Location getLocationFromOffset(@NonNull Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
-    }
-
-    /**
-     * 지정한 엔티티가 특정 WorldGuard 지역 안에 있는지 확인한다.
-     *
-     * @param entity     확인할 엔티티
-     * @param regionName 지역 이름
-     * @return {@code entity}가 {@code regionName} 내부에 있으면 {@code true} 반환
-     */
-    public static boolean isInRegion(@NonNull Entity entity, @NonNull String regionName) {
-        RegionManager regionManager = WGBukkit.getRegionManager(entity.getWorld());
-
-        for (ProtectedRegion region : regionManager.getApplicableRegions(entity.getLocation()))
-            if (region.getId().equalsIgnoreCase(regionName))
-                return true;
-
-        return false;
-    }
-
-    /**
-     * 지정한 위치의 특정 Y 좌표에 특정 블록이 있는지 확인한다.
-     *
-     * <p>주로 간단하게 지역을 확인할 때 사용한다.</p>
-     *
-     * @param location    확인할 위치
-     * @param yCoordinate Y 좌표. 0~255 사이의 값
-     * @param material    블록의 종류
-     * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에 있으면 {@code true} 반환
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static boolean isInSameBlockXZ(@NonNull Location location, int yCoordinate, @NonNull Material material) {
-        Validate.inclusiveBetween(0, 255, yCoordinate, "255 >= yCoordinate >= 0 (%d)", yCoordinate);
-
-        Location loc = location.clone();
-        loc.setY(yCoordinate);
-
-        return loc.getBlock().getType() == material;
     }
 }
