@@ -157,7 +157,7 @@ public final class NeaceUlt extends UltimateSkill {
 
     private final class NeaceUltArea extends Area<Healable> {
         private NeaceUltArea() {
-            super(combatUser, NeaceWeaponInfo.Heal.MAX_DISTANCE, EntityCondition.team(combatUser));
+            super(combatUser, NeaceWeaponInfo.Heal.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
