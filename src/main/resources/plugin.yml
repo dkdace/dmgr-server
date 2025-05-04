@@ -92,5 +92,3 @@ commands:
     aliases:
       - dummy
       - 더미
-  게임:
-    permission: admin
