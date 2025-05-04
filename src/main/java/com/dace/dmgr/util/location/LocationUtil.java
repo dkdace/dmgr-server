@@ -1,20 +1,13 @@
-package com.dace.dmgr.util;
+package com.dace.dmgr.util.location;
 
-import com.sk89q.worldguard.bukkit.WGBukkit;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.material.*;
 import org.bukkit.util.Vector;
-
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * 위치 및 블록 관련 기능을 제공하는 클래스.
@@ -265,139 +258,5 @@ public final class LocationUtil {
     @NonNull
     public static Location getLocationFromOffset(@NonNull Location location, double offsetX, double offsetY, double offsetZ) {
         return getLocationFromOffset(location, location.getDirection(), offsetX, offsetY, offsetZ);
-    }
-
-    /**
-     * 지정한 엔티티가 특정 WorldGuard 지역 안에 있는지 확인한다.
-     *
-     * @param entity     확인할 엔티티
-     * @param regionName 지역 이름
-     * @return {@code entity}가 {@code regionName} 내부에 있으면 {@code true} 반환
-     */
-    public static boolean isInRegion(@NonNull Entity entity, @NonNull String regionName) {
-        RegionManager regionManager = WGBukkit.getRegionManager(entity.getWorld());
-
-        for (ProtectedRegion region : regionManager.getApplicableRegions(entity.getLocation()))
-            if (region.getId().equalsIgnoreCase(regionName))
-                return true;
-
-        return false;
-    }
-
-    /**
-     * 지정한 위치의 특정 Y 좌표에 특정 블록이 있는지 확인한다.
-     *
-     * <p>주로 간단하게 지역을 확인할 때 사용한다.</p>
-     *
-     * @param location    확인할 위치
-     * @param yCoordinate Y 좌표. 0~255 사이의 값
-     * @param material    블록의 종류
-     * @return {@code material}에 해당하는 블록이 {@code location}의 Y 좌표 {@code yCoordinate}에 있으면 {@code true} 반환
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static boolean isInSameBlockXZ(@NonNull Location location, int yCoordinate, @NonNull Material material) {
-        Validate.inclusiveBetween(0, 255, yCoordinate, "255 >= yCoordinate >= 0 (%d)", yCoordinate);
-
-        Location loc = location.clone();
-        loc.setY(yCoordinate);
-
-        return loc.getBlock().getType() == material;
-    }
-
-    /**
-     * 반복 가능한 이동하는 위치를 나타내는 클래스.
-     */
-    public static final class IterableLocation implements Iterable<Location> {
-        /** 시작 위치 */
-        private final Location location;
-        /** 시작 속도 */
-        private final Vector velocity;
-        /** 최대 이동 거리. (단위: 블록) */
-        private final double maxTravelDistance;
-
-        /**
-         * 기준 위치에서 지정한 속도로 이동하는 반복 가능한 위치 인스턴스를 생성한다.
-         *
-         * @param location          기준 위치
-         * @param velocity          속도
-         * @param maxTravelDistance 최대 이동 거리. (단위: 블록). 0 이상의 값.
-         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-         */
-        private IterableLocation(@NonNull Location location, @NonNull Vector velocity, double maxTravelDistance) {
-            Validate.isTrue(maxTravelDistance >= 0, "maxTravelDistance >= 0 (%f)", maxTravelDistance);
-
-            this.location = location.clone();
-            this.velocity = velocity.clone();
-            this.maxTravelDistance = maxTravelDistance;
-        }
-
-        /**
-         * 기준 위치에서 지정한 속도로 이동하는 반복 가능한 위치 인스턴스를 생성한다.
-         *
-         * @param location 기준 위치
-         * @param velocity 속도
-         */
-        private IterableLocation(@NonNull Location location, @NonNull Vector velocity) {
-            this(location, velocity, Double.MAX_VALUE);
-        }
-
-        /**
-         * 위치 반복자 인스턴스를 생성하여 반환한다.
-         *
-         * @return {@link LocationIterator}
-         */
-        @Override
-        @NonNull
-        public LocationIterator iterator() {
-            return new LocationIterator(this);
-        }
-    }
-
-    /**
-     * 이동하는 위치의 반복 기능을 제공하는 클래스.
-     *
-     * @see IterableLocation
-     */
-    public static final class LocationIterator implements Iterator<Location> {
-        /** 반복 가능한 위치 인스턴스 */
-        private final IterableLocation iterableLocation;
-        /** 현재 위치 */
-        private final Location location;
-        /** 현재 속도 */
-        private final Vector velocity;
-        /** 이동한 거리. (단위: 블록) */
-        private double travelDistance = 0;
-        /** 반복 시작 여부 */
-        private boolean isStarted = false;
-
-        /**
-         * 위치 반복자 인스턴스를 생성한다.
-         *
-         * @param iterableLocation 반복 가능한 위치
-         */
-        private LocationIterator(@NonNull IterableLocation iterableLocation) {
-            this.iterableLocation = iterableLocation;
-            this.location = iterableLocation.location.clone();
-            this.velocity = iterableLocation.velocity.clone();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterableLocation.maxTravelDistance == Double.MAX_VALUE || travelDistance + velocity.length() < iterableLocation.maxTravelDistance;
-        }
-
-        @Override
-        public Location next() {
-            if (!hasNext())
-                throw new NoSuchElementException("다음 위치가 존재하지 않음");
-
-            if (!isStarted) {
-                isStarted = true;
-                return location;
-            }
-
-            travelDistance += velocity.length();
-            return location.add(velocity).clone();
-        }
     }
 }

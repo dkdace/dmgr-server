@@ -1,4 +1,4 @@
-package com.dace.dmgr;
+package com.dace.dmgr.util.location;
 
 import com.dace.dmgr.yaml.Serializer;
 import lombok.*;
@@ -16,6 +16,7 @@ import java.util.Map;
  */
 @AllArgsConstructor
 @EqualsAndHashCode
+@Getter
 public final class GlobalLocation {
     /** 모든 값이 0인 전역 위치 */
     public static final GlobalLocation ZERO = new GlobalLocation(0, 0, 0, 0, 0);

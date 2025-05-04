@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.interaction;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;

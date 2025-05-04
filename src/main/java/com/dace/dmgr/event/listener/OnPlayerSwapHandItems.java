@@ -1,12 +1,10 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.FreeCombat;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.combatant.SelectChar;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.trainingcenter.Arena;
 import com.dace.dmgr.combat.trainingcenter.ArenaOption;
-import com.dace.dmgr.combat.trainingcenter.TrainingCenter;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.menu.Menu;
@@ -33,15 +31,15 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
 
-        if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)
-                || TrainingCenter.getInstance().isInSelectCharZone(player)) {
+        if (gameUser != null && gameUser.isInSpawn() || GeneralConfig.getFreeCombatConfig().getWaitRegion().isIn(player)
+                || GeneralConfig.getTrainingConfig().getSelectCharRegion().isIn(player)) {
             new SelectChar(player);
             return;
         }
 
         CombatUser combatUser = CombatUser.fromUser(user);
         if (combatUser != null) {
-            if (Arena.getInstance().isInOptionZone(player)) {
+            if (GeneralConfig.getTrainingConfig().getArenaConfig().getOptionRegion().isIn(player)) {
                 new ArenaOption(player);
                 return;
             }

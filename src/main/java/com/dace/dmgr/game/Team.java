@@ -1,14 +1,13 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
-import com.dace.dmgr.GlobalLocation;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.map.GameMap;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.BlockRegion;
+import com.dace.dmgr.util.location.GlobalLocation;
 import lombok.*;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
@@ -79,8 +78,7 @@ public final class Team {
      * @return 해당 플레이어가 팀 스폰 내부에 있으면 {@code true} 반환
      */
     public boolean isInSpawn(@NonNull GameUser gameUser) {
-        return LocationUtil.isInSameBlockXZ(gameUser.getPlayer().getLocation(), GeneralConfig.getGameConfig().getSpawnRegionCheckYCoordinate(),
-                type.teamSpawnBlockType);
+        return type.teamSpawnRegion.isIn(gameUser.getPlayer());
     }
 
     /**
@@ -108,8 +106,8 @@ public final class Team {
      */
     @AllArgsConstructor
     public enum Type {
-        RED(ChatColor.RED, "레드", GameMap::getRedTeamSpawns, Game::getBlueTeam, GeneralConfig.getGameConfig().getRedTeamSpawnBlock()),
-        BLUE(ChatColor.BLUE, "블루", GameMap::getBlueTeamSpawns, Game::getRedTeam, GeneralConfig.getGameConfig().getBlueTeamSpawnBlock());
+        RED(ChatColor.RED, "레드", GameMap::getRedTeamSpawns, Game::getBlueTeam, GeneralConfig.getGameConfig().getRedTeamSpawnRegion()),
+        BLUE(ChatColor.BLUE, "블루", GameMap::getBlueTeamSpawns, Game::getRedTeam, GeneralConfig.getGameConfig().getBlueTeamSpawnRegion());
 
         /** 팀 색상 */
         @Getter
@@ -122,7 +120,7 @@ public final class Team {
         private final Function<GameMap, GlobalLocation[]> teamSpawnFunction;
         /** 상대 팀 반환에 실행할 작업 */
         private final Function<Game, Team> oppositeTeamFunction;
-        /** 팀 스폰 식별 블록 타입 */
-        private final Material teamSpawnBlockType;
+        /** 팀 스폰 지역 */
+        private final BlockRegion teamSpawnRegion;
     }
 }

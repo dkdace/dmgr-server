@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.entity.combatuser;
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.*;
-import com.dace.dmgr.combat.FreeCombat;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.SkillInfo;
@@ -30,7 +29,7 @@ import com.dace.dmgr.user.GlowingManager;
 import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.*;
@@ -422,7 +421,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     public boolean canBeTargeted() {
         if (gameUser != null && gameUser.isInSpawn())
             return false;
-        if (FreeCombat.getInstance().isInFreeCombatWait(entity))
+        if (GeneralConfig.getFreeCombatConfig().getWaitRegion().isIn(entity))
             return false;
 
         return !isDead;

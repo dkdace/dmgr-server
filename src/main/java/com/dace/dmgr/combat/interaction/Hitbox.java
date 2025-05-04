@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;

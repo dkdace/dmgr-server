@@ -1,6 +1,6 @@
 package com.dace.dmgr.game.map;
 
-import com.dace.dmgr.GlobalLocation;
+import com.dace.dmgr.util.location.GlobalLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;

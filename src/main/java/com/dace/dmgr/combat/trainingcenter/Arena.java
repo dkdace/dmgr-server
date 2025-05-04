@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.DummyBehavior;
 import com.dace.dmgr.effect.BossBarDisplay;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.*;
 import org.apache.commons.lang3.RandomUtils;
@@ -19,7 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
@@ -72,25 +70,6 @@ public final class Arena {
     }
 
     /**
-     * 지정한 플레이어가 아레나 설정 지역에 있는지 확인한다.
-     *
-     * @param player 확인할 플레이어
-     * @return 아레나 설정 지역 안에 있으면 {@code true} 반환
-     */
-    public boolean isInOptionZone(@NonNull Player player) {
-        return LocationUtil.isInSameBlockXZ(player.getLocation(), CONFIG.getOptionRegionCheckYCoordinate(), CONFIG.getOptionZoneBlock());
-    }
-
-    /**
-     * 현재 플레이어가 아레나 지역에 있는지 확인한다.
-     *
-     * @return 아레나 지역 안에 있으면 {@code true} 반환
-     */
-    private boolean isInArena() {
-        return LocationUtil.isInSameBlockXZ(Validate.notNull(combatUser).getLocation(), CONFIG.getRegionCheckYCoordinate(), CONFIG.getZoneBlock());
-    }
-
-    /**
      * 지정한 플레이어의 아레나 훈련을 시작한다.
      *
      * @param combatUser 대상 플레이어
@@ -104,7 +83,7 @@ public final class Arena {
         this.combatUser = combatUser;
 
         runCheckTask = new IntervalTask(i -> {
-            if (!combatUser.isRemoved() && isInArena())
+            if (!combatUser.isRemoved() && CONFIG.getRegion().isIn(combatUser.getEntity()))
                 return true;
 
             finish();

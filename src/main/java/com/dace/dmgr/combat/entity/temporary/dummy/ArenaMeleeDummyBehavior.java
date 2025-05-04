@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import net.citizensnpcs.util.NMS;
 import org.apache.commons.lang3.RandomUtils;

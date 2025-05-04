@@ -1,6 +1,9 @@
 package com.dace.dmgr;
 
 import com.dace.dmgr.user.Tier;
+import com.dace.dmgr.util.location.BlockRegion;
+import com.dace.dmgr.util.location.CuboidRegion;
+import com.dace.dmgr.util.location.GlobalLocation;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.Initializable;
 import com.dace.dmgr.yaml.TypeToken;
@@ -185,12 +188,12 @@ public final class GeneralConfig implements Initializable<Void> {
         private final World world = Bukkit.getWorld(section.getEntry("world", "FreeCombat").get());
         /** 대기실 위치 */
         private final GlobalLocation waitLocation = section.getEntry("wait_location", GlobalLocation.ZERO).get();
-        /** 대기실 지역 이름 */
+        /** 대기실 지역 */
         @NonNull
-        private final String waitRegionName = section.getEntry("wait_region_name", "BattlePVP").get();
-        /** 이동 지역 이름 */
+        private final CuboidRegion waitRegion = section.getEntry("wait_region", CuboidRegion.DEFAULT).get();
+        /** 이동 지역 */
         @NonNull
-        private final String warpRegionName = section.getEntry("warp_region_name", "BattlePVPWarp").get();
+        private final CuboidRegion warpRegion = section.getEntry("warp_region", CuboidRegion.DEFAULT).get();
         /** 스폰 위치 목록 */
         private final List<GlobalLocation> spawnLocations = section.getListEntry("spawn_locations",
                 new TypeToken<List<GlobalLocation>>() {
@@ -227,11 +230,9 @@ public final class GeneralConfig implements Initializable<Void> {
         private final World world = Bukkit.getWorld(section.getEntry("world", "Training").get());
         /** 스폰 위치 */
         private final GlobalLocation spawnLocation = section.getEntry("spawn_location", GlobalLocation.ZERO).get();
-        /** 전투원 선택 지역 확인 Y 좌표 */
-        private final int selectCharRegionCheckYCoordinate = section.getEntry("select_char_region_check_y_coordinate", 208).get();
-        /** 전투원 선택 지역 식별 블록 타입 */
+        /** 전투원 선택 지역 */
         @NonNull
-        private final Material selectCharZoneBlock = section.getEntry("select_char_zone_block", Material.ENDER_PORTAL_FRAME).get();
+        private final BlockRegion selectCharRegion = section.getEntry("select_char_region", BlockRegion.DEFAULT).get();
 
         /** 기본 더미의 위치 설정 */
         @NonNull
@@ -335,16 +336,12 @@ public final class GeneralConfig implements Initializable<Void> {
             /** Yaml 섹션 인스턴스 */
             private static final YamlFile.Section section = TrainingConfig.section.getSection("arena");
 
-            /** 지역 확인 Y 좌표 */
-            private final int regionCheckYCoordinate = section.getEntry("region_check_y_coordinate", 208).get();
-            /** 지역 식별 블록 타입 */
+            /** 지역 */
             @NonNull
-            private final Material zoneBlock = section.getEntry("zone_block", Material.GOLD_ORE).get();
-            /** 설정 지역 확인 Y 좌표 */
-            private final int optionRegionCheckYCoordinate = section.getEntry("option_region_check_y_coordinate", 209).get();
-            /** 설정 지역 식별 블록 타입 */
+            private final BlockRegion region = section.getEntry("region", BlockRegion.DEFAULT).get();
+            /** 설정 지역 */
             @NonNull
-            private final Material optionZoneBlock = section.getEntry("option_zone_block", Material.ENCHANTMENT_TABLE).get();
+            private final BlockRegion optionRegion = section.getEntry("option_region", BlockRegion.DEFAULT).get();
             /** 더미 생성 위치 */
             private final GlobalLocation dummyLocation = section.getEntry("dummy_location", GlobalLocation.ZERO).get();
 
@@ -515,18 +512,16 @@ public final class GeneralConfig implements Initializable<Void> {
         /** 게임 시작 후 탭리스트에 플레이어의 전투원이 공개될 때 까지의 시간 */
         @NonNull
         private final Timespan headRevealTimeAfterStart = section.getEntry("head_reveal_time_after_start", Timespan.ofSeconds(20)).get();
-        /** 스폰 지역 확인 Y 좌표 */
-        private final int spawnRegionCheckYCoordinate = section.getEntry("spawn_region_check_y_coordinate", 41).get();
         /** 팀 스폰 입장 시 초당 회복량 */
         private final int teamSpawnHealPerSecond = section.getEntry("team_spawn_heal_per_second", 500).get();
         /** 상대 팀 스폰 입장 시 초당 피해량 */
         private final int oppositeSpawnDamagePerSecond = section.getEntry("opposite_spawn_damage_per_second", 250).get();
-        /** 레드 팀 스폰 식별 블록 타입 */
+        /** 레드 팀 스폰 지역 */
         @NonNull
-        private final Material redTeamSpawnBlock = section.getEntry("red_team_spawn_block", Material.REDSTONE_ORE).get();
-        /** 블루 팀 스폰 식별 블록 타입 */
+        private final BlockRegion redTeamSpawnRegion = section.getEntry("red_team_spawn_region", BlockRegion.DEFAULT).get();
+        /** 블루 팀 스폰 지역 */
         @NonNull
-        private final Material blueTeamSpawnBlock = section.getEntry("blue_team_spawn_block", Material.LAPIS_ORE).get();
+        private final BlockRegion blueTeamSpawnRegion = section.getEntry("blue_team_spawn_region", BlockRegion.DEFAULT).get();
         /** 궁극기 팩 활성화 대기 시간 */
         @NonNull
         private final Timespan ultPackActivationTime = section.getEntry("ult_pack_activation_time", Timespan.ofSeconds(60)).get();

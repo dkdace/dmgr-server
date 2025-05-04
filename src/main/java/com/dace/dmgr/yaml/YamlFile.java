@@ -168,8 +168,7 @@ public final class YamlFile implements Initializable<Void> {
             return (Entry<T>) entries.computeIfAbsent(key, k -> {
                 Class<T> type = (Class<T>) defaultValue.getClass();
 
-                return new Entry<>(k, defaultValue, SerializerUtil.getDefaultSerializer(type, new TypeToken<T>(type) {
-                }));
+                return new Entry<>(k, defaultValue, SerializerUtil.getDefaultSerializer(type));
             });
         }
 

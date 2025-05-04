@@ -4,7 +4,6 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,26 +30,6 @@ public final class FreeCombat {
     @NonNull
     public Location getWaitLocation() {
         return CONFIG.getWaitLocation();
-    }
-
-    /**
-     * 지정한 플레이어가 자유 전투 대기실 안에 있는지 확인한다.
-     *
-     * @param player 확인할 플레이어
-     * @return 대기실 안에 있으면 {@code true} 반환
-     */
-    public boolean isInFreeCombatWait(@NonNull Player player) {
-        return LocationUtil.isInRegion(player, CONFIG.getWaitRegionName());
-    }
-
-    /**
-     * 지정한 플레이어가 자유 전투 이동 지역 안에 있는지 확인한다.
-     *
-     * @param player 확인할 플레이어
-     * @return 이동 지역 안에 있으면 {@code true} 반환
-     */
-    public boolean isInFreeCombatWarp(@NonNull Player player) {
-        return LocationUtil.isInRegion(player, CONFIG.getWarpRegionName());
     }
 
     /**

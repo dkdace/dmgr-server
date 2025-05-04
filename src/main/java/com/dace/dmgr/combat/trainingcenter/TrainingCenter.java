@@ -12,12 +12,10 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
@@ -92,16 +90,6 @@ public final class TrainingCenter {
     @NonNull
     public Location getSpawnLocation() {
         return CONFIG.getSpawnLocation();
-    }
-
-    /**
-     * 지정한 플레이어가 전투원 선택 지역에 있는지 확인한다.
-     *
-     * @param player 확인할 플레이어
-     * @return 전투원 선택 지역 안에 있으면 {@code true} 반환
-     */
-    public boolean isInSelectCharZone(@NonNull Player player) {
-        return LocationUtil.isInSameBlockXZ(player.getLocation(), CONFIG.getSelectCharRegionCheckYCoordinate(), CONFIG.getSelectCharZoneBlock());
     }
 
     /**
