@@ -50,11 +50,9 @@ public class FullAutoModule {
     public final void use() {
         Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(6));
 
-        if (cooldownTimestamp.isAfter(Timestamp.now())) {
+        if (fullAutoTask != null && !fullAutoTask.isStopped()) {
             cooldownTimestamp = expiration;
-
-            if (fullAutoTask != null && !fullAutoTask.isStopped())
-                return;
+            return;
         }
 
         cooldownTimestamp = expiration;
