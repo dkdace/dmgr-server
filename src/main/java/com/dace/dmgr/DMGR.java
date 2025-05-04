@@ -122,7 +122,6 @@ public class DMGR extends JavaPlugin {
         });
 
         getHolographicDisplaysAPI().deleteHolograms();
-        if (npcRegistry != null)
-            npcRegistry.deregisterAll();
+        getNpcRegistry().deregisterAll();
     }
 }
