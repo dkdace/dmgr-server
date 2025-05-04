@@ -30,7 +30,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3;
     /** 넉백 강도 */
-    public static final double KNOCKBACK = 0.35;
+    public static final double KNOCKBACK = 0.45;
 
     /** 직격 점수 */
     public static final int DIRECT_HIT_SCORE = 1;
