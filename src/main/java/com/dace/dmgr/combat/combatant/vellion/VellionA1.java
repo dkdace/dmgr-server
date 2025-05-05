@@ -93,7 +93,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        entityModule.disposeEntity();
+        entityModule.removeEntity();
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
     }

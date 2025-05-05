@@ -66,7 +66,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
-        entityModule.disposeEntity();
+        entityModule.removeEntity();
 
         JagerUltInfo.Sounds.USE.play(combatUser.getLocation());
 

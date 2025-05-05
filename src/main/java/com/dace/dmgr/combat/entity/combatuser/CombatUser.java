@@ -225,7 +225,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setCombatantType(combatantType);
 
         addOnTick(this::onTick);
-        addOnRemove(this::onDispose);
+        addOnRemove(this::onRemove);
     }
 
     /**
@@ -274,7 +274,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /**
      * 제거되었을 때 실행할 작업.
      */
-    private void onDispose() {
+    private void onRemove() {
         if (deathMentHologram != null)
             deathMentHologram.remove();
 

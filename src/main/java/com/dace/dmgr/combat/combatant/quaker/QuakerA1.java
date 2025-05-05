@@ -90,7 +90,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        entityModule.disposeEntity();
+        entityModule.removeEntity();
 
         QuakerA1Info.Sounds.DISABLE.play(combatUser.getLocation());
     }

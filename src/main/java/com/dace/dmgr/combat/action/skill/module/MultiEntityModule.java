@@ -32,7 +32,7 @@ public final class MultiEntityModule<T extends SummonEntity<?>> {
         Validate.isTrue(maxCount >= 1, "maxCount >= 1 (%d)", maxCount);
 
         this.maxCount = maxCount;
-        skill.addOnReset(this::disposeEntities);
+        skill.addOnReset(this::removeEntities);
     }
 
     /**
@@ -57,7 +57,7 @@ public final class MultiEntityModule<T extends SummonEntity<?>> {
      */
     public void add(@NonNull T summonEntity) {
         if (summonEntities.size() >= maxCount)
-            disposeEldestEntity();
+            removeEldestEntity();
 
         summonEntities.add(summonEntity);
         summonEntity.addOnRemove(() -> summonEntities.remove(summonEntity));
@@ -66,14 +66,14 @@ public final class MultiEntityModule<T extends SummonEntity<?>> {
     /**
      * 소환한 모든 엔티티의 {@link SummonEntity#remove()}를 실행한다.
      */
-    public void disposeEntities() {
+    public void removeEntities() {
         new ArrayList<>(summonEntities).forEach(SummonEntity::remove);
     }
 
     /**
      * 가장 오래된 엔티티의 {@link SummonEntity#remove()}를 실행한다.
      */
-    public void disposeEldestEntity() {
+    public void removeEldestEntity() {
         summonEntities.get(0).remove();
     }
 }

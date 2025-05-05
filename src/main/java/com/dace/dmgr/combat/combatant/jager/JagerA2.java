@@ -60,7 +60,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
-        entityModule.disposeEntity();
+        entityModule.removeEntity();
 
         JagerA2Info.Sounds.USE.play(combatUser.getLocation());
 

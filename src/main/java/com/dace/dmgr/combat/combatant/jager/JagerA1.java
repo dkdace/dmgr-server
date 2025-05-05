@@ -94,7 +94,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
                     confirmModule.toggleCheck();
                 } else {
                     setDuration(Timespan.ZERO);
-                    entityModule.disposeEntity();
+                    entityModule.removeEntity();
                 }
 
                 break;
