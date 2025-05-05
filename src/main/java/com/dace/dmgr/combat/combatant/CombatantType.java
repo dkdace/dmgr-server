@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.jager.Jager;
 import com.dace.dmgr.combat.combatant.magritta.Magritta;
 import com.dace.dmgr.combat.combatant.metar.Metar;
 import com.dace.dmgr.combat.combatant.neace.Neace;
+import com.dace.dmgr.combat.combatant.no7.No7;
 import com.dace.dmgr.combat.combatant.palas.Palas;
 import com.dace.dmgr.combat.combatant.quaker.Quaker;
 import com.dace.dmgr.combat.combatant.silia.Silia;
@@ -44,6 +45,7 @@ public enum CombatantType {
     CHED(Ched.getInstance()),
 
     INFERNO(Inferno.getInstance()),
+    NO7(No7.getInstance()),
 
     QUAKER(Quaker.getInstance()),
     METAR(Metar.getInstance()),
