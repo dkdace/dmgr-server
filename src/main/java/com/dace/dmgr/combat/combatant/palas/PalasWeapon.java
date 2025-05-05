@@ -9,13 +9,15 @@ import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
@@ -82,9 +84,9 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 reloadModule.cancel();
                 isActionCooldown = false;
 
-                CombatUtil.sendRecoil(combatUser, PalasWeaponInfo.RECOIL.UP, PalasWeaponInfo.RECOIL.SIDE, PalasWeaponInfo.RECOIL.UP_SPREAD,
-                        PalasWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                PalasWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+                CombatUtil.sendRecoil(combatUser, PalasWeaponInfo.Recoil.UP, PalasWeaponInfo.Recoil.SIDE, PalasWeaponInfo.Recoil.UP_SPREAD,
+                        PalasWeaponInfo.Recoil.SIDE_SPREAD, 2, 1);
+                PalasWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));
 
@@ -132,7 +134,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onReloadTick(long i) {
-        PalasWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
+        PalasWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -145,7 +147,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        PalasWeaponInfo.SOUND.AIM_ON.play(combatUser.getLocation());
+        PalasWeaponInfo.Sounds.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
@@ -153,7 +155,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        PalasWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
+        PalasWeaponInfo.Sounds.AIM_OFF.play(combatUser.getLocation());
     }
 
     /**
@@ -166,7 +168,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.cancel();
 
         addActionTask(new IntervalTask(i -> {
-            PalasWeaponInfo.SOUND.ACTION.play(i, combatUser.getLocation());
+            PalasWeaponInfo.Sounds.ACTION.play(i, combatUser.getLocation());
 
             switch ((int) i) {
                 case 1:
@@ -192,7 +194,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     private final class PalasWeaponHitscan extends Hitscan<Damageable> {
         private PalasWeaponHitscan(boolean isAiming) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+            super(combatUser, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser).exclude(combatUser)),
                     (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).build());
         }
 
@@ -201,7 +203,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(8, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
-                PalasWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+                PalasWeaponInfo.Particles.BULLET_TRAIL.play(loc);
             });
         }
 
@@ -221,7 +223,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 if (target.isEnemy(combatUser)) {
                     target.getDamageModule().damage(combatUser, PalasWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
 
-                    PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                    PalasWeaponInfo.Particles.HIT_ENTITY.play(location);
                 }
 
                 return false;
@@ -231,7 +233,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     private final class PalasWeaponHealHitscan extends Hitscan<Damageable> {
         private PalasWeaponHealHitscan(boolean isAiming) {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)),
+            super(combatUser, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser).exclude(combatUser)),
                     (isAiming ? Option.builder() : Option.builder().maxDistance(PalasWeaponInfo.DISTANCE)).size(PalasWeaponInfo.HEAL_SIZE).build());
         }
 
@@ -252,15 +254,16 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                    PalasP1 skillp1 = combatUser.getSkill(PalasP1Info.getInstance());
+                    ActionManager actionManager = combatUser.getActionManager();
+                    PalasP1 skillp1 = actionManager.getSkill(PalasP1Info.getInstance());
                     skillp1.setHealAmount(PalasWeaponInfo.HEAL);
                     skillp1.setTarget((Healable) target);
 
-                    combatUser.useAction(ActionKey.PERIODIC_1);
+                    actionManager.useAction(ActionKey.PERIODIC_1);
 
                     ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 
-                    PalasWeaponInfo.PARTICLE.HIT_ENTITY.play(location);
+                    PalasWeaponInfo.Particles.HIT_ENTITY.play(location);
                 }
 
                 return false;

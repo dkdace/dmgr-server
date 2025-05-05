@@ -1,16 +1,16 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
@@ -62,13 +62,13 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        InfernoA2Info.SOUND.USE.play(combatUser.getLocation());
+        InfernoA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
-            InfernoA2Info.SOUND.TICK.play(combatUser.getLocation());
+            InfernoA2Info.Sounds.TICK.play(combatUser.getLocation());
             playTickEffect(i);
         }, 1, InfernoA2Info.DURATION.toTicks()));
     }
@@ -98,7 +98,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         loc.setYaw(0);
         loc.setPitch(0);
 
-        InfernoA2Info.PARTICLE.TICK_CORE.play(loc);
+        InfernoA2Info.Particles.TICK_CORE.play(loc);
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -114,7 +114,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
                 Location loc2 = loc.clone().add(vec.clone().multiply(1.8));
 
-                InfernoA2Info.PARTICLE.TICK_DECO.play(loc2, vec);
+                InfernoA2Info.Particles.TICK_DECO.play(loc2, vec);
             }
         }
     }
@@ -142,7 +142,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
     private final class InfernoA2Area extends Area<Damageable> {
         private InfernoA2Area() {
-            super(combatUser, InfernoA2Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, InfernoA2Info.RADIUS, EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -156,9 +156,9 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser) {
+                if (target.isGoalTarget()) {
                     combatUser.addScore("적 고정", InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
                 }
             }
 

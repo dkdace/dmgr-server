@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.combatant.arkace;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -24,7 +24,8 @@ public final class ArkaceP1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !((ArkaceWeapon) combatUser.getWeapon()).getReloadModule().isReloading();
+        return super.canUse(actionKey) && isDurationFinished()
+                && !((ArkaceWeapon) combatUser.getActionManager().getWeapon()).getReloadModule().isReloading();
     }
 
     @Override
@@ -32,8 +33,8 @@ public final class ArkaceP1 extends AbstractSkill {
         setDuration();
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getWeapon();
-        weapon.setDurability(ArkaceWeaponInfo.RESOURCE.SPRINT);
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getActionManager().getWeapon();
+        weapon.setDurability(ArkaceWeaponInfo.Resource.SPRINT);
 
         addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting() && !weapon.getReloadModule().isReloading(),
                 this::cancel, 1));
@@ -49,6 +50,6 @@ public final class ArkaceP1 extends AbstractSkill {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        combatUser.getWeapon().setDurability(ArkaceWeaponInfo.RESOURCE.DEFAULT);
+        combatUser.getActionManager().getWeapon().setDurability(ArkaceWeaponInfo.Resource.DEFAULT);
     }
 }

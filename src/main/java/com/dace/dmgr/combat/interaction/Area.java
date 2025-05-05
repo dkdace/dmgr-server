@@ -2,7 +2,8 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +29,7 @@ public abstract class Area<T extends CombatEntity> {
     /** 범위 (반지름). (단위: 블록) */
     protected final double radius;
     /** 대상 엔티티를 찾는 조건 */
-    protected final CombatUtil.EntityCondition<T> entityCondition;
+    protected final EntityCondition<T> entityCondition;
     /** 피격자별 관통 가능 여부 목록 (피격자 : 관통 가능 여부) */
     private final HashMap<T, Boolean> penetrationMap = new HashMap<>();
 
@@ -43,7 +44,7 @@ public abstract class Area<T extends CombatEntity> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Area(@NonNull CombatEntity shooter, double radius, @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(radius >= 0, "radius >= 0 (%f)", radius);
 
         this.shooter = shooter;
@@ -61,7 +62,7 @@ public abstract class Area<T extends CombatEntity> {
             return;
 
         isUsed = true;
-        Set<T> targets = CombatUtil.getNearCombatEntities(shooter.getGame(), center, radius, entityCondition);
+        Set<T> targets = CombatUtil.getNearCombatEntities(center, radius, entityCondition);
         for (T target : targets)
             penetrationMap.put(target, null);
 

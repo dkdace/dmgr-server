@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -37,7 +37,7 @@ public final class MagrittaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -49,17 +49,17 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION.toTicks(), 2, false, false), true);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
-        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
+        MagrittaA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation().add(0, 0.1, 0);
 
-            MagrittaA2Info.PARTICLE.TICK_CORE.play(loc);
-            MagrittaA2Info.PARTICLE.TICK_DECO.play(combatUser.getCenterLocation());
+            MagrittaA2Info.Particles.TICK_CORE.play(loc);
+            MagrittaA2Info.Particles.TICK_DECO.play(combatUser.getCenterLocation());
         }, 1, MagrittaA2Info.DURATION.toTicks()));
     }
 
@@ -69,11 +69,11 @@ public final class MagrittaA2 extends ActiveSkill {
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getWeapon();
+        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
         weapon.setVisible(true);
         weapon.getReloadModule().resetRemainingAmmo();
 
-        MagrittaA2Info.SOUND.USE.play(combatUser.getLocation());
+        MagrittaA2Info.Sounds.USE.play(combatUser.getLocation());
     }
 
     @Override

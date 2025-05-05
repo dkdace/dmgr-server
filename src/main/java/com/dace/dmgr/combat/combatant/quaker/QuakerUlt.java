@@ -6,17 +6,18 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,7 +48,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        QuakerA1 skill1 = combatUser.getSkill(QuakerA1Info.getInstance());
+        QuakerA1 skill1 = combatUser.getActionManager().getSkill(QuakerA1Info.getInstance());
         if (skill1.isDurationFinished()) {
             combatUser.getUser().sendAlertActionBar(skill1.getSkillInfo() + " 를 활성화한 상태에서만 사용할 수 있습니다.");
             return false;
@@ -65,7 +66,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        QuakerWeapon weapon = (QuakerWeapon) combatUser.getWeapon();
+        QuakerWeapon weapon = (QuakerWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
         weapon.use(true);
@@ -83,7 +84,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     @Override
@@ -111,8 +112,8 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
             }
         }
 
-        QuakerUltInfo.SOUND.USE_READY.play(loc);
-        QuakerUltInfo.PARTICLE.USE_READY.play(LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5));
+        QuakerUltInfo.Sounds.USE_READY.play(loc);
+        QuakerUltInfo.Particles.USE_READY.play(LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5));
         CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(6));
     }
 
@@ -120,7 +121,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerUltProjectile(@NonNull HashSet<Damageable> targets) {
-            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerUltInfo.SIZE).maxDistance(QuakerUltInfo.DISTANCE).build());
             this.targets = targets;
         }
@@ -130,7 +131,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(15, location -> {
                 Vector vec = VectorUtil.getSpreadedVector(getVelocity().normalize(), 20);
-                QuakerUltInfo.PARTICLE.BULLET_TRAIL.play(location, vec);
+                QuakerUltInfo.Particles.BULLET_TRAIL.play(location, vec);
             });
         }
 
@@ -155,13 +156,13 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
                             ((Movable) target).getMoveModule().knockback(dir);
                         }
 
-                        if (target instanceof CombatUser) {
+                        if (target.isGoalTarget()) {
                             combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
-                            bonusScoreModule.addTarget((CombatUser) target, QuakerUltInfo.SLOW_DURATION);
+                            bonusScoreModule.addTarget(target, QuakerUltInfo.SLOW_DURATION);
                         }
                     }
 
-                    QuakerUltInfo.PARTICLE.HIT_ENTITY.play(location);
+                    QuakerUltInfo.Particles.HIT_ENTITY.play(location);
                 }
 
                 return !(target instanceof Barrier);

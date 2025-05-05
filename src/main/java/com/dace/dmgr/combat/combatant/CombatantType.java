@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.combatant.arkace.Arkace;
 import com.dace.dmgr.combat.combatant.ched.Ched;
@@ -12,13 +13,10 @@ import com.dace.dmgr.combat.combatant.palas.Palas;
 import com.dace.dmgr.combat.combatant.quaker.Quaker;
 import com.dace.dmgr.combat.combatant.silia.Silia;
 import com.dace.dmgr.combat.combatant.vellion.Vellion;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
-import com.dace.dmgr.item.gui.SelectCharInfo;
-import com.dace.dmgr.item.gui.SelectCore;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -73,7 +71,7 @@ public enum CombatantType {
     CombatantType(Combatant combatant) {
         this.combatant = combatant;
 
-        this.profileItem = new ItemBuilder(PlayerSkullUtil.fromCombatant(this))
+        this.profileItem = new ItemBuilder(PlayerSkin.fromName(combatant.getSkinName()))
                 .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}",
                         combatant.getIcon(),
                         combatant.getRole().getColor(),
@@ -106,29 +104,30 @@ public enum CombatantType {
                         "§7§n좌클릭§f하여 전투원을 선택합니다.",
                         "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
                 .build(),
-                (clickType, player) -> {
-                    if (clickType == ClickType.LEFT) {
-                        User user = User.fromPlayer(player);
+                new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
+                    User user = User.fromPlayer(player);
 
-                        GameUser gameUser = GameUser.fromUser(user);
-                        if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(this))
-                            return false;
+                    GameUser gameUser = GameUser.fromUser(user);
+                    if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(this))
+                        return false;
 
-                        CombatUser combatUser = CombatUser.fromUser(user);
-                        if (combatUser == null)
-                            combatUser = new CombatUser(this, user);
-                        else
-                            combatUser.setCombatantType(this);
+                    CombatUser combatUser = CombatUser.fromUser(user);
+                    if (combatUser == null)
+                        combatUser = new CombatUser(this, user);
+                    else
+                        combatUser.setCombatantType(this);
 
-                        player.closeInventory();
+                    player.closeInventory();
 
-                        if (!user.getUserData().getCombatantRecord(this).getCores().isEmpty())
-                            combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
-                    } else if (clickType == ClickType.RIGHT)
-                        new SelectCharInfo(player, this);
+                    if (!user.getUserData().getCombatantRecord(this).getCores().isEmpty())
+                        combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
 
                     return true;
-                });
+                }),
+                new DefinedItem.ClickHandler(ClickType.RIGHT, player -> {
+                    new SelectCharInfo(player, this);
+                    return true;
+                }));
     }
 
     /**

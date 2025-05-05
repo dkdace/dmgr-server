@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -41,7 +41,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         super.onUse(actionKey);
 
         setCooldown();
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);
@@ -49,20 +49,20 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§c§l아드레날린 투여", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-
-            combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
             ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
         }
+        if (target.isGoalTarget())
+            combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
 
-        PalasUltInfo.SOUND.USE.play(combatUser.getLocation());
+        PalasUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         Location location = target.getCenterLocation();
-        PalasUltInfo.SOUND.HIT_ENTITY.play(location);
-        PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_1.play(location);
-        PalasUltInfo.PARTICLE.HIT_ENTITY_CORE_2.play(location);
+        PalasUltInfo.Sounds.HIT_ENTITY.play(location);
+        PalasUltInfo.Particles.HIT_ENTITY_CORE_1.play(location);
+        PalasUltInfo.Particles.HIT_ENTITY_CORE_2.play(location);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.LEFT), location, 0.4))
-            PalasUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc);
+            PalasUltInfo.Particles.HIT_ENTITY_DECO.play(loc);
     }
 
     @Override
@@ -72,8 +72,8 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
-        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+    public EntityCondition<Healable> getEntityCondition() {
+        return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasUltBuff.instance));
     }
 
@@ -97,7 +97,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            PalasUltInfo.PARTICLE.TICK.play(combatEntity.getCenterLocation());
+            PalasUltInfo.Particles.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override

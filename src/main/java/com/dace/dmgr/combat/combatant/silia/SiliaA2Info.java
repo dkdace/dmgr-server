@@ -53,7 +53,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(1).build());
@@ -71,7 +71,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
@@ -80,7 +80,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
                         .speedMultiplier(0.25).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, SiliaWeaponInfo.PARTICLE.COLOR)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, SiliaWeaponInfo.Particles.COLOR)
                         .count(3).horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 타격 */
         public static final ParticleEffect HIT = new ParticleEffect(

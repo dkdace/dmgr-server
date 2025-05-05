@@ -52,7 +52,7 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
@@ -69,7 +69,7 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(156, 60, 130);
 

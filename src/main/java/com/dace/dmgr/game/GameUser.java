@@ -3,23 +3,23 @@ package com.dace.dmgr.game;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.Healer;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.mode.GamePlayMode;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.ItemBuilder;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import com.keenant.tabbed.util.Skin;
-import com.keenant.tabbed.util.Skins;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,9 +27,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.function.Function;
 
 /**
@@ -54,7 +52,9 @@ public final class GameUser {
     /** 팀 */
     @NonNull
     @Getter
-    private final Game.Team team;
+    private final Team team;
+    /** 게임 탭리스트 프로필 */
+    private final GameTabListProfile gameTabListProfile;
     /** 게임 시작 시점 */
     @Getter
     private final Timestamp startTime = Timestamp.now();
@@ -97,7 +97,7 @@ public final class GameUser {
      * @param team 설정할 팀
      * @throws IllegalStateException 해당 {@code user}가 지정한 {@code game}의 방에 입장하지 않았거나 GameUser가 이미 존재하면 발생
      */
-    GameUser(@NonNull User user, @NonNull Game game, @NonNull Game.Team team) {
+    GameUser(@NonNull User user, @NonNull Game game, @NonNull Team team) {
         Validate.validState(!GAME_USER_MAP.containsKey(user), "GameUser가 이미 존재함");
         Validate.validState(user.getGameRoom() != null && user.getGameRoom().getGame() == game, "user.getGameRoom().getGame() == game (false)");
 
@@ -105,12 +105,14 @@ public final class GameUser {
         this.player = user.getPlayer();
         this.game = game;
         this.team = team;
+        this.gameTabListProfile = new GameTabListProfile(this);
 
-        user.quitFreeCombat();
+        user.setCurrentPlace(Place.LOBBY);
 
         GAME_USER_MAP.put(user, this);
 
         game.onAddGameUser(this);
+        team.onAddGameUser(this);
 
         this.onTickTask = new IntervalTask(this::onTick, 1);
 
@@ -129,15 +131,14 @@ public final class GameUser {
     }
 
     private void onInit() {
-        for (CommunicationItem communicationItem : CommunicationItem.values())
-            user.getGui().set(communicationItem.slotIndex, communicationItem.definedItem);
+        CommunicationItem.updateGUI(this);
 
-        user.teleport(getSpawnLocation());
+        EntityUtil.teleport(player, getSpawnLocation());
         user.clearChat();
 
         user.sendTitle(game.getGamePlayMode().getName(), "§b§nF키§b를 눌러 전투원을 선택하십시오.", Timespan.ofSeconds(0.5),
                 game.isPlaying() ? Timespan.ofSeconds(2) : game.getGamePlayMode().getReadyDuration(), Timespan.ofSeconds(1.5), Timespan.ofSeconds(4));
-        user.getTabListManager().clearItems();
+        user.setTabListProfile(gameTabListProfile);
     }
 
     /**
@@ -153,13 +154,10 @@ public final class GameUser {
                 onTickOppositeSpawn();
         }
         if (!isInSpawn() && (!game.isPlaying() || CombatUser.fromUser(user) == null))
-            user.teleport(getSpawnLocation());
+            EntityUtil.teleport(player, getSpawnLocation());
 
         if (i % 5 == 0)
-            team.getTeamUsers().forEach(target -> target.getUser().setGlowing(player, ChatColor.BLUE));
-
-        if (i % 20 == 0)
-            updateGameTabList();
+            team.getTeamUsers().forEach(target -> target.getUser().getGlowingManager().setGlowing(player, team.getType().getColor()));
     }
 
     /**
@@ -208,65 +206,11 @@ public final class GameUser {
 
         onTickTask.stop();
         game.onRemoveGameUser(this);
-
-        user.reset();
+        team.onRemoveGameUser(this);
 
         GAME_USER_MAP.remove(user);
-    }
 
-    /**
-     * 게임 탭리스트를 업데이트한다.
-     */
-    private void updateGameTabList() {
-        User.TabListManager tabListManager = user.getTabListManager();
-
-        String title = (game.getGamePlayMode().isRanked() ? "§6§l[ 랭크 ] §f" : "§a§l[ 일반 ] §f") + game.getGamePlayMode().getName();
-        String teamScore = MessageFormat.format("§4-=-=-=- §c§lRED §f[ {0} ] §4-=-=-=-            §1-=-=-=- §9§lBLUE §f[ {1} ] §1-=-=-=-",
-                game.getRedTeam().getScore(),
-                game.getBlueTeam().getScore());
-        tabListManager.setHeader("\n" + title + "\n" + teamScore);
-
-        boolean isHeadReveal = game.isPlaying()
-                && game.getElapsedTime().compareTo(GeneralConfig.getGameConfig().getHeadRevealTimeAfterStart()) > 0;
-
-        int column = 0;
-        for (Game.Team targetTeam : new Game.Team[]{game.getRedTeam(), game.getBlueTeam()}) {
-            tabListManager.setItem(++column, 0, MessageFormat.format("{0}§l§n {1} §f({2}명)",
-                    targetTeam.getType().getColor(),
-                    targetTeam.getType().getName(),
-                    targetTeam.getTeamUsers().size()), Skins.getDot(targetTeam.getType().getColor()));
-
-            Iterator<GameUser> iterator = targetTeam.getTeamUsers().stream()
-                    .sorted(Comparator.comparing(GameUser::getScore).reversed())
-                    .iterator();
-
-            for (int i = 0; i < game.getGamePlayMode().getMaxPlayer() / 2; i++) {
-                int row = i * 3 + 1;
-
-                if (i > targetTeam.getTeamUsers().size() - 1) {
-                    tabListManager.removeItem(column, row);
-                    tabListManager.removeItem(column, row + 1);
-                } else {
-                    GameUser target = iterator.next();
-                    User targetUser = target.getUser();
-
-                    if (team == targetTeam || isHeadReveal)
-                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), targetUser);
-                    else
-                        tabListManager.setItem(column, row, targetUser.getPlayer().getName(), Skins.getPlayer("crashdummie99"));
-
-                    tabListManager.setItem(column, row + 1, MessageFormat.format("§7{0} §f{1}   §7{2} §f{3}   §7{4} §f{5}   §7{6} §f{7}",
-                            "✪",
-                            (int) target.getScore(),
-                            TextIcon.DAMAGE,
-                            target.getKill(),
-                            TextIcon.POISON,
-                            target.getDeath(),
-                            "✔",
-                            target.getAssist()), (Skin) null);
-                }
-            }
-        }
+        user.setCurrentPlace(Place.LOBBY);
     }
 
     /**
@@ -348,18 +292,18 @@ public final class GameUser {
      * 스폰 위치를 반환한다.
      *
      * @return 스폰 위치
-     * @see Game.Team#getSpawn()
+     * @see Game#getTeamSpawn(Team)
      */
     @NonNull
     public Location getSpawnLocation() {
-        return team.getSpawn();
+        return game.getTeamSpawn(team);
     }
 
     /**
      * 플레이어가 스폰 지역 안에 있는지 확인한다.
      *
      * @return 플레이어가 스폰 안에 있으면 {@code true} 반환
-     * @see Game.Team#isInSpawn(GameUser)
+     * @see Team#isInSpawn(GameUser)
      */
     public boolean isInSpawn() {
         return team.isInSpawn(this);
@@ -384,7 +328,7 @@ public final class GameUser {
      */
     @NonNull
     private String getFormattedChatMessage(@NonNull String message) {
-        return MessageFormat.format("§f<{0}§l[미선택]§f{1}> §f{2}", team.getType().getColor(), player.getName(), message);
+        return MessageFormat.format("<{0}§l[미선택]§f{1}> {2}", team.getType().getColor(), player.getName(), message);
     }
 
     /**
@@ -393,7 +337,7 @@ public final class GameUser {
      * @param message 메시지
      * @param isTeam  {@code true}로 지정 시 팀원에게만 전송
      */
-    public void broadcastChatMessage(@NonNull String message, boolean isTeam) {
+    private void broadcastChatMessage(@NonNull String message, boolean isTeam) {
         CombatUser combatUser = CombatUser.fromUser(user);
         String fullMessage = MessageFormat.format("§7§l[{0}] {1}",
                 isTeam ? "팀" : "전체",
@@ -408,49 +352,27 @@ public final class GameUser {
     }
 
     /**
+     * 게임에 참여한 모든 플레이어에게 채팅 메시지를 전송한다.
+     *
+     * @param message 메시지
+     */
+    public void broadcastChatMessage(@NonNull String message) {
+        broadcastChatMessage(message, isTeamChat);
+    }
+
+    /**
      * 의사소통 아이템 목록.
      */
     private enum CommunicationItem {
         /** 치료 요청 */
-        REQ_HEAL("§a치료 요청", 9, targetCombatUser -> {
-            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
-            String state;
-            String ment;
-
-            if (targetCombatUser.getDamageModule().isLowHealth()) {
-                state = "치명상";
-                ment = combatant.getReqHealMentLow();
-            } else if (targetCombatUser.getDamageModule().isHalfHealth()) {
-                state = "체력 낮음";
-                ment = combatant.getReqHealMentHalf();
-            } else {
-                state = "치료 요청";
-                ment = combatant.getReqHealMentNormal();
-            }
-
-            return MessageFormat.format("§7[{0}] §f§l{1}", state, ment);
-        }),
+        REQ_HEAL("§a치료 요청", 9, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getReqHealMent(targetCombatUser)),
         /** 궁극기 상태 */
-        SHOW_ULT("§a궁극기 상태", 10, targetCombatUser -> {
-            Combatant combatant = targetCombatUser.getCombatantType().getCombatant();
-            String ment;
-
-            if (targetCombatUser.getUltGaugePercent() < 0.9)
-                ment = combatant.getUltStateMentLow();
-            else if (targetCombatUser.getUltGaugePercent() < 1)
-                ment = combatant.getUltStateMentNearFull();
-            else
-                ment = combatant.getUltStateMentFull();
-
-            return MessageFormat.format("§7[궁극기 {0}%] §f§l{1}", Math.floor(targetCombatUser.getUltGaugePercent() * 100), ment);
-        }),
+        SHOW_ULT("§a궁극기 상태", 10, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getUltStateMent(targetCombatUser)),
         /** 집결 요청 */
-        REQ_RALLY("§a집결 요청", 11, targetCombatUser -> {
-            String[] ments = targetCombatUser.getCombatantType().getCombatant().getReqRallyMents();
-            String ment = ments[RandomUtils.nextInt(0, ments.length)];
-
-            return MessageFormat.format("§7[집결 요청] §f§l{0}", ment);
-        });
+        REQ_RALLY("§a집결 요청", 11, targetCombatUser ->
+                targetCombatUser.getCombatantType().getCombatant().getReqRallyMent());
 
         /** 인벤토리 칸 번호 */
         private final int slotIndex;
@@ -464,11 +386,8 @@ public final class GameUser {
                             .setDamage((short) 5)
                             .setName(name)
                             .build(),
-                    (clickType, player) -> {
-                        if (clickType != ClickType.LEFT)
-                            return false;
-
-                        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(player));
+                    new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
+                        CombatUser combatUser = CombatUser.fromUser(User.fromPlayer(target));
                         if (combatUser == null)
                             return false;
 
@@ -476,7 +395,7 @@ public final class GameUser {
                         if (gameUser == null)
                             return false;
 
-                        if (!player.isOp()) {
+                        if (!target.isOp()) {
                             if (gameUser.communicationTimestamp.isAfter(Timestamp.now()))
                                 return false;
 
@@ -484,10 +403,20 @@ public final class GameUser {
                         }
 
                         gameUser.broadcastChatMessage(action.apply(combatUser), true);
-                        player.closeInventory();
+                        target.closeInventory();
 
                         return true;
-                    });
+                    }));
+        }
+
+        /**
+         * 의사소통 아이템 인벤토리 GUI를 업데이트한다.
+         *
+         * @param gameUser 대상 플레이어
+         */
+        private static void updateGUI(@NonNull GameUser gameUser) {
+            for (CommunicationItem communicationItem : CommunicationItem.values())
+                gameUser.getUser().getGui().set(communicationItem.slotIndex, communicationItem.definedItem);
         }
     }
 }

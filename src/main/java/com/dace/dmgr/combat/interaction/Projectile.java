@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,7 +51,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Option
      */
-    Projectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition,
+    Projectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull EntityCondition<T> entityCondition,
                @NonNull Option option) {
         super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
         Validate.isTrue(speed >= 0, "speed >= 0 (%d)", speed);
@@ -75,7 +75,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Option
      */
-    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
+    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull EntityCondition<T> entityCondition, @NonNull Option option) {
         this(shooter, null, speed, entityCondition, option);
     }
 
@@ -91,7 +91,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      * @see Option
      */
-    protected Projectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition, @NonNull Option option) {
+    protected Projectile(@NonNull Action action, int speed, @NonNull EntityCondition<T> entityCondition, @NonNull Option option) {
         this(action.getCombatUser(), action, speed, entityCondition, option);
     }
 
@@ -103,7 +103,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Projectile(@NonNull CombatEntity shooter, int speed, @NonNull EntityCondition<T> entityCondition) {
         this(shooter, null, speed, entityCondition, Option.builder().build());
     }
 
@@ -115,7 +115,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Projectile(@NonNull Action action, int speed, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Projectile(@NonNull Action action, int speed, @NonNull EntityCondition<T> entityCondition) {
         this(action.getCombatUser(), action, speed, entityCondition, Option.builder().build());
     }
 

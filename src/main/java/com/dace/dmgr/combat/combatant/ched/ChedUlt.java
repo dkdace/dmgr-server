@@ -8,19 +8,20 @@ import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
-import com.dace.dmgr.combat.entity.temporary.Dummy;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,7 +59,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -71,11 +72,11 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 
-        ChedUltInfo.SOUND.USE.play(combatUser.getLocation());
+        ChedUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         EffectManager effectManager = new EffectManager();
 
@@ -85,7 +86,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             Location location = combatUser.getArmLocation(MainHand.RIGHT);
             new ChedUltProjectile().shot(location);
 
-            ChedUltInfo.SOUND.USE_READY.play(location);
+            ChedUltInfo.Sounds.USE_READY.play(location);
 
             addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, 20));
         }, 1, ChedUltInfo.READY_DURATION.toTicks()));
@@ -137,9 +138,9 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                     Location loc2 = loc.clone().add(vec2).add(loc.getDirection().multiply(forward));
 
                     if (index <= 30)
-                        ChedUltInfo.PARTICLE.USE_TICK_1.play(loc2, vec, index / 60.0);
+                        ChedUltInfo.Particles.USE_TICK_1.play(loc2, vec, index / 60.0);
                     else
-                        ChedUltInfo.PARTICLE.USE_TICK_2.play(loc2, vec);
+                        ChedUltInfo.Particles.USE_TICK_2.play(loc2, vec);
                 }
             }
 
@@ -149,9 +150,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     private final class ChedUltProjectile extends Projectile<Damageable> {
         private ChedUltProjectile() {
-            super(ChedUlt.this, ChedUltInfo.VELOCITY,
-                    CombatUtil.EntityCondition.enemy(combatUser).and(combatEntity ->
-                            combatEntity instanceof CombatUser || combatEntity instanceof Dummy),
+            super(ChedUlt.this, ChedUltInfo.VELOCITY, EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget),
                     Option.builder().size(ChedUltInfo.SIZE).build());
         }
 
@@ -161,38 +160,38 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             return createPeriodIntervalHandler(15, location -> {
                 location.setPitch(0);
 
-                ChedUltInfo.SOUND.TICK.play(location);
+                ChedUltInfo.Sounds.TICK.play(location);
 
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_CORE.play(location);
+                ChedUltInfo.Particles.BULLET_TRAIL_CORE.play(location);
 
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6),
                         0.2, 0.12);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2),
                         0.16, 0.08);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8),
                         0.12, 0.04);
 
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8),
                         0.1, 0.16);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1),
                         0.1, 0.16);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4),
                         0.18, 0.16);
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
+                ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6),
                         0.24, 0.16);
 
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, -2.8, 1.7, 0));
-                ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, 2.8, 1.7, 0));
+                ChedUltInfo.Particles.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, -2.8, 1.7, 0));
+                ChedUltInfo.Particles.BULLET_TRAIL_DECO_1.play(LocationUtil.getLocationFromOffset(location, 2.8, 1.7, 0));
 
                 for (int i = 0; i < 6; i++) {
                     Location loc1 = LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
                     Location loc2 = LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
                     Vector vec = VectorUtil.getSpreadedVector(getVelocity().normalize(), 20);
 
-                    ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc1, 0.1, 0.1 + i * 0.04);
-                    ChedUltInfo.PARTICLE.BULLET_TRAIL_SHAPE.play(loc2, 0.1, 0.1 + i * 0.04);
-                    ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc1, vec);
-                    ChedUltInfo.PARTICLE.BULLET_TRAIL_DECO_2.play(loc2, vec);
+                    ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(loc1, 0.1, 0.1 + i * 0.04);
+                    ChedUltInfo.Particles.BULLET_TRAIL_SHAPE.play(loc2, 0.1, 0.1 + i * 0.04);
+                    ChedUltInfo.Particles.BULLET_TRAIL_DECO_2.play(loc1, vec);
+                    ChedUltInfo.Particles.BULLET_TRAIL_DECO_2.play(loc2, vec);
                 }
             });
         }
@@ -213,10 +212,10 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 entityModule.set(new ChedUltFireFloor(loc));
 
                 for (Location loc2 : LocationUtil.getLine(location, loc, 0.4))
-                    ChedUltInfo.PARTICLE.HIT_ENTITY.play(loc2);
+                    ChedUltInfo.Particles.HIT_ENTITY.play(loc2);
 
-                ChedUltInfo.SOUND.EXPLODE.play(loc);
-                ChedUltInfo.PARTICLE.EXPLODE.play(loc);
+                ChedUltInfo.Sounds.EXPLODE.play(loc);
+                ChedUltInfo.Particles.EXPLODE.play(loc);
 
                 return false;
             };
@@ -235,8 +234,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(ChedUltProjectile.this, 0, DamageType.NORMAL, null, false, false)
-                        && target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                        && target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, center.distance(location), radius / 2.0);
 
@@ -256,7 +255,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
      */
     public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false, true);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false);
             addOnTick(this::onTick);
         }
 
@@ -265,8 +264,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
             new ChedUltFireFloorArea().emit(loc);
 
             if (i % 4 == 0)
-                ChedUltInfo.SOUND.FIRE_FLOOR_TICK.play(loc);
-            ChedUltInfo.PARTICLE.FIRE_FLOOR_TICK.play(loc);
+                ChedUltInfo.Sounds.FIRE_FLOOR_TICK.play(loc);
+            ChedUltInfo.Particles.FIRE_FLOOR_TICK.play(loc);
 
             if (i >= ChedUltInfo.FIRE_FLOOR_DURATION.toTicks())
                 remove();
@@ -274,7 +273,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
         private final class ChedUltFireFloorArea extends Area<Damageable> {
             private ChedUltFireFloorArea() {
-                super(combatUser, ChedUltInfo.SIZE, CombatUtil.EntityCondition.enemy(combatUser));
+                super(combatUser, ChedUltInfo.SIZE, EntityCondition.enemy(combatUser).and(combatEntity ->
+                        Math.abs(combatEntity.getLocation().getY() - ChedUltFireFloor.this.getLocation().getY()) < ChedUltInfo.FIRE_FLOOR_HEIGHT));
             }
 
             @Override
@@ -287,8 +287,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
                     target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
 
-                    if (target instanceof CombatUser)
-                        bonusScoreModule.addTarget((CombatUser) target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
+                    if (target.isGoalTarget())
+                        bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
                 return !(target instanceof Barrier);

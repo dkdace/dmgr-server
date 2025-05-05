@@ -53,7 +53,7 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
@@ -74,7 +74,7 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 틱 입자 효과 */
         public static final ParticleEffect USE_TICK = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT_MAGIC)

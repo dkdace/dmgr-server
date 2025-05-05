@@ -2,16 +2,17 @@ package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -32,8 +33,9 @@ public final class SiliaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
-                && combatUser.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && actionManager.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -41,9 +43,9 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
-        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
 
-        SiliaA2Info.SOUND.USE.play(combatUser.getLocation());
+        SiliaA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
@@ -55,14 +57,14 @@ public final class SiliaA2 extends ActiveSkill {
                 angle += 360 / 6;
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(1.6 - i * 0.2);
 
-                SiliaA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec), vec);
+                SiliaA2Info.Particles.USE_TICK.play(loc.clone().add(vec), vec);
             }
         }, () -> {
             cancel();
 
             new SiliaA2Projectile().shot();
 
-            SiliaA2Info.SOUND.USE_READY.play(combatUser.getLocation());
+            SiliaA2Info.Sounds.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaA2Info.READY_DURATION.toTicks()));
     }
 
@@ -78,7 +80,7 @@ public final class SiliaA2 extends ActiveSkill {
 
     private final class SiliaA2Projectile extends Projectile<Damageable> {
         private SiliaA2Projectile() {
-            super(SiliaA2.this, SiliaA2Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(SiliaA2.this, SiliaA2Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(SiliaA2Info.SIZE).maxDistance(SiliaA2Info.DISTANCE).build());
         }
 
@@ -86,7 +88,7 @@ public final class SiliaA2 extends ActiveSkill {
         protected void onHit(@NonNull Location location) {
             for (int i = 0; i < 40; i++) {
                 Vector vec = VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60);
-                SiliaA2Info.PARTICLE.HIT.play(location, vec, Math.random());
+                SiliaA2Info.Particles.HIT.play(location, vec, Math.random());
             }
         }
 
@@ -107,7 +109,7 @@ public final class SiliaA2 extends ActiveSkill {
                         Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
                         Location loc = location.clone().add(vec);
 
-                        SiliaA2Info.PARTICLE.BULLET_TRAIL.play(loc, vec);
+                        SiliaA2Info.Particles.BULLET_TRAIL.play(loc, vec);
                     }
 
                     i++;
@@ -138,9 +140,9 @@ public final class SiliaA2 extends ActiveSkill {
                     loc.setPitch(0);
                     loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
 
-                    SiliaA2Info.SOUND.HIT_ENTITY.play(location);
+                    SiliaA2Info.Sounds.HIT_ENTITY.play(location);
                     for (Location loc2 : LocationUtil.getLine(combatUser.getLocation(), loc, 0.5))
-                        SiliaA2Info.PARTICLE.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
+                        SiliaA2Info.Particles.HIT_ENTITY.play(loc2.clone().add(0, 1, 0));
 
                     knockback(loc, target);
                 }
@@ -162,7 +164,7 @@ public final class SiliaA2 extends ActiveSkill {
             combatUser.getMoveModule().teleport(location);
             combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
-            if (target instanceof CombatUser)
+            if (target.isGoalTarget())
                 combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
         }
     }

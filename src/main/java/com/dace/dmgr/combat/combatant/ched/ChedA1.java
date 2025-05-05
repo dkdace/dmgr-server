@@ -2,18 +2,18 @@ package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,7 +51,7 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -65,17 +65,17 @@ public final class ChedA1 extends StackableSkill {
         setDuration();
         combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
 
-        ChedA1Info.SOUND.USE.play(combatUser.getLocation());
+        ChedA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
 
             weapon.setGlowing(true);
             weapon.setMaterial(WeaponInfo.MATERIAL);
-            weapon.setDurability(ChedWeaponInfo.RESOURCE.FIRE);
+            weapon.setDurability(ChedWeaponInfo.Resource.FIRE);
         }, ChedA1Info.READY_DURATION.toTicks()));
     }
 
@@ -90,10 +90,10 @@ public final class ChedA1 extends StackableSkill {
 
         setDuration(Timespan.ZERO);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.setGlowing(false);
         weapon.setMaterial(Material.BOW);
-        weapon.setDurability(ChedWeaponInfo.RESOURCE.DEFAULT);
+        weapon.setDurability(ChedWeaponInfo.Resource.DEFAULT);
     }
 
     /**
@@ -106,17 +106,17 @@ public final class ChedA1 extends StackableSkill {
 
         new ChedA1Projectile().shot();
 
-        ChedA1Info.SOUND.SHOOT.play(combatUser.getLocation());
+        ChedA1Info.Sounds.SHOOT.play(combatUser.getLocation());
     }
 
     private final class ChedA1Projectile extends Projectile<Damageable> {
         private ChedA1Projectile() {
-            super(ChedA1.this, ChedA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedA1.this, ChedA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            ChedWeaponInfo.SOUND.HIT.play(location);
+            ChedWeaponInfo.Sounds.HIT.play(location);
         }
 
         @Override
@@ -126,7 +126,7 @@ public final class ChedA1 extends StackableSkill {
                     .chain(createGravityIntervalHandler())
                     .next(createPeriodIntervalHandler(9, location -> {
                         Location loc = LocationUtil.getLocationFromOffset(location, 0.2, 0, 0);
-                        ChedA1Info.PARTICLE.BULLET_TRAIL.play(loc);
+                        ChedA1Info.Particles.BULLET_TRAIL.play(loc);
                     }));
         }
 
@@ -136,7 +136,7 @@ public final class ChedA1 extends StackableSkill {
             return (location, hitBlock) -> {
                 CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
                 CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1.5);
-                ChedA1Info.PARTICLE.HIT_BLOCK.play(location);
+                ChedA1Info.Particles.HIT_BLOCK.play(location);
 
                 return false;
             };
@@ -149,8 +149,8 @@ public final class ChedA1 extends StackableSkill {
                 if (target.getDamageModule().damage(this, ChedA1Info.DAMAGE, DamageType.NORMAL, location, isCrit, true)) {
                     target.getStatusEffectModule().apply(burning, ChedA1Info.FIRE_DURATION);
 
-                    if (target instanceof CombatUser)
-                        ((CombatUser) shooter).addScore("불화살", ChedA1Info.DAMAGE_SCORE);
+                    if (target.isGoalTarget())
+                        combatUser.addScore("불화살", ChedA1Info.DAMAGE_SCORE);
                 }
 
                 return false;

@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public class Stun extends StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).cancelAction(attacker);
+            ((CombatUser) combatEntity).getActionManager().cancelAction(attacker);
     }
 
     @Override

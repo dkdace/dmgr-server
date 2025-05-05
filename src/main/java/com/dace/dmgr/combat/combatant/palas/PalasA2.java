@@ -1,18 +1,18 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -48,7 +48,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);
@@ -57,19 +57,19 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         if (target instanceof CombatUser) {
             ((CombatUser) target).getUser().sendTitle("§e§l해로운 효과 면역", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-
-            combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
             ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
         }
+        if (target.isGoalTarget())
+            combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
 
-        PalasA2Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA2Info.Sounds.USE.play(combatUser.getLocation());
 
         Location location = target.getCenterLocation();
-        PalasA2Info.SOUND.HIT_ENTITY.play(location);
-        PalasA2Info.PARTICLE.HIT_ENTITY_CORE.play(location);
+        PalasA2Info.Sounds.HIT_ENTITY.play(location);
+        PalasA2Info.Particles.HIT_ENTITY_CORE.play(location);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.LEFT), location, 0.4))
-            PalasA2Info.PARTICLE.HIT_ENTITY_DECO.play(loc);
+            PalasA2Info.Particles.HIT_ENTITY_DECO.play(loc);
     }
 
     @Override
@@ -79,8 +79,8 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
-        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+    public EntityCondition<Healable> getEntityCondition() {
+        return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(PalasA2Immune.instance));
     }
 
@@ -103,7 +103,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            PalasA2Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
+            PalasA2Info.Particles.TICK.play(combatEntity.getCenterLocation());
         }
 
         @Override

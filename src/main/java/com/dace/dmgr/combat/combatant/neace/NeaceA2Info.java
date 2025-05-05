@@ -53,7 +53,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.5).build(),
@@ -66,7 +66,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(140, 255, 245);
 

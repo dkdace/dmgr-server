@@ -1,5 +1,10 @@
 package com.dace.dmgr.item;
 
+import com.dace.dmgr.ConsoleLogger;
+import com.dace.dmgr.PlayerSkin;
+import com.dace.dmgr.util.ReflectionUtil;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
@@ -11,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -52,6 +58,25 @@ public final class ItemBuilder {
      */
     public ItemBuilder(@NonNull Material material) {
         this(new ItemStack(material));
+    }
+
+    /**
+     * 플레이어 머리 아이템을 생성하기 위한 빌더 인스턴스를 생성한다.
+     *
+     * @param playerSkin 플레이어 스킨
+     */
+    public ItemBuilder(@NonNull PlayerSkin playerSkin) {
+        this.itemStack = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        this.itemMeta = itemStack.getItemMeta();
+
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+        gameProfile.getProperties().put("textures", new Property("textures", playerSkin.toProperty().getValue()));
+
+        try {
+            ReflectionUtil.getField(itemMeta.getClass(), "profile").set(itemMeta, gameProfile);
+        } catch (Exception ex) {
+            ConsoleLogger.severe("아이템 메타 지정 실패", ex);
+        }
     }
 
     /**

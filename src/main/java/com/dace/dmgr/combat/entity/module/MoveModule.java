@@ -5,7 +5,7 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -56,12 +56,13 @@ public final class MoveModule {
         this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
 
         combatEntity.addOnTick(i -> {
-            double movementSpeed = speedStatus.getValue();
-            if (!canMove() || !combatEntity.canMove())
-                movementSpeed = 0;
+            double finalSpeed = Math.max(0, getFinalSpeed());
 
             LivingEntity livingEntity = combatEntity.getEntity();
-            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(movementSpeed);
+            livingEntity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(finalSpeed);
+
+            if (livingEntity instanceof Player)
+                ((Player) livingEntity).setFlySpeed((float) (finalSpeed * 0.35));
 
             if (canJump() && combatEntity.canJump()) {
                 if (livingEntity.hasPotionEffect(PotionEffectType.JUMP) && livingEntity.getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
@@ -70,6 +71,30 @@ public final class MoveModule {
                 livingEntity.addPotionEffect(
                         new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -6, false, false), true);
         });
+    }
+
+    /**
+     * 최종 이동속도를 반환한다.
+     *
+     * @return 최종 이동속도
+     */
+    private double getFinalSpeed() {
+        if (!canMove() || !combatEntity.canMove())
+            return 0;
+
+        double speed = speedStatus.getValue();
+
+        LivingEntity livingEntity = combatEntity.getEntity();
+        if (!(livingEntity instanceof Player))
+            return speed;
+
+        if (((Player) livingEntity).isSprinting()) {
+            speed *= 0.88;
+            if (!livingEntity.isOnGround())
+                speed *= speed / speedStatus.getBaseValue();
+        }
+
+        return speed;
     }
 
     /**
@@ -157,13 +182,7 @@ public final class MoveModule {
      * @param location 이동할 위치
      */
     public void teleport(@NonNull Location location) {
-        if (combatEntity instanceof Damageable && ((Damageable) combatEntity).getStatusEffectModule().hasRestriction(CombatRestriction.TELEPORT))
-            return;
-
-        if (combatEntity.getEntity() instanceof Player) {
-            User user = User.fromPlayer(combatEntity.getEntity());
-            user.teleport(location);
-        } else
-            combatEntity.getEntity().teleport(location);
+        if (!(combatEntity instanceof Damageable) || !((Damageable) combatEntity).getStatusEffectModule().hasRestriction(CombatRestriction.TELEPORT))
+            EntityUtil.teleport(combatEntity.getEntity(), location);
     }
 }

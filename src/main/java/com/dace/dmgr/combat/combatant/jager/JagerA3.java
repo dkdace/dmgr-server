@@ -8,17 +8,19 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -62,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && !combatUser.getActionManager().getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -77,21 +79,21 @@ public final class JagerA3 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
-        JagerA3Info.SOUND.USE.play(combatUser.getLocation());
+        JagerA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
             explodeTimestamp = Timestamp.now().plus(JagerA3Info.EXPLODE_DURATION);
 
-            JagerA3Info.SOUND.USE_READY.play(combatUser.getLocation());
+            JagerA3Info.Sounds.USE_READY.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
-                JagerA3Info.PARTICLE.BULLET_TRAIL.play(loc);
+                JagerA3Info.Particles.BULLET_TRAIL.play(loc);
             }, () -> {
                 forceCancel();
 
@@ -111,7 +113,7 @@ public final class JagerA3 extends ActiveSkill {
         isEnabled = false;
 
         setDuration(Timespan.ZERO);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -120,7 +122,7 @@ public final class JagerA3 extends ActiveSkill {
     private void onThrow() {
         forceCancel();
 
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(2));
+        combatUser.getActionManager().getWeapon().setCooldown(Timespan.ofTicks(2));
 
         Location loc = combatUser.getArmLocation(MainHand.RIGHT);
         new JagerA3Projectile().shot(loc);
@@ -138,8 +140,8 @@ public final class JagerA3 extends ActiveSkill {
         Location loc = location.clone().add(0, 0.1, 0);
         new JagerA3Area(projectile).emit(loc);
 
-        JagerA3Info.SOUND.EXPLODE.play(loc);
-        JagerA3Info.PARTICLE.EXPLODE.play(loc);
+        JagerA3Info.Sounds.EXPLODE.play(loc);
+        JagerA3Info.Particles.EXPLODE.play(loc);
     }
 
     /**
@@ -155,13 +157,13 @@ public final class JagerA3 extends ActiveSkill {
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
             if (combatEntity.isCreature())
-                JagerA3Info.PARTICLE.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
+                JagerA3Info.Particles.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
         }
     }
 
     private final class JagerA3Projectile extends BouncingProjectile<Damageable> {
         private JagerA3Projectile() {
-            super(JagerA3.this, JagerA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerA3.this, JagerA3Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timestamp.now().until(explodeTimestamp)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }
@@ -176,7 +178,7 @@ public final class JagerA3 extends ActiveSkill {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerA3Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerA3Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -207,7 +209,7 @@ public final class JagerA3 extends ActiveSkill {
         private final JagerA3Projectile projectile;
 
         private JagerA3Area(@Nullable JagerA3Projectile projectile) {
-            super(combatUser, JagerA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).include(combatUser));
+            super(combatUser, JagerA3Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
             this.projectile = projectile;
         }
 
@@ -236,10 +238,11 @@ public final class JagerA3 extends ActiveSkill {
                 if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
-                    combatUser.getSkill(JagerP1Info.getInstance()).setTarget(target);
-                    combatUser.useAction(ActionKey.PERIODIC_1);
+                    ActionManager actionManager = combatUser.getActionManager();
+                    actionManager.getSkill(JagerP1Info.getInstance()).setTarget(target);
+                    actionManager.useAction(ActionKey.PERIODIC_1);
 
-                    if (target != combatUser && target instanceof CombatUser)
+                    if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
                 }
             }

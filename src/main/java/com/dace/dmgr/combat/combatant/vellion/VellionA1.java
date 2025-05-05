@@ -1,23 +1,25 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -58,8 +60,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && !actionManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -69,7 +72,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        VellionA1Info.SOUND.USE.play(combatUser.getLocation());
+        VellionA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
             cancel();
@@ -77,7 +80,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             entityModule.set(new VellionA1Entity(loc));
 
-            VellionA1Info.SOUND.USE_READY.play(loc);
+            VellionA1Info.Sounds.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION.toTicks()));
     }
 
@@ -114,9 +117,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                 Location loc2 = loc.clone().add(vec);
 
                 if (i == 9)
-                    VellionA1Info.PARTICLE.USE_TICK_2.play(loc2);
+                    VellionA1Info.Particles.USE_TICK_2.play(loc2);
                 else
-                    VellionA1Info.PARTICLE.USE_TICK_1.play(loc2, i / 8.0);
+                    VellionA1Info.Particles.USE_TICK_1.play(loc2, i / 8.0);
             }
         }
     }
@@ -161,7 +164,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         private long returnTime = VellionA1Info.RETURN_DURATION.toTicks();
 
         private VellionA1Entity(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false, true);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false);
 
             entity.setGravity(false);
             addOnTick(this::onTick);
@@ -187,12 +190,12 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
             new VellionA1Area().emit(loc);
 
-            VellionA1Info.PARTICLE.DISPLAY.play(getLocation());
+            VellionA1Info.Particles.DISPLAY.play(getLocation());
         }
 
         private final class VellionA1Area extends Area<Damageable> {
             private VellionA1Area() {
-                super(combatUser, VellionA1Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
+                super(combatUser, VellionA1Info.RADIUS, EntityCondition.of(Damageable.class).and(Damageable::isCreature).exclude(combatUser));
             }
 
             @Override
@@ -208,7 +211,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                     else if (target instanceof Healable)
                         target.getStatusEffectModule().apply(heal, target.getStatusEffectModule().getDuration(heal).plus(VellionA1Info.EFFECT_DURATION));
 
-                    if (target instanceof CombatUser)
+                    if (target.isGoalTarget())
                         combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);
                 }
 
@@ -227,8 +230,8 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                     target.getStatusEffectModule().apply(Snare.getInstance(), VellionA1Info.SNARE_DURATION);
                 }
 
-                VellionA1Info.PARTICLE.HIT_ENTITY.play(location);
-                VellionA1Info.SOUND.HIT_ENTITY.play(location);
+                VellionA1Info.Particles.HIT_ENTITY.play(location);
+                VellionA1Info.Sounds.HIT_ENTITY.play(location);
             }
         }
     }

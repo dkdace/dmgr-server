@@ -4,9 +4,10 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -41,10 +42,11 @@ public final class SiliaUlt extends UltimateSkill {
         setDuration(Timespan.MAX);
         combatUser.setGlobalCooldown(SiliaUltInfo.READY_DURATION);
 
-        SiliaWeapon weapon = (SiliaWeapon) combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        SiliaWeapon weapon = (SiliaWeapon) actionManager.getWeapon();
         weapon.setVisible(false);
 
-        combatUser.getSkill(SiliaA3Info.getInstance()).cancel();
+        actionManager.getSkill(SiliaA3Info.getInstance()).cancel();
 
         float yaw = combatUser.getLocation().getYaw();
         EffectManager effectManager = new EffectManager();
@@ -57,12 +59,11 @@ public final class SiliaUlt extends UltimateSkill {
             setDuration();
             combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-            combatUser.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
-
-            weapon.setStrike(true);
+            actionManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
+            actionManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
             weapon.setVisible(true);
 
-            SiliaUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
+            SiliaUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaUltInfo.READY_DURATION.toTicks()));
     }
 
@@ -73,7 +74,7 @@ public final class SiliaUlt extends UltimateSkill {
         isEnabled = false;
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-        ((SiliaWeapon) combatUser.getWeapon()).setStrike(false);
+        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
     }
 
     @Override
@@ -84,7 +85,7 @@ public final class SiliaUlt extends UltimateSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -122,9 +123,9 @@ public final class SiliaUlt extends UltimateSkill {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, forward - 0.4 * j);
 
                     if (j == 2)
-                        SiliaUltInfo.PARTICLE.USE_TICK_DECO.play(loc2);
+                        SiliaUltInfo.Particles.USE_TICK_DECO.play(loc2);
                     else
-                        SiliaUltInfo.PARTICLE.USE_TICK_CORE.play(loc2);
+                        SiliaUltInfo.Particles.USE_TICK_CORE.play(loc2);
                 }
             }
 

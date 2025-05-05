@@ -4,12 +4,11 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,7 +34,7 @@ public final class Inferno extends Vanguard {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build());
 
     private Inferno() {
-        super(null, "인페르노", "화염 돌격병", "DVInferno", '\u32D7', 1, 2000, 0.9, 1.4);
+        super(null, "인페르노", "화염 돌격병", "DVInferno", Species.HUMAN, '\u32D7', 1, 2000, 0.9, 1.4);
     }
 
     @Override
@@ -91,7 +90,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"머리 좀 식혀, 멍청아."};
@@ -106,7 +105,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "뭐... 이런 날도 있는거지.",
                 "바닥은... 조금 차갑네.",
@@ -115,15 +114,11 @@ public final class Inferno extends Vanguard {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -133,29 +128,27 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
-        if (victim.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        super.onDamage(victim, attacker, damage, location, isCrit);
+
+        if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 
-        InfernoUltInfo.SOUND.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
+        InfernoUltInfo.Sounds.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
         if (location != null)
-            InfernoUltInfo.PARTICLE.DAMAGE.play(location, damage * 0.04);
+            InfernoUltInfo.Particles.DAMAGE.play(location, damage * 0.04);
     }
 
     @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
+        super.onKill(attacker, victim, contributionScore, isFinalHit);
 
-        if (!(victim instanceof CombatUser))
-            return;
-
-        InfernoUlt skillUlt = attacker.getSkill(InfernoUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
-            attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * score / 100.0);
+        if (victim.isGoalTarget() && !attacker.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+            attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * contributionScore);
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(InfernoA1Info.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(InfernoA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

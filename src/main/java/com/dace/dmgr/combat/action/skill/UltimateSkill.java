@@ -1,11 +1,12 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.game.GameUser;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Sound;
@@ -64,8 +65,7 @@ public abstract class UltimateSkill extends ActiveSkill {
         combatUser.setUltGaugePercent(0);
         ULTIMATE_USE_SOUND.play(combatUser.getLocation());
 
-        GameUser gameUser = combatUser.getGameUser();
-        if (gameUser != null)
-            gameUser.broadcastChatMessage("§l" + combatUser.getCombatantType().getCombatant().getUltUseMent(), false);
+        CombatUtil.getCombatEntities(combatUser.getEntity().getWorld(), EntityCondition.of(CombatUser.class))
+                .forEach(target -> combatUser.sendMentMessage(target, "§e" + combatUser.getCombatantType().getCombatant().getUltUseMent()));
     }
 }

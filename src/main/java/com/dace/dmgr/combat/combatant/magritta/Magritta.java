@@ -4,11 +4,10 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -26,7 +25,7 @@ public final class Magritta extends Scuffler {
     private static final Magritta instance = new Magritta();
 
     private Magritta() {
-        super(null, "마그리타", "방화광", "DVMagrita", '\u32D8', 2, 1200, 1.0, 1.0);
+        super(null, "마그리타", "방화광", "DVMagrita", Species.HUMAN, '\u32D8', 2, 1200, 1.0, 1.0);
     }
 
     @Override
@@ -82,7 +81,7 @@ public final class Magritta extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"어라? 나잖아?"};
@@ -98,7 +97,7 @@ public final class Magritta extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case MAGRITTA:
                 return new String[]{"넌 뭐야!"};
@@ -113,42 +112,28 @@ public final class Magritta extends Scuffler {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+
         if (i % 5 == 0)
-            combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!(victim instanceof CombatUser))
-            return;
-
-        MagrittaUlt skillUlt = attacker.getSkill(MagrittaUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
-            attacker.addScore("궁극기 보너스", MagrittaUltInfo.KILL_SCORE * score / 100.0);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaA2Info.getInstance()).isDurationFinished() && combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

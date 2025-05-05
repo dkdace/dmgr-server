@@ -1,7 +1,8 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
@@ -29,18 +30,19 @@ public final class OnPlayerItemHeld extends EventListener<PlayerItemHeldEvent> {
         if (newSlot >= 4)
             return;
 
+        ActionManager actionManager = combatUser.getActionManager();
         switch (newSlot) {
             case 0:
-                combatUser.useAction(ActionKey.SLOT_1);
+                actionManager.useAction(ActionKey.SLOT_1);
                 break;
             case 1:
-                combatUser.useAction(ActionKey.SLOT_2);
+                actionManager.useAction(ActionKey.SLOT_2);
                 break;
             case 2:
-                combatUser.useAction(ActionKey.SLOT_3);
+                actionManager.useAction(ActionKey.SLOT_3);
                 break;
             case 3:
-                combatUser.useAction(ActionKey.SLOT_4);
+                actionManager.useAction(ActionKey.SLOT_4);
                 break;
             default:
                 break;

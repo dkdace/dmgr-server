@@ -20,6 +20,8 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 40;
+    /** 궁극기 처치 점수 제한시간 */
+    public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
 
     @Getter
     private static final ArkaceUltInfo instance = new ArkaceUltInfo();
@@ -38,7 +40,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사격 */
         public static final SoundEffect SHOOT = new SoundEffect(
                 SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
@@ -50,7 +52,7 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,

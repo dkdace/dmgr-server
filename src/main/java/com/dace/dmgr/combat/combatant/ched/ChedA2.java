@@ -3,8 +3,8 @@ package com.dace.dmgr.combat.combatant.ched;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public final class ChedA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getSkill(ChedP1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(ChedP1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -35,8 +35,8 @@ public final class ChedA2 extends ActiveSkill {
         Location location = combatUser.getLocation();
         location.setPitch(0);
 
-        ChedA2Info.SOUND.USE.play(location);
-        ChedA2Info.PARTICLE.USE.play(location.clone().add(0, 0.5, 0));
+        ChedA2Info.Sounds.USE.play(location);
+        ChedA2Info.Particles.USE.play(location.clone().add(0, 0.5, 0));
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
@@ -64,7 +64,7 @@ public final class ChedA2 extends ActiveSkill {
             combatUser.getMoveModule().push(vec, true);
         }, 1, 2));
 
-        addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.PARTICLE.USE_TICK.play(combatUser.getLocation()), 1, 10));
+        addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.Particles.USE_TICK.play(combatUser.getLocation()), 1, 10));
     }
 
     @Override

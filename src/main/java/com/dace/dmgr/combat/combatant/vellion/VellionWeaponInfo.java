@@ -30,7 +30,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     private static final VellionWeaponInfo instance = new VellionWeaponInfo();
 
     private VellionWeaponInfo() {
-        super(VellionWeapon.class, RESOURCE.DEFAULT, "절멸",
+        super(VellionWeapon.class, Resource.DEFAULT, "절멸",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("마법 구체를 발사하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
@@ -44,7 +44,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 14;
     }
@@ -53,7 +53,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(0.8).pitch(0.5).build(),
@@ -65,7 +65,7 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(4).horizontalSpread(0.1).verticalSpread(0.1).build(),

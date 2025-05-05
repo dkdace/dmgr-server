@@ -3,8 +3,8 @@ package com.dace.dmgr.combat.combatant.silia;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -23,7 +23,7 @@ public final class SiliaP1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -31,10 +31,10 @@ public final class SiliaP1 extends AbstractSkill {
         setDuration();
 
         Location location = combatUser.getLocation();
-        if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-            SiliaP1Info.SOUND.USE.play(location, 1, 0);
+        if (combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+            SiliaP1Info.Sounds.USE.play(location, 1, 0);
         else
-            SiliaP1Info.SOUND.USE.play(location, 0, 1);
+            SiliaP1Info.Sounds.USE.play(location, 0, 1);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();

@@ -1,15 +1,16 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -33,7 +34,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -41,7 +42,8 @@ public final class ChedWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                ChedA1 skill1 = combatUser.getSkill(ChedA1Info.getInstance());
+                ActionManager actionManager = combatUser.getActionManager();
+                ChedA1 skill1 = actionManager.getSkill(ChedA1Info.getInstance());
 
                 if (skill1.isEnabled()) {
                     setCooldown(ChedA1Info.COOLDOWN);
@@ -52,12 +54,12 @@ public final class ChedWeapon extends AbstractWeapon {
                     setCanShoot(true);
 
                     if (combatUser.getEntity().isHandRaised()) {
-                        Weapon weapon = combatUser.getWeapon();
+                        Weapon weapon = actionManager.getWeapon();
                         weapon.setVisible(false);
                         weapon.setVisible(true);
                     }
 
-                    ChedWeaponInfo.SOUND.CHARGE.play(combatUser.getLocation());
+                    ChedWeaponInfo.Sounds.CHARGE.play(combatUser.getLocation());
                 }
 
                 break;
@@ -66,7 +68,7 @@ public final class ChedWeapon extends AbstractWeapon {
                 new ChedWeaponProjectile(power).shot();
                 setCanShoot(false);
 
-                ChedWeaponInfo.SOUND.USE.play(combatUser.getLocation(), power, power);
+                ChedWeaponInfo.Sounds.USE.play(combatUser.getLocation(), power, power);
 
                 break;
             }
@@ -88,13 +90,13 @@ public final class ChedWeapon extends AbstractWeapon {
         private final double power;
 
         private ChedWeaponProjectile(double power) {
-            super(ChedWeapon.this, (int) (power * ChedWeaponInfo.MAX_VELOCITY), CombatUtil.EntityCondition.enemy(combatUser));
+            super(ChedWeapon.this, (int) (power * ChedWeaponInfo.MAX_VELOCITY), EntityCondition.enemy(combatUser));
             this.power = power;
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            ChedWeaponInfo.SOUND.HIT.play(location, power);
+            ChedWeaponInfo.Sounds.HIT.play(location, power);
         }
 
         @Override
@@ -124,7 +126,7 @@ public final class ChedWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location, isCrit, true)
-                        && target instanceof CombatUser && isCrit)
+                        && target.isGoalTarget() && isCrit)
                     combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
 
                 return false;

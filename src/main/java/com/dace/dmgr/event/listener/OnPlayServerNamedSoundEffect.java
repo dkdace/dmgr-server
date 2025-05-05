@@ -6,9 +6,10 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -42,13 +43,13 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
             return true;
 
         Player target = (Player) location.getWorld().getNearbyEntities(location, 0.5, 0.5, 0.5).stream()
-                .filter(targetPlayer -> targetPlayer instanceof Player && targetPlayer != player)
+                .filter(targetPlayer -> targetPlayer instanceof Player && targetPlayer != player && !EntityUtil.isCitizensNPC(targetPlayer))
                 .findFirst()
                 .orElse(null);
         if (target != null) {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
             return targetCombatUser != null && targetCombatUser.getCombatantType() == CombatantType.SILIA
-                    && !targetCombatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished()
+                    && !targetCombatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished()
                     && sound.toString().endsWith("_STEP") && soundCategory == EnumWrappers.SoundCategory.PLAYERS;
         }
 

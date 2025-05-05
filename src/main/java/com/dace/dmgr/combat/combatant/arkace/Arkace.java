@@ -4,11 +4,9 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -26,7 +24,7 @@ public final class Arkace extends Marksman {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super(null, "아케이스", "슈퍼 솔저", "DVArkace", '\u32D0', 1, 1000, 1.0, 1.0);
+        super(null, "아케이스", "슈퍼 솔저", "DVArkace", Species.HUMAN, '\u32D0', 1, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -82,7 +80,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
             case CHED:
@@ -103,7 +101,7 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "제법..이군..",
                 "운수 한 번... 안 좋은 날이군...",
@@ -112,29 +110,11 @@ public final class Arkace extends Marksman {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
         if (combatUser.getEntity().isSprinting())
-            combatUser.useAction(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
-
-        if (!(victim instanceof CombatUser))
-            return;
-
-        ArkaceUlt skillUlt = attacker.getSkill(ArkaceUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished())
-            attacker.addScore("궁극기 보너스", ArkaceUltInfo.KILL_SCORE * score / 100.0);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override

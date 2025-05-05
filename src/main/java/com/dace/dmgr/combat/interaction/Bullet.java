@@ -2,7 +2,8 @@ package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,7 +40,7 @@ public abstract class Bullet<T extends CombatEntity> {
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     protected final double size;
     /** 대상 엔티티를 찾는 조건 */
-    protected final CombatUtil.EntityCondition<T> entityCondition;
+    protected final EntityCondition<T> entityCondition;
     /** 피격자 목록 */
     private final HashSet<T> targets = new HashSet<>();
 
@@ -83,7 +84,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, @NonNull CombatUtil.EntityCondition<T> entityCondition) {
+    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(startDistance >= 0, "startDistance >= 0 (%f)", startDistance);
         Validate.isTrue(maxDistance >= 0, "maxDistance >= %f (%f)", startDistance, maxDistance);
         Validate.isTrue(size >= 0, "size >= 0 (%f)", size);
@@ -118,6 +119,16 @@ public abstract class Bullet<T extends CombatEntity> {
      */
     @NonNull
     protected abstract HitEntityHandler<T> getHitEntityHandler();
+
+    /**
+     * 지정한 엔티티가 총알에 맞은 적이 없는지 확인한다.
+     *
+     * @param target 확인할 엔티티
+     * @return {@code target}이 총알에 맞지 않았으면 {@code true} 반환
+     */
+    protected boolean isNotHit(@NonNull T target) {
+        return !targets.contains(target);
+    }
 
     private void validateIsShot() {
         Validate.validState(isShot, "총알이 발사되지 않음");
@@ -321,7 +332,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @return 총알 소멸 여부
      */
     private boolean handleEntityCollision() {
-        T target = CombatUtil.getNearCombatEntity(shooter.getGame(), getLocation(), size, entityCondition);
+        T target = CombatUtil.getNearCombatEntity(getLocation(), size, entityCondition);
 
         if (target == null || !targets.add(target))
             return false;

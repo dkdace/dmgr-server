@@ -48,7 +48,7 @@ public final class JagerT1 {
                 modifier.setIncrement(-getValue());
 
             if (combatEntity.isCreature())
-                JagerT1Info.PARTICLE.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
+                JagerT1Info.Particles.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
         }
 
         @Override

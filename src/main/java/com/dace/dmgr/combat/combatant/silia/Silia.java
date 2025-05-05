@@ -1,18 +1,20 @@
 package com.dace.dmgr.combat.combatant.silia;
 
-import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Location;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 전투원 - 실리아 클래스.
@@ -35,7 +37,7 @@ public final class Silia extends Scuffler {
     private static final Silia instance = new Silia();
 
     private Silia() {
-        super(null, "실리아", "고요한 폭풍", "DVSilia", '\u32D1', 4, 1000, 1.0, 1.0);
+        super(null, "실리아", "고요한 폭풍", "DVSilia", Species.HUMAN, '\u32D1', 4, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -92,7 +94,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             default:
                 return new String[]{
@@ -105,7 +107,7 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         return new String[]{
                 "으... 눈이... 감겨..",
                 "피곤해... 잠시 쉬어야겠어...",
@@ -114,44 +116,52 @@ public final class Silia extends Scuffler {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
-    public boolean onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (attacker != victim && victim instanceof CombatUser && isCrit)
+    public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
+        if (attacker != victim && victim.isGoalTarget() && isCrit)
             attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
-
-        return true;
     }
 
     @Override
-    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, int score, boolean isFinalHit) {
-        super.onKill(attacker, victim, score, isFinalHit);
+    public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
+        super.onDamage(victim, attacker, damage, location, isCrit);
 
-        if (!(victim instanceof CombatUser))
+        SiliaA3 skill3 = victim.getActionManager().getSkill(SiliaA3Info.getInstance());
+        if (skill3.isDurationFinished())
             return;
 
-        Timespan timeLimit = GeneralConfig.getCombatConfig().getDamageSumTimeLimit().minus(FAST_KILL_SCORE_TIME_LIMIT);
-        if (((CombatUser) victim).getKillContributorRemainingTime(attacker).compareTo(timeLimit) > 0)
-            attacker.addScore("암살", FAST_KILL_SCORE * score / 100.0);
+        skill3.setDamage(skill3.getDamage() + damage);
+        if (skill3.getDamage() >= victim.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO) {
+            skill3.cancel();
+            skill3.setCooldown(SiliaA3Info.COOLDOWN_FORCE);
+        }
+    }
 
-        SiliaA1 skill1 = attacker.getSkill(SiliaA1Info.getInstance());
+    @Override
+    public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
+        super.onKill(attacker, victim, contributionScore, isFinalHit);
+
+        if (!victim.isGoalTarget())
+            return;
+
+        if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributionElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
+            attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
+
+        ActionManager actionManager = attacker.getActionManager();
+
+        SiliaA1 skill1 = actionManager.getSkill(SiliaA1Info.getInstance());
         if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
             skill1.setCooldown(Timespan.ZERO);
 
-        SiliaUlt skillUlt = attacker.getSkill(SiliaUltInfo.getInstance());
+        SiliaUlt skillUlt = actionManager.getSkill(SiliaUltInfo.getInstance());
         if (!skillUlt.isDurationFinished()) {
             skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
-            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * score / 100.0);
+            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * contributionScore);
         }
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        return combatUser.getSkill(SiliaP1Info.getInstance()).canUse(ActionKey.SPACE);
+        return combatUser.getActionManager().getSkill(SiliaP1Info.getInstance()).canUse(ActionKey.SPACE);
     }
 
     @Override

@@ -1,22 +1,22 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -61,14 +61,14 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getActionManager().getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case SLOT_3: {
-                combatUser.getWeapon().cancel();
                 confirmModule.toggleCheck();
 
                 break;
@@ -130,22 +130,20 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        combatUser.getWeapon().setCooldown(Timespan.ofTicks(1));
-
         Location location = confirmModule.getCurrentLocation();
 
-        VellionA3Info.SOUND.USE.play(combatUser.getLocation());
+        VellionA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            VellionA3Info.PARTICLE.USE_TICK_CORE.play(location);
+            VellionA3Info.Particles.USE_TICK_CORE.play(location);
             for (Location loc2 : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), location, 0.7))
-                VellionA3Info.PARTICLE.USE_TICK_DECO.play(loc2);
+                VellionA3Info.Particles.USE_TICK_DECO.play(loc2);
         }, () -> {
             cancel();
 
             Location loc = location.clone().add(0, 0.1, 0);
 
-            VellionA3Info.SOUND.USE_READY.play(loc);
+            VellionA3Info.Sounds.USE_READY.play(loc);
 
             addTask(new IntervalTask(i -> {
                 if (i % 4 == 0)
@@ -167,7 +165,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         loc.setYaw(0);
         loc.setPitch(0);
 
-        VellionA3Info.PARTICLE.TICK_CORE.play(loc);
+        VellionA3Info.Particles.TICK_CORE.play(loc);
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -182,7 +180,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
                 Location loc2 = loc.clone().add(vec.clone().multiply(distance));
 
-                VellionA3Info.PARTICLE.TICK_DECO_1.play(loc2, vec.setY(0.4));
+                VellionA3Info.Particles.TICK_DECO_1.play(loc2, vec.setY(0.4));
             }
 
             long angle2 = index * 44;
@@ -194,7 +192,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
                 Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
 
-                VellionA3Info.PARTICLE.TICK_DECO_2.play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
+                VellionA3Info.Particles.TICK_DECO_2.play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0),
                         dir.setY(distance2 * 0.1));
             }
         }
@@ -202,7 +200,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
     private final class VellionA3Area extends Area<Damageable> {
         private VellionA3Area() {
-            super(combatUser, VellionA3Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, VellionA3Info.RADIUS, EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -216,9 +214,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 target.getStatusEffectModule().apply(HealBlock.getInstance(), Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(silence, Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser) {
+                if (target.isGoalTarget()) {
                     combatUser.addScore("적 침묵", VellionA3Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
                 }
             }
 

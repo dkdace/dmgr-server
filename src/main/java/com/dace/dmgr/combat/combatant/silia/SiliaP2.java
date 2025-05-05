@@ -3,9 +3,10 @@ package com.dace.dmgr.combat.combatant.silia;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -57,7 +58,9 @@ public final class SiliaP2 extends AbstractSkill {
         setDuration();
 
         combatUser.addYawAndPitch(0, 0);
-        combatUser.getWeapon().setVisible(false);
+
+        ActionManager actionManager = combatUser.getActionManager();
+        actionManager.getWeapon().setVisible(false);
 
         double distance = combatUser.getEntity().getEyeLocation().distance(combatUser.getEntity().getTargetBlock(null, 1).getLocation());
         if (distance < 1)
@@ -72,10 +75,10 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
-            if (combatUser.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
-                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 1, 0);
+            if (actionManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+                SiliaP2Info.Sounds.USE.play(combatUser.getLocation(), 1, 0);
             else
-                SiliaP2Info.SOUND.USE.play(combatUser.getLocation(), 0, 1);
+                SiliaP2Info.Sounds.USE.play(combatUser.getLocation(), 0, 1);
 
             return true;
         }, isCancelled -> {
@@ -97,7 +100,7 @@ public final class SiliaP2 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
 
         addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }

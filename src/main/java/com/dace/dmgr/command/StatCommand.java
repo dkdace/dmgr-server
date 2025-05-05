@@ -1,6 +1,6 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.item.gui.Stat;
+import com.dace.dmgr.menu.Stat;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import lombok.Getter;

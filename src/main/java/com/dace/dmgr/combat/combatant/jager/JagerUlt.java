@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Summonable;
@@ -10,17 +9,20 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AttackModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
+import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -50,8 +52,9 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && isDurationFinished() && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -60,12 +63,12 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
         entityModule.disposeEntity();
 
-        JagerUltInfo.SOUND.USE.play(combatUser.getLocation());
+        JagerUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -89,7 +92,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
-            super(JagerUlt.this, JagerUltInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerUlt.this, JagerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
                     Option.builder().bounceVelocityMultiplier(0.35).build());
         }
@@ -104,7 +107,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerUltInfo.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerUltInfo.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -139,7 +142,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private final ReadyTimeModule readyTimeModule;
 
         private JagerUltEntity(@NonNull Location spawnLocation) {
-            super(ArmorStand.class, spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true, true,
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true,
                     Hitbox.builder(0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build());
 
             this.attackModule = new AttackModule();
@@ -153,8 +156,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private void onInit() {
             entity.setGravity(false);
 
-            owner.getUser().setGlowing(entity, ChatColor.WHITE);
-            JagerUltInfo.SOUND.SUMMON.play(getLocation());
+            owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
+            JagerUltInfo.Sounds.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
         }
@@ -165,8 +168,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
                 entity.teleport(getLocation().add(0, 0.2, 0));
 
             Location loc = getLocation();
-            JagerUltInfo.PARTICLE.SUMMON_BEFORE_READY_TICK.play(loc);
-            JagerUltInfo.SOUND.SUMMON_BEFORE_READY.play(loc);
+            JagerUltInfo.Particles.SUMMON_BEFORE_READY_TICK.play(loc);
+            JagerUltInfo.Sounds.SUMMON_BEFORE_READY.play(loc);
         }
 
         @Override
@@ -175,7 +178,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         }
 
         private void onTick(long i) {
-            JagerUltInfo.PARTICLE.DISPLAY.play(getLocation());
+            JagerUltInfo.Particles.DISPLAY.play(getLocation());
             if (!readyTimeModule.isReady())
                 return;
 
@@ -200,7 +203,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         private void playTickEffect(long i, double range) {
             Location loc = getLocation();
             if (i <= JagerUltInfo.DURATION.toTicks() - 100 && i % 30 == 0)
-                JagerUltInfo.SOUND.TICK.play(loc);
+                JagerUltInfo.Sounds.TICK.play(loc);
 
             loc.setYaw(0);
             loc.setPitch(0);
@@ -214,10 +217,10 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
                 Location loc1 = loc.clone().add(vec.clone().multiply(range / 6 * j));
                 Location loc2 = loc.clone().subtract(vec.clone().multiply(range / 6 * j));
 
-                JagerUltInfo.PARTICLE.TICK_CORE.play(loc1, vec.setY(-0.6), j / 6.0);
-                JagerUltInfo.PARTICLE.TICK_CORE.play(loc2, vec.multiply(-1).setY(-0.6), j / 6.0);
-                JagerUltInfo.PARTICLE.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
-                JagerUltInfo.PARTICLE.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
+                JagerUltInfo.Particles.TICK_CORE.play(loc1, vec.setY(-0.6), j / 6.0);
+                JagerUltInfo.Particles.TICK_CORE.play(loc2, vec.multiply(-1).setY(-0.6), j / 6.0);
+                JagerUltInfo.Particles.TICK_DECO.play(loc1.subtract(0, 2.5, 0));
+                JagerUltInfo.Particles.TICK_DECO.play(loc2.subtract(0, 2.5, 0));
             }
         }
 
@@ -237,7 +240,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         }
 
         @Override
-        public double getScore() {
+        public int getScore() {
             return JagerUltInfo.DEATH_SCORE;
         }
 
@@ -245,8 +248,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
-            if (victim instanceof CombatUser)
-                bonusScoreModule.addTarget((CombatUser) victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
+            if (victim.isGoalTarget())
+                bonusScoreModule.addTarget(victim, JagerUltInfo.KILL_SCORE_TIME_LIMIT);
         }
 
         @Override
@@ -256,7 +259,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-            JagerUltInfo.SOUND.DAMAGE.play(getLocation(), 1 + damage * 0.001);
+            JagerUltInfo.Sounds.DAMAGE.play(getLocation(), 1 + damage * 0.001);
             CombatEffectUtil.playBreakParticle(this, location, damage);
         }
 
@@ -264,13 +267,13 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         public void onDeath(@Nullable Attacker attacker) {
             remove();
 
-            JagerUltInfo.PARTICLE.DEATH.play(getLocation());
-            JagerUltInfo.SOUND.DEATH.play(getLocation());
+            JagerUltInfo.Particles.DEATH.play(getLocation());
+            JagerUltInfo.Sounds.DEATH.play(getLocation());
         }
 
         private final class JagerUltArea extends Area<Damageable> {
             private JagerUltArea(double radius) {
-                super(JagerUltEntity.this, radius, CombatUtil.EntityCondition.enemy(JagerUltEntity.this).and(combatEntity ->
+                super(JagerUltEntity.this, radius, EntityCondition.enemy(JagerUltEntity.this).and(combatEntity ->
                         combatEntity.getLocation().add(0, combatEntity.getHeight(), 0).getY() < JagerUltEntity.this.getLocation().getY()));
             }
 

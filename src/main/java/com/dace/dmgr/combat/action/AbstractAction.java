@@ -5,7 +5,7 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.Task;
 import com.dace.dmgr.util.task.TaskManager;

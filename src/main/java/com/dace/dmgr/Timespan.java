@@ -1,11 +1,13 @@
 package com.dace.dmgr;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import com.dace.dmgr.yaml.Serializer;
+import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.bukkit.util.NumberConversions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 밀리초 단위의 기간을 나타내는 클래스.
@@ -17,19 +19,19 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 public final class Timespan implements Comparable<Timespan> {
     /** 0의 값을 가진 기간 */
     public static final Timespan ZERO = new Timespan(0);
-    /** 사용 가능한 최댓값의 기간 */
+    /** 사용 가능한 최댓값의 기간. 무한대로 취급 */
     public static final Timespan MAX = new Timespan(Long.MAX_VALUE);
 
-    /** 밀리초 : 틱 */
-    private static final int MILLISECONDS_TO_TICKS = 50;
-    /** 틱 : 초 */
-    private static final int TICKS_TO_SECONDS = MILLISECONDS_TO_TICKS * 20;
-    /** 초 : 분 */
-    private static final int SECONDS_TO_MINUTES = TICKS_TO_SECONDS * 60;
-    /** 분 : 시간 */
-    private static final int MINUTES_TO_HOURS = SECONDS_TO_MINUTES * 60;
-    /** 시간 : 일 */
-    private static final int HOURS_TO_DAYS = MINUTES_TO_HOURS * 24;
+    /** 밀리초로 나타낸 1틱 */
+    private static final int MILLISECONDS_IN_TICK = 50;
+    /** 밀리초로 나타낸 1초 */
+    private static final int MILLISECONDS_IN_SECOND = MILLISECONDS_IN_TICK * 20;
+    /** 밀리초로 나타낸 1분 */
+    private static final int MILLISECONDS_IN_MINUTE = MILLISECONDS_IN_SECOND * 60;
+    /** 밀리초로 나타낸 1시간 */
+    private static final int MILLISECONDS_IN_HOUR = MILLISECONDS_IN_MINUTE * 60;
+    /** 밀리초로 나타낸 1일 */
+    private static final int MILLISECONDS_IN_DAY = MILLISECONDS_IN_HOUR * 24;
 
     /** 시간 (ms) */
     private final long milliseconds;
@@ -56,13 +58,33 @@ public final class Timespan implements Comparable<Timespan> {
     /**
      * 기간을 반환한다.
      *
+     * @param milliseconds 시간 (밀리초). 0 이상의 값
+     * @return 기간
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    @NonNull
+    public static Timespan ofMilliseconds(double milliseconds) {
+        Validate.isTrue(milliseconds >= 0.0, "milliseconds >= 0 (%f)", milliseconds);
+        Validate.notNaN(milliseconds, "milliseconds is not NaN");
+
+        if (milliseconds < 1.0)
+            return ZERO;
+        if (milliseconds >= Long.MAX_VALUE)
+            return MAX;
+
+        return new Timespan((long) milliseconds);
+    }
+
+    /**
+     * 기간을 반환한다.
+     *
      * @param ticks 시간 (틱). 0 이상의 값
      * @return 기간
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
     public static Timespan ofTicks(long ticks) {
-        return ofMilliseconds(ticks * MILLISECONDS_TO_TICKS);
+        return ofMilliseconds(ticks * MILLISECONDS_IN_TICK);
     }
 
     /**
@@ -74,7 +96,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public static Timespan ofSeconds(double seconds) {
-        return ofMilliseconds((long) (seconds * TICKS_TO_SECONDS));
+        return ofMilliseconds(seconds * MILLISECONDS_IN_SECOND);
     }
 
     /**
@@ -86,7 +108,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public static Timespan ofMinutes(double minutes) {
-        return ofMilliseconds((long) (minutes * SECONDS_TO_MINUTES));
+        return ofMilliseconds(minutes * MILLISECONDS_IN_MINUTE);
     }
 
     /**
@@ -98,7 +120,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public static Timespan ofHours(double hours) {
-        return ofMilliseconds((long) (hours * MINUTES_TO_HOURS));
+        return ofMilliseconds(hours * MILLISECONDS_IN_HOUR);
     }
 
     /**
@@ -110,7 +132,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public static Timespan ofDays(double days) {
-        return ofMilliseconds((long) (days * HOURS_TO_DAYS));
+        return ofMilliseconds(days * MILLISECONDS_IN_DAY);
     }
 
     /**
@@ -165,7 +187,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public Timespan multiply(double value) {
-        return this.equals(MAX) ? MAX : ofMilliseconds((long) (milliseconds * value));
+        return this.equals(MAX) ? MAX : ofMilliseconds(Math.min(milliseconds * value, Long.MAX_VALUE));
     }
 
     /**
@@ -177,7 +199,7 @@ public final class Timespan implements Comparable<Timespan> {
      */
     @NonNull
     public Timespan divide(double value) {
-        return this.equals(MAX) ? MAX : ofMilliseconds((long) (milliseconds / value));
+        return this.equals(MAX) ? MAX : ofMilliseconds(Math.min(milliseconds / value, Long.MAX_VALUE));
     }
 
     /**
@@ -187,6 +209,15 @@ public final class Timespan implements Comparable<Timespan> {
      */
     public boolean isZero() {
         return equals(ZERO);
+    }
+
+    /**
+     * 값이 무한대인지 확인한다.
+     *
+     * @return {@link Timespan#MAX}와 같으면 {@code true} 반환
+     */
+    public boolean isInfinity() {
+        return equals(MAX);
     }
 
     /**
@@ -204,7 +235,7 @@ public final class Timespan implements Comparable<Timespan> {
      * @return 시간 (틱)
      */
     public long toTicks() {
-        return milliseconds / MILLISECONDS_TO_TICKS;
+        return milliseconds / MILLISECONDS_IN_TICK;
     }
 
     /**
@@ -213,7 +244,7 @@ public final class Timespan implements Comparable<Timespan> {
      * @return 시간 (초)
      */
     public double toSeconds() {
-        return (double) milliseconds / TICKS_TO_SECONDS;
+        return (double) milliseconds / MILLISECONDS_IN_SECOND;
     }
 
     /**
@@ -222,7 +253,7 @@ public final class Timespan implements Comparable<Timespan> {
      * @return 시간 (분)
      */
     public double toMinutes() {
-        return (double) milliseconds / SECONDS_TO_MINUTES;
+        return (double) milliseconds / MILLISECONDS_IN_MINUTE;
     }
 
     /**
@@ -231,7 +262,7 @@ public final class Timespan implements Comparable<Timespan> {
      * @return 시간 (시간)
      */
     public double toHours() {
-        return (double) milliseconds / MINUTES_TO_HOURS;
+        return (double) milliseconds / MILLISECONDS_IN_HOUR;
     }
 
     /**
@@ -240,7 +271,7 @@ public final class Timespan implements Comparable<Timespan> {
      * @return 시간 (일)
      */
     public double toDays() {
-        return (double) milliseconds / HOURS_TO_DAYS;
+        return (double) milliseconds / MILLISECONDS_IN_DAY;
     }
 
     @Override
@@ -251,5 +282,65 @@ public final class Timespan implements Comparable<Timespan> {
     @Override
     public String toString() {
         return DurationFormatUtils.formatDurationISO(milliseconds);
+    }
+
+    /**
+     * {@link Timespan}의 직렬화 처리기 클래스.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class TimespanSerializer implements Serializer<Timespan, Map<String, Number>> {
+        @Getter
+        private static final TimespanSerializer instance = new TimespanSerializer();
+
+        @Override
+        @NonNull
+        public Map<String, Number> serialize(@NonNull Timespan value) {
+            Map<String, Number> map = new HashMap<>();
+
+            if (value.equals(MAX)) {
+                map.put("infinity", 1);
+                return map;
+            }
+
+            long milliseconds = value.milliseconds;
+            long ticks = milliseconds / 50;
+            milliseconds %= 50;
+            long seconds = ticks / 20;
+            ticks %= 20;
+            long minutes = seconds / 60;
+            seconds %= 60;
+            long hours = minutes / 60;
+            minutes %= 60;
+            long days = hours / 24;
+            hours %= 24;
+
+            if (days > 0)
+                map.put("days", days);
+            if (hours > 0)
+                map.put("hours", hours);
+            if (minutes > 0)
+                map.put("minutes", minutes);
+            if (seconds > 0)
+                map.put("seconds", seconds);
+            if (ticks > 0)
+                map.put("ticks", ticks);
+            if (milliseconds > 0)
+                map.put("milliseconds", milliseconds);
+
+            return map;
+        }
+
+        @Override
+        @NonNull
+        public Timespan deserialize(@NonNull Map<String, Number> value) {
+            if (value.containsKey("infinity"))
+                return MAX;
+
+            return ofDays(NumberConversions.toDouble(value.get("days")))
+                    .plus(ofHours(NumberConversions.toDouble(value.get("hours"))))
+                    .plus(ofMinutes(NumberConversions.toDouble(value.get("minutes"))))
+                    .plus(ofSeconds(NumberConversions.toDouble(value.get("seconds"))))
+                    .plus(ofTicks(NumberConversions.toLong(value.get("ticks"))));
+        }
     }
 }

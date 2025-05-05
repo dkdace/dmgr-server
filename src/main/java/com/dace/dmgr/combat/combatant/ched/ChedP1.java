@@ -4,10 +4,11 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -84,7 +85,8 @@ public final class ChedP1 extends AbstractSkill {
         setDuration();
         combatUser.addYawAndPitch(0, 0);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getWeapon();
+        ActionManager actionManager = combatUser.getActionManager();
+        ChedWeapon weapon = (ChedWeapon) actionManager.getWeapon();
         weapon.setVisible(false);
 
         Location location = combatUser.getEntity().getEyeLocation();
@@ -108,15 +110,15 @@ public final class ChedP1 extends AbstractSkill {
 
             weapon.setCanShoot(false);
 
-            combatUser.getSkill(ChedA3Info.getInstance()).cancel();
-            combatUser.getSkill(ChedUltInfo.getInstance()).cancel();
+            actionManager.getSkill(ChedA3Info.getInstance()).cancel();
+            actionManager.getSkill(ChedUltInfo.getInstance()).cancel();
 
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);
 
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
-            ChedP1Info.SOUND.USE.play(combatUser.getLocation());
+            ChedP1Info.Sounds.USE.play(combatUser.getLocation());
 
             return true;
         }, () -> {
@@ -149,10 +151,10 @@ public final class ChedP1 extends AbstractSkill {
         if (isHanging) {
             setHanging(false);
 
-            ChedP1Info.SOUND.DISABLE_HANG.play(combatUser.getLocation());
-            ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
+            ChedP1Info.Sounds.DISABLE_HANG.play(combatUser.getLocation());
+            ChedP1Info.Particles.USE_HANG.play(combatUser.getLocation());
         } else
-            combatUser.getWeapon().setVisible(true);
+            combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -168,8 +170,8 @@ public final class ChedP1 extends AbstractSkill {
             if (!isHanging) {
                 setHanging(true);
 
-                ChedP1Info.SOUND.USE_HANG.play(combatUser.getLocation());
-                ChedP1Info.PARTICLE.USE_HANG.play(combatUser.getLocation());
+                ChedP1Info.Sounds.USE_HANG.play(combatUser.getLocation());
+                ChedP1Info.Particles.USE_HANG.play(combatUser.getLocation());
             }
 
             hangTick--;
@@ -196,7 +198,7 @@ public final class ChedP1 extends AbstractSkill {
             int angle = 360 / 7 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ChedP1Info.PARTICLE.TICK_HANG.play(loc.clone().add(vec));
+            ChedP1Info.Particles.TICK_HANG.play(loc.clone().add(vec));
         }
     }
 
@@ -211,6 +213,6 @@ public final class ChedP1 extends AbstractSkill {
         combatUser.getEntity().setGravity(!isHanging);
 
         if (!isDurationFinished())
-            combatUser.getWeapon().setVisible(isHanging);
+            combatUser.getActionManager().getWeapon().setVisible(isHanging);
     }
 }

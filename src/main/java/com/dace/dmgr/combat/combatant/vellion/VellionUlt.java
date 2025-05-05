@@ -1,23 +1,23 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,7 +57,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && !combatUser.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && isDurationFinished()
+                && !combatUser.getActionManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -69,9 +70,9 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        combatUser.getSkill(VellionP1Info.getInstance()).cancel();
+        combatUser.getActionManager().getSkill(VellionP1Info.getInstance()).cancel();
 
-        VellionUltInfo.SOUND.USE.play(combatUser.getLocation());
+        VellionUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         EffectManager effectManager = new EffectManager();
 
@@ -113,7 +114,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         setDuration();
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), VellionUltInfo.DURATION);
 
-        VellionUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
+        VellionUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             if (i % 4 == 0)
@@ -127,8 +128,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
             new VellionUltExplodeArea().emit(loc);
 
             Location loc2 = loc.add(0, 1, 0);
-            VellionUltInfo.SOUND.EXPLODE.play(loc2);
-            VellionUltInfo.PARTICLE.EXPLODE.play(loc2);
+            VellionUltInfo.Sounds.EXPLODE.play(loc2);
+            VellionUltInfo.Particles.EXPLODE.play(loc2);
         }, 1, VellionUltInfo.DURATION.toTicks()));
     }
 
@@ -142,9 +143,9 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         loc.setYaw(0);
         loc.setPitch(0);
 
-        VellionUltInfo.PARTICLE.TICK_CORE_1.play(loc.clone().add(0, 1, 0));
+        VellionUltInfo.Particles.TICK_CORE_1.play(loc.clone().add(0, 1, 0));
         if (i < 8)
-            VellionUltInfo.PARTICLE.TICK_CORE_2.play(loc.clone().add(0, 1, 0));
+            VellionUltInfo.Particles.TICK_CORE_2.play(loc.clone().add(0, 1, 0));
 
         Vector vector = VectorUtil.getRollAxis(loc);
         Vector axis = VectorUtil.getYawAxis(loc);
@@ -159,11 +160,11 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 Location loc2 = loc.clone().add(vec);
 
                 if (j > 0 && j % 10 == 0)
-                    VellionUltInfo.PARTICLE.TICK_DECO_1.play(loc2.clone().add(0, 2.5, 0));
+                    VellionUltInfo.Particles.TICK_DECO_1.play(loc2.clone().add(0, 2.5, 0));
                 else if (i > 20)
-                    VellionUltInfo.PARTICLE.TICK_DECO_3.play(loc2);
+                    VellionUltInfo.Particles.TICK_DECO_3.play(loc2);
                 else
-                    VellionUltInfo.PARTICLE.TICK_DECO_2.play(loc2, j / 49.0);
+                    VellionUltInfo.Particles.TICK_DECO_2.play(loc2, j / 49.0);
             }
         }
 
@@ -173,8 +174,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
             Location loc2 = loc.clone().add(vec);
 
-            VellionUltInfo.PARTICLE.TICK_DECO_4.play(loc2);
-            VellionUltInfo.PARTICLE.TICK_DECO_5.play(loc2.clone().add(0, 2, 0));
+            VellionUltInfo.Particles.TICK_DECO_4.play(loc2);
+            VellionUltInfo.Particles.TICK_DECO_5.play(loc2.clone().add(0, 2, 0));
         }
     }
 
@@ -211,7 +212,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
                     Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                    VellionUltInfo.PARTICLE.USE_TICK.play(loc2);
+                    VellionUltInfo.Particles.USE_TICK.play(loc2);
                 }
             }
 
@@ -221,7 +222,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     private final class VellionUltArea extends Area<Damageable> {
         private VellionUltArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
+            super(combatUser, VellionUltInfo.RADIUS, EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override
@@ -235,8 +236,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(SLOW, Timespan.ofTicks(10));
                 target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
-                if (target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, Timespan.ofTicks(10));
+                if (target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
             }
 
             return true;
@@ -245,7 +246,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     private final class VellionUltExplodeArea extends Area<Damageable> {
         private VellionUltExplodeArea() {
-            super(combatUser, VellionUltInfo.RADIUS, CombatUtil.EntityCondition.enemy(combatUser).and(Damageable::isCreature));
+            super(combatUser, VellionUltInfo.RADIUS, EntityCondition.enemy(combatUser).and(Damageable::isCreature));
         }
 
         @Override
@@ -259,17 +260,17 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                     DamageType.FIXED, null, false, false)) {
                 target.getStatusEffectModule().apply(stun, VellionUltInfo.STUN_DURATION);
 
-                if (target instanceof CombatUser) {
+                if (target.isGoalTarget()) {
                     combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
-                    bonusScoreModule.addTarget((CombatUser) target, VellionUltInfo.STUN_DURATION);
+                    bonusScoreModule.addTarget(target, VellionUltInfo.STUN_DURATION);
                 }
             }
 
-            VellionUltInfo.PARTICLE.HIT_ENTITY_CORE.play(location);
+            VellionUltInfo.Particles.HIT_ENTITY_CORE.play(location);
 
             Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
             for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                VellionUltInfo.PARTICLE.HIT_ENTITY_DECO.play(loc2);
+                VellionUltInfo.Particles.HIT_ENTITY_DECO.play(loc2);
 
             return true;
         }

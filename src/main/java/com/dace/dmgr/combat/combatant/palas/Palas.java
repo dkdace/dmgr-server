@@ -1,20 +1,18 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
-import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 
 /**
  * 전투원 - 팔라스 클래스.
@@ -33,7 +31,7 @@ public final class Palas extends Support {
     private static final Palas instance = new Palas();
 
     private Palas() {
-        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", '\u32D9', 4, 1000, 1.0, 1.0);
+        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", Species.HUMAN, '\u32D9', 4, 1000, 1.0, 1.0);
     }
 
     @Override
@@ -90,7 +88,7 @@ public final class Palas extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getKillMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{"어째서...어째서 너가..!"};
@@ -105,7 +103,7 @@ public final class Palas extends Support {
 
     @Override
     @NonNull
-    public String @NonNull [] getDeathMent(@NonNull CombatantType combatantType) {
+    public String @NonNull [] getDeathMents(@NonNull CombatantType combatantType) {
         switch (combatantType) {
             case SILIA:
                 return new String[]{"괜찮아...해야할 게 있..잖아..?"};
@@ -119,12 +117,6 @@ public final class Palas extends Support {
     }
 
     @Override
-    @NonNull
-    public Combatant.Species getSpecies() {
-        return Species.HUMAN;
-    }
-
-    @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
@@ -132,16 +124,16 @@ public final class Palas extends Support {
     }
 
     @Override
-    public boolean onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
-        if (provider != target && target instanceof CombatUser)
-            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
+    public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
+        super.onGiveHeal(provider, target, amount);
 
-        return true;
+        if (provider != target && target.isGoalTarget())
+            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((PalasWeapon) combatUser.getWeapon()).getAimModule().isAiming();
+        return !((PalasWeapon) combatUser.getActionManager().getWeapon()).getAimModule().isAiming();
     }
 
     @Override
@@ -176,12 +168,12 @@ public final class Palas extends Support {
 
     private static final class PalasTarget extends Target<Healable> {
         private PalasTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser).exclude(combatUser));
+            super(combatUser, PalasA2Info.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
         protected void onFindEntity(@NonNull Healable target) {
-            ((CombatUser) shooter).getUser().setGlowing(target.getEntity(), ChatColor.GREEN, Timespan.ofTicks(3));
+            ((CombatUser) shooter).setGlowing(target, Timespan.ofTicks(3));
         }
     }
 }

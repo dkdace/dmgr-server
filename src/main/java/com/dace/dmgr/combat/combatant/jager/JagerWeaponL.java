@@ -9,12 +9,14 @@ import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.module.AimModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.action.weapon.module.SwapModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -39,7 +41,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         this.reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
         this.swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
-        this.aimModule = new AimModule(this, JagerWeaponInfo.SCOPE.ZOOM_LEVEL);
+        this.aimModule = new AimModule(this, JagerWeaponInfo.Scope.ZOOM_LEVEL);
 
         addOnReset(() -> swapModule.getSubweapon().getReloadModule().resetRemainingAmmo());
     }
@@ -62,9 +64,10 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
+        ActionManager actionManager = combatUser.getActionManager();
         return (actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
-                && !combatUser.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && combatUser.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+                && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -82,9 +85,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 reloadModule.consume(1);
 
-                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.RECOIL.UP, JagerWeaponInfo.RECOIL.SIDE, JagerWeaponInfo.RECOIL.UP_SPREAD,
-                        JagerWeaponInfo.RECOIL.SIDE_SPREAD, 2, 1);
-                JagerWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.Recoil.UP, JagerWeaponInfo.Recoil.SIDE, JagerWeaponInfo.Recoil.UP_SPREAD,
+                        JagerWeaponInfo.Recoil.SIDE_SPREAD, 2, 1);
+                JagerWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -134,7 +137,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadTick(long i) {
-        JagerWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
+        JagerWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -157,7 +160,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        JagerWeaponInfo.SOUND.AIM_ON.play(combatUser.getLocation());
+        JagerWeaponInfo.Sounds.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
@@ -165,18 +168,18 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        JagerWeaponInfo.SOUND.AIM_OFF.play(combatUser.getLocation());
+        JagerWeaponInfo.Sounds.AIM_OFF.play(combatUser.getLocation());
     }
 
     private final class JagerWeaponLProjectile extends Projectile<Damageable> {
         private JagerWeaponLProjectile() {
-            super(JagerWeaponL.this, JagerWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(JagerWeaponL.this, JagerWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().maxDistance(JagerWeaponInfo.DISTANCE).build());
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            JagerWeaponInfo.PARTICLE.HIT.play(location);
+            JagerWeaponInfo.Particles.HIT.play(location);
         }
 
         @Override
@@ -184,7 +187,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(10, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                JagerWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+                JagerWeaponInfo.Particles.BULLET_TRAIL.play(loc);
             });
         }
 

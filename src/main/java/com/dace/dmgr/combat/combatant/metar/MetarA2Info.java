@@ -50,7 +50,7 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
@@ -70,7 +70,7 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 피격 */
         public static final ParticleEffect DAMAGE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC)

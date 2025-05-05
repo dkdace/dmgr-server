@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -67,7 +67,7 @@ public final class MeleeAttackAction extends AbstractAction {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(COOLDOWN);
         setCooldown();
 
@@ -85,7 +85,7 @@ public final class MeleeAttackAction extends AbstractAction {
 
     private final class MeleeAttack extends Hitscan<Damageable> {
         private MeleeAttack() {
-            super(combatUser, CombatUtil.EntityCondition.enemy(combatUser), Option.builder().size(SIZE).maxDistance(DISTANCE).build());
+            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(SIZE).maxDistance(DISTANCE).build());
         }
 
         @Override

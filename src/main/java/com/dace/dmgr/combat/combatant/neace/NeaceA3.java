@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
@@ -62,7 +62,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
         setDuration();
 
-        NeaceA3Info.SOUND.USE.play(combatUser.getLocation());
+        NeaceA3Info.Sounds.USE.play(combatUser.getLocation());
 
         Healable target = targetModule.getCurrentTarget();
 
@@ -80,12 +80,12 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
             combatUser.getMoveModule().push(distance < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
-            NeaceA3Info.PARTICLE.TICK_CORE.play(loc);
+            NeaceA3Info.Particles.TICK_CORE.play(loc);
 
             addTask(new DelayTask(() -> {
                 Location loc2 = combatUser.getLocation().add(0, 1, 0);
                 for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
-                    NeaceA3Info.PARTICLE.TICK_DECO.play(loc3);
+                    NeaceA3Info.Particles.TICK_DECO.play(loc3);
             }, 1));
 
             return true;
@@ -104,8 +104,8 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
-        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser);
+    public EntityCondition<Healable> getEntityCondition() {
+        return EntityCondition.team(combatUser).exclude(combatUser);
     }
 
     /**

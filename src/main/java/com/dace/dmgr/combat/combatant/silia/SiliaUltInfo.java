@@ -49,7 +49,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.swordhit").volume(2).pitch(1).build(),
@@ -62,10 +62,10 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 시 입자 효과 (중심) */
         public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.PARTICLE.COLOR)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.Particles.COLOR)
                         .count(2).horizontalSpread(0.15).verticalSpread(0.15).build());
         /** 사용 시 입자 효과 (장식) */
         public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(

@@ -44,7 +44,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.2).build(),
@@ -60,7 +60,7 @@ public final class NeaceUltInfo extends UltimateSkillInfo<NeaceUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(215, 255, 130);
 

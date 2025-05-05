@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 

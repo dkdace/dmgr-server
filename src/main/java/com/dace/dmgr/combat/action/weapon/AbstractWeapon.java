@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.AbstractAction;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatRestriction;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -44,6 +44,8 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
 
         this.weaponInfo = weaponInfo;
         this.itemStack = weaponInfo.getDefinedItem().getItemStack();
+
+        combatUser.getEntity().getInventory().setHeldItemSlot(ITEM_SLOT_INDEX);
 
         display();
         addOnRemove(() -> combatUser.getEntity().getInventory().clear(ITEM_SLOT_INDEX));

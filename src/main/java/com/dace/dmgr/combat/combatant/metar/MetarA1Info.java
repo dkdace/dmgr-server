@@ -30,7 +30,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3;
     /** 넉백 강도 */
-    public static final double KNOCKBACK = 0.35;
+    public static final double KNOCKBACK = 0.45;
 
     /** 직격 점수 */
     public static final int DIRECT_HIT_SCORE = 1;
@@ -54,7 +54,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.6).build(),
@@ -75,7 +75,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(40, 160, 200);
 

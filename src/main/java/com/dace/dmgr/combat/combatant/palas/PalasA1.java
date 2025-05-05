@@ -7,9 +7,10 @@ import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
@@ -49,11 +50,11 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
         setDuration();
         combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
 
-        Weapon weapon = combatUser.getWeapon();
+        Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
-        PalasA1Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA1Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -61,7 +62,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             new PalasA1Projectile().shot(loc);
 
-            PalasA1Info.SOUND.USE_READY.play(loc);
+            PalasA1Info.Sounds.USE_READY.play(loc);
         }, PalasA1Info.READY_DURATION.toTicks()));
     }
 
@@ -73,7 +74,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getWeapon().setVisible(true);
+        combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
     @Override
@@ -97,21 +98,21 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
                 CombatUtil.sendShake((CombatUser) combatEntity, 20, 20);
 
             if (i % 2 == 0) {
-                PalasA1Info.PARTICLE.TICK.play(combatEntity.getCenterLocation());
-                PalasA1Info.SOUND.TICK.play(combatEntity.getLocation());
+                PalasA1Info.Particles.TICK.play(combatEntity.getCenterLocation());
+                PalasA1Info.Sounds.TICK.play(combatEntity.getLocation());
             }
         }
     }
 
     private final class PalasA1Projectile extends Projectile<Damageable> {
         private PalasA1Projectile() {
-            super(PalasA1.this, PalasA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(PalasA1.this, PalasA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(8, PalasA1Info.PARTICLE.BULLET_TRAIL::play);
+            return createPeriodIntervalHandler(8, PalasA1Info.Particles.BULLET_TRAIL::play);
         }
 
         @Override
@@ -128,14 +129,14 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
                     if (target.isCreature()) {
                         target.getStatusEffectModule().apply(stun, PalasA1Info.STUN_DURATION);
 
-                        PalasA1Info.PARTICLE.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
+                        PalasA1Info.Particles.HIT_ENTITY.play(target.getCenterLocation(), target.getWidth(), target.getHeight());
                     }
 
-                    PalasA1Info.SOUND.HIT_ENTITY.play(location);
+                    PalasA1Info.Sounds.HIT_ENTITY.play(location);
 
-                    if (target instanceof CombatUser) {
+                    if (target.isGoalTarget()) {
                         combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
-                        bonusScoreModule.addTarget((CombatUser) target, PalasA1Info.STUN_DURATION);
+                        bonusScoreModule.addTarget(target, PalasA1Info.STUN_DURATION);
                     }
                 }
 

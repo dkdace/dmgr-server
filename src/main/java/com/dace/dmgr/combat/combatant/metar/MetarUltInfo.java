@@ -49,7 +49,7 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 시 틱 효과음 */
         public static final SoundEffect USE_TICK = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.charge").volume(3).pitch(0.5, 1.8).build(),
@@ -69,7 +69,7 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(30, 255, 180);
 

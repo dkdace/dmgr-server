@@ -1,12 +1,13 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.FreeCombat;
+import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.combatant.SelectChar;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.trainingcenter.ArenaOption;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.game.GameUser;
-import com.dace.dmgr.item.gui.Menu;
-import com.dace.dmgr.item.gui.SelectChar;
+import com.dace.dmgr.menu.Menu;
 import com.dace.dmgr.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,14 +31,20 @@ public final class OnPlayerSwapHandItems extends EventListener<PlayerSwapHandIte
         User user = User.fromPlayer(player);
         GameUser gameUser = GameUser.fromUser(user);
 
-        if (gameUser != null && gameUser.isInSpawn() || FreeCombat.getInstance().isInFreeCombatWait(player)) {
+        if (gameUser != null && gameUser.isInSpawn() || GeneralConfig.getFreeCombatConfig().getWaitRegion().isIn(player)
+                || GeneralConfig.getTrainingConfig().getSelectCharRegion().isIn(player)) {
             new SelectChar(player);
             return;
         }
 
         CombatUser combatUser = CombatUser.fromUser(user);
         if (combatUser != null) {
-            combatUser.useAction(ActionKey.SWAP_HAND);
+            if (GeneralConfig.getTrainingConfig().getArenaConfig().getOptionRegion().isIn(player)) {
+                new ArenaOption(player);
+                return;
+            }
+
+            combatUser.getActionManager().useAction(ActionKey.SWAP_HAND);
             return;
         }
 

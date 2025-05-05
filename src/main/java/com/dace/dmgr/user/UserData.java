@@ -1,31 +1,41 @@
 package com.dace.dmgr.user;
 
 import com.dace.dmgr.*;
-import com.dace.dmgr.combat.Core;
 import com.dace.dmgr.combat.combatant.CombatantType;
-import com.dace.dmgr.game.RankManager;
-import com.dace.dmgr.game.Tier;
+import com.dace.dmgr.combat.entity.combatuser.Core;
+import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.item.PlayerSkullUtil;
-import com.dace.dmgr.item.gui.ChatSoundOption;
+import com.dace.dmgr.menu.ChatSoundOption;
+import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.task.AsyncTask;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.Initializable;
+import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.TypeToken;
+import com.dace.dmgr.yaml.YamlFile;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 유저의 데이터 정보를 관리하는 클래스.
@@ -33,16 +43,24 @@ import java.util.stream.Collectors;
 public final class UserData implements Initializable<Void> {
     /** 유저 데이터 목록 (UUID : 유저 데이터 정보) */
     private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
-
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
-            "{0}§c관리자에 의해 서버에서 차단되었습니다.",
+            "§c관리자에 의해 서버에서 차단되었습니다.",
             "",
-            "§f해제 일시 : §e{1}",
+            "§f해제 일시 : §e{0}",
             "",
-            "§7문의 : {2}");
+            "§7문의 : {1}");
     /** Yaml 파일 경로의 디렉터리 이름 */
     private static final String DIRECTORY_NAME = "User";
+    /** 레벨 업 효과음 */
+    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
+    /** 티어 승급 효과음 */
+    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
+    /** 티어 강등 효과음 */
+    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
+            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
 
     /** 플레이어 UUID */
     @NonNull
@@ -52,7 +70,6 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     @Getter
     private final String playerName;
-
     /** Yaml 파일 관리 인스턴스 */
     private final YamlFile yamlFile;
     /** 경험치 */
@@ -62,7 +79,7 @@ public final class UserData implements Initializable<Void> {
     /** 돈 */
     private final YamlFile.Section.Entry<Integer> moneyEntry;
     /** 차단한 플레이어의 UUID 목록 */
-    private final YamlFile.Section.ListEntry<String> blockedPlayersEntry;
+    private final YamlFile.Section.Entry<List<UserData>> blockedPlayersEntry;
     /** 경고 횟수 */
     private final YamlFile.Section.Entry<Integer> warningEntry;
     /** 랭크 점수 (RR) */
@@ -103,7 +120,8 @@ public final class UserData implements Initializable<Void> {
         this.xpEntry = section.getEntry("xp", 0);
         this.levelEntry = section.getEntry("level", 1);
         this.moneyEntry = section.getEntry("money", 0);
-        this.blockedPlayersEntry = section.getListEntry("blockedPlayers");
+        this.blockedPlayersEntry = section.getListEntry("blockedPlayers", new TypeToken<List<UserData>>() {
+        });
         this.warningEntry = section.getEntry("warning", 0);
         this.rankRateEntry = section.getEntry("rankRate", 100);
         this.isRankedEntry = section.getEntry("isRanked", false);
@@ -127,9 +145,13 @@ public final class UserData implements Initializable<Void> {
      *
      * @param player 대상 플레이어
      * @return 유저 데이터 인스턴스
+     * @throws IllegalStateException 해당 {@code player}가 Citizens NPC이면 발생
      */
     @NonNull
     public static UserData fromPlayer(@NonNull OfflinePlayer player) {
+        if (player instanceof Player)
+            Validate.validState(!EntityUtil.isCitizensNPC((Player) player), "Citizens NPC는 UserData 인스턴스를 생성할 수 없음");
+
         UserData userData = USER_DATA_MAP.get(player.getUniqueId());
         if (userData == null)
             userData = new UserData(player.getUniqueId(), player.getName());
@@ -160,6 +182,28 @@ public final class UserData implements Initializable<Void> {
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(playerName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
+     *
+     * <p>플러그인 활성화 시 호출해야 한다.</p>
+     */
+    @NonNull
+    public static AsyncTask<Void> initAllUserDatas() {
+        List<AsyncTask<?>> userDataInitTasks = Collections.emptyList();
+
+        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
+            userDataInitTasks = userDataPaths
+                    .map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
+                    .filter(userData -> !userData.isInitialized())
+                    .map(UserData::init)
+                    .collect(Collectors.toList());
+        } catch (Exception ex) {
+            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
+        }
+
+        return AsyncTask.all(userDataInitTasks);
     }
 
     /**
@@ -214,6 +258,20 @@ public final class UserData implements Initializable<Void> {
     }
 
     /**
+     * 유저 데이터에 해당하는 유저 인스턴스를 반환한다.
+     *
+     * @return 유저 인스턴스. 플레이어가 접속 중이 아니면 {@code null} 반환
+     */
+    @Nullable
+    private User getOnlineUser() {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null)
+            return null;
+
+        return User.fromPlayer(player);
+    }
+
+    /**
      * @return 경험치
      */
     public int getXp() {
@@ -223,7 +281,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어의 경험치를 설정하고 필요 경험치를 충족했을 경우 레벨을 증가시킨다.
      *
-     * <p>레벨이 증가했을 경우 {@link User#playLevelUpEffect()}를 호출한다.</p>
+     * <p>레벨이 증가했을 경우 효과를 재생한다.</p>
      *
      * @param xp 경험치. 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
@@ -243,13 +301,16 @@ public final class UserData implements Initializable<Void> {
 
         xpEntry.set(xp);
 
-        if (levelup) {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player == null)
-                return;
+        if (levelup)
+            new DelayTask(() -> {
+                User user = getOnlineUser();
+                if (user == null)
+                    return;
 
-            User.fromPlayer(player).playLevelUpEffect();
-        }
+                user.sendTitle(getLevelPrefix() + " §e§l달성!", "", Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5),
+                        Timespan.ofSeconds(2));
+                LEVEL_UP_SOUND.play(user.getPlayer());
+            }, 100);
     }
 
     /**
@@ -325,7 +386,7 @@ public final class UserData implements Initializable<Void> {
     /**
      * 플레이어의 랭크 점수를 설정한다.
      *
-     * <p>티어가 바뀌었을 경우 {@link User#playTierUpEffect()} 또는 {@link User#playTierDownEffect()}를 호출한다.</p>
+     * <p>티어가 바뀌었을 경우 효과를 재생한다.</p>
      *
      * @param rankRate 랭크 점수 (RR)
      */
@@ -333,15 +394,27 @@ public final class UserData implements Initializable<Void> {
         Tier tier = getTier();
         rankRateEntry.set(rankRate);
 
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player == null)
-            return;
+        new DelayTask(() -> {
+            User user = getOnlineUser();
+            if (user == null)
+                return;
 
-        User user = User.fromPlayer(player);
-        if (getTier().getMinScore() > tier.getMinScore())
-            user.playTierUpEffect();
-        else if (getTier().getMinScore() < tier.getMinScore())
-            user.playTierDownEffect();
+            String title = null;
+            SoundEffect sound = null;
+            if (getTier().getMinScore() > tier.getMinScore()) {
+                title = "§b§l등급 상승";
+                sound = TIER_UP_SOUND;
+            } else if (getTier().getMinScore() < tier.getMinScore()) {
+                title = "§c§l등급 강등";
+                sound = TIER_DOWN_SOUND;
+            }
+
+            if (title == null)
+                return;
+
+            user.sendTitle(title, getTier().getPrefix(), Timespan.ofSeconds(0.4), Timespan.ofSeconds(2), Timespan.ofSeconds(1.5), Timespan.ofSeconds(2));
+            sound.play(user.getPlayer());
+        }, 80);
     }
 
     /**
@@ -450,9 +523,7 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     @UnmodifiableView
     public Set<@NonNull UserData> getBlockedPlayers() {
-        return Collections.unmodifiableSet(blockedPlayersEntry.get().stream()
-                .map(uuid -> UserData.fromUUID(UUID.fromString(uuid)))
-                .collect(Collectors.toSet()));
+        return Collections.unmodifiableSet(new HashSet<>(blockedPlayersEntry.get()));
     }
 
     /**
@@ -462,7 +533,7 @@ public final class UserData implements Initializable<Void> {
      * @return 차단 여부
      */
     public boolean isBlockedPlayer(@NonNull UserData userData) {
-        return blockedPlayersEntry.get().contains(userData.getPlayerUUID().toString());
+        return blockedPlayersEntry.get().contains(userData);
     }
 
     /**
@@ -471,8 +542,12 @@ public final class UserData implements Initializable<Void> {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void addBlockedPlayer(@NonNull UserData userData) {
-        if (!isBlockedPlayer(userData))
-            blockedPlayersEntry.add(userData.getPlayerUUID().toString());
+        List<UserData> list = blockedPlayersEntry.get();
+        if (list.contains(userData))
+            return;
+
+        list.add(userData);
+        blockedPlayersEntry.set(list);
     }
 
     /**
@@ -481,7 +556,10 @@ public final class UserData implements Initializable<Void> {
      * @param userData 대상 플레이어의 유저 데이터 정보
      */
     public void removeBlockedPlayer(@NonNull UserData userData) {
-        blockedPlayersEntry.remove(userData.getPlayerUUID().toString());
+        List<UserData> list = blockedPlayersEntry.get();
+        list.remove(userData);
+
+        blockedPlayersEntry.set(list);
     }
 
     /**
@@ -506,14 +584,13 @@ public final class UserData implements Initializable<Void> {
 
         Timestamp expiration = Timestamp.now().plus(duration);
         String finalReason = MessageFormat.format(MESSAGE_BANNED,
-                GeneralConfig.getConfig().getMessagePrefix(),
                 DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"),
                 GeneralConfig.getConfig().getAdminContact());
         Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, expiration.toDate(), null);
 
-        Player player = Bukkit.getPlayer(playerUUID);
-        if (player != null)
-            player.kickPlayer(finalReason);
+        User user = getOnlineUser();
+        if (user != null)
+            user.kick(finalReason);
 
         return expiration;
     }
@@ -603,11 +680,31 @@ public final class UserData implements Initializable<Void> {
      * 플레이어의 프로필 정보 아이템을 반환한다.
      *
      * @return 프로필 정보 아이템
-     * @see PlayerSkullUtil#fromPlayer(OfflinePlayer)
      */
     @NonNull
     public ItemStack getProfileItem() {
-        return new ItemBuilder(PlayerSkullUtil.fromPlayer(Bukkit.getOfflinePlayer(playerUUID))).setName(getDisplayName()).build();
+        return new ItemBuilder(PlayerSkin.fromUUID(playerUUID)).setName(getDisplayName()).build();
+    }
+
+    /**
+     * {@link UserData}의 직렬화 처리기 클래스.
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class UserDataSerializer implements Serializer<UserData, String> {
+        @Getter
+        private static final UserDataSerializer instance = new UserDataSerializer();
+
+        @Override
+        @NonNull
+        public String serialize(@NonNull UserData value) {
+            return value.getPlayerUUID().toString();
+        }
+
+        @Override
+        @NonNull
+        public UserData deserialize(@NonNull String value) {
+            return UserData.fromUUID(UUID.fromString(value));
+        }
     }
 
     /**
@@ -615,16 +712,13 @@ public final class UserData implements Initializable<Void> {
      */
     public final class Config {
         /** 채팅 효과음 */
-        private final YamlFile.Section.Entry<String> chatSoundEntry;
-        /** 한글 채팅 여부 */
-        private final YamlFile.Section.Entry<Boolean> koreanChatEntry;
+        private final YamlFile.Section.Entry<ChatSoundOption.ChatSound> chatSoundEntry;
         /** 야간 투시 여부 */
         private final YamlFile.Section.Entry<Boolean> nightVisionEntry;
 
         private Config() {
             YamlFile.Section section = yamlFile.getDefaultSection();
-            this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING.toString());
-            this.koreanChatEntry = section.getEntry("koreanChat", false);
+            this.chatSoundEntry = section.getEntry("chatSound", ChatSoundOption.ChatSound.PLING);
             this.nightVisionEntry = section.getEntry("nightVision", false);
         }
 
@@ -633,28 +727,14 @@ public final class UserData implements Initializable<Void> {
          */
         @NonNull
         public ChatSoundOption.ChatSound getChatSound() {
-            return ChatSoundOption.ChatSound.valueOf(chatSoundEntry.get());
+            return chatSoundEntry.get();
         }
 
         /**
          * @param chatSound 채팅 효과음
          */
         public void setChatSound(@NonNull ChatSoundOption.ChatSound chatSound) {
-            chatSoundEntry.set(chatSound.toString());
-        }
-
-        /**
-         * @return 한글 채팅 여부
-         */
-        public boolean isKoreanChat() {
-            return koreanChatEntry.get();
-        }
-
-        /**
-         * @param isKoreanChat 한글 채팅 여부
-         */
-        public void setKoreanChat(boolean isKoreanChat) {
-            koreanChatEntry.set(isKoreanChat);
+            chatSoundEntry.set(chatSound);
         }
 
         /**
@@ -683,14 +763,15 @@ public final class UserData implements Initializable<Void> {
         /** 플레이 시간 (초) */
         private final YamlFile.Section.Entry<Integer> playTimeEntry;
         /** 적용된 코어의 이름 목록 */
-        private final YamlFile.Section.ListEntry<String> coresEntry;
+        private final YamlFile.Section.Entry<List<Core>> coresEntry;
 
         private CombatantRecord(@NonNull CombatantType combatantType) {
             YamlFile.Section section = yamlFile.getDefaultSection().getSection("record").getSection(combatantType.toString());
             this.killEntry = section.getEntry("kill", 0);
             this.deathEntry = section.getEntry("death", 0);
             this.playTimeEntry = section.getEntry("playTime", 0);
-            this.coresEntry = section.getListEntry("cores");
+            this.coresEntry = section.getListEntry("cores", new TypeToken<List<Core>>() {
+            });
         }
 
         /**
@@ -744,9 +825,10 @@ public final class UserData implements Initializable<Void> {
         @NonNull
         @UnmodifiableView
         public Set<@NonNull Core> getCores() {
-            return Collections.unmodifiableSet(coresEntry.get().stream()
-                    .map(Core::valueOf)
-                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(Core.class))));
+            EnumSet<Core> cores = EnumSet.noneOf(Core.class);
+            cores.addAll(coresEntry.get());
+
+            return cores;
         }
 
         /**
@@ -755,8 +837,12 @@ public final class UserData implements Initializable<Void> {
          * @param core 추가할 코어
          */
         public void addCore(@NonNull Core core) {
-            if (!coresEntry.get().contains(core.toString()))
-                coresEntry.add(core.toString());
+            List<Core> cores = coresEntry.get();
+            if (cores.contains(core))
+                return;
+
+            cores.add(core);
+            coresEntry.set(cores);
         }
 
         /**
@@ -765,7 +851,10 @@ public final class UserData implements Initializable<Void> {
          * @param core 제거할 코어
          */
         public void removeCore(@NonNull Core core) {
-            coresEntry.remove(core.toString());
+            List<Core> cores = coresEntry.get();
+            cores.remove(core);
+
+            coresEntry.set(cores);
         }
     }
 }

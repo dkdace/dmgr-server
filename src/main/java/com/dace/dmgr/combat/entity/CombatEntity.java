@@ -2,9 +2,11 @@ package com.dace.dmgr.combat.entity;
 
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.Team;
 import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -19,14 +21,15 @@ import java.util.function.LongConsumer;
  */
 public interface CombatEntity {
     /**
-     * 게임에 소속되지 않은 모든 엔티티를 반환한다.
+     * 지정한 월드에 있는 모든 전투 시스템 엔티티를 반환한다.
      *
-     * @return 게임에 소속되지 않은 모든 엔티티
+     * @param world 대상 월드
+     * @return 모든 전투 시스템 엔티티
      */
     @NonNull
     @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllExcluded() {
-        return AbstractCombatEntity.getAllExcluded();
+    static Collection<@NonNull CombatEntity> getAllCombatEntities(@NonNull World world) {
+        return AbstractCombatEntity.getAllCombatEntities(world);
     }
 
     /**
@@ -63,7 +66,7 @@ public interface CombatEntity {
      * @return 팀. {@code null}이면 게임에 참여중이지 않음을 나타냄
      */
     @Nullable
-    Game.Team getTeam();
+    Team getTeam();
 
     /**
      * 엔티티를 제거한다.

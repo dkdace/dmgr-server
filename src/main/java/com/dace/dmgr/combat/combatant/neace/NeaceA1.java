@@ -1,18 +1,18 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -51,7 +51,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
         NeaceA1Mark neaceA1Mark = target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, NeaceA1Info.DURATION);
         neaceA1Mark.provider = combatUser;
 
-        NeaceA1Info.SOUND.USE.play(combatUser.getLocation());
+        NeaceA1Info.Sounds.USE.play(combatUser.getLocation());
         playUseEffect(target);
     }
 
@@ -62,8 +62,8 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public CombatUtil.EntityCondition<Healable> getEntityCondition() {
-        return CombatUtil.EntityCondition.team(combatUser).exclude(combatUser)
+    public EntityCondition<Healable> getEntityCondition() {
+        return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK));
     }
 
@@ -75,7 +75,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     private void playUseEffect(@NonNull Healable target) {
         Location location = combatUser.getArmLocation(MainHand.RIGHT);
         for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
-            NeaceA1Info.PARTICLE.HIT_ENTITY.play(loc);
+            NeaceA1Info.Particles.HIT_ENTITY.play(loc);
 
         Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
         Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
@@ -88,14 +88,14 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
                 angle += 360 / 5;
                 Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
 
-                NeaceA1Info.PARTICLE.USE.play(loc.clone().add(vec));
+                NeaceA1Info.Particles.USE.play(loc.clone().add(vec));
             }
         }
         for (int i = 0; i < 7; i++) {
             Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
             Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
-            NeaceA1Info.PARTICLE.USE.play(loc1);
-            NeaceA1Info.PARTICLE.USE.play(loc2);
+            NeaceA1Info.Particles.USE.play(loc1);
+            NeaceA1Info.Particles.USE.play(loc2);
         }
     }
 
@@ -118,7 +118,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            NeaceA1Info.PARTICLE.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
+            NeaceA1Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
             if (!(combatEntity instanceof Healable) || ((Healable) combatEntity).getDamageModule().isFullHealth())
                 return;

@@ -2,17 +2,17 @@ package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -40,14 +40,14 @@ public final class InfernoA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
 
         Location location = combatUser.getLocation();
         location.setPitch(Math.max(-40, Math.min(location.getPitch(), 10)));
 
-        InfernoA1Info.SOUND.USE.play(location);
-        InfernoA1Info.PARTICLE.USE.play(location);
+        InfernoA1Info.Sounds.USE.play(location);
+        InfernoA1Info.Particles.USE.play(location);
 
         Vector vec = location.getDirection().multiply(InfernoA1Info.PUSH_SIDE);
         vec.setY(vec.getY() + InfernoA1Info.PUSH_UP);
@@ -61,7 +61,7 @@ public final class InfernoA1 extends ActiveSkill {
 
                 for (int j = 0; j < 2; j++) {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc, -0.3 + j * 0.6, 0.8, -0.5);
-                    InfernoA1Info.PARTICLE.USE_TICK.play(loc2);
+                    InfernoA1Info.Particles.USE_TICK.play(loc2);
                 }
             }
 
@@ -79,7 +79,7 @@ public final class InfernoA1 extends ActiveSkill {
 
     @Override
     protected void onCancelled() {
-        if (combatUser.getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             setDuration(Timespan.ZERO);
         else
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));
@@ -92,8 +92,8 @@ public final class InfernoA1 extends ActiveSkill {
         Location loc = combatUser.getLocation().add(0, 0.1, 0);
         new InfernoA1Area().emit(loc);
 
-        InfernoA1Info.SOUND.LAND.play(loc);
-        InfernoA1Info.PARTICLE.LAND_CORE.play(loc);
+        InfernoA1Info.Sounds.LAND.play(loc);
+        InfernoA1Info.Particles.LAND_CORE.play(loc);
         CombatEffectUtil.playHitBlockParticle(loc, loc.clone().subtract(0, 0.5, 0).getBlock(), 5);
 
         loc.setYaw(0);
@@ -107,15 +107,15 @@ public final class InfernoA1 extends ActiveSkill {
             Location loc2 = loc.clone().add(vec.clone().multiply(1.5));
             Location loc3 = loc.clone().add(vec);
 
-            InfernoA1Info.PARTICLE.LAND_DECO_1.play(loc2);
+            InfernoA1Info.Particles.LAND_DECO_1.play(loc2);
             for (int j = 0; j < 2; j++)
-                InfernoA1Info.PARTICLE.LAND_DECO_2.play(loc3, vec.setY(vec.getY() + 0.1));
+                InfernoA1Info.Particles.LAND_DECO_2.play(loc3, vec.setY(vec.getY() + 0.1));
         }
     }
 
     private final class InfernoA1Area extends Area<Damageable> {
         private InfernoA1Area() {
-            super(combatUser, InfernoA1Info.RADIUS, CombatUtil.EntityCondition.enemy(combatUser));
+            super(combatUser, InfernoA1Info.RADIUS, EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -131,7 +131,7 @@ public final class InfernoA1 extends ActiveSkill {
                 ((Movable) target).getMoveModule().knockback(dir);
             }
 
-            InfernoA1Info.PARTICLE.HIT_ENTITY.play(location);
+            InfernoA1Info.Particles.HIT_ENTITY.play(location);
             return !(target instanceof Barrier);
         }
     }

@@ -63,7 +63,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 준비 */
         public static final SoundEffect USE_READY = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(5).pitch(0.5).build(),
@@ -77,7 +77,7 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 사용 준비 */
         public static final ParticleEffect USE_READY = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(100).horizontalSpread(0.2).verticalSpread(0.2).speed(0.6).build());

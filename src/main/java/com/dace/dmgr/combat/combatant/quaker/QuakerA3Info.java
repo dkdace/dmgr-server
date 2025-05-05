@@ -59,7 +59,7 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(0.8).build(),
@@ -84,10 +84,10 @@ public final class QuakerA3Info extends ActiveSkillInfo<QuakerA3> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 (이펙트 - 중심) */
         public static final ParticleEffect BULLET_TRAIL_EFFECT_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.PARTICLE.COLOR)
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.Particles.COLOR)
                         .count(2).horizontalSpread(0.12).verticalSpread(0.12).build());
         /** 총알 궤적 (이펙트 - 장식) */
         public static final ParticleEffect BULLET_TRAIL_EFFECT_DECO = new ParticleEffect(

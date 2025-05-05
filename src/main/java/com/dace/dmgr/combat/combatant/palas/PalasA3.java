@@ -2,15 +2,15 @@ package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -48,10 +48,10 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
-        PalasA3Info.SOUND.USE.play(combatUser.getLocation());
+        PalasA3Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             cancel();
@@ -81,9 +81,9 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     /**
      * 체력 증가 상태 효과 클래스.
      */
-    private static final class PalasA3HealthIncrease extends StatusEffect {
+    private final class PalasA3HealthIncrease extends StatusEffect {
         /** 증가한 최대 체력 */
-        private int increasedHealth;
+        private int increasedMaxHealth;
 
         private PalasA3HealthIncrease() {
             super(true);
@@ -91,12 +91,15 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
+            if (!(combatEntity instanceof Healable))
+                return;
+
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 + PalasA3Info.HEALTH_INCREASE_RATIO));
-            increasedHealth = newMaxHealth - maxHealth;
+            increasedMaxHealth = newMaxHealth - maxHealth;
 
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
-            combatEntity.getDamageModule().setHealth(combatEntity.getDamageModule().getHealth() + increasedHealth);
+            ((Healable) combatEntity).getDamageModule().heal(combatUser, increasedMaxHealth, true);
 
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", Timespan.ZERO, Timespan.ofTicks(5),
@@ -110,16 +113,17 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() - increasedHealth);
+            if (combatEntity instanceof Healable)
+                combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() - increasedMaxHealth);
         }
     }
 
     /**
      * 체력 감소 상태 효과 클래스.
      */
-    private static final class PalasA3HealthDecrease extends StatusEffect {
+    private final class PalasA3HealthDecrease extends StatusEffect {
         /** 감소한 최대 체력 */
-        private int decreasedHealth;
+        private int decreasedMaxHealth;
 
         private PalasA3HealthDecrease() {
             super(false);
@@ -127,10 +131,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
+            double health = combatEntity.getDamageModule().getHealth();
             int maxHealth = combatEntity.getDamageModule().getMaxHealth();
             int newMaxHealth = (int) (maxHealth * (1 - PalasA3Info.HEALTH_DECREASE_RATIO));
-            decreasedHealth = maxHealth - newMaxHealth;
+            double damage = Math.max(0, health - newMaxHealth);
+            decreasedMaxHealth = maxHealth - newMaxHealth;
 
+            combatEntity.getDamageModule().damage(combatUser, damage, DamageType.FIXED, null, false, true);
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
 
             if (combatEntity instanceof CombatUser)
@@ -145,13 +152,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() + decreasedHealth);
+            combatEntity.getDamageModule().setMaxHealth(combatEntity.getDamageModule().getMaxHealth() + decreasedMaxHealth);
         }
     }
 
     private final class PalasA3Projectile extends Projectile<Damageable> {
         private PalasA3Projectile() {
-            super(PalasA3.this, PalasA3Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser).or(CombatUtil.EntityCondition.team(combatUser)
+            super(PalasA3.this, PalasA3Info.VELOCITY, EntityCondition.enemy(combatUser).or(EntityCondition.team(combatUser)
                     .exclude(combatUser)));
         }
 
@@ -160,8 +167,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
             Location loc = location.add(0, 0.1, 0);
             new PalasA3Area().emit(loc);
 
-            PalasA3Info.SOUND.EXPLODE.play(loc);
-            PalasA3Info.PARTICLE.EXPLODE.play(loc);
+            PalasA3Info.Sounds.EXPLODE.play(loc);
+            PalasA3Info.Particles.EXPLODE.play(loc);
         }
 
         @Override
@@ -169,7 +176,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, PalasA3Info.PARTICLE.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, PalasA3Info.Particles.BULLET_TRAIL::play));
         }
 
         @Override
@@ -186,7 +193,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
         private final class PalasA3Area extends Area<Damageable> {
             private PalasA3Area() {
-                super(combatUser, PalasA3Info.RADIUS, CombatUtil.EntityCondition.of(Damageable.class));
+                super(combatUser, PalasA3Info.RADIUS, EntityCondition.of(Damageable.class));
             }
 
             @Override
@@ -202,7 +209,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
                     else if (target instanceof Healable)
                         onHitTeamer((Healable) target);
 
-                    if (target != combatUser && target instanceof CombatUser)
+                    if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
                 }
 
@@ -220,8 +227,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
                 target.getStatusEffectModule().apply(new PalasA3HealthDecrease(), PalasA3Info.DURATION);
 
-                if (target instanceof CombatUser)
-                    bonusScoreModule.addTarget((CombatUser) target, PalasA3Info.DURATION);
+                if (target.isGoalTarget())
+                    bonusScoreModule.addTarget(target, PalasA3Info.DURATION);
             }
 
             /**

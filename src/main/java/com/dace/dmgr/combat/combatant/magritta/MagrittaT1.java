@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.effect.TextHologram;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +26,7 @@ public final class MagrittaT1 {
         ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, MagrittaT1Info.DURATION);
         shreddingValue.addValue(attacker, victim);
 
-        MagrittaT1Info.SOUND.USE.play(victim.getLocation());
+        MagrittaT1Info.Sounds.USE.play(victim.getLocation());
     }
 
     /**
@@ -69,9 +69,9 @@ public final class MagrittaT1 {
 
             victim.getStatusEffectModule().apply(burning, MagrittaT1Info.DURATION);
 
-            MagrittaT1Info.SOUND.MAX.play(victim.getLocation());
+            MagrittaT1Info.Sounds.MAX.play(victim.getLocation());
 
-            if (victim instanceof CombatUser)
+            if (victim.isGoalTarget())
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 

@@ -8,12 +8,12 @@ import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -62,7 +62,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
 
         if (!isDurationFinished()) {
             cancel();
@@ -75,7 +75,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        QuakerA1Info.SOUND.USE.play(combatUser.getLocation());
+        QuakerA1Info.Sounds.USE.play(combatUser.getLocation());
 
         entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
     }
@@ -92,7 +92,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         entityModule.disposeEntity();
 
-        QuakerA1Info.SOUND.DISABLE.play(combatUser.getLocation());
+        QuakerA1Info.Sounds.DISABLE.play(combatUser.getLocation());
     }
 
     /**
@@ -137,7 +137,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
-            QuakerA1Info.SOUND.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
+            QuakerA1Info.Sounds.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
             if (location != null)
                 CombatEffectUtil.playBreakParticle(this, location, damage);
         }
@@ -150,11 +150,11 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             setStateValue(0);
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
-            QuakerA1Info.SOUND.DEATH.play(getCenterLocation());
+            QuakerA1Info.Sounds.DEATH.play(getCenterLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
-                    QuakerA1Info.PARTICLE.DEATH.play(loc);
+                    QuakerA1Info.Particles.DEATH.play(loc);
                 }
             }
         }

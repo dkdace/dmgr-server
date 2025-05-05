@@ -59,7 +59,7 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
@@ -76,7 +76,7 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 총알 궤적 */
         public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(20).horizontalSpread(0.2).verticalSpread(0.05).speed(0.25).build());

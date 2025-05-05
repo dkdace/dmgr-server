@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.VectorUtil;
@@ -39,7 +39,7 @@ public final class NeaceUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getSkill(NeaceA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(NeaceA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -51,7 +51,7 @@ public final class NeaceUlt extends UltimateSkill {
         combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        NeaceUltInfo.SOUND.USE.play(combatUser.getLocation());
+        NeaceUltInfo.Sounds.USE.play(combatUser.getLocation());
 
         EffectManager effectManager = new EffectManager();
 
@@ -63,15 +63,15 @@ public final class NeaceUlt extends UltimateSkill {
             setDuration();
             combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
-            NeaceUltInfo.SOUND.USE_READY.play(combatUser.getLocation());
-            NeaceUltInfo.PARTICLE.USE_READY.play(combatUser.getLocation());
+            NeaceUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
+            NeaceUltInfo.Particles.USE_READY.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 new NeaceUltArea().emit(loc);
 
                 playTickEffect(i);
-                NeaceWeaponInfo.SOUND.USE_HEAL.play(combatUser.getLocation());
+                NeaceWeaponInfo.Sounds.USE_HEAL.play(combatUser.getLocation());
             }, 1, NeaceUltInfo.DURATION.toTicks()));
         }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
     }
@@ -110,7 +110,7 @@ public final class NeaceUlt extends UltimateSkill {
             angle += 360 / 3;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
 
-            NeaceUltInfo.PARTICLE.TICK.play(loc.clone().add(vec));
+            NeaceUltInfo.Particles.TICK.play(loc.clone().add(vec));
         }
     }
 
@@ -147,7 +147,7 @@ public final class NeaceUlt extends UltimateSkill {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
                     Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                    NeaceUltInfo.PARTICLE.USE_TICK.play(loc2);
+                    NeaceUltInfo.Particles.USE_TICK.play(loc2);
                 }
             }
 
@@ -157,7 +157,7 @@ public final class NeaceUlt extends UltimateSkill {
 
     private final class NeaceUltArea extends Area<Healable> {
         private NeaceUltArea() {
-            super(combatUser, NeaceWeaponInfo.HEAL.MAX_DISTANCE, CombatUtil.EntityCondition.team(combatUser));
+            super(combatUser, NeaceWeaponInfo.Heal.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
         }
 
         @Override
@@ -167,7 +167,7 @@ public final class NeaceUlt extends UltimateSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Healable target) {
-            ((NeaceWeapon) combatUser.getWeapon()).healTarget(target);
+            ((NeaceWeapon) combatUser.getActionManager().getWeapon()).healTarget(target);
             return true;
         }
     }

@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
 import com.dace.dmgr.event.EventListener;
-import com.dace.dmgr.item.gui.ChestGUI;
+import com.dace.dmgr.item.ChestGUI;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

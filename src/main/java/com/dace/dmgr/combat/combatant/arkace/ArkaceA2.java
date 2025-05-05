@@ -4,7 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -38,7 +38,7 @@ public final class ArkaceA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        ArkaceA2Info.SOUND.USE.play(combatUser.getLocation());
+        ArkaceA2Info.Sounds.USE.play(combatUser.getLocation());
 
         long durationTicks = ArkaceA2Info.DURATION.toTicks();
 
@@ -77,7 +77,7 @@ public final class ArkaceA2 extends ActiveSkill {
             angle += 360 / 3;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            ArkaceA2Info.PARTICLE.TICK.play(loc.clone().add(vec), j / 2.0);
+            ArkaceA2Info.Particles.TICK.play(loc.clone().add(vec), j / 2.0);
         }
     }
 }

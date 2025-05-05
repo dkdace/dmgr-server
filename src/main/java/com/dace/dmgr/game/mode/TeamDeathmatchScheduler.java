@@ -8,6 +8,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 
+import java.text.MessageFormat;
+
 /**
  * 팀 데스매치 스케쥴러 클래스.
  */
@@ -27,7 +29,11 @@ public final class TeamDeathmatchScheduler implements GamePlayModeScheduler {
     public void onSecond(int remainingSeconds) {
         String displayTime = (remainingSeconds < 60 ? "§c§l" : "§l") +
                 DurationFormatUtils.formatDuration(remainingSeconds * 1000L, "mm:ss", true);
-        timerBossBar.setTitle("§b남은 시간 : " + displayTime);
+
+        timerBossBar.setTitle(MessageFormat.format("§c§lRED §f{0} §7:§f {1} §9§lBLUE     §b남은 시간 : {2}",
+                game.getRedTeam().getScore(),
+                game.getBlueTeam().getScore(),
+                displayTime));
         timerBossBar.setProgress(remainingSeconds / game.getGamePlayMode().getPlayDuration().toSeconds());
     }
 

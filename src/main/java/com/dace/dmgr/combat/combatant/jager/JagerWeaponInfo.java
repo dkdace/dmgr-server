@@ -42,7 +42,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
 
     private JagerWeaponInfo() {
-        super(JagerWeaponL.class, RESOURCE.DEFAULT, "MK.73 ELNR",
+        super(JagerWeaponL.class, Resource.DEFAULT, "MK.73 ELNR",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("두 개의 탄창을 가진 특수 소총으로, <3::냉각탄> 및 정조준하여 <3::저격탄>을 사격할 수 있습니다.")
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
@@ -60,8 +60,8 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
                         new ActionInfoLore.NamedSection("저격탄", ActionInfoLore.Section
                                 .builder("저격탄을 사격하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
-                                        SCOPE.DAMAGE, SCOPE.DAMAGE / 2, SCOPE.DAMAGE_WEAKENING_DISTANCE, SCOPE.DAMAGE_WEAKENING_DISTANCE * 2)
-                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, SCOPE.CAPACITY)
+                                        Scope.DAMAGE, Scope.DAMAGE / 2, Scope.DAMAGE_WEAKENING_DISTANCE, Scope.DAMAGE_WEAKENING_DISTANCE * 2)
+                                .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, Scope.CAPACITY)
                                 .build())));
     }
 
@@ -69,7 +69,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 정조준 상태의 정보.
      */
     @UtilityClass
-    public static final class SCOPE {
+    public static final class Scope {
         /** 피해량 */
         public static final int DAMAGE = 240;
         /** 피해량 감소 시작 거리 (단위: 블록) */
@@ -83,7 +83,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
          * 반동 정보.
          */
         @UtilityClass
-        public static final class RECOIL {
+        public static final class Recoil {
             /** 수직 반동 */
             public static final double UP = 2.8;
             /** 수평 반동 */
@@ -99,7 +99,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 반동 정보.
      */
     @UtilityClass
-    public static final class RECOIL {
+    public static final class Recoil {
         /** 수직 반동 */
         public static final double UP = 0.8;
         /** 수평 반동 */
@@ -114,7 +114,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 리소스별 아이템 내구도 정보.
      */
     @UtilityClass
-    public static final class RESOURCE {
+    public static final class Resource {
         /** 기본 */
         public static final short DEFAULT = 2;
     }
@@ -123,7 +123,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder("random.gun2.m16_1").volume(0.8).pitch(1.2).build(),
@@ -155,7 +155,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(137, 185, 240);
 

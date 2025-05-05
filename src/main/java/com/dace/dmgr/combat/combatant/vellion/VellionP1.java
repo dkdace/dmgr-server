@@ -4,10 +4,10 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -54,8 +54,8 @@ public final class VellionP1 extends AbstractSkill {
 
         Location location = combatUser.getLocation();
 
-        VellionP1Info.SOUND.USE.play(location);
-        VellionP1Info.PARTICLE.USE.play(location);
+        VellionP1Info.Sounds.USE.play(location);
+        VellionP1Info.Particles.USE.play(location);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
@@ -100,8 +100,8 @@ public final class VellionP1 extends AbstractSkill {
             return !combatUser.getEntity().isOnGround();
         }, () -> combatUser.getEntity().removePotionEffect(PotionEffectType.LEVITATION), 1));
 
-        VellionP1Info.SOUND.DISABLE.play(combatUser.getLocation());
-        VellionP1Info.PARTICLE.USE.play(combatUser.getLocation());
+        VellionP1Info.Sounds.DISABLE.play(combatUser.getLocation());
+        VellionP1Info.Particles.USE.play(combatUser.getLocation());
     }
 
     @Override
@@ -128,7 +128,7 @@ public final class VellionP1 extends AbstractSkill {
             int angle = 360 / 8 * i;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            VellionP1Info.PARTICLE.TICK.play(loc.clone().add(vec));
+            VellionP1Info.Particles.TICK.play(loc.clone().add(vec));
         }
     }
 }

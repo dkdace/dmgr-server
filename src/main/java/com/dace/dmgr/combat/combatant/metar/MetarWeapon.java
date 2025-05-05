@@ -9,13 +9,14 @@ import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -81,7 +82,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
                 } else
                     slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
 
-                MetarWeaponInfo.SOUND.USE.play(combatUser.getLocation());
+                MetarWeaponInfo.Sounds.USE.play(combatUser.getLocation());
                 break;
             }
             case DROP: {
@@ -114,7 +115,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
     @Override
     public void onReloadTick(long i) {
-        MetarWeaponInfo.SOUND.RELOAD.play(i, combatUser.getLocation());
+        MetarWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
     }
 
     @Override
@@ -135,15 +136,15 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         private final boolean isOpposite;
 
         private MetarWeaponProjectile(boolean isOpposite) {
-            super(MetarWeapon.this, MetarWeaponInfo.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser),
+            super(MetarWeapon.this, MetarWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().maxDistance(MetarWeaponInfo.DISTANCE).build());
             this.isOpposite = isOpposite;
         }
 
         @Override
         protected void onHit(@NonNull Location location) {
-            MetarWeaponInfo.PARTICLE.HIT.play(location);
-            MetarWeaponInfo.SOUND.HIT.play(location);
+            MetarWeaponInfo.Particles.HIT.play(location);
+            MetarWeaponInfo.Sounds.HIT.play(location);
         }
 
         @Override
@@ -151,7 +152,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(13, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, isOpposite ? -0.25 : 0.25, -0.2, 0);
-                MetarWeaponInfo.PARTICLE.BULLET_TRAIL.play(loc);
+                MetarWeaponInfo.Particles.BULLET_TRAIL.play(loc);
             });
         }
 

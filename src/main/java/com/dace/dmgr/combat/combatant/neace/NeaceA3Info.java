@@ -44,7 +44,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
      * 효과음 정보.
      */
     @UtilityClass
-    public static final class SOUND {
+    public static final class Sounds {
         /** 사용 */
         public static final SoundEffect USE = new SoundEffect(
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1.2).pitch(1.8).build(),
@@ -56,7 +56,7 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
      * 입자 효과 정보.
      */
     @UtilityClass
-    public static final class PARTICLE {
+    public static final class Particles {
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
                 ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(6).horizontalSpread(0.2).horizontalSpread(0.4).speed(0.1).build());

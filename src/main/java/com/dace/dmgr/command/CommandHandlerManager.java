@@ -1,9 +1,7 @@
 package com.dace.dmgr.command;
 
 import com.dace.dmgr.ConsoleLogger;
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.command.test.DummyCommand;
-import com.dace.dmgr.command.test.GameTestCommand;
 import com.dace.dmgr.command.test.SelectCharCommand;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.Validate;
@@ -40,8 +38,7 @@ public final class CommandHandlerManager {
      * 모든 테스트용 명령어 처리기를 등록한다.
      */
     public static void registerTestCommands() {
-        DMGR.getPlugin().getCommand("선택").setExecutor(SelectCharCommand.getInstance());
-        DMGR.getPlugin().getCommand("소환").setExecutor(DummyCommand.getInstance());
-        DMGR.getPlugin().getCommand("게임").setExecutor(GameTestCommand.getInstance());
+        Validate.notNull(SelectCharCommand.getInstance());
+        Validate.notNull(DummyCommand.getInstance());
     }
 }

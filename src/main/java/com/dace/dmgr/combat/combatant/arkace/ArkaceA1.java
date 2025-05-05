@@ -4,14 +4,15 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.LocationUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -40,14 +41,14 @@ public final class ArkaceA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getWeapon().cancel();
+        combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getArmLocation(MainHand.LEFT);
             new ArkaceA1Projectile().shot(loc);
 
-            ArkaceA1Info.SOUND.USE.play(loc);
+            ArkaceA1Info.Sounds.USE.play(loc);
         }, () -> addActionTask(new DelayTask(this::cancel, 4)), 5, 3));
     }
 
@@ -63,7 +64,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
     private final class ArkaceA1Projectile extends Projectile<Damageable> {
         private ArkaceA1Projectile() {
-            super(ArkaceA1.this, ArkaceA1Info.VELOCITY, CombatUtil.EntityCondition.enemy(combatUser));
+            super(ArkaceA1.this, ArkaceA1Info.VELOCITY, EntityCondition.enemy(combatUser));
         }
 
         @Override
@@ -71,14 +72,14 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = location.add(0, 0.1, 0);
             new ArkaceA1Area().emit(loc);
 
-            ArkaceA1Info.SOUND.EXPLODE.play(loc);
-            ArkaceA1Info.PARTICLE.EXPLODE.play(loc);
+            ArkaceA1Info.Sounds.EXPLODE.play(loc);
+            ArkaceA1Info.Particles.EXPLODE.play(loc);
         }
 
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(10, ArkaceA1Info.PARTICLE.BULLET_TRAIL::play);
+            return createPeriodIntervalHandler(10, ArkaceA1Info.Particles.BULLET_TRAIL::play);
         }
 
         @Override
@@ -91,9 +92,16 @@ public final class ArkaceA1 extends ActiveSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
-                        && target instanceof CombatUser)
-                    combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+                if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
+                    if (target instanceof Movable) {
+                        Vector dir = getVelocity().normalize().multiply(ArkaceA1Info.KNOCKBACK);
+                        ((Movable) target).getMoveModule().knockback(dir);
+                    }
+
+                    if (target.isGoalTarget())
+                        combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+                }
+
 
                 return false;
             };
@@ -114,7 +122,7 @@ public final class ArkaceA1 extends ActiveSkill {
                 double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable) {
+                        && target instanceof Movable && isNotHit(target)) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }

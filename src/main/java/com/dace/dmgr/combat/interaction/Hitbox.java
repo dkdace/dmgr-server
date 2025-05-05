@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.util.LocationUtil;
 import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -65,6 +65,25 @@ public final class Hitbox {
         this.axisOffsetY = builder.axisOffsetY;
         this.axisOffsetZ = builder.axisOffsetZ;
         this.isPitchFixed = builder.isPitchFixed;
+    }
+
+    /**
+     * 플레이어 엔티티의 기본 히트박스 목록을 생성하여 반환한다.
+     *
+     * @param sizeMultiplier 가로 및 세로 크기 배수. 0을 초과하는 값
+     * @return 히트박스 목록. 길이가 4인 배열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    @NonNull
+    public static Hitbox @NonNull [] createDefaultPlayerHitboxes(double sizeMultiplier) {
+        Validate.isTrue(sizeMultiplier > 0, "sizeMultiplier > 0 (%f)", sizeMultiplier);
+
+        return new Hitbox[]{
+                Hitbox.builder(0.5 * sizeMultiplier, 0.7, 0.3 * sizeMultiplier).axisOffsetY(0.35).pitchFixed().build(),
+                Hitbox.builder(0.8 * sizeMultiplier, 0.7, 0.45 * sizeMultiplier).axisOffsetY(1.05).pitchFixed().build(),
+                Hitbox.builder(0.45 * sizeMultiplier, 0.35, 0.45 * sizeMultiplier).offsetY(0.225).axisOffsetY(1.4).build(),
+                Hitbox.builder(0.45 * sizeMultiplier, 0.1, 0.45 * sizeMultiplier).offsetY(0.4).axisOffsetY(1.4).build()
+        };
     }
 
     /**

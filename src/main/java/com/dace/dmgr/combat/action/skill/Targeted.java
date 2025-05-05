@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.action.skill;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.NonNull;
 
@@ -25,5 +25,5 @@ public interface Targeted<T extends CombatEntity> extends Skill {
      * @return 대상 엔티티를 찾는 조건
      */
     @NonNull
-    CombatUtil.EntityCondition<T> getEntityCondition();
+    EntityCondition<T> getEntityCondition();
 }

@@ -5,9 +5,9 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.CombatUser;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.VectorUtil;
@@ -50,12 +50,12 @@ public final class NeaceA2 extends ActiveSkill {
         }
 
         setDuration();
-        combatUser.getWeapon().setGlowing(true);
+        combatUser.getActionManager().getWeapon().setGlowing(true);
 
-        NeaceA2Info.SOUND.USE.play(combatUser.getLocation());
+        NeaceA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            NeaceA2Info.PARTICLE.TICK.play(combatUser.getCenterLocation());
+            NeaceA2Info.Particles.TICK.play(combatUser.getCenterLocation());
             if (i < 12)
                 playUseTickEffect(i);
         }, 1, NeaceA2Info.DURATION.toTicks()));
@@ -64,7 +64,7 @@ public final class NeaceA2 extends ActiveSkill {
     @Override
     protected void onDurationFinished() {
         super.onDurationFinished();
-        combatUser.getWeapon().setGlowing(false);
+        combatUser.getActionManager().getWeapon().setGlowing(false);
     }
 
     @Override
@@ -95,7 +95,7 @@ public final class NeaceA2 extends ActiveSkill {
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            NeaceA2Info.PARTICLE.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
+            NeaceA2Info.Particles.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
         }
     }
 

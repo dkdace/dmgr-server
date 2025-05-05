@@ -1,6 +1,7 @@
 package com.dace.dmgr.command;
 
 import com.dace.dmgr.game.GameUser;
+import com.dace.dmgr.user.Place;
 import com.dace.dmgr.user.User;
 import lombok.Getter;
 import lombok.NonNull;
@@ -8,8 +9,6 @@ import org.bukkit.entity.Player;
 
 /**
  * 로비 이동 명령어 클래스.
- *
- * @see User#reset()
  */
 public final class LobbyCommand extends CommandHandler {
     @Getter
@@ -29,6 +28,6 @@ public final class LobbyCommand extends CommandHandler {
             return;
         }
 
-        user.reset();
+        user.setCurrentPlace(Place.LOBBY);
     }
 }
