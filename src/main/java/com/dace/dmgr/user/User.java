@@ -16,17 +16,16 @@ import com.dace.dmgr.item.GUI;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.TaskManager;
+import com.keenant.tabbed.Tabbed;
 import com.keenant.tabbed.tablist.TableTabList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.skinsrestorer.api.PlayerWrapper;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
@@ -84,6 +83,8 @@ public final class User {
             "§7다운로드 오류 문의 : {0}");
     /** 채팅의 메시지 포맷 패턴 */
     private static final String CHAT_FORMAT_PATTERN = "<{0}> {1}";
+    /** Tabbed 인스턴스 */
+    private static final Tabbed TABBED = new Tabbed(DMGR.getPlugin());
     /** 경고 액션바 효과음 */
     private static final SoundEffect ALERT_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build());
@@ -169,7 +170,7 @@ public final class User {
     private User(@NonNull Player player) {
         this.player = player;
         this.nameTagHider = EntityUtil.createTemporaryArmorStand(player.getLocation());
-        this.tabList = DMGR.getTabbed().newTableTabList(player);
+        this.tabList = TABBED.newTableTabList(player);
         this.tabList.setBatchEnabled(true);
         this.userData = UserData.fromPlayer(player);
         this.lobbyTabListProfile = new LobbyTabListProfile(this);
@@ -234,7 +235,7 @@ public final class User {
     private void onInit() {
         disableCollision();
         taskManager.add(new DelayTask(this::sendResourcePack, 10));
-        taskManager.add(resetSkin());
+        taskManager.add(PlayerSkin.fromUUID(player.getUniqueId()).applySkin(player));
 
         nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
                 0, userData.getDisplayName());
@@ -772,32 +773,6 @@ public final class User {
         place.onWarp(this);
 
         reset();
-    }
-
-    /**
-     * 플레이어의 스킨을 변경한다.
-     *
-     * @param playerSkin 적용할 스킨
-     */
-    @NonNull
-    public AsyncTask<Void> applySkin(@NonNull PlayerSkin playerSkin) {
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                DMGR.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), playerSkin.toProperty());
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
-                onError.accept(ex);
-            }
-        });
-    }
-
-    /**
-     * 플레이어의 스킨을 초기화한다.
-     */
-    @NonNull
-    public AsyncTask<Void> resetSkin() {
-        return applySkin(PlayerSkin.fromUUID(player.getUniqueId()));
     }
 
     /**

@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.entity.temporary.spawnhandler;
 
-import com.dace.dmgr.DMGR;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.entity.temporary.TemporaryEntity;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
 import lombok.NonNull;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.MemoryNPCDataStore;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.trait.SkinTrait;
 import net.skinsrestorer.api.property.IProperty;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
  * <p>실제 플레이어가 아니므로 {@link User#fromPlayer(Player)}를 호출하면 안 된다.</p>
  */
 public final class PlayerNPCSpawnHandler implements EntitySpawnHandler<Player> {
+    /** Citizens NPC 저장소 인스턴스 */
+    private static final NPCRegistry NPC_REGISTRY = CitizensAPI.createAnonymousNPCRegistry(new MemoryNPCDataStore());
+
     /** Citizens NPC 인스턴스 */
     private final NPC npc;
     /** 이름표 숨기기용 갑옷 거치대 인스턴스 */
@@ -34,7 +39,7 @@ public final class PlayerNPCSpawnHandler implements EntitySpawnHandler<Player> {
      * @param playerSkin 플레이어 스킨
      */
     public PlayerNPCSpawnHandler(@NonNull PlayerSkin playerSkin) {
-        this.npc = DMGR.getNpcRegistry().createNPC(EntityType.PLAYER, RandomStringUtils.randomAlphanumeric(8));
+        this.npc = NPC_REGISTRY.createNPC(EntityType.PLAYER, RandomStringUtils.randomAlphanumeric(8));
         this.npc.data().set(NPC.Metadata.NAMEPLATE_VISIBLE, false);
 
         IProperty property = playerSkin.toProperty();
@@ -49,7 +54,16 @@ public final class PlayerNPCSpawnHandler implements EntitySpawnHandler<Player> {
      */
     @NonNull
     public static NPC getNPC(@NonNull TemporaryEntity<@NonNull Player> combatEntity) {
-        return DMGR.getNpcRegistry().getNPC(combatEntity.getEntity());
+        return NPC_REGISTRY.getNPC(combatEntity.getEntity());
+    }
+
+    /**
+     * 생성된 모든 Citizens NPC를 제거한다.
+     *
+     * <p>플러그인 비활성화 시 호출해야 한다.</p>
+     */
+    public static void clearNPC() {
+        NPC_REGISTRY.deregisterAll();
     }
 
     @Override
