@@ -6,11 +6,11 @@ import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.task.AsyncTask;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
@@ -30,8 +30,8 @@ public final class Menu extends ChestGUI {
 
         fillAll(GUIItem.EMPTY);
 
-        new AsyncTask<>((onFinish, onError) ->
-                set(0, 4, new DefinedItem(UserData.fromPlayer(player).getProfileItem())));
+        UserData.fromPlayer(player).getProfileItem().onFinish((Consumer<ItemStack>) itemStack ->
+                set(0, 4, new DefinedItem(itemStack)));
 
         set(2, 2, MenuItem.RECORD.definedItem);
         set(2, 4, MenuItem.CORE.definedItem);

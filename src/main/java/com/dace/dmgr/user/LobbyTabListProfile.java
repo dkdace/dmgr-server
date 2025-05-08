@@ -5,8 +5,6 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.util.ReflectionUtil;
 import com.keenant.tabbed.util.Skins;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -18,11 +16,11 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * 로비 탭리스트 프로필 클래스.
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class LobbyTabListProfile implements TabListProfile {
     /** 헤더 문자열 */
     public static final String HEADER = "\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n";
@@ -31,6 +29,19 @@ public final class LobbyTabListProfile implements TabListProfile {
 
     /** 유저 인스턴스 */
     private final User user;
+    /** 유저 플레이어 스킨 */
+    @Nullable
+    private PlayerSkin userPlayerSkin;
+
+    /**
+     * 로비 탭리스트 프로필 인스턴스를 생성한다.
+     *
+     * @param user 대상 유저
+     */
+    LobbyTabListProfile(@NonNull User user) {
+        this.user = user;
+        PlayerSkin.fromUUID(user.getPlayer().getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> userPlayerSkin = playerSkin);
+    }
 
     /**
      * 서버의 최근 TPS (Ticks Per Second)를 반환한다.
@@ -101,8 +112,10 @@ public final class LobbyTabListProfile implements TabListProfile {
         items[0][3] = new Item(MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory), Skin.MEMORY);
         items[0][4] = new Item(MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), Skin.TPS);
         items[0][5] = new Item(MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()), Skin.ONLINE);
-        items[0][7] = new Item(MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", user.getPlayer().getName()),
-                PlayerSkin.fromUUID(user.getPlayer().getUniqueId()));
+
+        if (userPlayerSkin != null)
+            items[0][7] = new Item(MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", user.getPlayer().getName()), userPlayerSkin);
+
         items[0][9] = new Item(MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
                 userData.getWinCount(),
                 userData.getLoseCount(),

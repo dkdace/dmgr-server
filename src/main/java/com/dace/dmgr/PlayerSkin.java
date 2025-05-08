@@ -1,20 +1,30 @@
 package com.dace.dmgr;
 
-import com.comphenix.protocol.wrappers.WrappedSignedProperty;
+import com.comphenix.packetwrapper.WrapperPlayServerHeldItemSlot;
+import com.comphenix.packetwrapper.WrapperPlayServerPlayerInfo;
+import com.comphenix.packetwrapper.WrapperPlayServerPosition;
+import com.comphenix.packetwrapper.WrapperPlayServerRespawn;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.task.AsyncTask;
+import com.dace.dmgr.util.task.DelayTask;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import net.skinsrestorer.api.PlayerWrapper;
-import net.skinsrestorer.api.SkinsRestorerAPI;
-import net.skinsrestorer.api.property.IProperty;
-import org.apache.commons.lang3.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * 플레이어의 스킨 정보를 나타내는 클래스.
@@ -22,31 +32,20 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public final class PlayerSkin {
-    /** SkinsRestorer API 인스턴스 */
-    private static final SkinsRestorerAPI API = SkinsRestorerAPI.getApi();
     /** 스킨을 불러올 때 사용하는 토큰의 접두사 */
     private static final String SKIN_TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
+    /** Yaml 파일 경로의 디렉터리 이름 */
+    private static final String DIRECTORY_NAME = "Skin";
 
     /** Tabbed Skin 인스턴스 */
     @NonNull
     private final Skin skin;
 
     /**
-     * 지정한 스킨 이름으로 스킨 인스턴스를 생성하여 반환한다.
-     *
-     * @param skinName 스킨 이름
-     * @throws NullPointerException 해당 이름의 스킨이 존재하지 않으면 발생
-     */
-    @NonNull
-    public static PlayerSkin fromName(@NonNull String skinName) {
-        IProperty property = Validate.notNull(API.getSkinData(skinName), "스킨 %s이 존재하지 않음", skinName);
-        return new PlayerSkin(new Skin(property.getValue(), property.getSignature()));
-    }
-
-    /**
      * 지정한 Tabbed Skin으로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param skin Tabbed Skin 인스턴스
+     * @return {@link PlayerSkin}
      */
     @NonNull
     public static PlayerSkin fromSkin(@NonNull Skin skin) {
@@ -54,19 +53,41 @@ public final class PlayerSkin {
     }
 
     /**
+     * 지정한 스킨 이름으로 스킨 인스턴스를 생성하여 반환한다.
+     *
+     * @param skinName 스킨 이름
+     * @return {@link PlayerSkin}
+     * @throws NullPointerException 해당 이름의 스킨을 불러올 수 없으면 발생
+     */
+    @NonNull
+    public static PlayerSkin fromName(@NonNull String skinName) {
+        try {
+            List<String> lines = Files.readAllLines(DMGR.getPlugin().getDataFolder().toPath()
+                    .resolve(DIRECTORY_NAME)
+                    .resolve(skinName.toLowerCase() + ".skin"));
+
+            return fromSkin(new Skin(lines.get(0), lines.get(1)));
+        } catch (Exception ex) {
+            throw new IllegalStateException("스킨을 불러올 수 없음", ex);
+        }
+    }
+
+    /**
      * 지정한 UUID로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param uuid UUID
+     * @return {@link PlayerSkin}
      */
     @NonNull
-    public static PlayerSkin fromUUID(@NonNull UUID uuid) {
-        return fromSkin(Skins.getPlayer(uuid));
+    public static AsyncTask<@NonNull PlayerSkin> fromUUID(@NonNull UUID uuid) {
+        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(fromSkin(Skins.getPlayer(uuid))));
     }
 
     /**
      * 지정한 스킨 URL 값으로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param skinUrl 스킨 URL 값
+     * @return {@link PlayerSkin}
      * @apiNote 플레이어 머리 아이템에만 사용할 수 있음
      */
     @NonNull
@@ -79,27 +100,74 @@ public final class PlayerSkin {
      *
      * @param player 적용할 플레이어
      */
-    @NonNull
-    public AsyncTask<Void> applySkin(@NonNull Player player) {
-        return new AsyncTask<>((onFinish, onError) -> {
+    @SuppressWarnings("deprecation")
+    public void applySkin(@NonNull Player player) {
+        WrappedGameProfile gameProfile = WrappedGameProfile.fromPlayer(player);
+        gameProfile.getProperties().removeAll("textures");
+        gameProfile.getProperties().put("textures", skin.getProperty());
+
+        new DelayTask(() -> {
+            if (!player.isOnline())
+                return;
+
             try {
-                API.applySkin(new PlayerWrapper(player), toProperty());
-                onFinish.accept(null);
+                EnumWrappers.NativeGameMode nativeGameMode = EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode());
+
+                WrapperPlayServerPlayerInfo[] packets = new WrapperPlayServerPlayerInfo[2];
+                Arrays.setAll(packets, i -> {
+                    WrapperPlayServerPlayerInfo packet = new WrapperPlayServerPlayerInfo();
+
+                    packet.setData(Collections.singletonList(new PlayerInfoData(
+                            gameProfile,
+                            User.fromPlayer(player).getPing(),
+                            nativeGameMode,
+                            WrappedChatComponent.fromText(player.getName()))));
+
+                    return packet;
+                });
+
+                packets[0].setAction(EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
+                packets[1].setAction(EnumWrappers.PlayerInfoAction.ADD_PLAYER);
+
+                packets[0].broadcastPacket();
+                packets[1].broadcastPacket();
+
+                Location loc = player.getLocation();
+
+                WrapperPlayServerRespawn packet1 = new WrapperPlayServerRespawn();
+                packet1.setDimension(player.getWorld().getEnvironment().getId());
+                packet1.setDifficulty(EnumWrappers.Difficulty.valueOf(player.getWorld().getDifficulty().toString()));
+                packet1.setGamemode(nativeGameMode);
+                packet1.setLevelType(player.getWorld().getWorldType());
+                packet1.sendPacket(player);
+
+                WrapperPlayServerPosition packet2 = new WrapperPlayServerPosition();
+                packet2.setX(loc.getX());
+                packet2.setY(loc.getY());
+                packet2.setZ(loc.getZ());
+                packet2.setYaw(loc.getYaw());
+                packet2.setPitch(loc.getPitch());
+                packet2.setFlags(new HashSet<>());
+                packet2.sendPacket(player);
+
+                WrapperPlayServerHeldItemSlot packet3 = new WrapperPlayServerHeldItemSlot();
+                packet3.setSlot(player.getInventory().getHeldItemSlot());
+                packet3.sendPacket(player);
+
+                Method getHandleMethod = ReflectionUtil.getMethod(player.getClass(), "getHandle");
+                Object nmsPlayer = getHandleMethod.invoke(player);
+
+                ReflectionUtil.getMethod(nmsPlayer.getClass(), "updateAbilities").invoke(nmsPlayer);
+                ReflectionUtil.getMethod(player.getClass(), "updateScaledHealth").invoke(player);
+                ReflectionUtil.getMethod(nmsPlayer.getClass(), "triggerHealthUpdate").invoke(nmsPlayer);
+
+                player.updateInventory();
+
+                Bukkit.getOnlinePlayers().forEach(target -> target.hidePlayer(DMGR.getPlugin(), player));
+                Bukkit.getOnlinePlayers().forEach(target -> target.showPlayer(DMGR.getPlugin(), player));
             } catch (Exception ex) {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
-                onError.accept(ex);
             }
-        });
-    }
-
-    /**
-     * 플레이어 스킨을 SkinsRestorer API의 프로퍼티 인스턴스로 바꿔 반환한다.
-     *
-     * @return 프로퍼티 인스턴스
-     */
-    @NonNull
-    public IProperty toProperty() {
-        WrappedSignedProperty property = skin.getProperty();
-        return API.createProperty(property.getName(), property.getValue(), property.getSignature());
+        }, 1);
     }
 }
