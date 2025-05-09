@@ -12,15 +12,15 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.ReflectionUtil;
 import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.Initializable;
 import com.keenant.tabbed.util.Skin;
 import com.keenant.tabbed.util.Skins;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -56,31 +56,34 @@ public final class PlayerSkin {
      * 지정한 스킨 이름으로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param skinName 스킨 이름
-     * @return {@link PlayerSkin}
+     * @return {@link Async}
      * @throws NullPointerException 해당 이름의 스킨을 불러올 수 없으면 발생
      */
     @NonNull
-    public static PlayerSkin fromName(@NonNull String skinName) {
-        try {
-            List<String> lines = Files.readAllLines(DMGR.getPlugin().getDataFolder().toPath()
-                    .resolve(DIRECTORY_NAME)
-                    .resolve(skinName.toLowerCase() + ".skin"));
+    public static PlayerSkin.Async fromName(@NonNull String skinName) {
+        return new Async(new AsyncTask<>((onFinish, onError) -> {
+            try {
+                List<String> lines = Files.readAllLines(DMGR.getPlugin().getDataFolder().toPath()
+                        .resolve(DIRECTORY_NAME)
+                        .resolve(skinName.toLowerCase() + ".skin"));
 
-            return fromSkin(new Skin(lines.get(0), lines.get(1)));
-        } catch (Exception ex) {
-            throw new IllegalStateException("스킨을 불러올 수 없음", ex);
-        }
+                onFinish.accept(fromSkin(new Skin(lines.get(0), lines.get(1))));
+            } catch (Exception ex) {
+                ConsoleLogger.severe("스킨을 불러올 수 없음 : {0}", ex, skinName);
+                onError.accept(ex);
+            }
+        }));
     }
 
     /**
      * 지정한 UUID로 스킨 인스턴스를 생성하여 반환한다.
      *
      * @param uuid UUID
-     * @return {@link PlayerSkin}
+     * @return {@link Async}
      */
     @NonNull
-    public static AsyncTask<@NonNull PlayerSkin> fromUUID(@NonNull UUID uuid) {
-        return new AsyncTask<>((onFinish, onError) -> onFinish.accept(fromSkin(Skins.getPlayer(uuid))));
+    public static PlayerSkin.Async fromUUID(@NonNull UUID uuid) {
+        return new Async(new AsyncTask<>((onFinish, onError) -> onFinish.accept(fromSkin(Skins.getPlayer(uuid)))));
     }
 
     /**
@@ -169,5 +172,56 @@ public final class PlayerSkin {
                 ConsoleLogger.severe("{0}의 스킨 적용 실패", ex, player.getName());
             }
         }, 1);
+    }
+
+    /**
+     * 비동기적으로 불러오는 스킨을 나타내는 클래스.
+     *
+     * @see PlayerSkin#fromName(String)
+     * @see PlayerSkin#fromUUID(UUID)
+     */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Async implements Initializable<PlayerSkin> {
+        /** 플레이어 스킨을 불러오는 태스크 */
+        @NonNull
+        private final AsyncTask<PlayerSkin> playerSkinTask;
+        /** 플레이어 스킨 */
+        @Nullable
+        private PlayerSkin playerSkin;
+
+        /**
+         * 플레이어 스킨을 불러온다.
+         *
+         * @return 플레이어 스킨
+         */
+        @Override
+        @NonNull
+        public AsyncTask<PlayerSkin> init() {
+            if (isInitialized())
+                throw new IllegalStateException("인스턴스가 이미 초기화됨");
+
+            return new AsyncTask<>((onFinish, onError) ->
+                    playerSkinTask.onFinish(targetskin -> {
+                        playerSkin = targetskin;
+                        onFinish.accept(get());
+                    }));
+        }
+
+        @Override
+        public boolean isInitialized() {
+            return playerSkin != null;
+        }
+
+        /**
+         * {@link Async#init()}에서 불러온 플레이어 스킨을 반환한다.
+         *
+         * @return 플레이어 스킨
+         * @throws NullPointerException 현재 스킨을 불러오지 않았으면 발생
+         */
+        @NonNull
+        public PlayerSkin get() {
+            validate();
+            return Validate.notNull(playerSkin, "아직 스킨을 불러오지 않았음");
+        }
     }
 }

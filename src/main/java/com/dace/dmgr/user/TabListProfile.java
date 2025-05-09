@@ -65,20 +65,20 @@ public interface TabListProfile {
         /**
          * 탭리스트 항목 인스턴스를 생성한다.
          *
-         * @param content 내용
+         * @param content    내용
+         * @param playerSkin 머리 스킨. {@code null}로 지정 시 표시 안 함
          */
-        public Item(@NonNull String content) {
-            this.textTabItem = new TextTabItem(content, -1, Skins.DEFAULT_SKIN);
+        public Item(@NonNull String content, @Nullable PlayerSkin playerSkin) {
+            this.textTabItem = new TextTabItem(content, -1, playerSkin == null ? Skins.DEFAULT_SKIN : playerSkin.getSkin());
         }
 
         /**
          * 탭리스트 항목 인스턴스를 생성한다.
          *
-         * @param content    내용
-         * @param playerSkin 머리 스킨
+         * @param content 내용
          */
-        public Item(@NonNull String content, @NonNull PlayerSkin playerSkin) {
-            this.textTabItem = new TextTabItem(content, -1, playerSkin.getSkin());
+        public Item(@NonNull String content) {
+            this(content, (PlayerSkin) null);
         }
 
         /**

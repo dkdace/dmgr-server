@@ -686,7 +686,7 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     public AsyncTask<@NonNull ItemStack> getProfileItem() {
         return new AsyncTask<>((onFinish, onError) ->
-                PlayerSkin.fromUUID(playerUUID).onFinish((Consumer<PlayerSkin>) playerSkin ->
+                PlayerSkin.fromUUID(playerUUID).init().onFinish((Consumer<PlayerSkin>) playerSkin ->
                         onFinish.accept(new ItemBuilder(playerSkin).setName(getDisplayName()).build())));
     }
 

@@ -280,7 +280,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             deathMentHologram.remove();
 
         if (DMGR.getPlugin().isEnabled())
-            PlayerSkin.fromUUID(entity.getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(entity));
+            PlayerSkin.fromUUID(entity.getUniqueId()).init().onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(entity));
 
         reset();
     }
@@ -961,7 +961,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         combatant.onSet(this);
 
-        PlayerSkin.fromName(combatant.getSkinName()).applySkin(entity);
+        combatant.getPlayerSkin().get().applySkin(entity);
 
         addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
