@@ -235,7 +235,7 @@ public final class User {
     private void onInit() {
         disableCollision();
         taskManager.add(new DelayTask(this::sendResourcePack, 10));
-        taskManager.add(PlayerSkin.fromUUID(player.getUniqueId()).applySkin(player));
+        taskManager.add(PlayerSkin.fromUUID(player.getUniqueId()).init().onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(player)));
 
         nameTagHologram = new TextHologram(player, target -> target != player && CombatUser.fromUser(this) == null,
                 0, userData.getDisplayName());

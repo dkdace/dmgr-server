@@ -1,10 +1,14 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import com.dace.dmgr.command.CommandHandlerManager;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameTabListProfile;
+import com.dace.dmgr.user.LobbyTabListProfile;
 import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
@@ -34,6 +38,10 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         GeneralConfig.getInstance().init()
+                .onFinish(LobbyTabListProfile::loadSkins)
+                .onFinish(GameTabListProfile::loadSkins)
+                .onFinish(Dummy::loadSkin)
+                .onFinish(CombatantType::loadSkins)
                 .onFinish(UserData::initAllUserDatas)
                 .onFinish(() -> {
                     Validate.notNull(RankManager.getInstance());

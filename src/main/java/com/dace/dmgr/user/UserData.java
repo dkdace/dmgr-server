@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +44,7 @@ import java.util.stream.Stream;
 public final class UserData implements Initializable<Void> {
     /** 유저 데이터 목록 (UUID : 유저 데이터 정보) */
     private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
+
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
             "§c관리자에 의해 서버에서 차단되었습니다.",
@@ -682,8 +684,10 @@ public final class UserData implements Initializable<Void> {
      * @return 프로필 정보 아이템
      */
     @NonNull
-    public ItemStack getProfileItem() {
-        return new ItemBuilder(PlayerSkin.fromUUID(playerUUID)).setName(getDisplayName()).build();
+    public AsyncTask<@NonNull ItemStack> getProfileItem() {
+        return new AsyncTask<>((onFinish, onError) ->
+                PlayerSkin.fromUUID(playerUUID).init().onFinish((Consumer<PlayerSkin>) playerSkin ->
+                        onFinish.accept(new ItemBuilder(playerSkin).setName(getDisplayName()).build())));
     }
 
     /**
