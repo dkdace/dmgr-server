@@ -71,25 +71,33 @@ public final class YamlFile implements Initializable<Void> {
     @Override
     @NonNull
     public AsyncTask<Void> init() {
+        return new AsyncTask<>(() -> {
+            initSync();
+            return null;
+        });
+    }
+
+    /**
+     * Yaml 파일을 불러온다. (동기 실행).
+     *
+     * <p>파일이 존재하지 않으면 새 파일을 생성한다.</p>
+     */
+    public void initSync() {
         if (isInitialized)
             throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                if (!file.exists()) {
-                    ConsoleLogger.warning("파일을 찾을 수 없음. 파일 생성 중 : {0}", file);
-                    config.save(file);
-                }
-
-                config.load(file);
-                isInitialized = true;
-
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-                onError.accept(ex);
+        try {
+            if (!file.exists()) {
+                ConsoleLogger.warning("파일을 찾을 수 없음. 파일 생성 중 : {0}", file);
+                config.save(file);
             }
-        });
+
+            config.load(file);
+            isInitialized = true;
+        } catch (Exception ex) {
+            ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
+            throw new IllegalStateException(ex);
+        }
     }
 
     /**
@@ -99,13 +107,13 @@ public final class YamlFile implements Initializable<Void> {
     public AsyncTask<Void> save() {
         validate();
 
-        return new AsyncTask<>((onFinish, onError) -> {
+        return new AsyncTask<>(() -> {
             try {
                 config.save(file);
-                onFinish.accept(null);
+                return null;
             } catch (Exception ex) {
                 ConsoleLogger.severe("파일 저장 실패 : {0}", ex, file);
-                onError.accept(ex);
+                throw new IllegalStateException(ex);
             }
         });
     }

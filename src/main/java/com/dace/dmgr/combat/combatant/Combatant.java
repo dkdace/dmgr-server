@@ -48,7 +48,7 @@ public abstract class Combatant {
     private final String nickname;
     /** 스킨 */
     @NonNull
-    private final PlayerSkin.Async playerSkin;
+    private final PlayerSkin playerSkin;
     /** 주 역할군 */
     @NonNull
     private final Role role;

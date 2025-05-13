@@ -34,8 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -191,21 +190,17 @@ public final class UserData implements Initializable<Void> {
      *
      * <p>플러그인 활성화 시 호출해야 한다.</p>
      */
-    @NonNull
-    public static AsyncTask<Void> initAllUserDatas() {
-        List<AsyncTask<?>> userDataInitTasks = Collections.emptyList();
-
+    public static void initAllUserDatas() {
         try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
-            userDataInitTasks = userDataPaths
-                    .map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
+            userDataPaths.map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
                     .filter(userData -> !userData.isInitialized())
-                    .map(UserData::init)
-                    .collect(Collectors.toList());
+                    .forEach(userData -> {
+                        userData.yamlFile.initSync();
+                        userData.onInit();
+                    });
         } catch (Exception ex) {
             ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
         }
-
-        return AsyncTask.all(userDataInitTasks);
     }
 
     /**
@@ -223,12 +218,16 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     public AsyncTask<Void> init() {
         return yamlFile.init()
-                .onFinish(() -> {
-                    yamlFile.getDefaultSection().getEntry("playerName", "").set(playerName);
-
-                    ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
-                })
+                .onFinish(this::onInit)
                 .onError(ex -> ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName));
+    }
+
+    /**
+     * 유저 데이터 초기화 완료 시 실행할 작업.
+     */
+    private void onInit() {
+        yamlFile.getDefaultSection().getEntry("playerName", "").set(playerName);
+        ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
     }
 
     @Override
@@ -685,9 +684,8 @@ public final class UserData implements Initializable<Void> {
      */
     @NonNull
     public AsyncTask<@NonNull ItemStack> getProfileItem() {
-        return new AsyncTask<>((onFinish, onError) ->
-                PlayerSkin.fromUUID(playerUUID).init().onFinish((Consumer<PlayerSkin>) playerSkin ->
-                        onFinish.accept(new ItemBuilder(playerSkin).setName(getDisplayName()).build())));
+        return PlayerSkin.fromUUID(playerUUID)
+                .onFinish((Function<PlayerSkin, ItemStack>) playerSkin -> new ItemBuilder(playerSkin).setName(getDisplayName()).build());
     }
 
     /**

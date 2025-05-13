@@ -4,7 +4,6 @@ import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.util.ReflectionUtil;
-import com.dace.dmgr.util.task.AsyncTask;
 import com.keenant.tabbed.util.Skins;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -41,26 +40,11 @@ public final class LobbyTabListProfile implements TabListProfile {
      */
     LobbyTabListProfile(@NonNull User user) {
         this.user = user;
-        PlayerSkin.fromUUID(user.getPlayer().getUniqueId()).init().onFinish((Consumer<PlayerSkin>) playerSkin -> this.userPlayerSkin = playerSkin);
+        PlayerSkin.fromUUID(user.getPlayer().getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> this.userPlayerSkin = playerSkin);
     }
 
-    /**
-     * 모든 머리 스킨을 불러온다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    @NonNull
-    public static AsyncTask<Void> loadSkins() {
-        return Skin.SERVER_STATUS.init()
-                .onFinish(Skin.PING::init)
-                .onFinish(Skin.MEMORY::init)
-                .onFinish(Skin.TPS::init)
-                .onFinish(Skin.ONLINE::init)
-                .onFinish(Skin.WIN_RATE::init)
-                .onFinish(Skin.QUIT::init)
-                .onFinish(Skin.PLAY_TIME::init)
-                .onFinish(() -> {
-                });
+    public static void load() {
+        Skin.load();
     }
 
     /**
@@ -127,19 +111,19 @@ public final class LobbyTabListProfile implements TabListProfile {
         else if (tps < 19.7)
             tpsColor = ChatColor.YELLOW;
 
-        items[0][0] = new Item("§f§l§n 서버 상태 ", Skin.SERVER_STATUS.get());
-        items[0][2] = new Item(MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, user.getPing()), Skin.PING.get());
-        items[0][3] = new Item(MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory), Skin.MEMORY.get());
-        items[0][4] = new Item(MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), Skin.TPS.get());
-        items[0][5] = new Item(MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()), Skin.ONLINE.get());
+        items[0][0] = new Item("§f§l§n 서버 상태 ", Skin.SERVER_STATUS);
+        items[0][2] = new Item(MessageFormat.format("§f PING §7:: {0}{1} ms", pingColor, user.getPing()), Skin.PING);
+        items[0][3] = new Item(MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory), Skin.MEMORY);
+        items[0][4] = new Item(MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), Skin.TPS);
+        items[0][5] = new Item(MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()), Skin.ONLINE);
         items[0][7] = new Item(MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", user.getPlayer().getName()), userPlayerSkin);
         items[0][9] = new Item(MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
                 userData.getWinCount(),
                 userData.getLoseCount(),
-                (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100), Skin.WIN_RATE.get());
-        items[0][10] = new Item(MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()), Skin.QUIT.get());
+                (double) userData.getWinCount() / (userData.getNormalPlayCount() + userData.getRankPlayCount()) * 100), Skin.WIN_RATE);
+        items[0][10] = new Item(MessageFormat.format("§e 탈주 §7:: §c{0}회", userData.getQuitCount()), Skin.QUIT);
         items[0][11] = new Item(MessageFormat.format("§e 플레이 시간 §7:: §f{0}",
-                DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")), Skin.PLAY_TIME.get());
+                DurationFormatUtils.formatDuration(userData.getPlayTime().toMilliseconds(), "d일 H시간 m분")), Skin.PLAY_TIME);
 
         Iterator<User> lobbyUsersIterator = User.getAllUsers().stream()
                 .sorted(Comparator.comparing(target -> target.getPlayer().getName()))
@@ -191,24 +175,28 @@ public final class LobbyTabListProfile implements TabListProfile {
     @UtilityClass
     private static final class Skin {
         /** 서버 상태 */
-        private static final PlayerSkin.Async SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
+        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
         /** 핑 */
-        private static final PlayerSkin.Async PING = PlayerSkin.fromName("DTabPing");
+        private static final PlayerSkin PING = PlayerSkin.fromName("DTabPing");
         /** 메모리 */
-        private static final PlayerSkin.Async MEMORY = PlayerSkin.fromName("DTabMemory");
+        private static final PlayerSkin MEMORY = PlayerSkin.fromName("DTabMemory");
         /** TPS */
-        private static final PlayerSkin.Async TPS = PlayerSkin.fromName("DTabTPS");
+        private static final PlayerSkin TPS = PlayerSkin.fromName("DTabTPS");
         /** 접속자 수 */
-        private static final PlayerSkin.Async ONLINE = PlayerSkin.fromName("DTabOnline");
+        private static final PlayerSkin ONLINE = PlayerSkin.fromName("DTabOnline");
         /** 승률 */
-        private static final PlayerSkin.Async WIN_RATE = PlayerSkin.fromName("DTabWinRate");
+        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("DTabWinRate");
         /** 탈주 */
-        private static final PlayerSkin.Async QUIT = PlayerSkin.fromName("DTabQuit");
+        private static final PlayerSkin QUIT = PlayerSkin.fromName("DTabQuit");
         /** 플레이 시간 */
-        private static final PlayerSkin.Async PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
+        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
         /** 접속 인원 */
         private static final PlayerSkin USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
         /** 관리자 */
         private static final PlayerSkin ADMIN_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.AQUA));
+
+        private static void load() {
+            // 미사용
+        }
     }
 }
