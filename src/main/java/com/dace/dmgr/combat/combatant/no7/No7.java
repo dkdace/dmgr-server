@@ -4,9 +4,9 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.combatant.inferno.InfernoUltInfo;
-import com.dace.dmgr.combat.combatant.inferno.InfernoWeaponInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -15,6 +15,8 @@ import org.bukkit.Sound;
 
 /**
  * 전투원 - No.7 클래스.
+ *
+ * @see No7Weapon
  */
 public final class No7 extends Vanguard {
     @Getter
@@ -94,9 +96,19 @@ public final class No7 extends Vanguard {
     }
 
     @Override
+    public boolean canSprint(@NonNull CombatUser combatUser) {
+        return ((No7Weapon) combatUser.getActionManager().getWeapon()).canSprint();
+    }
+
+    @Override
+    public boolean canJump(@NonNull CombatUser combatUser) {
+        return canSprint(combatUser);
+    }
+
+    @Override
     @NonNull
-    public InfernoWeaponInfo getWeaponInfo() {
-        return InfernoWeaponInfo.getInstance();
+    public No7WeaponInfo getWeaponInfo() {
+        return No7WeaponInfo.getInstance();
     }
 
     @Override
@@ -114,7 +126,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[0];
+        return new ActiveSkillInfo[]{getUltimateSkillInfo()};
     }
 
     @Override

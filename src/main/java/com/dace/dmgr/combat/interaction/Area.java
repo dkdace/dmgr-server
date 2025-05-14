@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.util.location.LocationUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
@@ -23,8 +22,6 @@ public abstract class Area<T extends CombatEntity> {
     private static final double SIZE = 0.2;
 
     /** 발사자 엔티티 */
-    @NonNull
-    @Getter
     protected final CombatEntity shooter;
     /** 범위 (반지름). (단위: 블록) */
     protected final double radius;
