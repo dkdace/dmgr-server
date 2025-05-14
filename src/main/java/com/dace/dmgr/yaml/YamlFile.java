@@ -246,11 +246,16 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (value == null) {
-                    Object getValue = getConfigurationSection().get(key);
-                    if (getValue instanceof ConfigurationSection)
-                        getValue = ((ConfigurationSection) getValue).getValues(true);
+                    try {
+                        Object getValue = getConfigurationSection().get(key);
+                        if (getValue instanceof ConfigurationSection)
+                            getValue = ((ConfigurationSection) getValue).getValues(true);
 
-                    value = getValue == null ? defaultValue : ((Serializer<T, Object>) serializer).deserialize(getValue);
+                        value = getValue == null ? defaultValue : ((Serializer<T, Object>) serializer).deserialize(getValue);
+                    } catch (Exception ex) {
+                        ConsoleLogger.severe("값을 불러올 수 없음 : {0}", ex, key);
+                        value = defaultValue;
+                    }
                 }
 
                 return value;
