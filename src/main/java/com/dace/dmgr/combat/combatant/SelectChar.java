@@ -1,16 +1,19 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.game.GameUser;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.User;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.text.MessageFormat;
 
@@ -46,7 +49,7 @@ public final class SelectChar extends ChestGUI {
                 int rowIndex = combatantType.getCombatant().getRole().ordinal();
                 int columnIndex = columnIndexList[rowIndex]++;
 
-                set(rowIndex, columnIndex, combatantType.getSelectItem(), itemBuilder -> {
+                set(rowIndex, columnIndex, createSelectItem(combatantType), itemBuilder -> {
                     if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(combatantType))
                         itemBuilder.addLore("", "§c§l팀원이 이미 선택했습니다.");
                 });
@@ -54,6 +57,52 @@ public final class SelectChar extends ChestGUI {
 
             return true;
         }, 10);
+    }
+
+    /**
+     * 지정한 전투원 종류에 해당하는 전투원 선택 아이템을 생성하여 반환한다.
+     *
+     * @param combatantType 전투원 종류
+     * @return 전투원 선택 아이템
+     */
+    @NonNull
+    private DefinedItem createSelectItem(@NonNull CombatantType combatantType) {
+        Combatant combatant = combatantType.getCombatant();
+
+        return new DefinedItem(new ItemBuilder(combatantType.getProfileItem())
+                .setLore("",
+                        MessageFormat.format("§f▍ 역할군 : {0}", combatant.getRole().getColor() + combatant.getRole().getName() +
+                                (combatant.getSubRole() == null
+                                        ? ""
+                                        : " §f/ " + combatant.getSubRole().getColor() + combatant.getSubRole().getName())),
+                        "",
+                        "§7§n좌클릭§f하여 전투원을 선택합니다.",
+                        "§7§n우클릭§f하여 전투원 정보를 확인합니다.")
+                .build(),
+                new DefinedItem.ClickHandler(ClickType.LEFT, player -> {
+                    User user = User.fromPlayer(player);
+
+                    GameUser gameUser = GameUser.fromUser(user);
+                    if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(combatantType))
+                        return false;
+
+                    CombatUser combatUser = CombatUser.fromUser(user);
+                    if (combatUser == null)
+                        combatUser = new CombatUser(combatantType, user);
+                    else
+                        combatUser.setCombatantType(combatantType);
+
+                    player.closeInventory();
+
+                    if (!user.getUserData().getCombatantRecord(combatantType).getCores().isEmpty())
+                        combatUser.addTask(new DelayTask(() -> new SelectCore(player), 10));
+
+                    return true;
+                }),
+                new DefinedItem.ClickHandler(ClickType.RIGHT, player -> {
+                    new SelectCharInfo(player, combatantType);
+                    return true;
+                }));
     }
 
     /**

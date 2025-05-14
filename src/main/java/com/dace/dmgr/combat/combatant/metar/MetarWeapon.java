@@ -22,16 +22,17 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-@Getter
 public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MetarWeaponInfo.SLOW);
 
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
     @NonNull
+    @Getter
     private final FullAutoModule fullAutoModule;
     /** 이동속도 감소 타임스탬프 */
     private Timestamp slowTimestamp = Timestamp.now();

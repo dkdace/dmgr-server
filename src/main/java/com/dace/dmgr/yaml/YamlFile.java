@@ -71,25 +71,30 @@ public final class YamlFile implements Initializable<Void> {
     @Override
     @NonNull
     public AsyncTask<Void> init() {
+        return AsyncTask.create(this::initSync);
+    }
+
+    /**
+     * Yaml 파일을 불러온다. (동기 실행).
+     *
+     * <p>파일이 존재하지 않으면 새 파일을 생성한다.</p>
+     */
+    public void initSync() {
         if (isInitialized)
             throw new IllegalStateException("인스턴스가 이미 초기화됨");
 
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                if (!file.exists()) {
-                    ConsoleLogger.warning("파일을 찾을 수 없음. 파일 생성 중 : {0}", file);
-                    config.save(file);
-                }
-
-                config.load(file);
-                isInitialized = true;
-
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-                onError.accept(ex);
+        try {
+            if (!file.exists()) {
+                ConsoleLogger.warning("파일을 찾을 수 없음. 파일 생성 중 : {0}", file);
+                config.save(file);
             }
-        });
+
+            config.load(file);
+            isInitialized = true;
+        } catch (Exception ex) {
+            ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
+            throw new IllegalStateException("파일을 불러올 수 없음");
+        }
     }
 
     /**
@@ -97,17 +102,7 @@ public final class YamlFile implements Initializable<Void> {
      */
     @NonNull
     public AsyncTask<Void> save() {
-        validate();
-
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                config.save(file);
-                onFinish.accept(null);
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 저장 실패 : {0}", ex, file);
-                onError.accept(ex);
-            }
-        });
+        return AsyncTask.create(this::saveSync);
     }
 
     /**
@@ -120,6 +115,7 @@ public final class YamlFile implements Initializable<Void> {
             config.save(file);
         } catch (Exception ex) {
             ConsoleLogger.severe("파일 저장 실패 : {0}", ex, file);
+            throw new IllegalStateException("파일을 저장할 수 없음");
         }
     }
 
@@ -250,11 +246,16 @@ public final class YamlFile implements Initializable<Void> {
                 validate();
 
                 if (value == null) {
-                    Object getValue = getConfigurationSection().get(key);
-                    if (getValue instanceof ConfigurationSection)
-                        getValue = ((ConfigurationSection) getValue).getValues(true);
+                    try {
+                        Object getValue = getConfigurationSection().get(key);
+                        if (getValue instanceof ConfigurationSection)
+                            getValue = ((ConfigurationSection) getValue).getValues(true);
 
-                    value = getValue == null ? defaultValue : ((Serializer<T, Object>) serializer).deserialize(getValue);
+                        value = getValue == null ? defaultValue : ((Serializer<T, Object>) serializer).deserialize(getValue);
+                    } catch (Exception ex) {
+                        ConsoleLogger.severe("값을 불러올 수 없음 : {0}", ex, key);
+                        value = defaultValue;
+                    }
                 }
 
                 return value;

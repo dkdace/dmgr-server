@@ -52,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
@@ -279,7 +280,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             deathMentHologram.remove();
 
         if (DMGR.getPlugin().isEnabled())
-            PlayerSkin.fromUUID(entity.getUniqueId()).applySkin(entity);
+            PlayerSkin.fromUUID(entity.getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(entity));
 
         reset();
     }
@@ -960,7 +961,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         combatant.onSet(this);
 
-        addTask(PlayerSkin.fromName(combatant.getSkinName()).applySkin(user.getPlayer()));
+        combatant.getPlayerSkin().applySkin(entity);
+
         addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
                 1, 10));

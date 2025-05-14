@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.IntUnaryOperator;
+
 /**
  * 탭리스트의 프로필 클래스.
  */
@@ -63,20 +65,20 @@ public interface TabListProfile {
         /**
          * 탭리스트 항목 인스턴스를 생성한다.
          *
-         * @param content 내용
+         * @param content    내용
+         * @param playerSkin 머리 스킨. {@code null}로 지정 시 표시 안 함
          */
-        public Item(@NonNull String content) {
-            this.textTabItem = new TextTabItem(content, -1, Skins.DEFAULT_SKIN);
+        public Item(@NonNull String content, @Nullable PlayerSkin playerSkin) {
+            this.textTabItem = new TextTabItem(content, -1, playerSkin == null ? Skins.DEFAULT_SKIN : playerSkin.getSkin());
         }
 
         /**
          * 탭리스트 항목 인스턴스를 생성한다.
          *
-         * @param content    내용
-         * @param playerSkin 머리 스킨
+         * @param content 내용
          */
-        public Item(@NonNull String content, @NonNull PlayerSkin playerSkin) {
-            this.textTabItem = new TextTabItem(content, -1, playerSkin.getSkin());
+        public Item(@NonNull String content) {
+            this(content, (PlayerSkin) null);
         }
 
         /**
@@ -86,19 +88,18 @@ public interface TabListProfile {
          * @param user    표시할 플레이어
          */
         public Item(@NonNull String content, @NonNull User user) {
-            int realPing;
-            if (user.getPing() < 50)
-                realPing = 0;
-            else if (user.getPing() < 70)
-                realPing = 150;
-            else if (user.getPing() < 100)
-                realPing = 300;
-            else if (user.getPing() < 130)
-                realPing = 600;
-            else
-                realPing = 1000;
-
-            this.textTabItem = new TextTabItem(content, realPing, Skins.getPlayer(user.getPlayer()));
+            this.textTabItem = new TextTabItem(content, ((IntUnaryOperator) ping -> {
+                if (ping < 50)
+                    return 0;
+                else if (ping < 70)
+                    return 150;
+                else if (ping < 100)
+                    return 300;
+                else if (ping < 130)
+                    return 600;
+                else
+                    return 1000;
+            }).applyAsInt(user.getPing()), Skins.getPlayer(user.getPlayer()));
         }
     }
 }

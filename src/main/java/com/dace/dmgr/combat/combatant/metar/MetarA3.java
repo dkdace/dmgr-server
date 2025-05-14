@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 
 public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     /** 보너스 점수 모듈 */
+    @NonNull
     @Getter
     private final BonusScoreModule bonusScoreModule;
 

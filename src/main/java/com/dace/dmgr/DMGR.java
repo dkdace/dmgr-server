@@ -1,16 +1,20 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.combat.combatant.CombatantType;
+import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
 import com.dace.dmgr.command.CommandHandlerManager;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.event.EventListenerManager;
 import com.dace.dmgr.game.Game;
+import com.dace.dmgr.game.GameTabListProfile;
+import com.dace.dmgr.user.LobbyTabListProfile;
 import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.EntityUtil;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,21 +37,25 @@ public class DMGR extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        GeneralConfig.getInstance().init()
-                .onFinish(UserData::initAllUserDatas)
-                .onFinish(() -> {
-                    Validate.notNull(RankManager.getInstance());
-                    EventListenerManager.register();
-                    CommandHandlerManager.register();
-                    CommandHandlerManager.registerTestCommands();
-                    EntityUtil.clearUnusedEntities();
-                    Game.clearDuplicatedWorlds();
+        try {
+            ReflectionUtil.loadClass(GeneralConfig.class);
+            ReflectionUtil.loadClass(LobbyTabListProfile.class);
+            ReflectionUtil.loadClass(GameTabListProfile.class);
+            ReflectionUtil.loadClass(Dummy.class);
+            ReflectionUtil.loadClass(CombatantType.class);
+            ReflectionUtil.loadClass(UserData.class);
+            ReflectionUtil.loadClass(RankManager.class);
+            ReflectionUtil.loadClass(EventListenerManager.class);
+            ReflectionUtil.loadClass(CommandHandlerManager.class);
+            ReflectionUtil.loadClass(EntityUtil.class);
+            ReflectionUtil.loadClass(Game.class);
 
-                    ConsoleLogger.info("플러그인 활성화 완료");
+            Bukkit.getOnlinePlayers().forEach(player -> User.fromPlayer(player).sendMessageInfo("시스템 재부팅 완료"));
 
-                    Bukkit.getOnlinePlayers().forEach(player -> User.fromPlayer(player).sendMessageInfo("시스템 재부팅 완료"));
-                })
-                .onError(ex -> ConsoleLogger.severe("플러그인 활성화 실패", ex));
+            ConsoleLogger.info("플러그인 활성화 완료");
+        } catch (Exception ex) {
+            ConsoleLogger.severe("플러그인 활성화 실패", ex);
+        }
     }
 
     /**

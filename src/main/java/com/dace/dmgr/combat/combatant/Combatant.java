@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant;
 
+import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.weapon.Swappable;
@@ -12,7 +13,6 @@ import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,7 +38,6 @@ import java.util.ArrayList;
  * @see Support
  * @see Controller
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Getter
 public abstract class Combatant {
     /** 이름 */
@@ -47,9 +46,9 @@ public abstract class Combatant {
     /** 별명 */
     @NonNull
     private final String nickname;
-    /** 스킨 이름 */
+    /** 스킨 */
     @NonNull
-    private final String skinName;
+    private final PlayerSkin playerSkin;
     /** 주 역할군 */
     @NonNull
     private final Role role;
@@ -69,6 +68,36 @@ public abstract class Combatant {
     private final double speedMultiplier;
     /** 히트박스 크기 배수 */
     private final double hitboxMultiplier;
+
+    /**
+     * 전투원 정보 인스턴스를 생성한다.
+     *
+     * @param name             이름
+     * @param nickname         별명
+     * @param skinName         스킨 이름
+     * @param role             주 역할군
+     * @param subRole          부 역할군
+     * @param species          종족 유형
+     * @param icon             전투원 아이콘
+     * @param difficulty       난이도
+     * @param health           체력
+     * @param speedMultiplier  이동속도 배수
+     * @param hitboxMultiplier 히트박스 크기 배수
+     */
+    Combatant(@NonNull String name, @NonNull String nickname, @NonNull String skinName, @NonNull Role role, @Nullable Role subRole,
+              @NonNull Species species, char icon, int difficulty, int health, double speedMultiplier, double hitboxMultiplier) {
+        this.name = name;
+        this.nickname = nickname;
+        this.playerSkin = PlayerSkin.fromName(skinName);
+        this.role = role;
+        this.subRole = subRole;
+        this.species = species;
+        this.icon = icon;
+        this.difficulty = difficulty;
+        this.health = health;
+        this.speedMultiplier = speedMultiplier;
+        this.hitboxMultiplier = hitboxMultiplier;
+    }
 
     /**
      * 치명상일 때의 치료 요청 대사를 반환한다.

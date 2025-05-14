@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity.temporary.spawnhandler;
 
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.entity.temporary.TemporaryEntity;
 import com.dace.dmgr.user.User;
@@ -10,7 +11,6 @@ import net.citizensnpcs.api.npc.MemoryNPCDataStore;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.trait.SkinTrait;
-import net.skinsrestorer.api.property.IProperty;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -42,7 +42,7 @@ public final class PlayerNPCSpawnHandler implements EntitySpawnHandler<Player> {
         this.npc = NPC_REGISTRY.createNPC(EntityType.PLAYER, RandomStringUtils.randomAlphanumeric(8));
         this.npc.data().set(NPC.Metadata.NAMEPLATE_VISIBLE, false);
 
-        IProperty property = playerSkin.toProperty();
+        WrappedSignedProperty property = playerSkin.getSkin().getProperty();
         this.npc.getOrAddTrait(SkinTrait.class).setSkinPersistent(playerSkin.toString(), property.getSignature(), property.getValue());
     }
 

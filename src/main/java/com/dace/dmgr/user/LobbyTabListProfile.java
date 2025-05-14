@@ -5,8 +5,6 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.util.ReflectionUtil;
 import com.keenant.tabbed.util.Skins;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -18,11 +16,11 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * 로비 탭리스트 프로필 클래스.
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class LobbyTabListProfile implements TabListProfile {
     /** 헤더 문자열 */
     public static final String HEADER = "\n" + GeneralConfig.getConfig().getMessagePrefix() + "§e스킬 PVP 미니게임 서버 §f:: §d§nDMGR.mcsv.kr\n";
@@ -31,6 +29,19 @@ public final class LobbyTabListProfile implements TabListProfile {
 
     /** 유저 인스턴스 */
     private final User user;
+    /** 유저 플레이어 스킨 */
+    @Nullable
+    private PlayerSkin userPlayerSkin;
+
+    /**
+     * 로비 탭리스트 프로필 인스턴스를 생성한다.
+     *
+     * @param user 대상 유저
+     */
+    LobbyTabListProfile(@NonNull User user) {
+        this.user = user;
+        PlayerSkin.fromUUID(user.getPlayer().getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> this.userPlayerSkin = playerSkin);
+    }
 
     /**
      * 서버의 최근 TPS (Ticks Per Second)를 반환한다.
@@ -101,8 +112,7 @@ public final class LobbyTabListProfile implements TabListProfile {
         items[0][3] = new Item(MessageFormat.format("§f 메모리 §7:: {0}{1} §f/ {2} (MB)", memoryColor, memory, totalMemory), Skin.MEMORY);
         items[0][4] = new Item(MessageFormat.format("§f TPS §7:: {0}{1} tick/s", tpsColor, tps), Skin.TPS);
         items[0][5] = new Item(MessageFormat.format("§f 접속자 수 §7:: §f{0}명", Bukkit.getOnlinePlayers().size()), Skin.ONLINE);
-        items[0][7] = new Item(MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", user.getPlayer().getName()),
-                PlayerSkin.fromUUID(user.getPlayer().getUniqueId()));
+        items[0][7] = new Item(MessageFormat.format("§f§n §e§n{0}§f§l§n님의 전적 ", user.getPlayer().getName()), userPlayerSkin);
         items[0][9] = new Item(MessageFormat.format("§e 승률 §7:: §b{0}승 §f/ §c{1}패 §f({2}%)",
                 userData.getWinCount(),
                 userData.getLoseCount(),
@@ -127,7 +137,7 @@ public final class LobbyTabListProfile implements TabListProfile {
             User lobbyUser = lobbyUsersIterator.next();
             items[1 + i % 2][i / 2 + 1] = new Item(getTabListPlayerName(lobbyUser), lobbyUser);
         }
-        items[1][0] = new Item(MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", i), Skin.LOBBY_USERS);
+        items[1][0] = new Item(MessageFormat.format("§a§l§n 접속 인원 §f({0}명)", i), Skin.USERS);
 
         int j = 0;
         for (; adminUsersIterator.hasNext(); j++) {
@@ -161,24 +171,28 @@ public final class LobbyTabListProfile implements TabListProfile {
     @UtilityClass
     private static final class Skin {
         /** 서버 상태 */
-        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
+        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("tab_serverstatus");
         /** 핑 */
-        private static final PlayerSkin PING = PlayerSkin.fromName("DTabPing");
+        private static final PlayerSkin PING = PlayerSkin.fromName("tab_ping");
         /** 메모리 */
-        private static final PlayerSkin MEMORY = PlayerSkin.fromName("DTabMemory");
+        private static final PlayerSkin MEMORY = PlayerSkin.fromName("tab_memory");
         /** TPS */
-        private static final PlayerSkin TPS = PlayerSkin.fromName("DTabTPS");
+        private static final PlayerSkin TPS = PlayerSkin.fromName("tab_tps");
         /** 접속자 수 */
-        private static final PlayerSkin ONLINE = PlayerSkin.fromName("DTabOnline");
+        private static final PlayerSkin ONLINE = PlayerSkin.fromName("tab_online");
         /** 승률 */
-        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("DTabWinRate");
+        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("tab_winrate");
         /** 탈주 */
-        private static final PlayerSkin QUIT = PlayerSkin.fromName("DTabQuit");
+        private static final PlayerSkin QUIT = PlayerSkin.fromName("tab_quit");
         /** 플레이 시간 */
-        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
+        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("tab_playtime");
         /** 접속 인원 */
-        private static final PlayerSkin LOBBY_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
+        private static final PlayerSkin USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
         /** 관리자 */
         private static final PlayerSkin ADMIN_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.AQUA));
+
+        private static void load() {
+            // 미사용
+        }
     }
 }

@@ -52,6 +52,24 @@ public final class Game implements Initializable<Void> {
     private static final SoundEffect ON_PLAY_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(1).build());
 
+    static {
+        try (Stream<Path> worldPaths = Files.list(WORLD_DIRECTORY_PATH)) {
+            worldPaths.filter(path -> path.getFileName().toString().startsWith(TEMPORARY_WORLD_NAME_PREFIX)).forEach(path -> {
+                try {
+                    World targetWorld = Bukkit.getWorld(FilenameUtils.removeExtension(path.getFileName().toString()));
+                    if (targetWorld != null)
+                        Bukkit.unloadWorld(targetWorld, false);
+
+                    Files.delete(path);
+                } catch (Exception ex) {
+                    ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
+                }
+            });
+        } catch (Exception ex) {
+            ConsoleLogger.severe("모든 복제 월드를 삭제할 수 없음", ex);
+        }
+    }
+
     /** 현재 게임 방 인스턴스 */
     private final GameRoom gameRoom;
     /** 소속된 게임 플레이어 목록 */
@@ -72,7 +90,6 @@ public final class Game implements Initializable<Void> {
     private final GameMap gameMap;
     /** 게임 모드 스케쥴러 */
     private final GamePlayModeScheduler gamePlayModeScheduler;
-
     /** 초기화 여부 */
     @Getter
     private boolean isInitialized = false;
@@ -108,29 +125,6 @@ public final class Game implements Initializable<Void> {
         this.redTeam = new Team(this, Team.Type.RED);
         this.blueTeam = new Team(this, Team.Type.BLUE);
         this.gamePlayModeScheduler = gamePlayMode.createScheduler(this);
-    }
-
-    /**
-     * 모든 복제 월드를 삭제한다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    public static void clearDuplicatedWorlds() {
-        try (Stream<Path> worldPaths = Files.list(WORLD_DIRECTORY_PATH)) {
-            worldPaths.filter(path -> path.getFileName().toString().startsWith(TEMPORARY_WORLD_NAME_PREFIX)).forEach(path -> {
-                try {
-                    World targetWorld = Bukkit.getWorld(FilenameUtils.removeExtension(path.getFileName().toString()));
-                    if (targetWorld != null)
-                        Bukkit.unloadWorld(targetWorld, false);
-
-                    Files.delete(path);
-                } catch (Exception ex) {
-                    ConsoleLogger.severe("월드 삭제 중 오류 발생", ex);
-                }
-            });
-        } catch (Exception ex) {
-            ConsoleLogger.severe("모든 복제 월드를 삭제할 수 없음", ex);
-        }
     }
 
     @Override
@@ -263,17 +257,15 @@ public final class Game implements Initializable<Void> {
         SlimeLoader loader = swmPlugin.getLoader(worldData.getDataSource());
         CommandManager.getInstance().getWorldsInUse().add(worldName);
 
-        return new AsyncTask<>((onFinish, onError) -> {
+        return AsyncTask.create(() -> {
             try {
                 swmPlugin.generateWorld(swmPlugin.loadWorld(loader, worldName, true, worldData.toPropertyMap())
                         .clone(targetWorldName, loader));
 
                 world = Bukkit.getWorld(targetWorldName);
-
-                onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("월드 생성 실패 : {0}", ex, targetWorldName);
-                onError.accept(ex);
+                throw new IllegalStateException("월드를 생성할 수 없음");
             } finally {
                 CommandManager.getInstance().getWorldsInUse().remove(targetWorldName);
             }
@@ -287,15 +279,13 @@ public final class Game implements Initializable<Void> {
         String worldName = Validate.notNull(world).getName();
         Path path = WORLD_DIRECTORY_PATH.resolve(worldName + ".slime");
 
-        new AsyncTask<>((onFinish, onError) -> {
+        AsyncTask.create(() -> {
             try {
                 Bukkit.unloadWorld(world, false);
                 Files.delete(path);
-
-                onFinish.accept(null);
             } catch (Exception ex) {
                 ConsoleLogger.severe("월드 삭제 실패 : {0}", ex, worldName);
-                onError.accept(ex);
+                throw new IllegalStateException("월드를 삭제할 수 없음");
             } finally {
                 CommandManager.getInstance().getWorldsInUse().remove(worldName);
             }
