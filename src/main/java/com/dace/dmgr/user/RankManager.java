@@ -44,23 +44,17 @@ public final class RankManager {
      */
     @NonNull
     private AsyncTask<@NonNull Integer> updateRanking() {
-        return new AsyncTask<>((onFinish, onError) -> {
-            try {
-                Collection<UserData> userDatas = UserData.getAllUserDatas();
-                if (userDatas.isEmpty()) {
-                    onFinish.accept(0);
-                    return;
-                }
+        return AsyncTask.create(() -> {
+            Collection<UserData> userDatas = UserData.getAllUserDatas();
+            if (userDatas.isEmpty())
+                return 0;
 
-                for (RankType rankType : RankType.values())
-                    rankingMap.put(rankType, userDatas.stream()
-                            .sorted(Comparator.comparing(rankType.valueFunction::applyAsInt).reversed())
-                            .collect(Collectors.toList()));
+            for (RankType rankType : RankType.values())
+                rankingMap.put(rankType, userDatas.stream()
+                        .sorted(Comparator.comparing(rankType.valueFunction::applyAsInt).reversed())
+                        .collect(Collectors.toList()));
 
-                onFinish.accept(userDatas.size());
-            } catch (Exception ex) {
-                onError.accept(ex);
-            }
+            return userDatas.size();
         });
     }
 

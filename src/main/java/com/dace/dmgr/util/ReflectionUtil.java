@@ -21,6 +21,21 @@ public final class ReflectionUtil {
     private static final HashMap<String, Class<?>> CLASS_MAP = new HashMap<>();
 
     /**
+     * 지정한 클래스를 {@link Class#forName(String)}을 이용하여 동적으로 불러온다.
+     *
+     * <p>주로 필요한 static initializer를 실행할 때 사용한다.</p>
+     *
+     * @param clazz 클래스
+     */
+    public static void loadClass(@NonNull Class<?> clazz) {
+        try {
+            getClass(clazz.getName());
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    /**
      * 지정한 이름에 해당하는 클래스를 반환한다.
      *
      * <p>{@link Class#forName(String)}과 동일한 기능이다.</p>

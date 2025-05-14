@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.combatant.quaker.Quaker;
 import com.dace.dmgr.combat.combatant.silia.Silia;
 import com.dace.dmgr.combat.combatant.vellion.Vellion;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.util.task.AsyncTask;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 /**
  * 지정할 수 있는 전투원의 목록.
@@ -53,18 +51,6 @@ public enum CombatantType {
     private final Combatant combatant;
 
     /**
-     * 모든 전투원의 스킨을 불러온다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    @NonNull
-    public static AsyncTask<Void> loadSkins() {
-        return AsyncTask.all(Arrays.stream(values())
-                .map(combatantType -> combatantType.getCombatant().getPlayerSkin().init())
-                .collect(Collectors.toList()));
-    }
-
-    /**
      * 이름({@link Combatant#getName()}) 순으로 정렬된 전투원의 목록을 반환한다.
      *
      * @return 이름 순으로 정렬된 전투원 목록
@@ -84,7 +70,7 @@ public enum CombatantType {
      */
     @NonNull
     public ItemStack getProfileItem() {
-        return new ItemBuilder(combatant.getPlayerSkin().get())
+        return new ItemBuilder(combatant.getPlayerSkin())
                 .setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}",
                         combatant.getIcon(),
                         combatant.getRole().getColor(),

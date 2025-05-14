@@ -19,7 +19,6 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
-import com.dace.dmgr.util.task.AsyncTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -49,7 +48,7 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
             SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
     /** 더미 플레이어 스킨 */
-    private static final PlayerSkin.Async PLAYER_SKIN = PlayerSkin.fromName("DVDummy");
+    private static final PlayerSkin PLAYER_SKIN = PlayerSkin.fromName("DVDummy");
 
     /** 공격 모듈 */
     @NonNull
@@ -86,7 +85,7 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
      * @see DummyBehavior
      */
     public Dummy(@NonNull DummyBehavior dummyBehavior, @NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
-        super(new PlayerNPCSpawnHandler(PLAYER_SKIN.get()), spawnLocation, "훈련용 봇", Hitbox.createDefaultPlayerHitboxes(1));
+        super(new PlayerNPCSpawnHandler(PLAYER_SKIN), spawnLocation, "훈련용 봇", Hitbox.createDefaultPlayerHitboxes(1));
         Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;
@@ -109,17 +108,6 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
     public Dummy(@NonNull Location spawnLocation, int maxHealth, double speedMultiplier, boolean isEnemy) {
         this(new DummyBehavior() {
         }, spawnLocation, maxHealth, speedMultiplier, isEnemy);
-    }
-
-    /**
-     * 더미의 기본 스킨을 불러온다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    @NonNull
-    public static AsyncTask<Void> loadSkin() {
-        return PLAYER_SKIN.init().onFinish(() -> {
-        });
     }
 
     private void onInit() {
