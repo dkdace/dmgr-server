@@ -26,7 +26,7 @@ public final class Jager extends Marksman {
     private static final Jager instance = new Jager();
 
     private Jager() {
-        super(null, "예거", "혹한의 사냥꾼", "DVJager", Species.HUMAN, '\u32D2', 3, 1000, 1.0, 1.0);
+        super(null, "예거", "혹한의 사냥꾼", "ch_jager", Species.HUMAN, '\u32D2', 3, 1000, 1.0, 1.0);
     }
 
     @Override

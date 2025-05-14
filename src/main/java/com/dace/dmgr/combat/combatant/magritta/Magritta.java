@@ -25,7 +25,7 @@ public final class Magritta extends Scuffler {
     private static final Magritta instance = new Magritta();
 
     private Magritta() {
-        super(null, "마그리타", "방화광", "DVMagrita", Species.HUMAN, '\u32D8', 2, 1200, 1.0, 1.0);
+        super(null, "마그리타", "방화광", "ch_magrita", Species.HUMAN, '\u32D8', 2, 1200, 1.0, 1.0);
     }
 
     @Override

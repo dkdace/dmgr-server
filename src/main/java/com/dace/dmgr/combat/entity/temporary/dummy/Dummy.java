@@ -48,7 +48,7 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
             SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
             SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
     /** 더미 플레이어 스킨 */
-    private static final PlayerSkin PLAYER_SKIN = PlayerSkin.fromName("DVDummy");
+    private static final PlayerSkin PLAYER_SKIN = PlayerSkin.fromName("dummy");
 
     /** 공격 모듈 */
     @NonNull

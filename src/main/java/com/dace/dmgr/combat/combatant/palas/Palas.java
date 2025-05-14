@@ -31,7 +31,7 @@ public final class Palas extends Support {
     private static final Palas instance = new Palas();
 
     private Palas() {
-        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "DVPalas", Species.HUMAN, '\u32D9', 4, 1000, 1.0, 1.0);
+        super(Role.MARKSMAN, "팔라스", "생물학 연구원", "ch_palas", Species.HUMAN, '\u32D9', 4, 1000, 1.0, 1.0);
     }
 
     @Override

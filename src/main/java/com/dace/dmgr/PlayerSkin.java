@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -34,8 +35,8 @@ import java.util.*;
 public final class PlayerSkin {
     /** 스킨을 불러올 때 사용하는 토큰의 접두사 */
     private static final String SKIN_TOKEN_PREFIX = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUv";
-    /** Yaml 파일 경로의 디렉터리 이름 */
-    private static final String DIRECTORY_NAME = "Skin";
+    /** 스킨 디렉토리 경로 */
+    private static final Path SKIN_DIRECTORY_PATH = DMGR.getPlugin().getDataFolder().toPath().resolve("Skin");
 
     /** Tabbed Skin 인스턴스 */
     @NonNull
@@ -57,19 +58,16 @@ public final class PlayerSkin {
      *
      * @param skinName 스킨 이름
      * @return {@link PlayerSkin}
-     * @throws NullPointerException 해당 이름의 스킨을 불러올 수 없으면 발생
      */
     @NonNull
     public static PlayerSkin fromName(@NonNull String skinName) {
         try {
-            List<String> lines = Files.readAllLines(DMGR.getPlugin().getDataFolder().toPath()
-                    .resolve(DIRECTORY_NAME)
-                    .resolve(skinName.toLowerCase() + ".skin"));
+            List<String> lines = Files.readAllLines(SKIN_DIRECTORY_PATH.resolve(skinName + ".skin"));
 
             return fromSkin(new Skin(lines.get(0), lines.get(1)));
         } catch (Exception ex) {
             ConsoleLogger.severe("스킨을 불러올 수 없음 : {0}", ex, skinName);
-            throw new IllegalStateException("스킨을 불러올 수 없음");
+            return fromSkin(Skins.DEFAULT_SKIN);
         }
     }
 

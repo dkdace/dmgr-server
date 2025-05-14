@@ -171,21 +171,21 @@ public final class LobbyTabListProfile implements TabListProfile {
     @UtilityClass
     private static final class Skin {
         /** 서버 상태 */
-        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("DTabServerStatus");
+        private static final PlayerSkin SERVER_STATUS = PlayerSkin.fromName("tab_serverstatus");
         /** 핑 */
-        private static final PlayerSkin PING = PlayerSkin.fromName("DTabPing");
+        private static final PlayerSkin PING = PlayerSkin.fromName("tab_ping");
         /** 메모리 */
-        private static final PlayerSkin MEMORY = PlayerSkin.fromName("DTabMemory");
+        private static final PlayerSkin MEMORY = PlayerSkin.fromName("tab_memory");
         /** TPS */
-        private static final PlayerSkin TPS = PlayerSkin.fromName("DTabTPS");
+        private static final PlayerSkin TPS = PlayerSkin.fromName("tab_tps");
         /** 접속자 수 */
-        private static final PlayerSkin ONLINE = PlayerSkin.fromName("DTabOnline");
+        private static final PlayerSkin ONLINE = PlayerSkin.fromName("tab_online");
         /** 승률 */
-        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("DTabWinRate");
+        private static final PlayerSkin WIN_RATE = PlayerSkin.fromName("tab_winrate");
         /** 탈주 */
-        private static final PlayerSkin QUIT = PlayerSkin.fromName("DTabQuit");
+        private static final PlayerSkin QUIT = PlayerSkin.fromName("tab_quit");
         /** 플레이 시간 */
-        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("DTabPlayTime");
+        private static final PlayerSkin PLAY_TIME = PlayerSkin.fromName("tab_playtime");
         /** 접속 인원 */
         private static final PlayerSkin USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
         /** 관리자 */
