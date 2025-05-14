@@ -75,7 +75,7 @@ public final class RankManager {
         if (userDatas == null)
             userDatas = Collections.emptyList();
 
-        userDatas = userDatas.subList(0, limit);
+        userDatas = userDatas.subList(0, Math.min(userDatas.size(), limit));
 
         return Collections.unmodifiableList(userDatas);
     }
