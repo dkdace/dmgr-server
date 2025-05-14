@@ -13,9 +13,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.combat.interaction.Shotgun;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
@@ -49,7 +47,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        new No7WeaponShotgun().shot();
+        CombatUtil.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
 
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
@@ -70,18 +68,6 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
      */
     boolean canSprint() {
         return slowTimestamp.isBefore(Timestamp.now());
-    }
-
-    private final class No7WeaponShotgun extends Shotgun<Damageable> {
-        private No7WeaponShotgun() {
-            super(No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
-        }
-
-        @Override
-        @NonNull
-        protected Bullet<Damageable> getBullet(int i) {
-            return new No7WeaponHitscan(i == 0);
-        }
     }
 
     private final class No7WeaponHitscan extends Hitscan<Damageable> {
