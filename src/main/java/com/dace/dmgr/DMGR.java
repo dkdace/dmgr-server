@@ -43,14 +43,12 @@ public class DMGR extends JavaPlugin {
             ReflectionUtil.loadClass(GameTabListProfile.class);
             ReflectionUtil.loadClass(Dummy.class);
             ReflectionUtil.loadClass(CombatantType.class);
-            UserData.initAllUserDatas();
+            ReflectionUtil.loadClass(UserData.class);
             ReflectionUtil.loadClass(RankManager.class);
-
-            EventListenerManager.register();
-            CommandHandlerManager.register();
-            CommandHandlerManager.registerTestCommands();
-            EntityUtil.clearUnusedEntities();
-            Game.clearDuplicatedWorlds();
+            ReflectionUtil.loadClass(EventListenerManager.class);
+            ReflectionUtil.loadClass(CommandHandlerManager.class);
+            ReflectionUtil.loadClass(EntityUtil.class);
+            ReflectionUtil.loadClass(Game.class);
 
             Bukkit.getOnlinePlayers().forEach(player -> User.fromPlayer(player).sendMessageInfo("시스템 재부팅 완료"));
 

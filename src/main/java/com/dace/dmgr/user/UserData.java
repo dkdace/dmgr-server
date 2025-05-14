@@ -63,6 +63,18 @@ public final class UserData implements Initializable<Void> {
     private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
 
+    static {
+        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
+            userDataPaths.map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
+                    .forEach(userData -> {
+                        userData.yamlFile.initSync();
+                        userData.onInit();
+                    });
+        } catch (Exception ex) {
+            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
+        }
+    }
+
     /** 플레이어 UUID */
     @NonNull
     @Getter
@@ -183,24 +195,6 @@ public final class UserData implements Initializable<Void> {
                 .filter(target -> target.getPlayerName().equalsIgnoreCase(playerName))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    public static void initAllUserDatas() {
-        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
-            userDataPaths.map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
-                    .filter(userData -> !userData.isInitialized())
-                    .forEach(userData -> {
-                        userData.yamlFile.initSync();
-                        userData.onInit();
-                    });
-        } catch (Exception ex) {
-            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
-        }
     }
 
     /**
