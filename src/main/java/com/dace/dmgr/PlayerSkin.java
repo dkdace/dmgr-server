@@ -81,7 +81,7 @@ public final class PlayerSkin {
      */
     @NonNull
     public static AsyncTask<@NonNull PlayerSkin> fromUUID(@NonNull UUID uuid) {
-        return new AsyncTask<>(() -> fromSkin(Skins.getPlayer(uuid)));
+        return AsyncTask.create(() -> fromSkin(Skins.getPlayer(uuid)));
     }
 
     /**

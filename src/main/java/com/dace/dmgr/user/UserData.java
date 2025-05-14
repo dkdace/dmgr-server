@@ -238,13 +238,11 @@ public final class UserData implements Initializable<Void> {
     /**
      * 유저의 데이터 정보를 저장한다.
      */
-    @Nullable
-    public AsyncTask<Void> save() {
+    public void save() {
         if (DMGR.getPlugin().isEnabled())
-            return yamlFile.save();
-
-        yamlFile.saveSync();
-        return null;
+            yamlFile.save();
+        else
+            yamlFile.saveSync();
     }
 
     /**

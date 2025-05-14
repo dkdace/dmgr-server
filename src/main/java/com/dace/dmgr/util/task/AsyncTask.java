@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  * <p>Example:</p>
  *
  * <pre><code>
- * new AsyncTask&lt;Integer&gt;(() -&gt; {
+ * AsyncTask.create(() -&gt; {
  *     // 별도의 스레드에서 비동기 작업을 수행한다.
  *
  *     try {
@@ -59,11 +59,36 @@ public final class AsyncTask<T> extends Task {
      *
      *               <p>성공을 나타내려면 결과 값을 반환, 실패를 나타내려면 예외 던지기</p>
      */
-    public AsyncTask(@NonNull Supplier<T> onInit) {
+    private AsyncTask(@NonNull Supplier<T> onInit) {
         this.future = new CompletableFuture<>();
         this.onInit = onInit;
 
         run();
+    }
+
+    /**
+     * 반환값이 있는 비동기 작업을 수행하는 태스크 인스턴스를 생성하여 반환한다.
+     *
+     * @param onInit 태스크에서 성공 및 실패 시 실행할 작업.
+     *
+     *               <p>성공을 나타내려면 결과 값을 반환, 실패를 나타내려면 예외 던지기</p>
+     */
+    @NonNull
+    public static <T> AsyncTask<T> create(@NonNull Supplier<T> onInit) {
+        return new AsyncTask<>(onInit);
+    }
+
+    /**
+     * 반환값이 없는 비동기 작업을 수행하는 태스크 인스턴스를 생성하여 반환한다.
+     *
+     * @param onInit 태스크에서 성공 및 실패 시 실행할 작업
+     */
+    @NonNull
+    public static AsyncTask<Void> create(@NonNull Runnable onInit) {
+        return new AsyncTask<>(() -> {
+            onInit.run();
+            return null;
+        });
     }
 
     /**

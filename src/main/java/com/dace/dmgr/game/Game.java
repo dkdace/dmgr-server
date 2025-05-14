@@ -263,14 +263,12 @@ public final class Game implements Initializable<Void> {
         SlimeLoader loader = swmPlugin.getLoader(worldData.getDataSource());
         CommandManager.getInstance().getWorldsInUse().add(worldName);
 
-        return new AsyncTask<>(() -> {
+        return AsyncTask.create(() -> {
             try {
                 swmPlugin.generateWorld(swmPlugin.loadWorld(loader, worldName, true, worldData.toPropertyMap())
                         .clone(targetWorldName, loader));
 
                 world = Bukkit.getWorld(targetWorldName);
-
-                return null;
             } catch (Exception ex) {
                 ConsoleLogger.severe("월드 생성 실패 : {0}", ex, targetWorldName);
                 throw new IllegalStateException("월드를 생성할 수 없음");
@@ -287,12 +285,10 @@ public final class Game implements Initializable<Void> {
         String worldName = Validate.notNull(world).getName();
         Path path = WORLD_DIRECTORY_PATH.resolve(worldName + ".slime");
 
-        new AsyncTask<>(() -> {
+        AsyncTask.create(() -> {
             try {
                 Bukkit.unloadWorld(world, false);
                 Files.delete(path);
-
-                return null;
             } catch (Exception ex) {
                 ConsoleLogger.severe("월드 삭제 실패 : {0}", ex, worldName);
                 throw new IllegalStateException("월드를 삭제할 수 없음");

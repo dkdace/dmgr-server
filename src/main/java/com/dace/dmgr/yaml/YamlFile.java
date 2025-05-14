@@ -71,10 +71,7 @@ public final class YamlFile implements Initializable<Void> {
     @Override
     @NonNull
     public AsyncTask<Void> init() {
-        return new AsyncTask<>(() -> {
-            initSync();
-            return null;
-        });
+        return AsyncTask.create(this::initSync);
     }
 
     /**
@@ -96,7 +93,7 @@ public final class YamlFile implements Initializable<Void> {
             isInitialized = true;
         } catch (Exception ex) {
             ConsoleLogger.severe("파일 불러오기 실패 : {0}", ex, file);
-            throw new IllegalStateException(ex);
+            throw new IllegalStateException("파일을 불러올 수 없음");
         }
     }
 
@@ -105,17 +102,7 @@ public final class YamlFile implements Initializable<Void> {
      */
     @NonNull
     public AsyncTask<Void> save() {
-        validate();
-
-        return new AsyncTask<>(() -> {
-            try {
-                config.save(file);
-                return null;
-            } catch (Exception ex) {
-                ConsoleLogger.severe("파일 저장 실패 : {0}", ex, file);
-                throw new IllegalStateException(ex);
-            }
-        });
+        return AsyncTask.create(this::saveSync);
     }
 
     /**
@@ -128,6 +115,7 @@ public final class YamlFile implements Initializable<Void> {
             config.save(file);
         } catch (Exception ex) {
             ConsoleLogger.severe("파일 저장 실패 : {0}", ex, file);
+            throw new IllegalStateException("파일을 저장할 수 없음");
         }
     }
 

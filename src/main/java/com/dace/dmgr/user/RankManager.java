@@ -48,7 +48,7 @@ public final class RankManager {
      */
     @NonNull
     private AsyncTask<@NonNull Integer> updateRanking() {
-        return new AsyncTask<>(() -> {
+        return AsyncTask.create(() -> {
             Collection<UserData> userDatas = UserData.getAllUserDatas();
             if (userDatas.isEmpty())
                 return 0;
