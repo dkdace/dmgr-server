@@ -26,10 +26,6 @@ public final class GameTabListProfile implements TabListProfile {
     /** 게임 유저 인스턴스 */
     private final GameUser gameUser;
 
-    public static void load() {
-        // 미사용
-    }
-
     @Override
     @NonNull
     public String getHeader() {

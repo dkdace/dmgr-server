@@ -37,10 +37,6 @@ public final class RankManager {
         }, GeneralConfig.getConfig().getRankingUpdatePeriod().toTicks());
     }
 
-    public static void load() {
-        // 미사용
-    }
-
     /**
      * 모든 랭킹을 업데이트한다.
      *

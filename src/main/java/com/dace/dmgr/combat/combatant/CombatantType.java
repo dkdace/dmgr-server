@@ -50,10 +50,6 @@ public enum CombatantType {
     @NonNull
     private final Combatant combatant;
 
-    public static void load() {
-        // 미사용
-    }
-
     /**
      * 이름({@link Combatant#getName()}) 순으로 정렬된 전투원의 목록을 반환한다.
      *

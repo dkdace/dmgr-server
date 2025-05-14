@@ -13,6 +13,7 @@ import com.dace.dmgr.user.RankManager;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.EntityUtil;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,14 +38,13 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            GeneralConfig.load();
-
-            LobbyTabListProfile.load();
-            GameTabListProfile.load();
-            Dummy.load();
-            CombatantType.load();
+            ReflectionUtil.loadClass(GeneralConfig.class);
+            ReflectionUtil.loadClass(LobbyTabListProfile.class);
+            ReflectionUtil.loadClass(GameTabListProfile.class);
+            ReflectionUtil.loadClass(Dummy.class);
+            ReflectionUtil.loadClass(CombatantType.class);
             UserData.initAllUserDatas();
-            RankManager.load();
+            ReflectionUtil.loadClass(RankManager.class);
 
             EventListenerManager.register();
             CommandHandlerManager.register();

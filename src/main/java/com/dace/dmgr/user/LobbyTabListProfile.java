@@ -43,10 +43,6 @@ public final class LobbyTabListProfile implements TabListProfile {
         PlayerSkin.fromUUID(user.getPlayer().getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> this.userPlayerSkin = playerSkin);
     }
 
-    public static void load() {
-        Skin.load();
-    }
-
     /**
      * 서버의 최근 TPS (Ticks Per Second)를 반환한다.
      *

@@ -51,10 +51,6 @@ public final class GeneralConfig {
         ConsoleLogger.info("전역 설정 불러오기 완료");
     }
 
-    public static void load() {
-        // 미사용
-    }
-
     /**
      * @return 일반 설정
      */

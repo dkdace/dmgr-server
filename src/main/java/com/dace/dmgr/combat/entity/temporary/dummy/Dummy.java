@@ -110,10 +110,6 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
         }, spawnLocation, maxHealth, speedMultiplier, isEnemy);
     }
 
-    public static void load() {
-        // 미사용
-    }
-
     private void onInit() {
         entity.setSilent(true);
         entity.setAI(true);
