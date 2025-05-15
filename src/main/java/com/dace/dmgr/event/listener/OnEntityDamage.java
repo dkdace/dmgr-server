@@ -33,6 +33,8 @@ public final class OnEntityDamage extends EventListener<EntityDamageEvent> {
                 case SUFFOCATION:
                 case DROWNING:
                 case CRAMMING:
+                case ENTITY_EXPLOSION:
+                case VOID:
                     event.setCancelled(true);
                     break;
                 default:
