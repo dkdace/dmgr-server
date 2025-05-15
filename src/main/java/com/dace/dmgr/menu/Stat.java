@@ -61,7 +61,7 @@ public final class Stat extends ChestGUI {
         for (int i = 0; i < combatantTypes.length; i++) {
             UserData.CombatantRecord combatantRecord = userData.getCombatantRecord(combatantTypes[i]);
 
-            set(i + 9, new DefinedItem(combatantTypes[i].getProfileItem()), itemBuilder -> itemBuilder
+            set(i + 9, new DefinedItem(combatantTypes[i].getCombatant().getProfileItem()), itemBuilder -> itemBuilder
                     .setLore("",
                             "§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
                             "§e플레이 시간 : §f{3}")

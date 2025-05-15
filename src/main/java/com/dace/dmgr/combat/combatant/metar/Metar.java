@@ -32,7 +32,8 @@ public final class Metar extends Guardian {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7).pitch(0.85).pitchVariance(0.1).build());
 
     private Metar() {
-        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "ch_metar", Species.ROBOT, '\u32DA', 2, 2500, 0.8, 1.8);
+        super("METAR", "군용 차세대 전술 돌격 로봇", "ch_metar", null, Species.ROBOT, '\u32DA', 2,
+                2500, 0.8, 1.8);
     }
 
     @Override

@@ -29,7 +29,7 @@ public final class SelectCharInfo extends ChestGUI {
 
         fillAll(GUIItem.EMPTY);
 
-        set(0, 3, new DefinedItem(new ItemBuilder(combatantType.getProfileItem())
+        set(0, 3, new DefinedItem(new ItemBuilder(combatantType.getCombatant().getProfileItem())
                 .setLore("",
                         "§e✪ 난이도 §7:: §f{0}",
                         "§a{1} 생명력 §7:: §f{2}",
