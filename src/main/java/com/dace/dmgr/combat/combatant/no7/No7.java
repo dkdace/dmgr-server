@@ -92,6 +92,12 @@ public final class No7 extends Vanguard {
     }
 
     @Override
+    public void onTick(@NonNull CombatUser combatUser, long i) {
+        super.onTick(combatUser, i);
+        combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(-No7T1Info.DECREASE_PER_SECOND / 20.0);
+    }
+
+    @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
     }
@@ -115,7 +121,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+        return new TraitInfo[]{No7T1Info.getInstance()};
     }
 
     @Override
