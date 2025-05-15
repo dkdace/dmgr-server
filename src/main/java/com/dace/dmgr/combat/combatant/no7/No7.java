@@ -27,7 +27,8 @@ public final class No7 extends Vanguard {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.6).pitch(1).pitchVariance(0.1).build());
 
     private No7() {
-        super(Role.GUARDIAN, "No.7", "전기 깡통 로봇", "ch_no7", Species.ROBOT, '\u32DB', 2, 2000, 0.9, 1.6);
+        super("No.7", "전기 깡통 로봇", "ch_no7", Role.GUARDIAN, Species.ROBOT, '\u32DB', 2,
+                2000, 0.9, 1.6);
     }
 
     @Override
