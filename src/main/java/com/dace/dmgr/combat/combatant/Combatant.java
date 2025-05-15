@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.item.ItemBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -22,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,35 +40,41 @@ import java.util.ArrayList;
  * @see Support
  * @see Controller
  */
-@Getter
 public abstract class Combatant {
     /** 이름 */
     @NonNull
+    @Getter
     private final String name;
     /** 별명 */
-    @NonNull
     private final String nickname;
     /** 스킨 */
     @NonNull
+    @Getter
     private final PlayerSkin playerSkin;
     /** 주 역할군 */
     @NonNull
+    @Getter
     private final Role role;
     /** 부 역할군 */
     @Nullable
+    @Getter
     private final Role subRole;
     /** 종족 유형 */
-    @NonNull
     private final Species species;
     /** 전투원 아이콘 */
+    @Getter
     private final char icon;
     /** 난이도 */
+    @Getter
     private final int difficulty;
     /** 체력 */
+    @Getter
     private final int health;
     /** 이동속도 배수 */
+    @Getter
     private final double speedMultiplier;
     /** 히트박스 크기 배수 */
+    @Getter
     private final double hitboxMultiplier;
 
     /**
@@ -97,6 +105,16 @@ public abstract class Combatant {
         this.health = health;
         this.speedMultiplier = speedMultiplier;
         this.hitboxMultiplier = hitboxMultiplier;
+    }
+
+    /**
+     * 전투원의 프로필 정보 아이템을 반환한다.
+     *
+     * @return 프로필 정보 아이템
+     */
+    @NonNull
+    public ItemStack getProfileItem() {
+        return new ItemBuilder(playerSkin).setName(MessageFormat.format("§f{0} {1}{2} §8§o{3}", icon, role.getColor(), name, nickname)).build();
     }
 
     /**
@@ -312,7 +330,7 @@ public abstract class Combatant {
     @MustBeInvokedByOverriders
     public void onTick(@NonNull CombatUser combatUser, long i) {
         if (!combatUser.isDead() && combatUser.getDamageModule().isLowHealth())
-            species.getReaction().onTickLowHealth(combatUser);
+            species.reaction.onTickLowHealth(combatUser);
     }
 
     /**
@@ -353,7 +371,7 @@ public abstract class Combatant {
     @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         if (victim.getDamageModule().getTotalShield() == 0)
-            species.getReaction().onDamage(victim, damage, location);
+            species.reaction.onDamage(victim, damage, location);
     }
 
     /**
@@ -411,7 +429,7 @@ public abstract class Combatant {
      */
     @MustBeInvokedByOverriders
     public void onDeath(@NonNull CombatUser victim, @Nullable Attacker attacker) {
-        species.getReaction().onDeath(victim);
+        species.reaction.onDeath(victim);
     }
 
     /**
@@ -536,7 +554,6 @@ public abstract class Combatant {
      * 전투원의 종족 유형.
      */
     @AllArgsConstructor
-    @Getter
     protected enum Species {
         /** 인간 */
         HUMAN(new HumanReaction()),
@@ -544,7 +561,6 @@ public abstract class Combatant {
         ROBOT(new RobotReaction());
 
         /** 이벤트 반응 */
-        @NonNull
         private final Reaction reaction;
 
         /**

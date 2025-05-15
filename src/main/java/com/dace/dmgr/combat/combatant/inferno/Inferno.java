@@ -34,7 +34,8 @@ public final class Inferno extends Vanguard {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build());
 
     private Inferno() {
-        super(null, "인페르노", "화염 돌격병", "ch_inferno", Species.HUMAN, '\u32D7', 1, 2000, 0.9, 1.4);
+        super("인페르노", "화염 돌격병", "ch_inferno", null, Species.HUMAN, '\u32D7', 1,
+                2000, 0.9, 1.4);
     }
 
     @Override

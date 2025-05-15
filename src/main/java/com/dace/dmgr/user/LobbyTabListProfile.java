@@ -27,6 +27,10 @@ public final class LobbyTabListProfile implements TabListProfile {
     /** 푸터 문자열 */
     public static final String FOOTER = "\n§7현재 서버는 테스트 단계이며, 시스템 상 문제점이나 버그가 발생할 수 있습니다.\n";
 
+    static {
+        ReflectionUtil.loadClass(Skin.class);
+    }
+
     /** 유저 인스턴스 */
     private final User user;
     /** 유저 플레이어 스킨 */
@@ -190,9 +194,5 @@ public final class LobbyTabListProfile implements TabListProfile {
         private static final PlayerSkin USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.GREEN));
         /** 관리자 */
         private static final PlayerSkin ADMIN_USERS = PlayerSkin.fromSkin(Skins.getDot(ChatColor.AQUA));
-
-        private static void load() {
-            // 미사용
-        }
     }
 }

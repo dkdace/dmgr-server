@@ -33,7 +33,8 @@ public final class Quaker extends Guardian {
             SoundEffect.SoundInfo.builder("new.entity.ravager.step").volume(0.2).pitch(0.8).pitchVariance(0.1).build());
 
     private Quaker() {
-        super(null, "퀘이커", "불굴의 방패", "ch_quaker", Species.HUMAN, '\u32D3', 1, 2500, 0.85, 1.8);
+        super("퀘이커", "불굴의 방패", "ch_quaker", null, Species.HUMAN, '\u32D3', 1,
+                2500, 0.85, 1.8);
     }
 
     @Override

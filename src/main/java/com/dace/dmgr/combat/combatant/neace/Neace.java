@@ -34,7 +34,8 @@ public final class Neace extends Support {
     private static final Neace instance = new Neace();
 
     private Neace() {
-        super(null, "니스", "평화주의자", "ch_nis", Species.HUMAN, '\u32D5', 1, 1000, 1.0, 1.0);
+        super("니스", "평화주의자", "ch_nis", null, Species.HUMAN, '\u32D5', 1,
+                1000, 1.0, 1.0);
     }
 
     @Override

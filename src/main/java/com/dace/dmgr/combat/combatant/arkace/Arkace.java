@@ -24,7 +24,8 @@ public final class Arkace extends Marksman {
     private static final Arkace instance = new Arkace();
 
     private Arkace() {
-        super(null, "아케이스", "슈퍼 솔저", "ch_arkace", Species.HUMAN, '\u32D0', 1, 1000, 1.0, 1.0);
+        super("아케이스", "슈퍼 솔저", "ch_arkace", null, Species.HUMAN, '\u32D0', 1,
+                1000, 1.0, 1.0);
     }
 
     @Override

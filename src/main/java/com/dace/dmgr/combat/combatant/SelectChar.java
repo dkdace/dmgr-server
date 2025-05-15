@@ -69,7 +69,7 @@ public final class SelectChar extends ChestGUI {
     private DefinedItem createSelectItem(@NonNull CombatantType combatantType) {
         Combatant combatant = combatantType.getCombatant();
 
-        return new DefinedItem(new ItemBuilder(combatantType.getProfileItem())
+        return new DefinedItem(new ItemBuilder(combatantType.getCombatant().getProfileItem())
                 .setLore("",
                         MessageFormat.format("§f▍ 역할군 : {0}", combatant.getRole().getColor() + combatant.getRole().getName() +
                                 (combatant.getSubRole() == null
