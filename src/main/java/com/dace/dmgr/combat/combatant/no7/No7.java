@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.no7;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -7,6 +8,7 @@ import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.combatant.inferno.InfernoUltInfo;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -17,6 +19,7 @@ import org.bukkit.Sound;
  * 전투원 - No.7 클래스.
  *
  * @see No7Weapon
+ * @see No7P1
  * @see No7A1
  */
 public final class No7 extends Vanguard {
@@ -95,7 +98,15 @@ public final class No7 extends Vanguard {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(-No7T1Info.DECREASE_PER_SECOND / 20.0);
+
+        ActionManager actionManager = combatUser.getActionManager();
+
+        No7T1 skillt1 = actionManager.getTrait(No7T1Info.getInstance());
+        if (!combatUser.getDamageModule().isLowHealth() || skillt1.getShield() > No7P1Info.SHIELD)
+            skillt1.addShield(-No7T1Info.DECREASE_PER_SECOND / 20.0);
+
+        if (combatUser.getDamageModule().isLowHealth())
+            actionManager.useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -128,7 +139,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[0];
+        return new PassiveSkillInfo[]{No7P1Info.getInstance()};
     }
 
     @Override

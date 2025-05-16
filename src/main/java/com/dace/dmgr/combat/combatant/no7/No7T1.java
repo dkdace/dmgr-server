@@ -15,6 +15,15 @@ public final class No7T1 extends Trait {
     }
 
     /**
+     * 남은 보호막 체력을 반환한다.
+     *
+     * @return 남은 보호막 체력
+     */
+    double getShield() {
+        return shield.getHealth();
+    }
+
+    /**
      * 지정한 양만큼 보호막을 증가시킨다.
      *
      * @param amount 보호막
