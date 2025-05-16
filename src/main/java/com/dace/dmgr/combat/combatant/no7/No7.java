@@ -20,6 +20,7 @@ import org.bukkit.Sound;
  *
  * @see No7Weapon
  * @see No7P1
+ * @see No7P2
  * @see No7A1
  */
 public final class No7 extends Vanguard {
@@ -107,6 +108,9 @@ public final class No7 extends Vanguard {
 
         if (combatUser.getDamageModule().isLowHealth())
             actionManager.useAction(ActionKey.PERIODIC_1);
+
+        if (i % 5 == 0)
+            actionManager.useAction(ActionKey.PERIODIC_2);
     }
 
     @Override
@@ -139,7 +143,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{No7P1Info.getInstance()};
+        return new PassiveSkillInfo[]{No7P1Info.getInstance(), No7P2Info.getInstance()};
     }
 
     @Override
