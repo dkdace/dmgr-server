@@ -44,7 +44,7 @@ public final class TargetModule<T extends CombatEntity> {
             }
 
             @Override
-            protected void onDestroy(@NonNull Location location) {
+            protected void onDestroy(@NonNull Location location, boolean isForce) {
                 if (currentTarget == null)
                     skill.getCombatUser().getUser().sendAlertActionBar("대상을 찾을 수 없습니다.");
             }

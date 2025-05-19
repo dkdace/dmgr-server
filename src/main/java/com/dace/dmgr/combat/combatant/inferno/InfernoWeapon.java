@@ -144,6 +144,11 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(9, location -> {
@@ -186,7 +191,10 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
+            if (isForce)
+                return;
+
             Location loc = location.add(0, 0.1, 0);
             new InfernoWeaponLArea().emit(loc);
 

@@ -100,6 +100,11 @@ public final class SiliaA1 extends ActiveSkill {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(12, location -> {

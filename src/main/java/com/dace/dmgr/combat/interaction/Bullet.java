@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.interaction;
 import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -121,6 +122,16 @@ public abstract class Bullet<T extends CombatEntity> {
     protected abstract HitEntityHandler<T> getHitEntityHandler();
 
     /**
+     * 총알이 {@link BulletBarrier}에 맞았을 때 제거될 수 있는지 확인한다.
+     *
+     * @return {@link BulletBarrier}에 맞았을 때 제거 여부
+     * @see BulletBarrier
+     */
+    protected boolean canBeRemoved() {
+        return true;
+    }
+
+    /**
      * 지정한 엔티티가 총알에 맞은 적이 없는지 확인한다.
      *
      * @param target 확인할 엔티티
@@ -225,16 +236,26 @@ public abstract class Bullet<T extends CombatEntity> {
     }
 
     /**
-     * 총알을 소멸시키고 {@link Bullet#onDestroy(Location)}를 호출한다.
+     * 총알을 소멸시키고 {@link Bullet#onDestroy(Location, boolean)}를 호출한다.
+     *
+     * @param isForce 강제 소멸 여부. 특정 스킬이나 {@link BulletBarrier} 등에 의해 사라진 경우 강제 소멸
+     * @throws IllegalStateException 총알이 발사되지 않았거나 이미 제거되었으면 발생
+     */
+    final void destroy(boolean isForce) {
+        validateIsShot();
+        Validate.validState(!isDestroyed, "Bullet이 이미 제거됨");
+
+        onDestroy(getLocation(), isForce);
+        isDestroyed = true;
+    }
+
+    /**
+     * 총알을 강제로 소멸시키고 {@link Bullet#onDestroy(Location, boolean)}를 호출한다.
      *
      * @throws IllegalStateException 총알이 발사되지 않았거나 이미 제거되었으면 발생
      */
     public final void destroy() {
-        validateIsShot();
-        Validate.validState(!isDestroyed, "Bullet이 이미 제거됨");
-
-        onDestroy(getLocation());
-        isDestroyed = true;
+        destroy(true);
     }
 
     /**
@@ -297,7 +318,10 @@ public abstract class Bullet<T extends CombatEntity> {
      */
     final void next() {
         if (!Validate.notNull(intervalHandler).onInterval(getLocation(), index++) || handleBlockCollision() || handleEntityCollision()) {
-            destroy();
+            destroy(false);
+            return;
+        } else if (handleBulletBarrierCollision()) {
+            destroy(true);
             return;
         }
 
@@ -324,6 +348,25 @@ public abstract class Bullet<T extends CombatEntity> {
         }
 
         return false;
+    }
+
+    /**
+     * 총알 주변의 {@link BulletBarrier}를 찾고 피격 로직을 처리한다.
+     *
+     * @return 총알 소멸 여부
+     */
+    private boolean handleBulletBarrierCollision() {
+        if (!canBeRemoved())
+            return false;
+
+        BulletBarrier targetBulletBarrier = CombatUtil.getNearCombatEntity(getLocation(), size,
+                EntityCondition.of(BulletBarrier.class).and(combatEntity -> combatEntity.isEnemy(shooter)));
+
+        if (targetBulletBarrier == null)
+            return false;
+
+        targetBulletBarrier.onRemove(this, getLocation());
+        return true;
     }
 
     /**
@@ -354,8 +397,9 @@ public abstract class Bullet<T extends CombatEntity> {
      * 총알이 소멸했을 때 실행될 작업.
      *
      * @param location 마지막 위치
+     * @param isForce  강제 소멸 여부. 특정 스킬이나 {@link BulletBarrier} 등에 의해 사라진 경우 강제 소멸
      */
-    protected void onDestroy(@NonNull Location location) {
+    protected void onDestroy(@NonNull Location location, boolean isForce) {
         // 미사용
     }
 
@@ -413,7 +457,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @param <T> {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      */
     @FunctionalInterface
-    public interface CritHitEntityHandler<T extends CombatEntity> {
+    protected interface CritHitEntityHandler<T extends CombatEntity> {
         /**
          * 총알이 엔티티에 맞았을 때 실행될 작업.
          *
@@ -429,7 +473,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * 매 판정점 ({@link Bullet#HITBOX_INTERVAL} 간격)마다 실행될 작업을 처리하는 인터페이스.
      */
     @FunctionalInterface
-    public interface IntervalHandler {
+    protected interface IntervalHandler {
         /**
          * 연쇄 판정점 처리기를 생성하여 반환한다.
          *
@@ -474,7 +518,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * 총알이 블록에 맞았을 때 실행될 작업을 처리하는 인터페이스.
      */
     @FunctionalInterface
-    public interface HitBlockHandler {
+    protected interface HitBlockHandler {
         /**
          * 연쇄 블록 판정 처리기를 생성하여 반환한다.
          *
@@ -521,7 +565,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @param <T> {@link CombatEntity}를 상속받는 전투 시스템 엔티티
      */
     @FunctionalInterface
-    public interface HitEntityHandler<T extends CombatEntity> {
+    protected interface HitEntityHandler<T extends CombatEntity> {
         /**
          * 연쇄 엔티티 판정 처리기를 생성하여 반환한다.
          *

@@ -47,7 +47,7 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, SIZE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new ActionInfoLore.NamedSection("지속시간 종료/재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1)

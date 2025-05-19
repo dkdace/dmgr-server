@@ -154,7 +154,12 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             QuakerWeaponInfo.Particles.BULLET_TRAIL_DECO.play(loc);
         }
@@ -191,6 +196,11 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             super(QuakerA2.this, QuakerA2Info.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerA2Info.SIZE).maxDistance(QuakerA2Info.DISTANCE).build());
             this.targets = targets;
+        }
+
+        @Override
+        protected boolean canBeRemoved() {
+            return false;
         }
 
         @Override

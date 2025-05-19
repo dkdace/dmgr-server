@@ -22,6 +22,7 @@ import org.bukkit.Sound;
  * @see No7P1
  * @see No7P2
  * @see No7A1
+ * @see No7A2
  */
 public final class No7 extends Vanguard {
     @Getter
@@ -87,7 +88,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public String @NonNull [] getKillMents(@NonNull CombatantType combatantType) {
-        return new String[]{"목표 제거"};
+        return new String[]{"목표 제거."};
     }
 
     @Override
@@ -116,6 +117,11 @@ public final class No7 extends Vanguard {
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+    }
+
+    @Override
+    public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
+        return combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -149,7 +155,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{No7A1Info.getInstance(), getUltimateSkillInfo()};
+        return new ActiveSkillInfo[]{No7A1Info.getInstance(), No7A2Info.getInstance(), getUltimateSkillInfo()};
     }
 
     @Override

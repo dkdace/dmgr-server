@@ -66,6 +66,11 @@ public abstract class Area<T extends CombatEntity> {
         for (T target : targets)
             new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
                 @Override
+                protected boolean canBeRemoved() {
+                    return false;
+                }
+
+                @Override
                 @NonNull
                 protected IntervalHandler getIntervalHandler() {
                     return (location, i) -> true;

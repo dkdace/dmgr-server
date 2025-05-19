@@ -140,6 +140,11 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(18, location -> {

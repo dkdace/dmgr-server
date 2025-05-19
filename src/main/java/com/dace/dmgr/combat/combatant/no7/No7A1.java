@@ -42,6 +42,11 @@ public final class No7A1 extends ActiveSkill {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         if (!isDurationFinished()) {
             cancel();
@@ -88,6 +93,11 @@ public final class No7A1 extends ActiveSkill {
         private No7A1Attack(@NonNull HashMap<Damageable, Timestamp> targets) {
             super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(No7A1Info.SIZE).maxDistance(No7A1Info.DISTANCE).build());
             this.targets = targets;
+        }
+
+        @Override
+        protected boolean canBeRemoved() {
+            return false;
         }
 
         @Override

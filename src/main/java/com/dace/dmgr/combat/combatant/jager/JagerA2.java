@@ -92,8 +92,9 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
-            entityModule.set(new JagerA2Entity(location));
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
+            if (!isForce)
+                entityModule.set(new JagerA2Entity(location));
         }
 
         @Override

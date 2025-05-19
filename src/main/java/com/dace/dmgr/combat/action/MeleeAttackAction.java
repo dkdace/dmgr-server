@@ -89,6 +89,11 @@ public final class MeleeAttackAction extends AbstractAction {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return (location, i) -> true;

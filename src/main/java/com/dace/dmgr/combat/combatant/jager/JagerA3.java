@@ -169,8 +169,9 @@ public final class JagerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
-            onExplode(location, this);
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
+            if (!isForce)
+                onExplode(location, this);
         }
 
         @Override

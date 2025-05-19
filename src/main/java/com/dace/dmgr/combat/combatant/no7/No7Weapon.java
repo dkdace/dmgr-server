@@ -46,6 +46,11 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
     }
 
     @Override
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     public void onUse(@NonNull ActionKey actionKey) {
         CombatUtil.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
 

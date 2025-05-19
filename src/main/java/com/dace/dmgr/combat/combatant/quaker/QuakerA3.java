@@ -94,7 +94,12 @@ public final class QuakerA3 extends ActiveSkill {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
             for (int i = 0; i < 3; i++) {
                 Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
                 QuakerA3Info.Particles.BULLET_TRAIL_EFFECT_DECO.play(loc);
