@@ -624,12 +624,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim.fallZoneTimestamp.isAfter(Timestamp.now()))
             addScore("추락사", FALL_ZONE_KILL_SCORE);
 
+        double contributionScore = victim.killContributorManager.getContributionScore(this);
+        combatant.onKill(this, victim, contributionScore, false);
+
         int score = victim.killContributorManager.getScore(this);
+        addScore(MessageFormat.format("§e{0}§f 처치 도움", victim.getName()), score);
 
-        combatant.onKill(this, victim, score, false);
-
-        addScore(MessageFormat.format("§e{0}§f 처치 도움", name), score);
-        actionManager.handleBonusScoreSkill(victim, score);
+        actionManager.handleBonusScoreSkill(victim, contributionScore);
 
         playKillEffect();
 
