@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Vanguard;
-import com.dace.dmgr.combat.combatant.inferno.InfernoUltInfo;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
@@ -24,6 +23,7 @@ import org.bukkit.Sound;
  * @see No7A1
  * @see No7A2
  * @see No7A3
+ * @see No7Ult
  */
 public final class No7 extends Vanguard {
     @Getter
@@ -161,7 +161,7 @@ public final class No7 extends Vanguard {
 
     @Override
     @NonNull
-    public InfernoUltInfo getUltimateSkillInfo() {
-        return InfernoUltInfo.getInstance();
+    public No7UltInfo getUltimateSkillInfo() {
+        return No7UltInfo.getInstance();
     }
 }
