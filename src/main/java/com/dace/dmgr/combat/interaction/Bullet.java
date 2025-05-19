@@ -15,8 +15,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -132,13 +135,14 @@ public abstract class Bullet<T extends CombatEntity> {
     }
 
     /**
-     * 지정한 엔티티가 총알에 맞은 적이 없는지 확인한다.
+     * 총알에 맞은 엔티티의 목록을 반환한다.
      *
-     * @param target 확인할 엔티티
-     * @return {@code target}이 총알에 맞지 않았으면 {@code true} 반환
+     * @return 맞은 엔티티 목록
      */
-    protected boolean isNotHit(@NonNull T target) {
-        return !targets.contains(target);
+    @NonNull
+    @UnmodifiableView
+    public final Set<T> getHitTargets() {
+        return Collections.unmodifiableSet(targets);
     }
 
     private void validateIsShot() {

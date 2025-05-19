@@ -23,6 +23,7 @@ import org.bukkit.Sound;
  * @see No7P2
  * @see No7A1
  * @see No7A2
+ * @see No7A3
  */
 public final class No7 extends Vanguard {
     @Getter
@@ -155,7 +156,7 @@ public final class No7 extends Vanguard {
     @Override
     @NonNull
     public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{No7A1Info.getInstance(), No7A2Info.getInstance(), getUltimateSkillInfo()};
+        return new ActiveSkillInfo[]{No7A1Info.getInstance(), No7A2Info.getInstance(), No7A3Info.getInstance(), getUltimateSkillInfo()};
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
+import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.combat.interaction.Bullet;
@@ -48,7 +49,9 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(No7A1Info.getInstance()).isDurationFinished();
+        ActionManager actionManager = combatUser.getActionManager();
+        return super.canUse(actionKey) && actionManager.getSkill(No7A1Info.getInstance()).isDurationFinished()
+                && actionManager.getSkill(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -70,7 +73,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
         addActionTask(new IntervalTask(i -> {
             No7A2Info.Sounds.TICK.play(combatUser.getLocation());
-            playUseTickEffect(i, loc.getYaw());
+            playTickEffect(i, loc.getYaw());
         }, 1, No7A2Info.DURATION.toTicks()));
     }
 
@@ -93,12 +96,12 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     }
 
     /**
-     * 사용 시 효과를 재생한다.
+     * 사용 중 효과를 재생한다.
      *
      * @param i   인덱스
      * @param yaw 원본 Yaw 값
      */
-    private void playUseTickEffect(long i, float yaw) {
+    private void playTickEffect(long i, float yaw) {
         Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(yaw);
         loc.setPitch(0);

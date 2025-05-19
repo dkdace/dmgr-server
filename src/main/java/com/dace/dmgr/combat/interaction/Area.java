@@ -8,7 +8,9 @@ import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -47,6 +49,17 @@ public abstract class Area<T extends CombatEntity> {
         this.shooter = shooter;
         this.radius = radius;
         this.entityCondition = entityCondition;
+    }
+
+    /**
+     * 광역 판정에 맞은 엔티티의 목록을 반환한다.
+     *
+     * @return 맞은 엔티티 목록
+     */
+    @NonNull
+    @UnmodifiableView
+    public final Set<T> getHitTargets() {
+        return Collections.unmodifiableSet(penetrationMap.keySet());
     }
 
     /**
