@@ -109,13 +109,18 @@ public final class QuakerWeapon extends AbstractWeapon {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         protected void onHit(@NonNull Location location) {
             if (!isUlt)
                 QuakerWeaponInfo.Sounds.HIT.play(location);
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
             QuakerWeaponInfo.Particles.BULLET_TRAIL_DECO.play(loc);
         }

@@ -210,15 +210,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.killContributorManager = new KillContributorManager(this);
         this.killHelperManager = new KillHelperManager();
 
-        this.combatantType = combatantType;
-        this.combatant = combatantType.getCombatant();
-        this.actionManager = new ActionManager(this);
-
         this.attackModule = new AttackModule();
         this.healerModule = new HealerModule();
         this.damageModule = new HealModule(this, 1000, true);
         this.statusEffectModule = new StatusEffectModule(this);
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+
+        this.combatantType = combatantType;
+        this.combatant = combatantType.getCombatant();
+        this.actionManager = new ActionManager(this);
 
         user.getSidebarManager().clear();
         user.getGui().set(8, MENU_ITEM);

@@ -113,7 +113,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
             projectile = null;
             if (isEnabled)
                 forceCancel();

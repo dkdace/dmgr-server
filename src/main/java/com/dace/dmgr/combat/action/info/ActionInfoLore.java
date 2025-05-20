@@ -293,6 +293,8 @@ public final class ActionInfoLore {
             CAPACITY("{0}발"),
             /** 시간당 값. 초당 피해량, 초당 치유량 등 */
             PER_SECOND("{0}/초"),
+            /** 가변 시간당 값 */
+            VARIABLE_PER_SECOND("{0}/초 ~ {1}/초"),
             /** 퍼센트 */
             PERCENT("{0}%"),
             /** 거리 */

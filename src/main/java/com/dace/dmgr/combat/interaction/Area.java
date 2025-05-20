@@ -4,12 +4,13 @@ import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.util.location.LocationUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -23,8 +24,6 @@ public abstract class Area<T extends CombatEntity> {
     private static final double SIZE = 0.2;
 
     /** 발사자 엔티티 */
-    @NonNull
-    @Getter
     protected final CombatEntity shooter;
     /** 범위 (반지름). (단위: 블록) */
     protected final double radius;
@@ -53,6 +52,17 @@ public abstract class Area<T extends CombatEntity> {
     }
 
     /**
+     * 광역 판정에 맞은 엔티티의 목록을 반환한다.
+     *
+     * @return 맞은 엔티티 목록
+     */
+    @NonNull
+    @UnmodifiableView
+    public final Set<T> getHitTargets() {
+        return Collections.unmodifiableSet(penetrationMap.keySet());
+    }
+
+    /**
      * 지정한 위치에서 광역 판정을 실행한다.
      *
      * @param center 판정 중심지
@@ -68,6 +78,11 @@ public abstract class Area<T extends CombatEntity> {
 
         for (T target : targets)
             new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
+                @Override
+                protected boolean canBeRemoved() {
+                    return false;
+                }
+
                 @Override
                 @NonNull
                 protected IntervalHandler getIntervalHandler() {

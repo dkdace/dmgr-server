@@ -95,6 +95,11 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler

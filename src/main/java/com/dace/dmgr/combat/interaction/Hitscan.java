@@ -46,7 +46,7 @@ public abstract class Hitscan<T extends CombatEntity> extends Bullet<T> {
                 return;
         }
 
-        destroy();
+        destroy(false);
     }
 
     /**
