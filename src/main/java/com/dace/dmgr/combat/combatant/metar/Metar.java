@@ -106,13 +106,21 @@ public final class Metar extends Guardian {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        if (combatUser.getEntity().isSneaking())
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        MetarP1 skillp1 = combatUser.getActionManager().getSkill(MetarP1Info.getInstance());
+        skillp1.addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
+
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+    }
+
+    @Override
+    public void onKnockbacked(@NonNull CombatUser victim, double speed) {
+        MetarP1 skillp1 = victim.getActionManager().getSkill(MetarP1Info.getInstance());
+        skillp1.addValue(-speed * MetarP1Info.DECREASE_MULTIPLIER);
     }
 
     @Override

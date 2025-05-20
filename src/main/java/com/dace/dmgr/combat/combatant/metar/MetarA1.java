@@ -183,7 +183,7 @@ public final class MetarA1 extends ActiveSkill {
                 double damage = CombatUtil.getDistantDamage(MetarA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
 
                 if (target.getDamageModule().damage(MetarA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable && !MetarA1Projectile.this.getHitTargets().contains(target)) {
+                        && target != combatUser && target instanceof Movable && !MetarA1Projectile.this.getHitTargets().contains(target)) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MetarA1Info.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }

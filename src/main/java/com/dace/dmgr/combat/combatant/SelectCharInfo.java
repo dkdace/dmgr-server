@@ -34,7 +34,7 @@ public final class SelectCharInfo extends ChestGUI {
                         "§e✪ 난이도 §7:: §f{0}",
                         "§a{1} 생명력 §7:: §f{2}",
                         "§b{3} 이동속도 배수 §7:: §f{4}",
-                        "§6⬜ 히트박스 배수 §7:: §f{5}")
+                        "§6{5} 히트박스 배수 §7:: §f{6}")
                 .formatLore(
                         StringFormUtil.getProgressBar(combatant.getDifficulty(), 5, ChatColor.YELLOW, 5, '✰')
                                 .replace("§0", "§8"),
@@ -42,6 +42,7 @@ public final class SelectCharInfo extends ChestGUI {
                         combatant.getHealth(),
                         TextIcon.WALK_SPEED,
                         combatant.getSpeedMultiplier(),
+                        TextIcon.UNDEFINED,
                         combatant.getHitboxMultiplier())
                 .build()));
 

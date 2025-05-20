@@ -105,6 +105,29 @@ public final class ActionBarStringUtil {
     }
 
     /**
+     * 진행 막대를 반환한다.
+     *
+     * <p>기본적으로 흰색, 현재 값이 최대 값의 1/2 이하일 경우 노란색, 1/4 이하일 경우 빨간색으로 표시한다.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>[Test] <font color="yellow">■■■■</font><font color="black">■■■■■■</font> [40/100]</pre>
+     * <pre><code>
+     * ActionBarStringUtil.getProgressBar("[Test]", 40, 100);
+     * </code></pre>
+     *
+     * @param prefix  접두사
+     * @param current 현재 값
+     * @param max     최대 값
+     * @return 진행 막대 문자열
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    @NonNull
+    public static String getProgressBar(@NonNull String prefix, int current, int max) {
+        return getProgressBar(prefix, current, max, 10, '■');
+    }
+
+    /**
      * 지정한 충전형 스킬의 상태 변수 진행 막대를 반환한다.
      *
      * <p>기본적으로 흰색, 상태 변수가 최대 값의 1/2 이하일 경우 노란색, 1/4 이하일 경우 빨간색으로 표시한다.</p>

@@ -375,6 +375,16 @@ public abstract class Combatant {
     }
 
     /**
+     * 전투원이 강제로 밀쳐졌을 때 실행될 작업.
+     *
+     * @param victim 피격자
+     * @param speed  속력
+     */
+    public void onKnockbacked(@NonNull CombatUser victim, double speed) {
+        // 미사용
+    }
+
+    /**
      * 전투원이 다른 엔티티를 치유했을 때 실행될 작업.
      *
      * @param provider 제공자
