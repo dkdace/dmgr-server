@@ -63,7 +63,7 @@ public final class No7A3Info extends ActiveSkillInfo<No7A3> {
     @UtilityClass
     public static final class Particles {
         /** 색상 */
-        public static final Color COLOR = Color.fromRGB(255, 255, 175);
+        public static final Color COLOR = Color.fromRGB(255, 255, 43);
 
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(

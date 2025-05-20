@@ -71,7 +71,7 @@ public final class No7A2Info extends ActiveSkillInfo<No7A2> {
         /** 틱 입자 효과 */
         public static final ParticleEffect TICK = new ParticleEffect(
                 ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 240, 40)).build(),
+                        Color.fromRGB(255, 255, 176)).build(),
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT)
                         .speedMultiplier(-0.5).build());
         /** 피격 */
