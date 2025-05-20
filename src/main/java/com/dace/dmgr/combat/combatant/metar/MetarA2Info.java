@@ -17,13 +17,13 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
     /** 쿨타임 */
     public static final Timespan COOLDOWN = Timespan.ofSeconds(0.5);
     /** 스택 충전 쿨타임 */
-    public static final Timespan STACK_COOLDOWN = Timespan.ofSeconds(7);
+    public static final Timespan STACK_COOLDOWN = Timespan.ofSeconds(8);
     /** 최대 스택 충전량 */
     public static final int MAX_STACK = 2;
     /** 체력 */
     public static final int HEALTH = 1000;
     /** 지속시간 */
-    public static final Timespan DURATION = Timespan.ofSeconds(14);
+    public static final Timespan DURATION = Timespan.ofSeconds(10);
 
     /** 방어 점수 */
     public static final int BLOCK_SCORE = 20;
