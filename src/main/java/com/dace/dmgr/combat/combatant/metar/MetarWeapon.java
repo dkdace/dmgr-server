@@ -167,7 +167,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                double damage = CombatUtil.getDistantDamage(MetarWeaponInfo.DAMAGE, getTravelDistance(), MetarWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
+                double damage = CombatUtil.getDistantDamage(MetarWeaponInfo.DAMAGE, getTravelDistance(), MetarWeaponInfo.DISTANCE / 2.0);
 
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true);
                 return false;

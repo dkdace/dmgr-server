@@ -20,11 +20,9 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     /** 연사속도 */
     public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_840;
     /** 피해량 */
-    public static final int DAMAGE = 30;
-    /** 피해량 감소 시작 거리 (단위: 블록) */
-    public static final int DAMAGE_WEAKENING_DISTANCE = 12;
+    public static final int DAMAGE = 25;
     /** 사거리 (단위: 블록) */
-    public static final int DISTANCE = 24;
+    public static final int DISTANCE = 30;
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
     /** 탄퍼짐 */
@@ -46,7 +44,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("대용량 탄창이 장착된 에너지 기관포입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
-                                DAMAGE, DAMAGE / 2, DAMAGE_WEAKENING_DISTANCE, DAMAGE_WEAKENING_DISTANCE * 2)
+                                DAMAGE, DAMAGE / 2, DISTANCE / 2, DISTANCE)
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME_WITH_RPM,
                                 60.0 / FIRE_RATE.getRoundsPerMinute(), FIRE_RATE.getRoundsPerMinute())
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
