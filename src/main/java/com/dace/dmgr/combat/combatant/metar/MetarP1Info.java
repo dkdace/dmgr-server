@@ -25,7 +25,7 @@ public final class MetarP1Info extends PassiveSkillInfo<MetarP1> {
                                 "자신의 밀쳐내기 효과는 받지 않습니다.")
                         .addValueInfo(TextIcon.UNDEFINED, "최대 {0}", MAX)
                         .addValueInfo(TextIcon.UNDEFINED, "초당 +{0}%", RECOVER_PER_SECOND)
-                        .addValueInfo(TextIcon.KNOCKBACK, "(중기갑)×{0}", KNOCKBACK_RESISTANCE_INCREMENT)
+                        .addValueInfo(TextIcon.KNOCKBACK, "(중기갑)×{0}%", KNOCKBACK_RESISTANCE_INCREMENT)
                         .build()));
     }
 }
