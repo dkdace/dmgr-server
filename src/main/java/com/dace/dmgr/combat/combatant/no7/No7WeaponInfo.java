@@ -17,7 +17,7 @@ public final class No7WeaponInfo extends WeaponInfo<No7Weapon> {
     /** 연사속도 */
     public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_300;
     /** 피해량 */
-    public static final int DAMAGE = 17;
+    public static final int DAMAGE = 16;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 20;
     /** 산탄 수 */
