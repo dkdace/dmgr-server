@@ -20,9 +20,9 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
     /** 이동 강도 */
     public static final double PUSH = 0.6;
     /** 피해량 */
-    public static final int DAMAGE = 80;
+    public static final int DAMAGE = 50;
     /** 보호막 */
-    public static final int SHIELD = 200;
+    public static final int SHIELD = 150;
     /** 사거리 (단위: 블록) */
     public static final double DISTANCE = 2;
     /** 판정 크기 (단위: 블록) */
