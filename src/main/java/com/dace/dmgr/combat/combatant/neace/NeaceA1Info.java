@@ -18,7 +18,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     /** 쿨타임 */
     public static final Timespan COOLDOWN = Timespan.ofSeconds(10);
     /** 초당 치유량 */
-    public static final int HEAL_PER_SECOND = 250;
+    public static final int HEAL_PER_SECOND = 200;
     /** 최대 치유량 */
     public static final int MAX_HEAL = 1000;
     /** 최대 거리 (단위: 블록) */
