@@ -20,7 +20,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 쿨타임 */
     public static final Timespan COOLDOWN = Timespan.ofSeconds(0.25);
     /** 피해량 */
-    public static final int DAMAGE = 70;
+    public static final int DAMAGE = 100;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 30;
     /** 투사체 속력 (단위: 블록/s) */
