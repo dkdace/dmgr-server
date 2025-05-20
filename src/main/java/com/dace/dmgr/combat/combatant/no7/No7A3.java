@@ -85,7 +85,7 @@ public final class No7A3 extends ActiveSkill {
         Location loc = combatUser.getLocation().add(0, 1, 0);
         loc.setYaw(0);
         loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(3 - i * 0.1);
+        Vector vector = VectorUtil.getRollAxis(loc).multiply(3 - i * 0.12);
         Vector axis = VectorUtil.getYawAxis(loc);
 
         long angle = i * 4;

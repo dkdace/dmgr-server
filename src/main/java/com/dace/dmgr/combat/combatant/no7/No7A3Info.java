@@ -67,8 +67,8 @@ public final class No7A3Info extends ActiveSkillInfo<No7A3> {
 
         /** 틱 입자 효과 (중심) */
         public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(4)
-                        .verticalSpread(0.8).build());
+                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(5)
+                        .verticalSpread(0.7).build());
         /** 틱 입자 효과 (장식) */
         public static final ParticleEffect TICK_DECO = new ParticleEffect(
                 ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT)
