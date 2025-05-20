@@ -68,7 +68,7 @@ public abstract class Guardian extends Combatant {
      */
     private static final class RoleTrait1Info extends TraitInfo {
         /** 넉백 저항 */
-        private static final int KNOCKBACK_RESISTANCE = 20;
+        private static final int KNOCKBACK_RESISTANCE = 25;
         /** 방어력 */
         private static final int DEFENSE = 15;
 

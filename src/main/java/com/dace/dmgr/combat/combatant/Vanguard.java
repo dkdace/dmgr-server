@@ -66,7 +66,7 @@ public abstract class Vanguard extends Combatant {
         /** 상태 효과 저항 */
         private static final int STATUS_EFFECT_RESISTANCE = 15;
         /** 넉백 저항 */
-        private static final int KNOCKBACK_RESISTANCE = 20;
+        private static final int KNOCKBACK_RESISTANCE = 25;
 
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
