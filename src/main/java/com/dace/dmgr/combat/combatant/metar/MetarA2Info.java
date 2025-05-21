@@ -43,6 +43,7 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
                         new ActionInfoLore.NamedSection("에너지 방벽", ActionInfoLore.Section
                                 .builder("공격을 막는 고정형 방벽입니다.")
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)
+                                .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                                 .build())));
     }
 
