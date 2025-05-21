@@ -118,7 +118,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            NeaceA1Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.8, 0));
+            NeaceA1Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
             if (provider == null || provider.isRemoved()) {
                 combatEntity.getStatusEffectModule().remove(this);

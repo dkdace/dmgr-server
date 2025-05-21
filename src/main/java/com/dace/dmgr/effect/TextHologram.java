@@ -60,7 +60,7 @@ public final class TextHologram {
      *
      * @param entity       고정할 엔티티
      * @param condition    홀로그램을 볼 수 있는 플레이어의 조건
-     * @param heightOffset 높이 오프셋. (단위: 0.4+{@code heightOffset}×0.3블록)
+     * @param heightOffset 높이 오프셋. (단위: 0.4+{@code heightOffset}×0.25블록)
      */
     public TextHologram(@NonNull Entity entity, @NonNull Predicate<@NonNull Player> condition, int heightOffset) {
         this.hologram = API.createHologram(entity.getLocation());
@@ -71,7 +71,7 @@ public final class TextHologram {
                 return false;
 
             setVisibility(entity.getWorld());
-            hologram.setPosition(entity.getLocation().add(0, entity.getHeight() + 0.4 + heightOffset * 0.3, 0));
+            hologram.setPosition(entity.getLocation().add(0, entity.getHeight() + 0.4 + heightOffset * 0.25, 0));
 
             return true;
         }, 1);
@@ -82,7 +82,7 @@ public final class TextHologram {
      *
      * @param entity       고정할 엔티티
      * @param condition    홀로그램을 볼 수 있는 플레이어의 조건
-     * @param heightOffset 높이 오프셋. (단위: 0.4+{@code heightOffset}×0.3블록)
+     * @param heightOffset 높이 오프셋. (단위: 0.4+{@code heightOffset}×0.25블록)
      * @param content      내용
      */
     public TextHologram(@NonNull Entity entity, @NonNull Predicate<@NonNull Player> condition, int heightOffset, @NonNull String content) {
