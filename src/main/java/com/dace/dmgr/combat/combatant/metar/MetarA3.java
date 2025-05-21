@@ -176,7 +176,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         private final class MetarA3Area extends Area<Damageable> {
             private MetarA3Area() {
-                super(combatUser, MetarA3Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
+                super(combatUser, MetarA3Info.RADIUS, MetarA3Projectile.this.entityCondition);
             }
 
             @Override

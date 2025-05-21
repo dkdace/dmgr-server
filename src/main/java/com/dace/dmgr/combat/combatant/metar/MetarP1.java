@@ -6,16 +6,19 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class MetarP1 extends AbstractSkill {
+    /** 중기갑 */
+    private double heavyArmor = MetarP1Info.MAX;
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(100);
+    private final AbilityStatus.Modifier modifier = new AbilityStatus.Modifier(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
 
     public MetarP1(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarP1Info.getInstance(), MetarP1Info.COOLDOWN, Timespan.MAX);
+        super(combatUser, MetarP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+        addOnReset(() -> heavyArmor = MetarP1Info.MAX);
     }
 
     @Override
@@ -25,14 +28,9 @@ public final class MetarP1 extends AbstractSkill {
     }
 
     @Override
-    @Nullable
+    @NonNull
     public String getActionBarString() {
-        if (!isCooldownFinished())
-            return ActionBarStringUtil.getCooldownBar(this);
-        else if (!isDurationFinished())
-            return skillInfo + " §a활성화";
-
-        return null;
+        return ActionBarStringUtil.getProgressBar(skillInfo.toString(), (int) heavyArmor, MetarP1Info.MAX);
     }
 
     @Override
@@ -43,23 +41,29 @@ public final class MetarP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getMoveModule().getResistanceStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().getResistanceStatus().addModifier(modifier);
 
-        MetarP1Info.Sounds.USE.play(combatUser.getLocation());
-
-        addActionTask(new IntervalTask(i -> combatUser.getEntity().isSneaking(), this::forceCancel, 1));
+        addActionTask(new IntervalTask(i -> !combatUser.getStatusEffectModule().hasType(StatusEffectType.SILENCE), this::forceCancel, 1));
     }
 
     @Override
     public boolean isCancellable() {
-        return combatUser.isDead();
+        return false;
     }
 
     @Override
     protected void onCancelled() {
-        setCooldown();
-        combatUser.getMoveModule().getResistanceStatus().removeModifier(MODIFIER);
+        setDuration(Timespan.ZERO);
+        combatUser.getMoveModule().getResistanceStatus().removeModifier(modifier);
+    }
 
-        MetarP1Info.Sounds.DISABLE.play(combatUser.getLocation());
+    /**
+     * 중기갑 수치를 증가시킨다.
+     *
+     * @param amount 증가량
+     */
+    void addValue(double amount) {
+        heavyArmor = Math.min(MetarP1Info.MAX, Math.max(0, heavyArmor + amount));
+        modifier.setIncrement(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
     }
 }

@@ -42,8 +42,7 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build()),
                         new ActionInfoLore.NamedSection("치유 광선", ActionInfoLore.Section
-                                .builder("바라보는 아군에게 치유 광선을 고정하여 지속적으로 <:HEAL:치유>합니다. " +
-                                        "<d::구원의 표식>이 있는 아군은 치유할 수 없습니다.")
+                                .builder("바라보는 아군에게 치유 광선을 고정하여 지속적으로 <:HEAL:치유>합니다.")
                                 .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, Heal.HEAL_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, Heal.MAX_DISTANCE)
                                 .build())));

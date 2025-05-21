@@ -18,7 +18,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     /** 쿨타임 */
     public static final Timespan COOLDOWN = Timespan.ofSeconds(10);
     /** 초당 치유량 */
-    public static final int HEAL_PER_SECOND = 250;
+    public static final int HEAL_PER_SECOND = 200;
     /** 최대 치유량 */
     public static final int MAX_HEAL = 1000;
     /** 최대 거리 (단위: 블록) */
@@ -33,7 +33,8 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
         super(NeaceA1.class, "구원의 표식",
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("바라보는 아군에게 표식을 남겨 일정 시간동안 <:HEAL:치유>합니다. " +
-                                "이미 표식이 있는 아군에게 사용할 수 없으며, 치유량이 최대치에 도달하거나 지속 시간이 지나면 사라집니다.")
+                                "이미 표식이 있는 아군에게 사용할 수 없으며, 치유량이 최대치에 도달하거나 지속 시간이 지나면 사라집니다. " +
+                                "기본 무기로 치유하고 있는 대상은 치유할 수 없습니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.HEAL, Format.PER_SECOND + " / 최대 {1}", HEAL_PER_SECOND, MAX_HEAL)
