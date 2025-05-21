@@ -990,7 +990,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         attackModule.getDamageMultiplierStatus().clearModifiers();
         healerModule.getHealMultiplierStatus().clearModifiers();
         damageModule.getDefenseMultiplierStatus().clearModifiers();
+        damageModule.getHealMultiplierStatus().clearModifiers();
         moveModule.getSpeedStatus().clearModifiers();
+        moveModule.getResistanceStatus().clearModifiers();
         coreManager.clear();
         actionManager.remove();
     }

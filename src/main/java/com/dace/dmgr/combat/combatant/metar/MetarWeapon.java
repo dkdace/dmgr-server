@@ -44,8 +44,6 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
         this.reloadModule = new ReloadModule(this, MetarWeaponInfo.CAPACITY, MetarWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, MetarWeaponInfo.FIRE_RATE);
-
-        addOnReset(() -> combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER));
     }
 
     @Override

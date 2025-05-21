@@ -33,10 +33,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     public No7Weapon(@NonNull CombatUser combatUser) {
         super(combatUser, No7WeaponInfo.getInstance(), Timespan.ZERO);
-
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, No7WeaponInfo.FIRE_RATE);
-
-        addOnReset(() -> combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER));
     }
 
     @Override
