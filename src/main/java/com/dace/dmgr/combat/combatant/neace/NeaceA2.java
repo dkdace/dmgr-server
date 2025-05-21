@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.combatant.neace;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
@@ -15,16 +15,15 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
-public final class NeaceA2 extends ActiveSkill {
+public final class NeaceA2 extends ChargeableSkill {
     /** 공격력 수정자 */
     private static final AbilityStatus.Modifier DAMAGE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DAMAGE_INCREMENT);
     /** 방어력 수정자 */
     private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
     public NeaceA2(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA2Info.getInstance(), NeaceA2Info.COOLDOWN, NeaceA2Info.DURATION, 1);
+        super(combatUser, NeaceA2Info.getInstance(), NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds(), 1);
     }
 
     @Override
@@ -34,12 +33,23 @@ public final class NeaceA2 extends ActiveSkill {
     }
 
     @Override
-    @Nullable
+    @NonNull
     public String getActionBarString() {
-        if (isDurationFinished())
-            return null;
+        String text = ActionBarStringUtil.getDurationBar(this, Timespan.ofSeconds(getStateValue()), Timespan.ofSeconds(maxStateValue));
+        if (!isDurationFinished())
+            text += ActionBarStringUtil.getKeyInfo(this, "해제");
 
-        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo(this, "해제");
+        return text;
+    }
+
+    @Override
+    protected double getStateValueDecrement() {
+        return 1;
+    }
+
+    @Override
+    protected double getStateValueIncrement() {
+        return getMaxStateValue() / NeaceA2Info.RECOVER_DURATION.toSeconds();
     }
 
     @Override
@@ -55,26 +65,29 @@ public final class NeaceA2 extends ActiveSkill {
         NeaceA2Info.Sounds.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
-            NeaceA2Info.Particles.TICK.play(combatUser.getCenterLocation());
-            if (i < 12)
-                playUseTickEffect(i);
-        }, 1, NeaceA2Info.DURATION.toTicks()));
-    }
+            if (getStateValue() <= 0)
+                return false;
 
-    @Override
-    protected void onDurationFinished() {
-        super.onDurationFinished();
-        combatUser.getActionManager().getWeapon().setGlowing(false);
+            NeaceA2Info.Particles.TICK.play(combatUser.getCenterLocation());
+            if (i < 10)
+                playUseTickEffect(i);
+
+            return true;
+        }, this::forceCancel, 1));
     }
 
     @Override
     public boolean isCancellable() {
-        return combatUser.isDead();
+        return combatUser.isDead() && !isDurationFinished();
     }
 
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+
+        combatUser.getActionManager().getWeapon().setGlowing(false);
+
+        NeaceA2Info.Sounds.DISABLE.play(combatUser.getLocation());
     }
 
     /**
@@ -95,7 +108,7 @@ public final class NeaceA2 extends ActiveSkill {
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            NeaceA2Info.Particles.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 11.0);
+            NeaceA2Info.Particles.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 9.0);
         }
     }
 
