@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.combat.interaction.Target;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -70,9 +69,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             case RIGHT_CLICK: {
                 if (target != null && (!target.canBeTargeted() || target.isRemoved() || targetResetTimestamp.isBefore(Timestamp.now())
                         || blockResetTimestamp.isBefore(Timestamp.now())
-                        || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.Heal.MAX_DISTANCE)) {
+                        || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.Heal.MAX_DISTANCE))
                     target = null;
-                }
 
                 if (target == null)
                     new NeaceWeaponRTarget().shot();
@@ -113,11 +111,21 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         if (isAmplifying)
             skill2.amplifyTarget(target);
-        else if (!target.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK))
+        else
             target.getDamageModule().heal(combatUser, NeaceWeaponInfo.Heal.HEAL_PER_SECOND / 20.0, true);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.8))
             (isAmplifying ? NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL).play(loc);
+    }
+
+    /**
+     * 대상이 치유를 받고 있는지 확인한다.
+     *
+     * @param target 확인할 대상
+     * @return 치유를 받고 있으면 {@code true} 반환
+     */
+    boolean isHealing(@NonNull Healable target) {
+        return this.target == target && targetResetTimestamp.isAfter(Timestamp.now());
     }
 
     private final class NeaceWeaponRTarget extends Target<Healable> {
