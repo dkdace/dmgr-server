@@ -3,7 +3,7 @@ version: '${project.version}'
 main: com.dace.dmgr.DMGR
 prefix: DMGR
 database: false
-depend: [ ProtocolLib, PacketWrapper, SkinsRestorer, Netherboard, Tabbed, HolographicDisplays, Citizens ]
+depend: [ ProtocolLib, PacketWrapper, Netherboard, Tabbed, HolographicDisplays, Citizens ]
 authors: [ DarkDace ]
 description: Core plugin of DMGR
 commands:

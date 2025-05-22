@@ -21,7 +21,7 @@ public final class EntityModule<T extends SummonEntity<?>> {
      * @param skill 대상 스킬
      */
     public EntityModule(@NonNull Summonable<T> skill) {
-        skill.addOnReset(this::disposeEntity);
+        skill.addOnReset(this::removeEntity);
     }
 
     /**
@@ -53,7 +53,7 @@ public final class EntityModule<T extends SummonEntity<?>> {
     /**
      * 소환한 엔티티가 지정되어 있으면 {@link SummonEntity#remove()}를 실행한다.
      */
-    public void disposeEntity() {
+    public void removeEntity() {
         if (summonEntity != null)
             summonEntity.remove();
     }

@@ -131,7 +131,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
             return (duration == Timespan.MAX || i < duration.toTicks()) && getDistanceFromStart() < maxDistance;
         }, () -> {
             if (!isDestroyed())
-                destroy();
+                destroy(false);
         }, 1);
 
         if (action != null)

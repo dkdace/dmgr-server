@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 
 /**
  * 피해를 받을 수 있는 엔티티의 모듈 클래스.
@@ -91,7 +92,7 @@ public class DamageModule {
      * 생명력 홀로그램을 생성한다.
      */
     private void createHealthBar() {
-        TextHologram textHologram = new TextHologram(combatEntity.getEntity(), target -> {
+        Predicate<Player> condition = target -> {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
             if (targetCombatUser == null)
                 return true;
@@ -102,7 +103,11 @@ public class DamageModule {
                         && LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
             } else
                 return targetCombatUser != combatEntity;
-        }, 0);
+        };
+
+        TextHologram healthHologram = new TextHologram(combatEntity.getEntity(), condition, 0);
+        TextHologram shieldHologram = new TextHologram(combatEntity.getEntity(), target -> getTotalShield() > 0 && condition.test(target),
+                1);
 
         combatEntity.addOnTick(i -> {
             ChatColor color;
@@ -115,9 +120,13 @@ public class DamageModule {
             else
                 color = ChatColor.GREEN;
 
-            textHologram.setContent(StringFormUtil.getProgressBar(getHealth(), getMaxHealth(), color));
+            healthHologram.setContent(StringFormUtil.getProgressBar(getHealth(), getMaxHealth(), color));
+            shieldHologram.setContent(StringFormUtil.getProgressBar(getTotalShield(), 1000, ChatColor.AQUA));
         });
-        combatEntity.addOnRemove(textHologram::remove);
+        combatEntity.addOnRemove(() -> {
+            healthHologram.remove();
+            shieldHologram.remove();
+        });
     }
 
     /**

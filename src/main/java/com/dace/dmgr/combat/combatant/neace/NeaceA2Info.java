@@ -15,13 +15,15 @@ import org.bukkit.Sound;
 
 public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
     /** 쿨타임 */
-    public static final Timespan COOLDOWN = Timespan.ofSeconds(7);
+    public static final Timespan COOLDOWN = Timespan.ofSeconds(1);
     /** 공격력 증가량 */
     public static final int DAMAGE_INCREMENT = 15;
     /** 방어력 증가량 */
     public static final int DEFENSE_INCREMENT = 15;
-    /** 지속시간 */
-    public static final Timespan DURATION = Timespan.ofSeconds(8);
+    /** 최대 지속시간 */
+    public static final Timespan MAX_DURATION = Timespan.ofSeconds(8);
+    /** 최대 충전 시간 */
+    public static final Timespan RECOVER_DURATION = Timespan.ofSeconds(6);
 
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 20;
@@ -34,7 +36,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 new ActionInfoLore(ActionInfoLore.Section
                         .builder("일정 시간동안 기본 무기의 치유 대상을 <3::축복>할 수 있습니다. " +
                                 "사용 중에는 기본 무기로 치유할 수 없습니다.")
-                        .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
+                        .addValueInfo(TextIcon.DURATION, Format.TIME_WITH_MAX_TIME, MAX_DURATION.toSeconds(), RECOVER_DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build(),
                         new ActionInfoLore.NamedSection("축복", ActionInfoLore.Section
@@ -42,7 +44,7 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                                 .addValueInfo(TextIcon.DAMAGE_INCREASE, Format.PERCENT, DAMAGE_INCREMENT)
                                 .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)
                                 .build()),
-                        new ActionInfoLore.NamedSection("지속시간 종료/재사용 시", ActionInfoLore.Section
+                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_2)
@@ -60,6 +62,9 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(1.4).build(),
                 SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.4).build());
+        /** 해제 */
+        public static final SoundEffect DISABLE = new SoundEffect(
+                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1).pitch(1.8).build());
     }
 
     /**

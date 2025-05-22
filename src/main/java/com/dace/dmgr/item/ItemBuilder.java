@@ -70,7 +70,7 @@ public final class ItemBuilder {
         this.itemMeta = itemStack.getItemMeta();
 
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-        gameProfile.getProperties().put("textures", new Property("textures", playerSkin.toProperty().getValue()));
+        gameProfile.getProperties().put("textures", new Property("textures", playerSkin.getSkin().getProperty().getValue()));
 
         try {
             ReflectionUtil.getField(itemMeta.getClass(), "profile").set(itemMeta, gameProfile);

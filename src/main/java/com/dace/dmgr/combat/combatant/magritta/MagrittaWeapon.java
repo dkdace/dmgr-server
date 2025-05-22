@@ -13,13 +13,11 @@ import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 
@@ -28,8 +26,6 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @NonNull
     @Getter
     private final ReloadModule reloadModule;
-    /** 블록 명중 횟수 */
-    private int blockHitCount = 0;
 
     public MagrittaWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaWeaponInfo.getInstance(), MagrittaWeaponInfo.COOLDOWN);
@@ -125,31 +121,28 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
      */
     void shot(boolean isUlt) {
         HashMap<Damageable, Integer> targets = new HashMap<>();
-        Vector dir = combatUser.getLocation().getDirection();
         double spread = MagrittaWeaponInfo.SPREAD;
         if (isUlt)
             spread *= 1.25;
 
-        new MagrittaWeaponHitscan(targets, isUlt).shot();
-        for (int i = 0; i < MagrittaWeaponInfo.PELLET_AMOUNT - 1; i++)
-            new MagrittaWeaponHitscan(targets, isUlt).shot(VectorUtil.getSpreadedVector(dir, spread));
+        CombatUtil.shotgun(i -> new MagrittaWeaponHitscan(targets, i == 0, isUlt), MagrittaWeaponInfo.PELLET_AMOUNT, spread);
 
         targets.forEach((target, hits) -> {
             if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
                 MagrittaT1.addShreddingValue(combatUser, target);
         });
-
-        blockHitCount = 0;
     }
 
     private final class MagrittaWeaponHitscan extends Hitscan<Damageable> {
         private final HashMap<Damageable, Integer> targets;
+        private final boolean isFirst;
         private final boolean isUlt;
 
-        private MagrittaWeaponHitscan(@NonNull HashMap<Damageable, Integer> targets, boolean isUlt) {
+        private MagrittaWeaponHitscan(@NonNull HashMap<Damageable, Integer> targets, boolean isFirst, boolean isUlt) {
             super(combatUser, EntityCondition.enemy(combatUser), Option.builder().maxDistance(MagrittaWeaponInfo.DISTANCE).build());
 
             this.targets = targets;
+            this.isFirst = isFirst;
             this.isUlt = isUlt;
         }
 
@@ -176,7 +169,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 if (isUlt)
                     MagrittaUltInfo.Particles.HIT_BLOCK.play(location);
 
-                if (blockHitCount++ == 0) {
+                if (isFirst) {
                     CombatEffectUtil.BULLET_HIT_BLOCK_SOUND.play(location);
                     CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
                 }

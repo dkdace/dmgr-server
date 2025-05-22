@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 
 public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     /** 보너스 점수 모듈 */
+    @NonNull
     @Getter
     private final BonusScoreModule bonusScoreModule;
 
@@ -112,7 +113,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
             projectile = null;
             if (isEnabled)
                 forceCancel();
@@ -175,7 +176,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         private final class MetarA3Area extends Area<Damageable> {
             private MetarA3Area() {
-                super(combatUser, MetarA3Info.RADIUS, EntityCondition.enemy(combatUser).include(combatUser));
+                super(combatUser, MetarA3Info.RADIUS, MetarA3Projectile.this.entityCondition);
             }
 
             @Override

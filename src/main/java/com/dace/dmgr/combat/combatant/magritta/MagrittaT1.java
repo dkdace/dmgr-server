@@ -54,7 +54,7 @@ public final class MagrittaT1 {
                             return LocationUtil.canPass(target.getEyeLocation(), victim.getCenterLocation());
 
                         return false;
-                    }, 1);
+                    }, 2);
 
                 shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
             }

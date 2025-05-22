@@ -22,7 +22,7 @@ import java.util.Iterator;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class GameTabListProfile implements TabListProfile {
     /** 미공개 상태의 플레이어 머리 스킨 */
-    private static final PlayerSkin UNKNOWN_PLAYER_SKIN = PlayerSkin.fromName("DTabUnknown");
+    private static final PlayerSkin UNKNOWN_PLAYER_SKIN = PlayerSkin.fromName("tab_unknown");
     /** 게임 유저 인스턴스 */
     private final GameUser gameUser;
 

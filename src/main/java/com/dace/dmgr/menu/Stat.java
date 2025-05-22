@@ -7,10 +7,12 @@ import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.task.AsyncTask;
 import lombok.NonNull;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.function.Consumer;
 
 /**
  * 전적 GUI 클래스.
@@ -29,8 +31,8 @@ public final class Stat extends ChestGUI {
 
         fillRow(0, GUIItem.EMPTY);
 
-        new AsyncTask<>((onFinish, onError) ->
-                set(0, 4, new DefinedItem(new ItemBuilder(userData.getProfileItem())
+        userData.getProfileItem().onFinish((Consumer<ItemStack>) itemStack ->
+                set(0, 4, new DefinedItem(new ItemBuilder(itemStack)
                         .setLore("",
                                 "§e승률 : §b{0}승 §f/ §c{1}패 §f({2}%)",
                                 "§e탈주 : §c{3}회",
@@ -59,7 +61,7 @@ public final class Stat extends ChestGUI {
         for (int i = 0; i < combatantTypes.length; i++) {
             UserData.CombatantRecord combatantRecord = userData.getCombatantRecord(combatantTypes[i]);
 
-            set(i + 9, new DefinedItem(combatantTypes[i].getProfileItem()), itemBuilder -> itemBuilder
+            set(i + 9, new DefinedItem(combatantTypes[i].getCombatant().getProfileItem()), itemBuilder -> itemBuilder
                     .setLore("",
                             "§e킬/데스 : §b{0} §f/ §c{1} §f({2})",
                             "§e플레이 시간 : §f{3}")

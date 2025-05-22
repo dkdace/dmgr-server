@@ -127,6 +127,11 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(15, location -> {

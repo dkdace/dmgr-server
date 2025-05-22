@@ -4,20 +4,16 @@ import com.dace.dmgr.user.Tier;
 import com.dace.dmgr.util.location.BlockRegion;
 import com.dace.dmgr.util.location.CuboidRegion;
 import com.dace.dmgr.util.location.GlobalLocation;
-import com.dace.dmgr.util.task.AsyncTask;
-import com.dace.dmgr.util.task.Initializable;
 import com.dace.dmgr.yaml.TypeToken;
 import com.dace.dmgr.yaml.YamlFile;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -25,36 +21,42 @@ import java.util.List;
 /**
  * 전역 설정 클래스.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GeneralConfig implements Initializable<Void> {
+public final class GeneralConfig {
     @Getter
     private static final GeneralConfig instance = new GeneralConfig();
 
     /** Yaml 파일 관리 인스턴스 */
-    private final YamlFile yamlFile = new YamlFile(Paths.get("config.yml"));
+    private final YamlFile yamlFile;
     /** 일반 설정 */
-    @Nullable
-    private Config config;
+    private final Config config;
     /** 자유 전투 설정 */
-    @Nullable
-    private FreeCombatConfig freeCombatConfig;
+    private final FreeCombatConfig freeCombatConfig;
     /** 훈련장 설정 */
-    @Nullable
-    private TrainingConfig trainingConfig;
+    private final TrainingConfig trainingConfig;
     /** 전투 시스템 관련 설정 */
-    @Nullable
-    private CombatConfig combatConfig;
+    private final CombatConfig combatConfig;
     /** 게임 관련 설정 */
-    @Nullable
-    private GameConfig gameConfig;
+    private final GameConfig gameConfig;
+
+    private GeneralConfig() {
+        this.yamlFile = new YamlFile(Paths.get("config.yml"));
+        this.yamlFile.initSync();
+
+        this.config = new Config();
+        this.freeCombatConfig = new FreeCombatConfig();
+        this.trainingConfig = new TrainingConfig();
+        this.combatConfig = new CombatConfig();
+        this.gameConfig = new GameConfig();
+
+        ConsoleLogger.info("전역 설정 불러오기 완료");
+    }
 
     /**
      * @return 일반 설정
      */
     @NonNull
     public static Config getConfig() {
-        instance.validate();
-        return Validate.notNull(instance.config);
+        return instance.config;
     }
 
     /**
@@ -62,8 +64,7 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NonNull
     public static FreeCombatConfig getFreeCombatConfig() {
-        instance.validate();
-        return Validate.notNull(instance.freeCombatConfig);
+        return instance.freeCombatConfig;
     }
 
     /**
@@ -71,8 +72,7 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NonNull
     public static TrainingConfig getTrainingConfig() {
-        instance.validate();
-        return Validate.notNull(instance.trainingConfig);
+        return instance.trainingConfig;
     }
 
     /**
@@ -80,8 +80,7 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NonNull
     public static CombatConfig getCombatConfig() {
-        instance.validate();
-        return Validate.notNull(instance.combatConfig);
+        return instance.combatConfig;
     }
 
     /**
@@ -89,8 +88,7 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NonNull
     public static GameConfig getGameConfig() {
-        instance.validate();
-        return Validate.notNull(instance.gameConfig);
+        return instance.gameConfig;
     }
 
     @NonNull
@@ -98,35 +96,14 @@ public final class GeneralConfig implements Initializable<Void> {
         return globalLocations.stream().map(globalLocation -> globalLocation.toLocation(world)).toArray(Location[]::new);
     }
 
-    @Override
-    @NonNull
-    public AsyncTask<Void> init() {
-        return yamlFile.init()
-                .onFinish(() -> {
-                    config = new Config();
-                    freeCombatConfig = new FreeCombatConfig();
-                    trainingConfig = new TrainingConfig();
-                    combatConfig = new CombatConfig();
-                    gameConfig = new GameConfig();
-
-                    ConsoleLogger.info("전역 설정 불러오기 완료");
-                })
-                .onError(ex -> ConsoleLogger.severe("전역 설정 불러오기 실패", ex));
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return yamlFile.isInitialized();
-    }
-
     /**
      * 일반 설정.
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class Config {
+    public final class Config {
         /** Yaml 섹션 인스턴스 */
-        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("default");
+        private final YamlFile.Section section = yamlFile.getDefaultSection().getSection("default");
 
         /** 리소스팩 URL */
         @NonNull
@@ -179,9 +156,9 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class FreeCombatConfig {
+    public final class FreeCombatConfig {
         /** Yaml 섹션 인스턴스 */
-        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("free_combat");
+        private final YamlFile.Section section = yamlFile.getDefaultSection().getSection("free_combat");
 
         /** 월드 */
         @NonNull
@@ -221,9 +198,9 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class TrainingConfig {
+    public final class TrainingConfig {
         /** Yaml 섹션 인스턴스 */
-        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("training");
+        private final YamlFile.Section section = yamlFile.getDefaultSection().getSection("training");
 
         /** 월드 */
         @NonNull
@@ -257,9 +234,9 @@ public final class GeneralConfig implements Initializable<Void> {
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         @Getter
-        public static final class DefaultDummyConfig {
+        public final class DefaultDummyConfig {
             /** Yaml 섹션 인스턴스 */
-            private static final YamlFile.Section section = TrainingConfig.section.getSection("default_dummy");
+            private final YamlFile.Section section = TrainingConfig.this.section.getSection("default_dummy");
 
             /** 리스폰 시간 */
             @NonNull
@@ -332,9 +309,9 @@ public final class GeneralConfig implements Initializable<Void> {
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         @Getter
-        public static final class ArenaConfig {
+        public final class ArenaConfig {
             /** Yaml 섹션 인스턴스 */
-            private static final YamlFile.Section section = TrainingConfig.section.getSection("arena");
+            private final YamlFile.Section section = TrainingConfig.this.section.getSection("arena");
 
             /** 지역 */
             @NonNull
@@ -359,9 +336,9 @@ public final class GeneralConfig implements Initializable<Void> {
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         @Getter
-        public static final class EffectTestBlockConfig {
+        public final class EffectTestBlockConfig {
             /** Yaml 섹션 인스턴스 */
-            private static final YamlFile.Section section = TrainingConfig.section.getSection("effect_test_block");
+            private final YamlFile.Section section = TrainingConfig.this.section.getSection("effect_test_block");
 
             /** 블록의 타입 */
             @NonNull
@@ -448,9 +425,9 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class CombatConfig {
+    public final class CombatConfig {
         /** Yaml 섹션 인스턴스 */
-        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("combat");
+        private final YamlFile.Section section = yamlFile.getDefaultSection().getSection("combat");
 
         /** 초당 궁극기 충전량 */
         private final int idleUltChargePerSecond = section.getEntry("idle_ult_charge_per_second", 10).get();
@@ -490,9 +467,9 @@ public final class GeneralConfig implements Initializable<Void> {
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
-    public static final class GameConfig {
+    public final class GameConfig {
         /** Yaml 섹션 인스턴스 */
-        private static final YamlFile.Section section = instance.yamlFile.getDefaultSection().getSection("game");
+        private final YamlFile.Section section = yamlFile.getDefaultSection().getSection("game");
 
         /** 일반 게임과 랭크 게임의 최대 방 갯수 */
         private final int maxRoomCount = section.getEntry("max_room_count", 5).get();

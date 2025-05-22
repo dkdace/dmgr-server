@@ -52,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
@@ -209,15 +210,15 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.killContributorManager = new KillContributorManager(this);
         this.killHelperManager = new KillHelperManager();
 
-        this.combatantType = combatantType;
-        this.combatant = combatantType.getCombatant();
-        this.actionManager = new ActionManager(this);
-
         this.attackModule = new AttackModule();
         this.healerModule = new HealerModule();
         this.damageModule = new HealModule(this, 1000, true);
         this.statusEffectModule = new StatusEffectModule(this);
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+
+        this.combatantType = combatantType;
+        this.combatant = combatantType.getCombatant();
+        this.actionManager = new ActionManager(this);
 
         user.getSidebarManager().clear();
         user.getGui().set(8, MENU_ITEM);
@@ -225,7 +226,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setCombatantType(combatantType);
 
         addOnTick(this::onTick);
-        addOnRemove(this::onDispose);
+        addOnRemove(this::onRemove);
     }
 
     /**
@@ -274,12 +275,12 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /**
      * 제거되었을 때 실행할 작업.
      */
-    private void onDispose() {
+    private void onRemove() {
         if (deathMentHologram != null)
             deathMentHologram.remove();
 
         if (DMGR.getPlugin().isEnabled())
-            user.resetSkin();
+            PlayerSkin.fromUUID(entity.getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(entity));
 
         reset();
     }
@@ -961,7 +962,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         combatant.onSet(this);
 
-        addTask(user.applySkin(PlayerSkin.fromName(combatant.getSkinName())));
+        combatant.getPlayerSkin().applySkin(entity);
+
         addTask(new IntervalTask((LongConsumer) i ->
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
                 1, 10));
@@ -988,7 +990,9 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         attackModule.getDamageMultiplierStatus().clearModifiers();
         healerModule.getHealMultiplierStatus().clearModifiers();
         damageModule.getDefenseMultiplierStatus().clearModifiers();
+        damageModule.getHealMultiplierStatus().clearModifiers();
         moveModule.getSpeedStatus().clearModifiers();
+        moveModule.getResistanceStatus().clearModifiers();
         coreManager.clear();
         actionManager.remove();
     }

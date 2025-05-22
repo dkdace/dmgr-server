@@ -46,7 +46,7 @@ public final class CoreList extends ChestGUI {
             Set<Core> cores = UserData.fromPlayer(player).getCombatantRecord(combatantType).getCores();
             boolean hasAllCores = cores.size() == Core.values().length;
 
-            set(i, new DefinedItem(combatantType.getProfileItem(), new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
+            set(i, new DefinedItem(combatantType.getCombatant().getProfileItem(), new DefinedItem.ClickHandler(ClickType.LEFT, target -> {
                 if (hasAllCores)
                     return false;
 

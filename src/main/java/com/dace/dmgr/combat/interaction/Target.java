@@ -27,6 +27,11 @@ public abstract class Target<T extends CombatEntity> extends Hitscan<T> {
     }
 
     @Override
+    protected final boolean canBeRemoved() {
+        return false;
+    }
+
+    @Override
     @NonNull
     protected final IntervalHandler getIntervalHandler() {
         return (location, i) -> true;

@@ -2,58 +2,53 @@ package com.dace.dmgr.event;
 
 import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.event.listener.*;
+import com.dace.dmgr.util.ReflectionUtil;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.Validate;
 
 /**
  * 이벤트 처리기를 등록하는 클래스.
  */
 @UtilityClass
 public final class EventListenerManager {
-    /**
-     * 모든 이벤트 처리기를 등록한다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    public static void register() {
-        Validate.notNull(OnAsyncPlayerChat.getInstance());
-        Validate.notNull(OnBlockBreak.getInstance());
-        Validate.notNull(OnBlockBurn.getInstance());
-        Validate.notNull(OnBlockFade.getInstance());
-        Validate.notNull(OnBlockPlace.getInstance());
-        Validate.notNull(OnChunkUnload.getInstance());
-        Validate.notNull(OnEntityDamage.getInstance());
-        Validate.notNull(OnEntityDamageByEntity.getInstance());
-        Validate.notNull(OnEntityDeath.getInstance());
-        Validate.notNull(OnEntityShootBowEvent.getInstance());
-        Validate.notNull(OnEntityTarget.getInstance());
-        Validate.notNull(OnFoodLevelChange.getInstance());
-        Validate.notNull(OnInventoryClick.getInstance());
-        Validate.notNull(OnInventoryClose.getInstance());
-        Validate.notNull(OnPlayerArmorStandManipulate.getInstance());
-        Validate.notNull(OnPlayerBucketEmpty.getInstance());
-        Validate.notNull(OnPlayerBucketFill.getInstance());
-        Validate.notNull(OnPlayerCommandPreprocess.getInstance());
-        Validate.notNull(OnPlayerDropItem.getInstance());
-        Validate.notNull(OnPlayerInteract.getInstance());
-        Validate.notNull(OnPlayerInteractEntity.getInstance());
-        Validate.notNull(OnPlayerItemHeld.getInstance());
-        Validate.notNull(OnPlayerJoin.getInstance());
-        Validate.notNull(OnPlayerMove.getInstance());
-        Validate.notNull(OnPlayerQuit.getInstance());
-        Validate.notNull(OnPlayerResourcePackStatus.getInstance());
-        Validate.notNull(OnPlayerSwapHandItems.getInstance());
-        Validate.notNull(OnPlayerToggleFlight.getInstance());
-        Validate.notNull(OnPlayerToggleSprint.getInstance());
-        Validate.notNull(OnTabComplete.getInstance());
-        Validate.notNull(OnWeatherChange.getInstance());
+    static {
+        ReflectionUtil.loadClass(OnAsyncPlayerChat.class);
+        ReflectionUtil.loadClass(OnBlockBreak.class);
+        ReflectionUtil.loadClass(OnBlockBurn.class);
+        ReflectionUtil.loadClass(OnBlockFade.class);
+        ReflectionUtil.loadClass(OnBlockPlace.class);
+        ReflectionUtil.loadClass(OnChunkUnload.class);
+        ReflectionUtil.loadClass(OnEntityDamage.class);
+        ReflectionUtil.loadClass(OnEntityDamageByEntity.class);
+        ReflectionUtil.loadClass(OnEntityDeath.class);
+        ReflectionUtil.loadClass(OnEntityShootBowEvent.class);
+        ReflectionUtil.loadClass(OnEntityTarget.class);
+        ReflectionUtil.loadClass(OnFoodLevelChange.class);
+        ReflectionUtil.loadClass(OnInventoryClick.class);
+        ReflectionUtil.loadClass(OnInventoryClose.class);
+        ReflectionUtil.loadClass(OnPlayerArmorStandManipulate.class);
+        ReflectionUtil.loadClass(OnPlayerBucketEmpty.class);
+        ReflectionUtil.loadClass(OnPlayerBucketFill.class);
+        ReflectionUtil.loadClass(OnPlayerCommandPreprocess.class);
+        ReflectionUtil.loadClass(OnPlayerDropItem.class);
+        ReflectionUtil.loadClass(OnPlayerInteract.class);
+        ReflectionUtil.loadClass(OnPlayerInteractEntity.class);
+        ReflectionUtil.loadClass(OnPlayerItemHeld.class);
+        ReflectionUtil.loadClass(OnPlayerJoin.class);
+        ReflectionUtil.loadClass(OnPlayerMove.class);
+        ReflectionUtil.loadClass(OnPlayerQuit.class);
+        ReflectionUtil.loadClass(OnPlayerResourcePackStatus.class);
+        ReflectionUtil.loadClass(OnPlayerSwapHandItems.class);
+        ReflectionUtil.loadClass(OnPlayerToggleFlight.class);
+        ReflectionUtil.loadClass(OnPlayerToggleSprint.class);
+        ReflectionUtil.loadClass(OnTabComplete.class);
+        ReflectionUtil.loadClass(OnWeatherChange.class);
 
-        Validate.notNull(OnPlayClientUseEntity.getInstance());
-        Validate.notNull(OnPlayServerAbilities.getInstance());
-        Validate.notNull(OnPlayServerCustomSoundEffect.getInstance());
-        Validate.notNull(OnPlayServerNamedSoundEffect.getInstance());
-        Validate.notNull(OnPlayServerPlayerInfo.getInstance());
-        Validate.notNull(OnPlayServerUpdateHealth.getInstance());
+        ReflectionUtil.loadClass(OnPlayClientUseEntity.class);
+        ReflectionUtil.loadClass(OnPlayServerAbilities.class);
+        ReflectionUtil.loadClass(OnPlayServerCustomSoundEffect.class);
+        ReflectionUtil.loadClass(OnPlayServerNamedSoundEffect.class);
+        ReflectionUtil.loadClass(OnPlayServerPlayerInfo.class);
+        ReflectionUtil.loadClass(OnPlayServerUpdateHealth.class);
 
         ConsoleLogger.info("이벤트 등록 완료");
     }

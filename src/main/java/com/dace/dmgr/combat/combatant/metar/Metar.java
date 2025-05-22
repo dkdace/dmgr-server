@@ -32,7 +32,8 @@ public final class Metar extends Guardian {
             SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7).pitch(0.85).pitchVariance(0.1).build());
 
     private Metar() {
-        super(null, "METAR", "군용 차세대 전술 돌격 로봇", "DVMetar", Species.ROBOT, '\u32DA', 2, 2500, 0.8, 1.8);
+        super("METAR", "군용 차세대 전술 돌격 로봇", "ch_metar", null, Species.ROBOT, '\u32DA', 2,
+                2500, 0.8, 1.8);
     }
 
     @Override
@@ -105,13 +106,21 @@ public final class Metar extends Guardian {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        if (combatUser.getEntity().isSneaking())
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        MetarP1 skillp1 = combatUser.getActionManager().getSkill(MetarP1Info.getInstance());
+        skillp1.addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
+
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
         FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+    }
+
+    @Override
+    public void onKnockbacked(@NonNull CombatUser victim, double speed) {
+        MetarP1 skillp1 = victim.getActionManager().getSkill(MetarP1Info.getInstance());
+        skillp1.addValue(-speed * MetarP1Info.DECREASE_MULTIPLIER);
     }
 
     @Override

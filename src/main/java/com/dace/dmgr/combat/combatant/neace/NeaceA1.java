@@ -120,13 +120,14 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
         public void onTick(@NonNull Damageable combatEntity, long i) {
             NeaceA1Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
-            if (!(combatEntity instanceof Healable) || ((Healable) combatEntity).getDamageModule().isFullHealth())
-                return;
-
             if (provider == null || provider.isRemoved()) {
                 combatEntity.getStatusEffectModule().remove(this);
                 return;
             }
+
+            if (!(combatEntity instanceof Healable) || ((Healable) combatEntity).getDamageModule().isFullHealth()
+                    || ((NeaceWeapon) provider.getActionManager().getWeapon()).isHealing((Healable) combatEntity))
+                return;
 
             double amount = NeaceA1Info.HEAL_PER_SECOND / 20.0;
             if (((Healable) combatEntity).getDamageModule().heal(provider, amount, true))

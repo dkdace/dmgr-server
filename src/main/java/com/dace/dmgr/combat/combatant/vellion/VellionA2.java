@@ -275,8 +275,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
             }
 
             VellionA2Info.Particles.HIT_ENTITY_MARK_CORE.play(location);
-            for (Location loc2 : LocationUtil.getLine(effectLoc, location, 0.4))
-                VellionA2Info.Particles.HIT_ENTITY_MARK_DECO.play(loc2);
+            for (Location loc : LocationUtil.getLine(effectLoc, location, 0.4))
+                VellionA2Info.Particles.HIT_ENTITY_MARK_DECO.play(loc);
 
             return !(target instanceof Barrier);
         }

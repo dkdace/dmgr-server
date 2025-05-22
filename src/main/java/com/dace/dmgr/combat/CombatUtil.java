@@ -5,6 +5,8 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.interaction.Bullet;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.IntFunction;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -184,5 +187,26 @@ public final class CombatUtil {
         combatUser.addYawAndPitch(
                 RandomUtils.nextDouble(0, yawSpread) - RandomUtils.nextDouble(0, yawSpread),
                 RandomUtils.nextDouble(0, pitchSpread) - RandomUtils.nextDouble(0, pitchSpread));
+    }
+
+    /**
+     * 동시에 여러 총알을 발사한다.
+     *
+     * @param bulletFunction 발사할 총알 반환에 실행할 작업.
+     *
+     *                       <p>인덱스 (0부터 시작)를 인자로 받으며, 0번째 총알은 탄퍼짐 없이 발사됨</p>
+     * @param amount         산탄 수. 2 이상의 값
+     * @param spread         탄퍼짐. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    public static void shotgun(@NonNull IntFunction<@NonNull Bullet<?>> bulletFunction, int amount, double spread) {
+        Validate.isTrue(amount >= 2, "amount >= 0 (%f)", amount);
+        Validate.isTrue(spread >= 0, "spread >= 0 (%f)", spread);
+
+        bulletFunction.apply(0).shot();
+        for (int i = 1; i < amount; i++) {
+            Bullet<?> bullet = bulletFunction.apply(i);
+            bullet.shot(VectorUtil.getSpreadedVector(bullet.getShooter().getLocation().getDirection(), spread));
+        }
     }
 }

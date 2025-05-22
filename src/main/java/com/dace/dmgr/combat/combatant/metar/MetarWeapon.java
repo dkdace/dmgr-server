@@ -22,16 +22,17 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-@Getter
 public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 수정자 */
     private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MetarWeaponInfo.SLOW);
 
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
     @NonNull
+    @Getter
     private final FullAutoModule fullAutoModule;
     /** 이동속도 감소 타임스탬프 */
     private Timestamp slowTimestamp = Timestamp.now();
@@ -43,8 +44,6 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
         this.reloadModule = new ReloadModule(this, MetarWeaponInfo.CAPACITY, MetarWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, MetarWeaponInfo.FIRE_RATE);
-
-        addOnReset(() -> combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER));
     }
 
     @Override
@@ -166,7 +165,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                double damage = CombatUtil.getDistantDamage(MetarWeaponInfo.DAMAGE, getTravelDistance(), MetarWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
+                double damage = CombatUtil.getDistantDamage(MetarWeaponInfo.DAMAGE, getTravelDistance(), MetarWeaponInfo.DISTANCE / 2.0);
 
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true);
                 return false;

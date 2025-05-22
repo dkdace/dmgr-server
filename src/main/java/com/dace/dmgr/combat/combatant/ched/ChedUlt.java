@@ -155,6 +155,11 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         }
 
         @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(15, location -> {

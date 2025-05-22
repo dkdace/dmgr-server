@@ -27,7 +27,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     /** 치유량 */
     public static final int HEAL = 300;
     /** 치유 투사체 크기 (단위: 블록) */
-    public static final double HEAL_SIZE = 0.2;
+    public static final double HEAL_SIZE = 0.16;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 30;
     /** 장탄수 */

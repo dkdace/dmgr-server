@@ -66,7 +66,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
-        entityModule.disposeEntity();
+        entityModule.removeEntity();
 
         JagerUltInfo.Sounds.USE.play(combatUser.getLocation());
 
@@ -98,8 +98,9 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         }
 
         @Override
-        protected void onDestroy(@NonNull Location location) {
-            entityModule.set(new JagerUltEntity(location));
+        protected void onDestroy(@NonNull Location location, boolean isForce) {
+            if (!isForce)
+                entityModule.set(new JagerUltEntity(location));
         }
 
         @Override

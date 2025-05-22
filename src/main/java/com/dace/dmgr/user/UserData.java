@@ -34,7 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 public final class UserData implements Initializable<Void> {
     /** 유저 데이터 목록 (UUID : 유저 데이터 정보) */
     private static final HashMap<UUID, UserData> USER_DATA_MAP = new HashMap<>();
+
     /** 차단 상태에서 접속 시도 시 표시되는 메시지 */
     private static final String MESSAGE_BANNED = String.join("\n",
             "§c관리자에 의해 서버에서 차단되었습니다.",
@@ -61,6 +62,18 @@ public final class UserData implements Initializable<Void> {
     /** 티어 강등 효과음 */
     private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
+
+    static {
+        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
+            userDataPaths.map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
+                    .forEach(userData -> {
+                        userData.yamlFile.initSync();
+                        userData.onInit();
+                    });
+        } catch (Exception ex) {
+            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
+        }
+    }
 
     /** 플레이어 UUID */
     @NonNull
@@ -185,28 +198,6 @@ public final class UserData implements Initializable<Void> {
     }
 
     /**
-     * 접속했던 모든 플레이어의 유저 데이터를 불러온다.
-     *
-     * <p>플러그인 활성화 시 호출해야 한다.</p>
-     */
-    @NonNull
-    public static AsyncTask<Void> initAllUserDatas() {
-        List<AsyncTask<?>> userDataInitTasks = Collections.emptyList();
-
-        try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
-            userDataInitTasks = userDataPaths
-                    .map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
-                    .filter(userData -> !userData.isInitialized())
-                    .map(UserData::init)
-                    .collect(Collectors.toList());
-        } catch (Exception ex) {
-            ConsoleLogger.severe("전체 유저 데이터를 불러올 수 없음", ex);
-        }
-
-        return AsyncTask.all(userDataInitTasks);
-    }
-
-    /**
      * 모든 유저의 데이터 정보를 반환한다.
      *
      * @return 유저 데이터 정보 인스턴스 목록
@@ -221,12 +212,16 @@ public final class UserData implements Initializable<Void> {
     @NonNull
     public AsyncTask<Void> init() {
         return yamlFile.init()
-                .onFinish(() -> {
-                    yamlFile.getDefaultSection().getEntry("playerName", "").set(playerName);
-
-                    ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
-                })
+                .onFinish(this::onInit)
                 .onError(ex -> ConsoleLogger.severe("{0}의 유저 데이터 불러오기 실패", ex, playerName));
+    }
+
+    /**
+     * 유저 데이터 초기화 완료 시 실행할 작업.
+     */
+    private void onInit() {
+        yamlFile.getDefaultSection().getEntry("playerName", "").set(playerName);
+        ConsoleLogger.info("{0}의 유저 데이터 불러오기 완료", playerName);
     }
 
     @Override
@@ -237,13 +232,11 @@ public final class UserData implements Initializable<Void> {
     /**
      * 유저의 데이터 정보를 저장한다.
      */
-    @Nullable
-    public AsyncTask<Void> save() {
+    public void save() {
         if (DMGR.getPlugin().isEnabled())
-            return yamlFile.save();
-
-        yamlFile.saveSync();
-        return null;
+            yamlFile.save();
+        else
+            yamlFile.saveSync();
     }
 
     /**
@@ -682,8 +675,9 @@ public final class UserData implements Initializable<Void> {
      * @return 프로필 정보 아이템
      */
     @NonNull
-    public ItemStack getProfileItem() {
-        return new ItemBuilder(PlayerSkin.fromUUID(playerUUID)).setName(getDisplayName()).build();
+    public AsyncTask<@NonNull ItemStack> getProfileItem() {
+        return PlayerSkin.fromUUID(playerUUID)
+                .onFinish((Function<PlayerSkin, ItemStack>) playerSkin -> new ItemBuilder(playerSkin).setName(getDisplayName()).build());
     }
 
     /**

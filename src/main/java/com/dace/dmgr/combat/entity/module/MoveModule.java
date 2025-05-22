@@ -5,6 +5,7 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.EntityUtil;
 import lombok.Getter;
 import lombok.NonNull;
@@ -151,8 +152,11 @@ public final class MoveModule {
     public void knockback(@NonNull Vector velocity, boolean isReset) {
         knockbackTimestamp = Timestamp.now().plus(Timespan.ofTicks(3));
 
-        Vector finalVelocity = velocity.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
+        Vector finalVelocity = velocity.clone().multiply(Math.max(0, 2 - resistanceStatus.getValue()));
         combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));
+
+        if (combatEntity instanceof CombatUser)
+            ((CombatUser) combatEntity).getCombatantType().getCombatant().onKnockbacked((CombatUser) combatEntity, velocity.length());
     }
 
     /**
