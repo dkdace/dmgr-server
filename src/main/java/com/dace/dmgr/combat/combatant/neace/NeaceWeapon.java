@@ -125,7 +125,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
      * @return 치유를 받고 있으면 {@code true} 반환
      */
     boolean isHealing(@NonNull Healable target) {
-        return this.target == target && targetResetTimestamp.isAfter(Timestamp.now());
+        return combatUser.getActionManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished() && this.target == target
+                && targetResetTimestamp.isAfter(Timestamp.now());
     }
 
     private final class NeaceWeaponRTarget extends Target<Healable> {
