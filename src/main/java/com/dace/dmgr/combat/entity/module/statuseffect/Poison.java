@@ -14,7 +14,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 독 상태 효과를 처리하는 클래스.
  */
-public class Poison extends StatusEffect {
+public class Poison implements StatusEffect {
     /** 틱 입자 효과 */
     private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(Particle.DAMAGE_INDICATOR)
@@ -37,11 +37,20 @@ public class Poison extends StatusEffect {
      * @param isUlt           궁극기 제공 여부
      */
     public Poison(@NonNull Attacker attacker, double damagePerSecond, boolean isUlt) {
-        super(StatusEffectType.POISON, false);
-
         this.attacker = attacker;
         this.damagePerSecond = damagePerSecond;
         this.isUlt = isUlt;
+    }
+
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.POISON;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

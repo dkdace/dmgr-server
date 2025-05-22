@@ -33,7 +33,18 @@ public final class JagerT1 {
         private final AbilityStatus.Modifier modifier = new AbilityStatus.Modifier(0);
 
         public FreezeValue() {
-            super(StatusEffectType.SLOW, false, JagerT1Info.MAX);
+            super(JagerT1Info.MAX);
+        }
+
+        @Override
+        @NonNull
+        public StatusEffectType getStatusEffectType() {
+            return StatusEffectType.SLOW;
+        }
+
+        @Override
+        public boolean isPositive() {
+            return false;
         }
 
         @Override

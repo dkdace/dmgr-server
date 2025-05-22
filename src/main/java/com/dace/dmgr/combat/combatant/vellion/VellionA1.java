@@ -127,9 +127,10 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     /**
      * 회복 상태 효과 클래스.
      */
-    private final class VellionA1Heal extends StatusEffect {
-        private VellionA1Heal() {
-            super(true);
+    private final class VellionA1Heal implements StatusEffect {
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override

@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -41,7 +40,12 @@ public final class MagrittaT1 {
         private Burning burning;
 
         public ShreddingValue() {
-            super(StatusEffectType.NONE, false, MagrittaT1Info.MAX);
+            super(MagrittaT1Info.MAX);
+        }
+
+        @Override
+        public boolean isPositive() {
+            return false;
         }
 
         private void addValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {

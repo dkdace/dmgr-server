@@ -11,7 +11,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 화염 상태 효과를 처리하는 클래스.
  */
-public class Burning extends StatusEffect {
+public class Burning implements StatusEffect {
     /** 화염 피해 효과음 */
     private static final SoundEffect BURNING_DAMAGE_SOUND = new SoundEffect(
             SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build());
@@ -31,11 +31,20 @@ public class Burning extends StatusEffect {
      * @param isUlt           궁극기 제공 여부
      */
     public Burning(@NonNull Attacker attacker, double damagePerSecond, boolean isUlt) {
-        super(StatusEffectType.BURNING, false);
-
         this.attacker = attacker;
         this.damagePerSecond = damagePerSecond;
         this.isUlt = isUlt;
+    }
+
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.BURNING;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

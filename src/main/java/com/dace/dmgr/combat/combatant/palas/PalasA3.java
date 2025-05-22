@@ -81,12 +81,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     /**
      * 체력 증가 상태 효과 클래스.
      */
-    private final class PalasA3HealthIncrease extends StatusEffect {
+    private final class PalasA3HealthIncrease implements StatusEffect {
         /** 증가한 최대 체력 */
         private int increasedMaxHealth;
 
-        private PalasA3HealthIncrease() {
-            super(true);
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override
@@ -121,12 +122,13 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     /**
      * 체력 감소 상태 효과 클래스.
      */
-    private final class PalasA3HealthDecrease extends StatusEffect {
+    private final class PalasA3HealthDecrease implements StatusEffect {
         /** 감소한 최대 체력 */
         private int decreasedMaxHealth;
 
-        private PalasA3HealthDecrease() {
-            super(false);
+        @Override
+        public boolean isPositive() {
+            return false;
         }
 
         @Override

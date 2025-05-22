@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -14,19 +15,21 @@ import java.util.Set;
 /**
  * 침묵 상태 효과를 처리하는 클래스.
  */
-public class Silence extends StatusEffect {
+@AllArgsConstructor
+public class Silence implements StatusEffect {
     /** 공격자 */
     @Nullable
     private final CombatUser attacker;
 
-    /**
-     * 침묵 상태 효과 인스턴스를 생성한다.
-     *
-     * @param attacker 공격자
-     */
-    public Silence(@Nullable CombatUser attacker) {
-        super(StatusEffectType.SILENCE, false);
-        this.attacker = attacker;
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SILENCE;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

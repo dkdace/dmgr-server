@@ -4,7 +4,9 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.util.EnumSet;
@@ -13,15 +15,20 @@ import java.util.Set;
 /**
  * 고정 상태 효과를 처리하는 클래스.
  */
-public class Grounding extends StatusEffect {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Grounding implements StatusEffect {
     @Getter
     private static final Grounding instance = new Grounding();
 
-    /**
-     * 고정 상태 효과 인스턴스를 생성한다.
-     */
-    protected Grounding() {
-        super(StatusEffectType.GROUNDING, false);
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.GROUNDING;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override
@@ -42,7 +49,7 @@ public class Grounding extends StatusEffect {
 
     @Override
     @NonNull
-    public Set<@NonNull CombatRestriction> getCombatRestrictions(@NonNull Damageable combatEntity) {
+    public final Set<@NonNull CombatRestriction> getCombatRestrictions(@NonNull Damageable combatEntity) {
         return EnumSet.of(CombatRestriction.ACTION_MOVE);
     }
 }

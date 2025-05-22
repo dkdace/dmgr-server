@@ -9,7 +9,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
 import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -108,7 +107,12 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
         private CombatUser provider;
 
         public NeaceA1Mark() {
-            super(StatusEffectType.NONE, true, NeaceA1Info.MAX_HEAL);
+            super(NeaceA1Info.MAX_HEAL);
+        }
+
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override

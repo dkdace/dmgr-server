@@ -4,7 +4,9 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.util.EnumSet;
@@ -13,15 +15,20 @@ import java.util.Set;
 /**
  * 속박 상태 효과를 처리하는 클래스.
  */
-public class Snare extends StatusEffect {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Snare implements StatusEffect {
     @Getter
     private static final Snare instance = new Snare();
 
-    /**
-     * 속박 상태 효과 인스턴스를 생성한다.
-     */
-    protected Snare() {
-        super(StatusEffectType.SNARE, false);
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SNARE;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

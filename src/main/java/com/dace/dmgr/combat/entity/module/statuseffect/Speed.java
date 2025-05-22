@@ -11,7 +11,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 속도 증가 상태 효과를 처리하는 클래스.
  */
-public class Speed extends StatusEffect {
+public class Speed implements StatusEffect {
     /** 틱 입자 효과 */
     private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
             ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB_AMBIENT,
@@ -28,8 +28,18 @@ public class Speed extends StatusEffect {
      * @param increment 이동 속도 증가량
      */
     public Speed(double increment) {
-        super(StatusEffectType.SPEED, true);
         this.modifier = new AbilityStatus.Modifier(increment);
+    }
+
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SPEED;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return true;
     }
 
     @Override

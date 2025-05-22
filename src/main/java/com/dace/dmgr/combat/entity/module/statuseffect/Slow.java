@@ -11,7 +11,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 /**
  * 둔화 상태 효과를 처리하는 클래스.
  */
-public class Slow extends StatusEffect {
+public class Slow implements StatusEffect {
     /** 틱 입자 효과 */
     private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
             ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 12).count(3)
@@ -26,8 +26,18 @@ public class Slow extends StatusEffect {
      * @param decrement 이동 속도 감소량
      */
     public Slow(double decrement) {
-        super(StatusEffectType.SLOW, false);
         this.modifier = new AbilityStatus.Modifier(-decrement);
+    }
+
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.SLOW;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

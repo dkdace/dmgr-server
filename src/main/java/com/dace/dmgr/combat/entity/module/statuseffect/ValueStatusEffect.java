@@ -4,32 +4,23 @@ import com.dace.dmgr.combat.combatant.jager.JagerT1;
 import com.dace.dmgr.combat.combatant.magritta.MagrittaT1;
 import com.dace.dmgr.combat.combatant.neace.NeaceA1;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.function.Supplier;
 
 /**
  * 상태 변수를 가지고 있는 상태 효과를 처리하는 클래스.
  */
-public abstract class ValueStatusEffect extends StatusEffect {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class ValueStatusEffect implements StatusEffect {
     /** 상태 변수 최댓값 */
     protected final double maxValue;
     /** 상태 변수 */
     @Getter
     private double value = 0;
-
-    /**
-     * 상태 변수를 가지고 있는 상태 효과 인스턴스를 생성한다.
-     *
-     * @param statusEffectType 상태 효과의 유형
-     * @param isPositive       이로운 효과 여부
-     * @param maxValue         상태 변수 최댓값
-     */
-    protected ValueStatusEffect(@NonNull StatusEffectType statusEffectType, boolean isPositive, double maxValue) {
-        super(statusEffectType, isPositive);
-        this.maxValue = maxValue;
-    }
 
     /**
      * 수치 값을 설정한다.

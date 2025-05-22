@@ -13,7 +13,9 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.location.LocationUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
@@ -87,11 +89,13 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     /**
      * 해로운 효과 면역 상태 효과 클래스.
      */
-    static final class PalasA2Immune extends StatusEffect {
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    static final class PalasA2Immune implements StatusEffect {
         static final PalasA2Immune instance = new PalasA2Immune();
 
-        private PalasA2Immune() {
-            super(true);
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override

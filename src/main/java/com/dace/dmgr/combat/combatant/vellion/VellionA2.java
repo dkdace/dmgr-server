@@ -223,11 +223,12 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     /**
      * 저주 표식 상태 효과 클래스.
      */
-    private static final class VellionA2Mark extends StatusEffect {
+    private static final class VellionA2Mark implements StatusEffect {
         private static final VellionA2Mark instance = new VellionA2Mark();
 
-        private VellionA2Mark() {
-            super(false);
+        @Override
+        public boolean isPositive() {
+            return false;
         }
 
         @Override

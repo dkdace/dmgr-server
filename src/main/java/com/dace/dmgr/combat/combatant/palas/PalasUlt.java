@@ -10,7 +10,9 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.location.LocationUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
@@ -80,11 +82,13 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
     /**
      * 아드레날린 상태 효과 클래스.
      */
-    static final class PalasUltBuff extends StatusEffect {
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    static final class PalasUltBuff implements StatusEffect {
         static final PalasUltBuff instance = new PalasUltBuff();
 
-        private PalasUltBuff() {
-            super(true);
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -14,19 +15,21 @@ import java.util.Set;
 /**
  * 기절 상태 효과를 처리하는 클래스.
  */
-public class Stun extends StatusEffect {
+@AllArgsConstructor
+public class Stun implements StatusEffect {
     /** 공격자 */
     @Nullable
     private final CombatUser attacker;
 
-    /**
-     * 기절 상태 효과 인스턴스를 생성한다.
-     *
-     * @param attacker 공격자
-     */
-    public Stun(@Nullable CombatUser attacker) {
-        super(StatusEffectType.STUN, false);
-        this.attacker = attacker;
+    @Override
+    @NonNull
+    public final StatusEffectType getStatusEffectType() {
+        return StatusEffectType.STUN;
+    }
+
+    @Override
+    public final boolean isPositive() {
+        return false;
     }
 
     @Override

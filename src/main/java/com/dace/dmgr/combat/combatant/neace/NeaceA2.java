@@ -127,11 +127,12 @@ public final class NeaceA2 extends ChargeableSkill {
     /**
      * 축복 상태 효과 클래스.
      */
-    private static final class NeaceA2Buff extends StatusEffect {
+    private static final class NeaceA2Buff implements StatusEffect {
         private static final NeaceA2Buff instance = new NeaceA2Buff();
 
-        private NeaceA2Buff() {
-            super(true);
+        @Override
+        public boolean isPositive() {
+            return true;
         }
 
         @Override
