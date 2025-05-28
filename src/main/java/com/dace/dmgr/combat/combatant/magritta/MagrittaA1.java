@@ -175,7 +175,7 @@ public final class MagrittaA1 extends ActiveSkill {
                         ((Movable) target).getMoveModule().knockback(dir);
                     }
 
-                    MagrittaT1.addShreddingValue(combatUser, target);
+                    MagrittaT1Util.addValue(combatUser, target);
                 }
 
                 return !(target instanceof Barrier);

@@ -16,23 +16,23 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 
 @UtilityClass
-public final class MagrittaT1 {
+public final class MagrittaT1Util {
     /**
      * 피격자의 파쇄 수치를 증가시킨다.
      *
      * @param attacker 공격자
      * @param victim   피격자
      */
-    static void addShreddingValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-        ShreddingValue shreddingValue = victim.getStatusEffectModule().get(ShreddingValue.class);
-        if (shreddingValue == null)
-            shreddingValue = new ShreddingValue(attacker);
+    static void addValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
+        ValueEffect valueEffect = victim.getStatusEffectModule().get(ValueEffect.class);
+        if (valueEffect == null)
+            valueEffect = new ValueEffect(attacker);
 
-        victim.getStatusEffectModule().apply(shreddingValue, MagrittaT1Info.DURATION);
-        shreddingValue.shredding = Math.min(MagrittaT1Info.MAX, shreddingValue.shredding + 1);
+        victim.getStatusEffectModule().apply(valueEffect, MagrittaT1Info.DURATION);
+        valueEffect.value = Math.min(MagrittaT1Info.MAX, valueEffect.value + 1);
 
-        if (shreddingValue.shredding == MagrittaT1Info.MAX) {
-            victim.getStatusEffectModule().apply(shreddingValue.burning, MagrittaT1Info.DURATION);
+        if (valueEffect.value == MagrittaT1Info.MAX) {
+            victim.getStatusEffectModule().apply(valueEffect.burning, MagrittaT1Info.DURATION);
 
             MagrittaT1Info.Sounds.MAX.play(victim.getLocation());
 
@@ -46,19 +46,19 @@ public final class MagrittaT1 {
     /**
      * 파쇄 수치 상태 효과 클래스.
      */
-    public static final class ShreddingValue implements StatusEffect {
+    public static final class ValueEffect implements StatusEffect {
         /** 공격자 */
         private final CombatUser attacker;
         /** 화염 상태 효과 */
         private final Burning burning;
         /** 파쇄 수치 */
         @Getter(AccessLevel.PACKAGE)
-        private int shredding = 0;
+        private int value = 0;
         /** 파쇄 수치 홀로그램 */
         @Nullable
         private TextHologram hologram;
 
-        public ShreddingValue(@NonNull CombatUser attacker) {
+        private ValueEffect(@NonNull CombatUser attacker) {
             this.attacker = attacker;
             this.burning = new Burning(attacker, MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
         }
@@ -82,7 +82,7 @@ public final class MagrittaT1 {
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
             if (hologram != null)
-                hologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, shredding));
+                hologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, value));
         }
 
         @Override

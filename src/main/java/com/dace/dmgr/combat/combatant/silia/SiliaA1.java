@@ -156,7 +156,7 @@ public final class SiliaA1 extends ActiveSkill {
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (targets.add(target)) {
                     target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
-                            SiliaT1.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
+                            SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
 
                     SiliaA1Info.Particles.HIT_ENTITY.play(location);
                 }

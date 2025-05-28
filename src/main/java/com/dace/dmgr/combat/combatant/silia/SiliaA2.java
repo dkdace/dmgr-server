@@ -131,7 +131,7 @@ public final class SiliaA2 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.getCritMultiplier(getVelocity(), target), true)) {
+                        SiliaT1Util.getCritMultiplier(getVelocity(), target), true)) {
 
                     if (target instanceof Movable)
                         ((Movable) target).getMoveModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);

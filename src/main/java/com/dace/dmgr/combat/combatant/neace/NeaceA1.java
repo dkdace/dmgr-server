@@ -46,11 +46,11 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
         Healable target = targetModule.getCurrentTarget();
 
-        NeaceA1Mark neaceA1Mark = target.getStatusEffectModule().get(NeaceA1Mark.class);
-        if (neaceA1Mark == null)
-            neaceA1Mark = new NeaceA1Mark();
+        ValueEffect valueEffect = target.getStatusEffectModule().get(ValueEffect.class);
+        if (valueEffect == null)
+            valueEffect = new ValueEffect();
 
-        target.getStatusEffectModule().apply(neaceA1Mark, NeaceA1Info.DURATION);
+        target.getStatusEffectModule().apply(valueEffect, NeaceA1Info.DURATION);
 
         NeaceA1Info.Sounds.USE.play(combatUser.getLocation());
         playUseEffect(target);
@@ -65,7 +65,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     @NonNull
     public EntityCondition<Healable> getEntityCondition() {
         return EntityCondition.team(combatUser).exclude(combatUser)
-                .and(combatEntity -> !combatEntity.getStatusEffectModule().has(NeaceA1Mark.class));
+                .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueEffect.class));
     }
 
     /**
@@ -103,7 +103,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     /**
      * 구원의 표식 상태 효과 클래스.
      */
-    private final class NeaceA1Mark implements StatusEffect {
+    private final class ValueEffect implements StatusEffect {
         private double heal = 0;
 
         @Override

@@ -233,7 +233,7 @@ public final class JagerA3 extends ActiveSkill {
                     ((Movable) target).getMoveModule().knockback(dir);
                 }
 
-                if (JagerT1.addFreezeValue(target, freeze).getValue() >= JagerT1Info.MAX) {
+                if (JagerT1Util.addValue(target, freeze).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
                     ActionManager actionManager = combatUser.getActionManager();

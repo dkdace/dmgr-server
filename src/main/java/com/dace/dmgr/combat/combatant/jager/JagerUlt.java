@@ -287,7 +287,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20.0, DamageType.NORMAL,
                         null, false, false))
-                    JagerT1.addFreezeValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
+                    JagerT1Util.addValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 
                 return true;
             }

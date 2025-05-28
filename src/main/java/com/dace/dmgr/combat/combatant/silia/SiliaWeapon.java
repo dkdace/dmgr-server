@@ -102,7 +102,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1.getCritMultiplier(getVelocity(), target), true);
+                        SiliaT1Util.getCritMultiplier(getVelocity(), target), true);
 
                 SiliaWeaponInfo.Particles.HIT_ENTITY.play(location);
                 SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);

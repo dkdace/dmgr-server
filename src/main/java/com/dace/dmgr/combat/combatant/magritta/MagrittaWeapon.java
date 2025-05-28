@@ -128,7 +128,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
         targets.forEach((target, hits) -> {
             if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
-                MagrittaT1.addShreddingValue(combatUser, target);
+                MagrittaT1Util.addValue(combatUser, target);
         });
     }
 
@@ -182,9 +182,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
-                MagrittaT1.ShreddingValue shreddingValue = target.getStatusEffectModule().get(MagrittaT1.ShreddingValue.class);
-                if (shreddingValue != null)
-                    damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shreddingValue.getShredding()) / 100.0;
+                MagrittaT1Util.ValueEffect valueEffect = target.getStatusEffectModule().get(MagrittaT1Util.ValueEffect.class);
+                if (valueEffect != null)
+                    damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * valueEffect.getValue()) / 100.0;
 
                 if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true)) {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);

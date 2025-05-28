@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 @UtilityClass
-public final class SiliaT1 {
+public final class SiliaT1Util {
     /**
      * 공격의 백어택(치명타) 여부를 확인하여 치명타 배수를 반환한다.
      *

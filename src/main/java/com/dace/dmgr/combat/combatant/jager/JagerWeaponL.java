@@ -202,7 +202,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
-                    JagerT1.addFreezeValue(target, JagerWeaponInfo.FREEZE);
+                    JagerT1Util.addValue(target, JagerWeaponInfo.FREEZE);
 
                 return false;
             };

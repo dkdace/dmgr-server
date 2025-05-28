@@ -10,7 +10,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @UtilityClass
-public final class JagerT1 {
+public final class JagerT1Util {
     /**
      * 피격자의 빙결 수치를 증가시킨다.
      *
@@ -19,22 +19,22 @@ public final class JagerT1 {
      * @return 빙결 수치 상태 효과
      */
     @NonNull
-    static FreezeValue addFreezeValue(@NonNull Damageable victim, int amount) {
-        FreezeValue freezeValue = victim.getStatusEffectModule().get(FreezeValue.class);
-        if (freezeValue == null)
-            freezeValue = new FreezeValue();
+    static ValueEffect addValue(@NonNull Damageable victim, int amount) {
+        ValueEffect valueEffect = victim.getStatusEffectModule().get(ValueEffect.class);
+        if (valueEffect == null)
+            valueEffect = new ValueEffect();
 
-        victim.getStatusEffectModule().apply(freezeValue, JagerT1Info.DURATION);
-        freezeValue.addValue(amount);
+        victim.getStatusEffectModule().apply(valueEffect, JagerT1Info.DURATION);
+        valueEffect.addValue(amount);
 
-        return freezeValue;
+        return valueEffect;
     }
 
     /**
      * 빙결 수치 상태 효과 클래스.
      */
-    public static final class FreezeValue extends Slow {
-        private FreezeValue() {
+    public static final class ValueEffect extends Slow {
+        private ValueEffect() {
             super(0);
         }
 
