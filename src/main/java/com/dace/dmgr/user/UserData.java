@@ -33,6 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -571,15 +573,15 @@ public final class UserData implements Initializable<Void> {
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     @NonNull
-    public Timestamp ban(@NonNull Timespan duration, @Nullable String reason) {
+    public Instant ban(@NonNull Duration duration, @Nullable String reason) {
         if (reason == null)
             reason = "없음";
 
-        Timestamp expiration = Timestamp.now().plus(duration);
+        Instant expiration = Instant.now().plus(duration);
         String finalReason = MessageFormat.format(MESSAGE_BANNED,
-                DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss"),
+                DateFormatUtils.format(expiration.toEpochMilli(), "yyyy-MM-dd HH:mm:ss"),
                 GeneralConfig.getConfig().getAdminContact());
-        Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, expiration.toDate(), null);
+        Bukkit.getBanList(BanList.Type.NAME).addBan(playerName, reason + "\n\n" + finalReason, Date.from(expiration), null);
 
         User user = getOnlineUser();
         if (user != null)
