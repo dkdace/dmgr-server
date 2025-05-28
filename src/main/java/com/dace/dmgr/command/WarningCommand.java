@@ -1,7 +1,5 @@
 package com.dace.dmgr.command;
 
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.task.DelayTask;
@@ -10,6 +8,8 @@ import lombok.NonNull;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 
 /**
@@ -106,14 +106,14 @@ public final class WarningCommand extends CommandHandler {
 
             if (targetUserData.getWarning() >= 3) {
                 new DelayTask(() -> {
-                    Timestamp expiration = targetUserData.ban(Timespan.ofDays(Math.pow(3, targetUserData.getWarning() - 2.0)), reason);
+                    Instant expiration = targetUserData.ban(Duration.ofDays((long) Math.pow(3, targetUserData.getWarning() - 2.0)), reason);
 
                     User.getAllUsers().forEach(target ->
                             target.sendMessageInfo("\n" +
                                             "§e§n{0}§r님이 경고 §c3회 §f누적으로 서버에서 차단되었습니다.\n" +
                                             "차단 해제 일시 : §c§n{1}\n",
                                     targetUserData.getPlayerName(),
-                                    DateFormatUtils.format(expiration.toDate(), "yyyy-MM-dd HH:mm:ss")));
+                                    DateFormatUtils.format(expiration.toEpochMilli(), "yyyy-MM-dd HH:mm:ss")));
                 }, 20);
             }
         }

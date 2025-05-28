@@ -72,43 +72,33 @@ public abstract class Area<T extends CombatEntity> {
             return;
 
         isUsed = true;
-        Set<T> targets = CombatUtil.getNearCombatEntities(center, radius, entityCondition);
-        for (T target : targets)
-            penetrationMap.put(target, null);
 
-        for (T target : targets)
-            new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
-                @Override
-                protected boolean canBeRemoved() {
-                    return false;
-                }
+        CombatUtil.getNearCombatEntities(center, radius, entityCondition).forEach(target ->
+                new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
+                    @Override
+                    protected boolean canBeRemoved() {
+                        return false;
+                    }
 
-                @Override
-                @NonNull
-                protected IntervalHandler getIntervalHandler() {
-                    return (location, i) -> true;
-                }
+                    @Override
+                    @NonNull
+                    protected IntervalHandler getIntervalHandler() {
+                        return (location, i) -> true;
+                    }
 
-                @Override
-                @NonNull
-                protected HitBlockHandler getHitBlockHandler() {
-                    return (location, hitBlock) -> onHitBlock(center.clone(), location.clone(), hitBlock);
-                }
+                    @Override
+                    @NonNull
+                    protected HitBlockHandler getHitBlockHandler() {
+                        return (location, hitBlock) -> onHitBlock(center.clone(), location.clone(), hitBlock);
+                    }
 
-                @Override
-                @NonNull
-                protected HitEntityHandler<T> getHitEntityHandler() {
-                    return (location, areaTarget) -> {
-                        Boolean canPenetrate = penetrationMap.get(areaTarget);
-                        if (canPenetrate == null) {
-                            canPenetrate = onHitEntity(center.clone(), location.clone(), areaTarget);
-                            penetrationMap.putIfAbsent(areaTarget, canPenetrate);
-                        }
-
-                        return canPenetrate;
-                    };
-                }
-            }.shot(center, LocationUtil.getDirection(center, target.getHitboxCenter()));
+                    @Override
+                    @NonNull
+                    protected HitEntityHandler<T> getHitEntityHandler() {
+                        return (location, areaTarget) ->
+                                penetrationMap.computeIfAbsent(areaTarget, k -> onHitEntity(center.clone(), location.clone(), k));
+                    }
+                }.shot(center, LocationUtil.getDirection(center, target.getHitboxCenter())));
     }
 
     /**

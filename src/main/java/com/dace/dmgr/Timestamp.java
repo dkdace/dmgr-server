@@ -1,15 +1,17 @@
 package com.dace.dmgr;
 
+import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.apache.commons.lang3.time.DateFormatUtils;
 
-import java.util.Date;
+import java.util.function.LongConsumer;
 
 /**
  * 시각(타임스탬프) 을 나타내는 클래스.
+ *
+ * <p>음수 값을 가질 수 없으며, 틱 단위와의 호환을 위해 사용한다.</p>
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
@@ -19,8 +21,15 @@ public final class Timestamp implements Comparable<Timestamp> {
     /** 사용 가능한 최댓값의 타임스탬프 */
     public static final Timestamp MAX = new Timestamp(Long.MAX_VALUE);
 
-    /** 기록된 시각 (타임스탬프, ms) */
-    private final long timestampMillis;
+    /** 현재 시각 (타임스탬프, 틱) */
+    private static long currentTimestampTicks = 0;
+
+    static {
+        new IntervalTask((LongConsumer) i -> currentTimestampTicks++, 1);
+    }
+
+    /** 기록된 시각 (타임스탬프, 틱) */
+    private final long timestampTicks;
 
     /**
      * 현재 시각의 타임스탬프를 반환한다.
@@ -29,7 +38,7 @@ public final class Timestamp implements Comparable<Timestamp> {
      */
     @NonNull
     public static Timestamp now() {
-        return new Timestamp(System.currentTimeMillis());
+        return new Timestamp(currentTimestampTicks);
     }
 
     /**
@@ -47,7 +56,7 @@ public final class Timestamp implements Comparable<Timestamp> {
         if (this.equals(MIN))
             return MIN;
 
-        return new Timestamp(timestampMillis + timespan.toMilliseconds());
+        return new Timestamp(timestampTicks + timespan.toTicks());
     }
 
     /**
@@ -78,28 +87,18 @@ public final class Timestamp implements Comparable<Timestamp> {
      */
     @NonNull
     public Timespan until(@NonNull Timestamp timestamp) {
-        return timestampMillis > timestamp.timestampMillis
+        return this.timestampTicks > timestamp.timestampTicks
                 ? Timespan.ZERO
-                : Timespan.ofMilliseconds(timestamp.timestampMillis - timestampMillis);
-    }
-
-    /**
-     * 타임스탬프를 Date로 바꿔 반환한다.
-     *
-     * @return 새로운 {@link Date}
-     */
-    @NonNull
-    public Date toDate() {
-        return new Date(timestampMillis);
+                : Timespan.ofTicks(timestamp.timestampTicks - this.timestampTicks);
     }
 
     @Override
     public int compareTo(@NonNull Timestamp other) {
-        return Long.compare(timestampMillis, other.timestampMillis);
+        return Long.compare(timestampTicks, other.timestampTicks);
     }
 
     @Override
     public String toString() {
-        return DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.format(timestampMillis);
+        return Long.toString(timestampTicks);
     }
 }
