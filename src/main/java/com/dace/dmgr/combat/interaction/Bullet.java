@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -363,7 +363,7 @@ public abstract class Bullet<T extends CombatEntity> {
         if (!canBeRemoved())
             return false;
 
-        BulletBarrier targetBulletBarrier = CombatUtil.getNearCombatEntity(getLocation(), size,
+        BulletBarrier targetBulletBarrier = CombatEntityRegistry.getNearCombatEntity(getLocation(), size,
                 EntityCondition.of(BulletBarrier.class).and(combatEntity -> combatEntity.isEnemy(shooter)));
 
         if (targetBulletBarrier == null)
@@ -379,7 +379,7 @@ public abstract class Bullet<T extends CombatEntity> {
      * @return 총알 소멸 여부
      */
     private boolean handleEntityCollision() {
-        T target = CombatUtil.getNearCombatEntity(getLocation(), size, entityCondition);
+        T target = CombatEntityRegistry.getNearCombatEntity(getLocation(), size, entityCondition);
 
         if (target == null || !targets.add(target))
             return false;

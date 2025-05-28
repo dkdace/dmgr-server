@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
@@ -217,7 +216,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
                 entity.setSitting(true);
                 entity.setTamed(true);
 
-                Damageable target = CombatUtil.getNearCombatEntity(getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
+                Damageable target = CombatEntityRegistry.getNearCombatEntity(getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
                         EntityCondition.enemy(this).and(Damageable::isCreature));
 
                 if (target != null) {

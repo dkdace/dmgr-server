@@ -12,12 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.function.LongConsumer;
 
 /**
@@ -26,11 +22,6 @@ import java.util.function.LongConsumer;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  */
 public abstract class AbstractCombatEntity<T extends Entity> implements CombatEntity {
-    /** 전투 시스템 엔티티 목록 (엔티티 : 전투 시스템 엔티티) */
-    private static final HashMap<Entity, CombatEntity> COMBAT_ENTITY_MAP = new HashMap<>();
-    /** 월드별 전투 시스템 엔티티 목록 (월드 : (엔티티 : 전투 시스템 엔티티)) */
-    private static final HashMap<World, HashMap<Entity, CombatEntity>> WORLD_COMBAT_ENTITY_MAP = new HashMap<>();
-
     /** 엔티티 인스턴스 */
     @NonNull
     @Getter
@@ -39,7 +30,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     @NonNull
     @Getter
     protected final String name;
-    /** 현재 월드 */
+    /** 월드 */
+    @Getter
     private final World world;
     /** 태스크 관리 인스턴스 */
     private final TaskManager taskManager = new TaskManager();
@@ -62,7 +54,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
     protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @NonNull Hitbox @NonNull ... hitboxes) {
-        Validate.validState(COMBAT_ENTITY_MAP.get(entity) == null, "CombatEntity가 이미 존재함");
+        Validate.validState(CombatEntityRegistry.get(entity) == null, "CombatEntity가 이미 존재함");
 
         this.entity = entity;
         this.name = name;
@@ -72,8 +64,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         entity.setCustomName(ChatColor.WHITE + name);
 
-        COMBAT_ENTITY_MAP.put(entity, this);
-        WORLD_COMBAT_ENTITY_MAP.computeIfAbsent(world, k -> new HashMap<>()).put(entity, this);
+        CombatEntityRegistry.onAdd(this);
 
         addTask(new IntervalTask(i -> {
             for (LongConsumer onTick : onTicks) {
@@ -89,29 +80,6 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         }, 1));
     }
 
-    /**
-     * 지정한 엔티티의 전투 시스템 엔티티 인스턴스를 반환한다.
-     *
-     * @param entity 대상 엔티티
-     * @return 전투 시스템의 엔티티 인스턴스. 존재하지 않으면 {@code null} 반환
-     */
-    static CombatEntity fromEntity(@NonNull Entity entity) {
-        return COMBAT_ENTITY_MAP.get(entity);
-    }
-
-    /**
-     * 지정한 월드에 있는 모든 전투 시스템 엔티티를 반환한다.
-     *
-     * @param world 대상 월드
-     * @return 모든 전투 시스템 엔티티
-     */
-    @NonNull
-    @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllCombatEntities(@NonNull World world) {
-        HashMap<Entity, CombatEntity> combatEntityMap = WORLD_COMBAT_ENTITY_MAP.get(world);
-        return Collections.unmodifiableCollection(combatEntityMap == null ? Collections.emptySet() : combatEntityMap.values());
-    }
-
     @Override
     public final void remove() {
         Validate.validState(!isRemoved(), "CombatEntity가 이미 제거됨");
@@ -120,13 +88,12 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
         onRemoves.clear();
         taskManager.stop();
 
-        COMBAT_ENTITY_MAP.remove(entity);
-        WORLD_COMBAT_ENTITY_MAP.get(world).remove(entity);
+        CombatEntityRegistry.onRemove(this);
     }
 
     @Override
     public final boolean isRemoved() {
-        return !COMBAT_ENTITY_MAP.containsKey(entity);
+        return CombatEntityRegistry.get(entity) == null;
     }
 
     @Override

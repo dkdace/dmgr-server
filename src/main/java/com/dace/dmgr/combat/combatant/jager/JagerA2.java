@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
@@ -172,7 +171,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             if (!readyTimeModule.isReady())
                 return;
 
-            Damageable target = CombatUtil.getNearCombatEntity(getLocation().add(0, 0.5, 0), 0.8,
+            Damageable target = CombatEntityRegistry.getNearCombatEntity(getLocation().add(0, 0.5, 0), 0.8,
                     EntityCondition.enemy(this).and(Damageable::isCreature));
 
             if (target != null)

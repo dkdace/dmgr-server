@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
@@ -65,7 +65,7 @@ public abstract class UltimateSkill extends ActiveSkill {
         combatUser.setUltGaugePercent(0);
         ULTIMATE_USE_SOUND.play(combatUser.getLocation());
 
-        CombatUtil.getCombatEntities(combatUser.getEntity().getWorld(), EntityCondition.of(CombatUser.class))
+        CombatEntityRegistry.getCombatEntities(combatUser.getEntity().getWorld(), EntityCondition.of(CombatUser.class))
                 .forEach(target -> combatUser.sendMentMessage(target, "§e" + combatUser.getCombatantType().getCombatant().getUltUseMent()));
     }
 }

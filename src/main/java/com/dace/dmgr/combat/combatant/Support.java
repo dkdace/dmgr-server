@@ -2,13 +2,13 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.Trait;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -49,7 +49,7 @@ public abstract class Support extends Combatant {
         super.onTick(combatUser, i);
 
         if (i % 5 == 0) {
-            boolean isActive = !CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
+            boolean isActive = !CombatEntityRegistry.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
                     .and(combatEntity -> combatEntity.isGoalTarget()
                             && combatEntity.getDamageModule().isHalfHealth()
                             && combatEntity.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS)).isEmpty();

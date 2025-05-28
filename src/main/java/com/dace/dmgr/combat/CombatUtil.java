@@ -2,8 +2,6 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.entity.CombatEntity;
-import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.util.VectorUtil;
@@ -12,16 +10,9 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collections;
-import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.function.LongConsumer;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -57,73 +48,6 @@ public final class CombatUtil {
         distance = distance - weakeningDistance;
 
         return Math.max(halfDamage, halfDamage * ((weakeningDistance - distance) / weakeningDistance) + halfDamage);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 가장 가까운 엔티티를 반환한다.
-     *
-     * @param location        위치
-     * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param entityCondition 엔티티 탐색 조건
-     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
-     * @return 범위 내 가장 가까운 엔티티
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntities(Location, double, EntityCondition)
-     */
-    @Nullable
-    public static <T extends CombatEntity> T getNearCombatEntity(@NonNull Location location, double range, @NonNull EntityCondition<T> entityCondition) {
-        Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
-
-        return CombatEntity.getAllCombatEntities(location.getWorld()).stream()
-                .map(entityCondition::cast)
-                .filter(combatEntity -> combatEntity != null && entityCondition.test(combatEntity) && combatEntity.canBeTargeted()
-                        && combatEntity.isInHitbox(location, range))
-                .findFirst()
-                .orElse(null);
-    }
-
-    /**
-     * 지정한 위치를 기준으로 범위 안의 특정 조건을 만족하는 모든 엔티티를 반환한다.
-     *
-     * @param location        위치
-     * @param range           범위 (반지름). (단위: 블록). 0 이상의 값
-     * @param entityCondition 엔티티 탐색 조건
-     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
-     * @return 범위 내 모든 엔티티
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     * @see CombatUtil#getNearCombatEntity(Location, double, EntityCondition)
-     */
-    @NonNull
-    @UnmodifiableView
-    public static <T extends CombatEntity> Set<@NonNull T> getNearCombatEntities(@NonNull Location location, double range,
-                                                                                 @NonNull EntityCondition<T> entityCondition) {
-        Validate.isTrue(range >= 0, "range >= 0 (%f)", range);
-
-        return Collections.unmodifiableSet(
-                CombatEntity.getAllCombatEntities(location.getWorld()).stream()
-                        .map(entityCondition::cast)
-                        .filter(combatEntity -> combatEntity != null && entityCondition.test(combatEntity) && combatEntity.canBeTargeted()
-                                && combatEntity.isInHitbox(location, range))
-                        .collect(Collectors.toSet()));
-    }
-
-    /**
-     * 지정한 월드에서 특정 조건을 만족하는 모든 엔티티를 반환한다.
-     *
-     * @param world           대상 월드
-     * @param entityCondition 엔티티 탐색 조건
-     * @param <T>             {@link CombatEntity}를 상속받는 전투 시스템 엔티티
-     * @return 범위 내 모든 엔티티
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    @NonNull
-    @UnmodifiableView
-    public static <T extends CombatEntity> Set<@NonNull T> getCombatEntities(@NonNull World world, @NonNull EntityCondition<T> entityCondition) {
-        return Collections.unmodifiableSet(
-                CombatEntity.getAllCombatEntities(world).stream()
-                        .map(entityCondition::cast)
-                        .filter(combatEntity -> combatEntity != null && entityCondition.test(combatEntity))
-                        .collect(Collectors.toSet()));
     }
 
     /**

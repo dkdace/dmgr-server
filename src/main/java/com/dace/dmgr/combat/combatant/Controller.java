@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.Trait;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -10,6 +9,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -47,10 +47,10 @@ public abstract class Controller extends Combatant {
         super.onTick(combatUser, i);
 
         if (i % 5 == 0)
-            CombatUtil.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
+            CombatEntityRegistry.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
                             .and(combatEntity -> combatEntity.isGoalTarget() && combatEntity.getDamageModule().isLowHealth()))
                     .forEach(target -> {
-                        Damageable targetCombatEntity = CombatUtil.getNearCombatEntity(target.getLocation(), RoleTrait1Info.DETECT_RADIUS,
+                        Damageable targetCombatEntity = CombatEntityRegistry.getNearCombatEntity(target.getLocation(), RoleTrait1Info.DETECT_RADIUS,
                                 EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
 
                         if (targetCombatEntity != null)

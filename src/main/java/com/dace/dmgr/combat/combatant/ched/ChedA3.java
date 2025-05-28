@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -192,7 +192,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, 0, DamageType.NORMAL, location, false, true)) {
-                    CombatUtil.getCombatEntities(location.getWorld(), EntityCondition.team(combatUser).and(CombatUser.class::isInstance))
+                    CombatEntityRegistry.getCombatEntities(location.getWorld(), EntityCondition.team(combatUser).and(CombatUser.class::isInstance))
                             .forEach(teamTarget -> ((CombatUser) teamTarget).setGlowing(target, ChedA3Info.DETECT_DURATION));
 
                     if (target.isGoalTarget()) {

@@ -9,9 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collection;
 import java.util.function.LongConsumer;
 
 /**
@@ -21,26 +19,15 @@ import java.util.function.LongConsumer;
  */
 public interface CombatEntity {
     /**
-     * 지정한 월드에 있는 모든 전투 시스템 엔티티를 반환한다.
-     *
-     * @param world 대상 월드
-     * @return 모든 전투 시스템 엔티티
-     */
-    @NonNull
-    @UnmodifiableView
-    static Collection<@NonNull CombatEntity> getAllCombatEntities(@NonNull World world) {
-        return AbstractCombatEntity.getAllCombatEntities(world);
-    }
-
-    /**
      * 지정한 엔티티의 전투 시스템 엔티티 인스턴스를 반환한다.
      *
      * @param entity 대상 엔티티
      * @return 전투 시스템의 엔티티 인스턴스. 존재하지 않으면 {@code null} 반환
+     * @see CombatEntityRegistry#get(Entity)
      */
     @Nullable
     static CombatEntity fromEntity(@NonNull Entity entity) {
-        return AbstractCombatEntity.fromEntity(entity);
+        return CombatEntityRegistry.get(entity);
     }
 
     /**
@@ -55,6 +42,12 @@ public interface CombatEntity {
      */
     @NonNull
     String getName();
+
+    /**
+     * @return 월드
+     */
+    @NonNull
+    World getWorld();
 
     /**
      * @return 소속된 게임. {@code null}이면 게임에 참여중이지 않음을 나타냄

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
@@ -73,7 +73,7 @@ public abstract class Area<T extends CombatEntity> {
 
         isUsed = true;
 
-        CombatUtil.getNearCombatEntities(center, radius, entityCondition).forEach(target ->
+        CombatEntityRegistry.getNearCombatEntities(center, radius, entityCondition).forEach(target ->
                 new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
                     @Override
                     protected boolean canBeRemoved() {
