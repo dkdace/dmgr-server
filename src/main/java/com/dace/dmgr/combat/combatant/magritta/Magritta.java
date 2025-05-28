@@ -87,6 +87,7 @@ public final class Magritta extends Scuffler {
             case MAGRITTA:
                 return new String[]{"어라? 나잖아?"};
             case METAR:
+            case NO7:
                 return new String[]{"고철은 역시 고철이군."};
             default:
                 return new String[]{

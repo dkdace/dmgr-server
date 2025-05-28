@@ -95,6 +95,7 @@ public final class Quaker extends Guardian {
             case ARKACE:
                 return new String[]{"조국의 방패는 납덩어리에 굴복하지 않는다!"};
             case METAR:
+            case NO7:
                 return new String[]{"찌그러져 있어라, 깡통!"};
             default:
                 return new String[]{
