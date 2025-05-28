@@ -69,8 +69,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
             addActionTask(new IntervalTask(i -> {
                 weapon.shot(true);
 
-                CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.Recoil.UP / 2, MagrittaWeaponInfo.Recoil.SIDE / 2,
-                        MagrittaWeaponInfo.Recoil.UP_SPREAD / 2, MagrittaWeaponInfo.Recoil.SIDE_SPREAD / 2, 2, 1);
+                MagrittaUltInfo.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
                 MagrittaUltInfo.Sounds.SHOOT.play(loc);

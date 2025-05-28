@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.jager;
 
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Aimable;
@@ -85,8 +84,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
                 reloadModule.consume(1);
 
-                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.Recoil.UP, JagerWeaponInfo.Recoil.SIDE, JagerWeaponInfo.Recoil.UP_SPREAD,
-                        JagerWeaponInfo.Recoil.SIDE_SPREAD, 2, 1);
+                JagerWeaponInfo.RECOIL.send(combatUser);
                 JagerWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 break;

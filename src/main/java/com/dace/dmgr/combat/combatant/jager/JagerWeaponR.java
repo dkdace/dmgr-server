@@ -69,8 +69,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
                 reloadModule.consume(1);
 
-                CombatUtil.sendRecoil(combatUser, JagerWeaponInfo.Scope.Recoil.UP, JagerWeaponInfo.Scope.Recoil.SIDE,
-                        JagerWeaponInfo.Scope.Recoil.UP_SPREAD, JagerWeaponInfo.Scope.Recoil.SIDE_SPREAD, 2, 1);
+                JagerWeaponInfo.Scope.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
                 JagerWeaponInfo.Sounds.USE_SCOPE.play(loc);

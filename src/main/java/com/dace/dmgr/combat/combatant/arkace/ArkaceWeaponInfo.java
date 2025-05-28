@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.5);
     /** 달리기 중 시전 시간 */
     public static final Timespan SPRINT_READY_DURATION = Timespan.ofSeconds(0.25);
+    /** 반동 */
+    public static final Recoil RECOIL = new Recoil(0.6, 0.04, 0.1, 0.06, Timespan.ofTicks(2), 2);
 
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();
@@ -42,21 +45,6 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
                         .addActionKeyInfo("사격", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)
                         .build()));
-    }
-
-    /**
-     * 반동 정보.
-     */
-    @UtilityClass
-    public static final class Recoil {
-        /** 수직 반동 */
-        public static final double UP = 0.6;
-        /** 수평 반동 */
-        public static final double SIDE = 0.04;
-        /** 수직 반동 분산도 */
-        public static final double UP_SPREAD = 0.1;
-        /** 수평 반동 분산도 */
-        public static final double SIDE_SPREAD = 0.06;
     }
 
     /**

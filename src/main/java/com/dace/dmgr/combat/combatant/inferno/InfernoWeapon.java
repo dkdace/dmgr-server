@@ -93,8 +93,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
-                CombatUtil.sendRecoil(combatUser, InfernoWeaponInfo.Fireball.Recoil.UP, InfernoWeaponInfo.Fireball.Recoil.SIDE,
-                        InfernoWeaponInfo.Fireball.Recoil.UP_SPREAD, InfernoWeaponInfo.Fireball.Recoil.SIDE_SPREAD, 3, 1);
+                InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);
                 InfernoWeaponInfo.Sounds.USE_FIREBALL.play(combatUser.getLocation());
 
                 break;

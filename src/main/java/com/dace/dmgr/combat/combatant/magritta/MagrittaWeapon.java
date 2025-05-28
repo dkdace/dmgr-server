@@ -65,8 +65,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
                 reloadModule.consume(1);
 
-                CombatUtil.sendRecoil(combatUser, MagrittaWeaponInfo.Recoil.UP, MagrittaWeaponInfo.Recoil.SIDE, MagrittaWeaponInfo.Recoil.UP_SPREAD,
-                        MagrittaWeaponInfo.Recoil.SIDE_SPREAD, 3, 1);
+                MagrittaWeaponInfo.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
                 MagrittaWeaponInfo.Sounds.USE.play(loc);

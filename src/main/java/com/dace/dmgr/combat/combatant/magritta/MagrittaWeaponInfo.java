@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -30,6 +31,8 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     public static final int CAPACITY = 8;
     /** 재장전 시간 */
     public static final Timespan RELOAD_DURATION = Timespan.ofSeconds(1.8);
+    /** 반동 */
+    public static final Recoil RECOIL = new Recoil(9, 0, 1, 3.2, Timespan.ofTicks(3), 1);
 
     @Getter
     private static final MagrittaWeaponInfo instance = new MagrittaWeaponInfo();
@@ -46,21 +49,6 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .build()));
-    }
-
-    /**
-     * 반동 정보.
-     */
-    @UtilityClass
-    public static final class Recoil {
-        /** 수직 반동 */
-        public static final double UP = 9.0;
-        /** 수평 반동 */
-        public static final double SIDE = 0;
-        /** 수직 반동 분산도 */
-        public static final double UP_SPREAD = 1.0;
-        /** 수평 반동 분산도 */
-        public static final double SIDE_SPREAD = 3.2;
     }
 
     /**

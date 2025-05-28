@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Aimable;
@@ -84,8 +83,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 reloadModule.cancel();
                 isActionCooldown = false;
 
-                CombatUtil.sendRecoil(combatUser, PalasWeaponInfo.Recoil.UP, PalasWeaponInfo.Recoil.SIDE, PalasWeaponInfo.Recoil.UP_SPREAD,
-                        PalasWeaponInfo.Recoil.SIDE_SPREAD, 2, 1);
+                PalasWeaponInfo.RECOIL.send(combatUser);
                 PalasWeaponInfo.Sounds.USE.play(combatUser.getLocation());
 
                 addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));

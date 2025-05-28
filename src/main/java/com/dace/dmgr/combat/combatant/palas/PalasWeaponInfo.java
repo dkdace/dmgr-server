@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -40,6 +41,8 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     public static final int AIM_SLOW = 30;
     /** 확대 레벨 */
     public static final Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L3;
+    /** 반동 */
+    public static final Recoil RECOIL = new Recoil(2.5, 0, 0.15, 0.2, Timespan.ofTicks(2), 1);
 
     @Getter
     private static final PalasWeaponInfo instance = new PalasWeaponInfo();
@@ -59,21 +62,6 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                         .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)
                         .build()));
-    }
-
-    /**
-     * 반동 정보.
-     */
-    @UtilityClass
-    public static final class Recoil {
-        /** 수직 반동 */
-        public static final double UP = 2.5;
-        /** 수평 반동 */
-        public static final double SIDE = 0;
-        /** 수직 반동 분산도 */
-        public static final double UP_SPREAD = 0.15;
-        /** 수평 반동 분산도 */
-        public static final double SIDE_SPREAD = 0.2;
     }
 
     /**

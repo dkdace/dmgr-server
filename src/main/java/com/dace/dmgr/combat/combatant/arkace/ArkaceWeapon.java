@@ -69,8 +69,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
                     reloadModule.consume(1);
 
-                    CombatUtil.sendRecoil(combatUser, ArkaceWeaponInfo.Recoil.UP, ArkaceWeaponInfo.Recoil.SIDE, ArkaceWeaponInfo.Recoil.UP_SPREAD,
-                            ArkaceWeaponInfo.Recoil.SIDE_SPREAD, 2, 2);
+                    ArkaceWeaponInfo.RECOIL.send(combatUser);
                     ArkaceWeaponInfo.Sounds.USE.play(loc);
 
                     addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));

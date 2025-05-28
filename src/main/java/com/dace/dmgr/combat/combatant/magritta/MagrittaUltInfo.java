@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
     public static final Timespan ATTACK_COOLDOWN = Timespan.ofSeconds(0.1);
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(3);
+    /** 반동 */
+    public static final Recoil RECOIL = new Recoil(4.5, 0, 0.5, 1.6, Timespan.ofTicks(2), 1);
 
     /** 궁극기 처치 점수 */
     public static final int KILL_SCORE = 20;
