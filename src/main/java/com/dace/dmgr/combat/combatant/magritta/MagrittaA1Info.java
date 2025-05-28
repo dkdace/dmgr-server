@@ -6,6 +6,8 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.DistantDamage;
+import com.dace.dmgr.combat.entity.DistantTimespan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -33,6 +35,10 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
     public static final int VELOCITY = 20;
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3.2;
+    /** 거리별 피해량 (폭발) */
+    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+    /** 거리별 화염 지속 시간 */
+    public static final DistantTimespan DISTANT_FIRE_DURATION = new DistantTimespan(FIRE_DURATION, RADIUS / 2);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.5;
 

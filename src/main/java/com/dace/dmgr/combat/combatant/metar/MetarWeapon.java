@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -165,9 +164,8 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                double damage = CombatUtil.getDistantDamage(MetarWeaponInfo.DAMAGE, getTravelDistance(), MetarWeaponInfo.DISTANCE / 2.0);
-
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true);
+                target.getDamageModule().damage(combatUser, MetarWeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance()), DamageType.NORMAL, location,
+                        false, true);
                 return false;
             };
         }

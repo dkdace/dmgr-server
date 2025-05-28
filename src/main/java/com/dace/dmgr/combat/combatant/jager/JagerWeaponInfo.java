@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -77,6 +78,8 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
         public static final int DAMAGE = 240;
         /** 피해량 감소 시작 거리 (단위: 블록) */
         public static final int DAMAGE_WEAKENING_DISTANCE = 30;
+        /** 거리별 피해량 */
+        public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DAMAGE_WEAKENING_DISTANCE);
         /** 장탄수 */
         public static final int CAPACITY = 7;
         /** 확대 레벨 */

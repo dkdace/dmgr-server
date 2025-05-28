@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -163,12 +162,10 @@ public final class MagrittaA1 extends ActiveSkill {
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(MagrittaA1Info.DAMAGE_EXPLODE, distance, radius / 2.0);
-                Timespan burningDuration = Timespan.ofTicks((long) CombatUtil.getDistantDamage(MagrittaA1Info.FIRE_DURATION.toTicks(), distance,
-                        radius / 2.0));
 
-                if (target.getDamageModule().damage(MagrittaA1Projectile.this, damage, DamageType.NORMAL, null, false, true)) {
-                    target.getStatusEffectModule().apply(burning, burningDuration);
+                if (target.getDamageModule().damage(MagrittaA1Projectile.this, MagrittaA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(distance),
+                        DamageType.NORMAL, null, false, true)) {
+                    target.getStatusEffectModule().apply(burning, MagrittaA1Info.DISTANT_FIRE_DURATION.getTimespan(distance));
 
                     if (target instanceof Movable) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MagrittaA1Info.KNOCKBACK);

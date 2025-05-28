@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -180,7 +179,7 @@ public final class MetarA1 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                double damage = CombatUtil.getDistantDamage(MetarA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
+                double damage = MetarA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(center.distance(location));
 
                 if (target.getDamageModule().damage(MetarA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
                         && target != combatUser && target instanceof Movable && !MetarA1Projectile.this.getHitTargets().contains(target)) {

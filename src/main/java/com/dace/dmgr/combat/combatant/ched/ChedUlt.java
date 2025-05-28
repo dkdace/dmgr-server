@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.Summonable;
@@ -242,10 +241,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                         && target.isGoalTarget())
                     bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
-                double damage = CombatUtil.getDistantDamage(ChedUltInfo.DAMAGE, center.distance(location), radius / 2.0);
-
-                if (target.getDamageModule().damage(ChedUltProjectile.this, damage, DamageType.NORMAL, null, false, false)
-                        && target instanceof Movable) {
+                if (target.getDamageModule().damage(ChedUltProjectile.this, ChedUltInfo.DISTANT_DAMAGE.getDamage(center.distance(location)),
+                        DamageType.NORMAL, null, false, false) && target instanceof Movable) {
                     Vector dir = LocationUtil.getDirection(location, location.clone().add(0, 1, 0)).multiply(ChedUltInfo.KNOCKBACK);
                     ((Movable) target).getMoveModule().knockback(dir);
                 }

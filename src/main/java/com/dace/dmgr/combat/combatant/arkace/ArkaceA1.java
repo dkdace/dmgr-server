@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -119,7 +118,7 @@ public final class ArkaceA1 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                double damage = CombatUtil.getDistantDamage(ArkaceA1Info.DAMAGE_EXPLODE, center.distance(location), radius / 2.0);
+                double damage = ArkaceA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(center.distance(location));
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
                         && target instanceof Movable && !ArkaceA1Projectile.this.getHitTargets().contains(target)) {

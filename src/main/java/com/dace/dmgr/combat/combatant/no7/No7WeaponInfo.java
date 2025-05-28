@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public final class No7WeaponInfo extends WeaponInfo<No7Weapon> {
     public static final int DAMAGE = 16;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 20;
+    /** 거리별 피해량 */
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
     /** 산탄 수 */
     public static final int PELLET_AMOUNT = 5;
     /** 탄퍼짐 */

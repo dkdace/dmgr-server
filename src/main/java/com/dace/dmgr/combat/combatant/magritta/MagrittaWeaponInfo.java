@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -23,6 +24,8 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     public static final int DAMAGE = 40;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 16;
+    /** 거리별 피해량 */
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
     /** 산탄 수 */
     public static final int PELLET_AMOUNT = 8;
     /** 탄퍼짐 */

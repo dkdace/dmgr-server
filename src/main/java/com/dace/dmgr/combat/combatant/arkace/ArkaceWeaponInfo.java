@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -21,6 +22,8 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     public static final int DAMAGE = 75;
     /** 피해량 감소 시작 거리 (단위: 블록) */
     public static final int DAMAGE_WEAKENING_DISTANCE = 25;
+    /** 거리별 피해량 */
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DAMAGE_WEAKENING_DISTANCE);
     /** 장탄수 */
     public static final int CAPACITY = 30;
     /** 재장전 시간 */

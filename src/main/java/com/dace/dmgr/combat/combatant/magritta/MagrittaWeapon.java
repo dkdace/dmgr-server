@@ -180,8 +180,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
+                double damage = MagrittaWeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance());
                 MagrittaT1Util.ValueEffect valueEffect = target.getStatusEffectModule().get(MagrittaT1Util.ValueEffect.class);
+
                 if (valueEffect != null)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * valueEffect.getValue()) / 100.0;
 

@@ -19,36 +19,6 @@ import java.util.function.LongConsumer;
 @UtilityClass
 public final class CombatUtil {
     /**
-     * 지정한 피해량에 거리별 피해량 감소가 적용된 최종 피해량을 반환한다.
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * // 최종 피해량 : 10 ~ 5 (20m~40m) = 5
-     * double damage = getDistantDamage(10, 40, 20)
-     * </code></pre>
-     *
-     * @param damage            피해량. 0 이상의 값
-     * @param distance          거리 (단위: 블록). 0 이상의 값
-     * @param weakeningDistance 피해 감소가 시작하는 거리. (단위: 블록). 0 이상의 값
-     * @return 최종 피해량
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static double getDistantDamage(double damage, double distance, double weakeningDistance) {
-        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-        Validate.isTrue(distance >= 0, "distance >= 0 (%f)", distance);
-        Validate.isTrue(weakeningDistance >= 0, "weakeningDistance >= 0 (%f)", weakeningDistance);
-
-        if (distance <= weakeningDistance)
-            return damage;
-
-        double halfDamage = damage / 2.0;
-        distance = distance - weakeningDistance;
-
-        return Math.max(halfDamage, halfDamage * ((weakeningDistance - distance) / weakeningDistance) + halfDamage);
-    }
-
-    /**
      * 지정한 플레이어에게 화면 흔들림 효과를 전송한다.
      *
      * @param combatUser  대상 플레이어

@@ -6,6 +6,8 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.DistantDamage;
+import com.dace.dmgr.combat.entity.DistantTimespan;
 import com.dace.dmgr.combat.entity.combatuser.Recoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -84,6 +86,10 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         public static final double SIZE = 0.5;
         /** 피해 범위 (단위: 블록) */
         public static final double RADIUS = 2.5;
+        /** 거리별 피해량 (폭발) */
+        public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+        /** 거리별 화염 지속 시간 */
+        public static final DistantTimespan DISTANT_FIRE_DURATION = new DistantTimespan(FIRE_DURATION, RADIUS / 2);
         /** 탄환 소모량 */
         public static final int CAPACITY_CONSUME = 50;
         /** 넉백 강도 */

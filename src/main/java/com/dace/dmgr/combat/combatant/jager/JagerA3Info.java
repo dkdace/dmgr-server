@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -29,6 +30,10 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     public static final double RADIUS = 6;
     /** 빙결량 */
     public static final int FREEZE = 100;
+    /** 거리별 피해량 (폭발) */
+    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+    /** 거리별 빙결량 */
+    public static final DistantDamage DISTANT_FREEZE = new DistantDamage(FREEZE, RADIUS / 2);
     /** 속박 시간 */
     public static final Timespan SNARE_DURATION = Timespan.ofSeconds(1.2);
     /** 넉백 강도 */

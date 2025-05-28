@@ -1,7 +1,5 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -243,12 +241,10 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 double distance = center.distance(location);
-                double damage = CombatUtil.getDistantDamage(InfernoWeaponInfo.Fireball.DAMAGE_EXPLODE, distance, radius / 2.0);
-                Timespan burningDuration = Timespan.ofTicks((long) CombatUtil.getDistantDamage(InfernoWeaponInfo.FIRE_DURATION.toTicks(), distance,
-                        radius / 2.0));
 
-                if (target.getDamageModule().damage(InfernoWeaponLProjectile.this, damage, DamageType.NORMAL, null, false, true)) {
-                    target.getStatusEffectModule().apply(burning, burningDuration);
+                if (target.getDamageModule().damage(InfernoWeaponLProjectile.this,
+                        InfernoWeaponInfo.Fireball.DISTANT_DAMAGE_EXPLODE.getDamage(distance), DamageType.NORMAL, null, false, true)) {
+                    target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.Fireball.DISTANT_FIRE_DURATION.getTimespan(distance));
 
                     if (target instanceof Movable && !InfernoWeaponLProjectile.this.getHitTargets().contains(target)) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);

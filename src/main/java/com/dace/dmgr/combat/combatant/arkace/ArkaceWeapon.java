@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -171,7 +170,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     combatUser.getActionManager().getSkill(ArkaceUltInfo.getInstance()).getBonusScoreModule()
                             .addTarget(target, ArkaceUltInfo.KILL_SCORE_TIME_LIMIT);
                 else
-                    damage = CombatUtil.getDistantDamage(damage, getTravelDistance(), ArkaceWeaponInfo.DAMAGE_WEAKENING_DISTANCE);
+                    damage = ArkaceWeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance());
 
                 target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, isCrit, !isUlt);
                 return false;

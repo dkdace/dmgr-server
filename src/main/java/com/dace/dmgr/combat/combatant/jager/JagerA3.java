@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.jager;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
@@ -221,8 +220,7 @@ public final class JagerA3 extends ActiveSkill {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             double distance = center.distance(location);
-            double damage = CombatUtil.getDistantDamage(JagerA3Info.DAMAGE_EXPLODE, distance, radius / 2.0);
-            int freeze = (int) CombatUtil.getDistantDamage(JagerA3Info.FREEZE, distance, radius / 2.0);
+            double damage = JagerA3Info.DISTANT_DAMAGE_EXPLODE.getDamage(distance);
             boolean isDamaged = projectile == null
                     ? target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true)
                     : target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
@@ -233,7 +231,7 @@ public final class JagerA3 extends ActiveSkill {
                     ((Movable) target).getMoveModule().knockback(dir);
                 }
 
-                if (JagerT1Util.addValue(target, freeze).getValue() >= JagerT1Info.MAX) {
+                if (JagerT1Util.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
                     ActionManager actionManager = combatUser.getActionManager();

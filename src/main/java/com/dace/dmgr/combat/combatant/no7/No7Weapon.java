@@ -108,9 +108,8 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                double damage = CombatUtil.getDistantDamage(No7WeaponInfo.DAMAGE, getTravelDistance(), No7WeaponInfo.DISTANCE / 2.0);
-
-                target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true);
+                target.getDamageModule().damage(combatUser, No7WeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance()), DamageType.NORMAL, location,
+                        false, true);
                 return false;
             };
         }

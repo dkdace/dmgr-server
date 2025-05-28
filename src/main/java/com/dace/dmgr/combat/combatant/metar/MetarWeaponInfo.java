@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -23,6 +24,8 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     public static final int DAMAGE = 25;
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 30;
+    /** 거리별 피해량 */
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
     /** 탄퍼짐 */
