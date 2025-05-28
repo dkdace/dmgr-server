@@ -12,15 +12,6 @@ import java.util.Set;
  */
 public interface StatusEffect {
     /**
-     * @return 상태 효과의 유형
-     * @implSpec {@link StatusEffectType#NONE}
-     */
-    @NonNull
-    default StatusEffectType getStatusEffectType() {
-        return StatusEffectType.NONE;
-    }
-
-    /**
      * 상태 효과가 이로운 효과인지 확인한다.
      *
      * @return {@code true} 반환 시 이로운 효과, {@code false} 반환 시 해로운 효과

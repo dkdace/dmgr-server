@@ -4,9 +4,11 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.util.location.LocationUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
@@ -22,56 +24,15 @@ public final class MagrittaT1 {
      * @param victim   피격자
      */
     static void addShreddingValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-        ShreddingValue shreddingValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.SHREDDING, MagrittaT1Info.DURATION);
-        shreddingValue.addValue(attacker, victim);
+        ShreddingValue shreddingValue = victim.getStatusEffectModule().get(ShreddingValue.class);
+        if (shreddingValue == null)
+            shreddingValue = new ShreddingValue(attacker);
 
-        MagrittaT1Info.Sounds.USE.play(victim.getLocation());
-    }
+        victim.getStatusEffectModule().apply(shreddingValue, MagrittaT1Info.DURATION);
+        shreddingValue.shredding = Math.min(MagrittaT1Info.MAX, shreddingValue.shredding + 1);
 
-    /**
-     * 파쇄 수치 상태 효과 클래스.
-     */
-    public static final class ShreddingValue extends ValueStatusEffect {
-        /** 파쇄 수치 홀로그램 */
-        @Nullable
-        private TextHologram shreddingHologram;
-        /** 화염 상태 효과 */
-        @Nullable
-        private Burning burning;
-
-        public ShreddingValue() {
-            super(MagrittaT1Info.MAX);
-        }
-
-        @Override
-        public boolean isPositive() {
-            return false;
-        }
-
-        private void addValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-            setValue(getValue() + 1);
-
-            if (victim.isCreature()) {
-                if (shreddingHologram == null)
-                    shreddingHologram = new TextHologram(victim.getEntity(), target -> {
-                        if (target == attacker.getEntity())
-                            return LocationUtil.canPass(target.getEyeLocation(), victim.getCenterLocation());
-
-                        return false;
-                    }, 2);
-
-                shreddingHologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, getValue()));
-            }
-
-            if (getValue() >= MagrittaT1Info.MAX)
-                onMaxValue(attacker, victim);
-        }
-
-        private void onMaxValue(@NonNull CombatUser attacker, @NonNull Damageable victim) {
-            if (burning == null)
-                burning = new Burning(attacker, MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
-
-            victim.getStatusEffectModule().apply(burning, MagrittaT1Info.DURATION);
+        if (shreddingValue.shredding == MagrittaT1Info.MAX) {
+            victim.getStatusEffectModule().apply(shreddingValue.burning, MagrittaT1Info.DURATION);
 
             MagrittaT1Info.Sounds.MAX.play(victim.getLocation());
 
@@ -79,24 +40,56 @@ public final class MagrittaT1 {
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 
+        MagrittaT1Info.Sounds.USE.play(victim.getLocation());
+    }
+
+    /**
+     * 파쇄 수치 상태 효과 클래스.
+     */
+    public static final class ShreddingValue implements StatusEffect {
+        /** 공격자 */
+        private final CombatUser attacker;
+        /** 화염 상태 효과 */
+        private final Burning burning;
+        /** 파쇄 수치 */
+        @Getter(AccessLevel.PACKAGE)
+        private int shredding = 0;
+        /** 파쇄 수치 홀로그램 */
+        @Nullable
+        private TextHologram hologram;
+
+        public ShreddingValue(@NonNull CombatUser attacker) {
+            this.attacker = attacker;
+            this.burning = new Burning(attacker, MagrittaT1Info.FIRE_DAMAGE_PER_SECOND, true);
+        }
+
+        @Override
+        public boolean isPositive() {
+            return false;
+        }
+
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
-            // 미사용
+            if (hologram == null)
+                hologram = new TextHologram(combatEntity.getEntity(), target -> {
+                    if (target == attacker.getEntity())
+                        return LocationUtil.canPass(target.getEyeLocation(), combatEntity.getCenterLocation());
+
+                    return false;
+                }, 2);
         }
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            // 미사용
+            if (hologram != null)
+                hologram.setContent(MessageFormat.format("§c{0} §f{1}", TextIcon.DAMAGE_INCREASE, shredding));
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            setValue(0);
-            burning = null;
-
-            if (shreddingHologram != null) {
-                shreddingHologram.remove();
-                shreddingHologram = null;
+            if (hologram != null) {
+                hologram.remove();
+                hologram = null;
             }
         }
     }

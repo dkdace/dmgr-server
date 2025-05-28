@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
@@ -43,7 +43,7 @@ public final class MetarP1 extends AbstractSkill {
         setDuration();
         combatUser.getMoveModule().getResistanceStatus().addModifier(modifier);
 
-        addActionTask(new IntervalTask(i -> !combatUser.getStatusEffectModule().hasType(StatusEffectType.SILENCE), this::forceCancel, 1));
+        addActionTask(new IntervalTask(i -> !combatUser.getStatusEffectModule().has(Silence.class), this::forceCancel, 1));
     }
 
     @Override

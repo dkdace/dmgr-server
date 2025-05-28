@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
+import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
@@ -17,7 +17,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Nullable;
 
 @Getter
 public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
@@ -47,8 +46,11 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
         Healable target = targetModule.getCurrentTarget();
 
-        NeaceA1Mark neaceA1Mark = target.getStatusEffectModule().apply(ValueStatusEffect.Type.HEALING_MARK, NeaceA1Info.DURATION);
-        neaceA1Mark.provider = combatUser;
+        NeaceA1Mark neaceA1Mark = target.getStatusEffectModule().get(NeaceA1Mark.class);
+        if (neaceA1Mark == null)
+            neaceA1Mark = new NeaceA1Mark();
+
+        target.getStatusEffectModule().apply(neaceA1Mark, NeaceA1Info.DURATION);
 
         NeaceA1Info.Sounds.USE.play(combatUser.getLocation());
         playUseEffect(target);
@@ -63,7 +65,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     @NonNull
     public EntityCondition<Healable> getEntityCondition() {
         return EntityCondition.team(combatUser).exclude(combatUser)
-                .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueStatusEffect.Type.HEALING_MARK));
+                .and(combatEntity -> !combatEntity.getStatusEffectModule().has(NeaceA1Mark.class));
     }
 
     /**
@@ -99,16 +101,10 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     }
 
     /**
-     * 치유 표식 상태 효과 클래스.
+     * 구원의 표식 상태 효과 클래스.
      */
-    public static final class NeaceA1Mark extends ValueStatusEffect {
-        /** 제공자 */
-        @Nullable
-        private CombatUser provider;
-
-        public NeaceA1Mark() {
-            super(NeaceA1Info.MAX_HEAL);
-        }
+    private final class NeaceA1Mark implements StatusEffect {
+        private double heal = 0;
 
         @Override
         public boolean isPositive() {
@@ -124,27 +120,26 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
         public void onTick(@NonNull Damageable combatEntity, long i) {
             NeaceA1Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
 
-            if (provider == null || provider.isRemoved()) {
+            if (combatUser.isRemoved()) {
                 combatEntity.getStatusEffectModule().remove(this);
                 return;
             }
 
             if (!(combatEntity instanceof Healable) || ((Healable) combatEntity).getDamageModule().isFullHealth()
-                    || ((NeaceWeapon) provider.getActionManager().getWeapon()).isHealing((Healable) combatEntity))
+                    || ((NeaceWeapon) combatUser.getActionManager().getWeapon()).isHealing((Healable) combatEntity))
                 return;
 
             double amount = NeaceA1Info.HEAL_PER_SECOND / 20.0;
-            if (((Healable) combatEntity).getDamageModule().heal(provider, amount, true))
-                setValue(getValue() + amount);
+            if (((Healable) combatEntity).getDamageModule().heal(combatUser, amount, true))
+                heal += amount;
 
-            if (getValue() >= NeaceA1Info.MAX_HEAL)
+            if (heal >= NeaceA1Info.MAX_HEAL)
                 combatEntity.getStatusEffectModule().remove(this);
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            setValue(0);
-            provider = null;
+            // 미사용
         }
     }
 }

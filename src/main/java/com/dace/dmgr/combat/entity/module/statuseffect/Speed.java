@@ -31,10 +31,20 @@ public class Speed implements StatusEffect {
         this.modifier = new AbilityStatus.Modifier(increment);
     }
 
-    @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.SPEED;
+    /**
+     * @return 이동 속도 증가량
+     */
+    protected final double getIncrement() {
+        return modifier.getIncrement();
+    }
+
+    /**
+     * 이동 속도 증가량을 설정한다.
+     *
+     * @param increment 이동 속도 증가량
+     */
+    protected final void setIncrement(double increment) {
+        modifier.setIncrement(increment);
     }
 
     @Override

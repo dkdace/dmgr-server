@@ -6,7 +6,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.user.User;
@@ -111,7 +111,7 @@ public class DamageModule {
 
         combatEntity.addOnTick(i -> {
             ChatColor color;
-            if (combatEntity.getStatusEffectModule().hasType(StatusEffectType.HEAL_BLOCK))
+            if (combatEntity.getStatusEffectModule().has(HealBlock.class))
                 color = ChatColor.DARK_PURPLE;
             else if (isLowHealth())
                 color = ChatColor.RED;

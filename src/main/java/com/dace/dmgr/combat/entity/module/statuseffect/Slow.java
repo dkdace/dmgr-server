@@ -29,10 +29,20 @@ public class Slow implements StatusEffect {
         this.modifier = new AbilityStatus.Modifier(-decrement);
     }
 
-    @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.SLOW;
+    /**
+     * @return 이동 속도 감소량
+     */
+    protected final double getDecrement() {
+        return -modifier.getIncrement();
+    }
+
+    /**
+     * 이동 속도 감소량을 설정한다.
+     *
+     * @param decrement 이동 속도 감소량
+     */
+    protected final void setDecrement(double decrement) {
+        modifier.setIncrement(-decrement);
     }
 
     @Override

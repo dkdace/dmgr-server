@@ -22,12 +22,6 @@ public class Stun implements StatusEffect {
     private final CombatUser attacker;
 
     @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.STUN;
-    }
-
-    @Override
     public final boolean isPositive() {
         return false;
     }

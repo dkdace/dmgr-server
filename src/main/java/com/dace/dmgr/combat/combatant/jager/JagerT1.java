@@ -2,10 +2,7 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
+import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
@@ -19,54 +16,50 @@ public final class JagerT1 {
      *
      * @param victim 피격자
      * @param amount 증가량
+     * @return 빙결 수치 상태 효과
      */
-    static void addFreezeValue(@NonNull Damageable victim, int amount) {
-        FreezeValue freezeValue = victim.getStatusEffectModule().apply(ValueStatusEffect.Type.FREEZE, JagerT1Info.DURATION);
-        freezeValue.setValue(freezeValue.getValue() + amount);
+    @NonNull
+    static FreezeValue addFreezeValue(@NonNull Damageable victim, int amount) {
+        FreezeValue freezeValue = victim.getStatusEffectModule().get(FreezeValue.class);
+        if (freezeValue == null)
+            freezeValue = new FreezeValue();
+
+        victim.getStatusEffectModule().apply(freezeValue, JagerT1Info.DURATION);
+        freezeValue.addValue(amount);
+
+        return freezeValue;
     }
 
     /**
      * 빙결 수치 상태 효과 클래스.
      */
-    public static final class FreezeValue extends ValueStatusEffect {
-        /** 수정자 */
-        private final AbilityStatus.Modifier modifier = new AbilityStatus.Modifier(0);
-
-        public FreezeValue() {
-            super(JagerT1Info.MAX);
-        }
-
-        @Override
-        @NonNull
-        public StatusEffectType getStatusEffectType() {
-            return StatusEffectType.SLOW;
-        }
-
-        @Override
-        public boolean isPositive() {
-            return false;
-        }
-
-        @Override
-        public void onStart(@NonNull Damageable combatEntity) {
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifier);
+    public static final class FreezeValue extends Slow {
+        private FreezeValue() {
+            super(0);
         }
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            if (combatEntity instanceof Movable)
-                modifier.setIncrement(-getValue());
-
             if (combatEntity.isCreature())
                 JagerT1Info.Particles.TICK_PARTICLE.play(combatEntity.getLocation().add(0, 0.5, 0), combatEntity.getWidth());
         }
 
-        @Override
-        public void onEnd(@NonNull Damageable combatEntity) {
-            setValue(0);
-            if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifier);
+        /**
+         * 현재 빙결 수치를 반환한다.
+         *
+         * @return 빙결 수치
+         */
+        int getValue() {
+            return (int) getDecrement();
+        }
+
+        /**
+         * 빙결 수치를 증가시킨다.
+         *
+         * @param amount 추가할 빙결 수치
+         */
+        private void addValue(int amount) {
+            setDecrement(Math.min(JagerT1Info.MAX, Math.max(0, getDecrement() + amount)));
         }
 
         @Override
@@ -74,9 +67,9 @@ public final class JagerT1 {
         public Set<@NonNull CombatRestriction> getCombatRestrictions(@NonNull Damageable combatEntity) {
             EnumSet<CombatRestriction> combatRestrictions = EnumSet.of(CombatRestriction.NONE);
 
-            if (getValue() >= JagerT1Info.NO_SPRINT)
+            if (getDecrement() >= JagerT1Info.NO_SPRINT)
                 combatRestrictions.add(CombatRestriction.SPRINT);
-            if (getValue() >= JagerT1Info.NO_JUMP)
+            if (getDecrement() >= JagerT1Info.NO_JUMP)
                 combatRestrictions.add(CombatRestriction.JUMP);
 
             return combatRestrictions;

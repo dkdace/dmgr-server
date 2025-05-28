@@ -37,12 +37,6 @@ public class Burning implements StatusEffect {
     }
 
     @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.BURNING;
-    }
-
-    @Override
     public final boolean isPositive() {
         return false;
     }

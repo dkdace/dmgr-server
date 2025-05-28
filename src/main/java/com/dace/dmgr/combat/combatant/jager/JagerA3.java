@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
@@ -234,9 +233,7 @@ public final class JagerA3 extends ActiveSkill {
                     ((Movable) target).getMoveModule().knockback(dir);
                 }
 
-                JagerT1.addFreezeValue(target, freeze);
-
-                if (target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.FREEZE).getValue() >= JagerT1Info.MAX) {
+                if (JagerT1.addFreezeValue(target, freeze).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
                     ActionManager actionManager = combatUser.getActionManager();

@@ -11,7 +11,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -183,9 +182,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 double damage = CombatUtil.getDistantDamage(MagrittaWeaponInfo.DAMAGE, getTravelDistance(), MagrittaWeaponInfo.DISTANCE / 2.0);
-                double shredding = target.getStatusEffectModule().getValueStatusEffect(ValueStatusEffect.Type.SHREDDING).getValue();
-                if (shredding > 0)
-                    damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shredding) / 100.0;
+                MagrittaT1.ShreddingValue shreddingValue = target.getStatusEffectModule().get(MagrittaT1.ShreddingValue.class);
+                if (shreddingValue != null)
+                    damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * shreddingValue.getShredding()) / 100.0;
 
                 if (target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, location, false, true)) {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);

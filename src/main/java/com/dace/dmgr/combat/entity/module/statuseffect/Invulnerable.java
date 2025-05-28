@@ -19,12 +19,6 @@ public class Invulnerable implements StatusEffect {
     private static final Invulnerable instance = new Invulnerable();
 
     @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.INVULNERABLE;
-    }
-
-    @Override
     public final boolean isPositive() {
         return true;
     }

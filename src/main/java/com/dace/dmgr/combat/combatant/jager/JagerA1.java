@@ -16,7 +16,7 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.*;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
@@ -264,7 +264,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         @Override
         public void onDefaultAttack(@NonNull Damageable victim) {
             victim.getDamageModule().damage(this, JagerA1Info.DAMAGE, DamageType.NORMAL, null,
-                    victim.getStatusEffectModule().hasType(StatusEffectType.SNARE), true);
+                    victim.getStatusEffectModule().has(Snare.class), true);
         }
 
         @Override

@@ -22,12 +22,6 @@ public class Silence implements StatusEffect {
     private final CombatUser attacker;
 
     @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.SILENCE;
-    }
-
-    @Override
     public final boolean isPositive() {
         return false;
     }

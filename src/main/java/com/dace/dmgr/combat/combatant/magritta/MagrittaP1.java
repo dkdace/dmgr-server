@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -79,7 +79,7 @@ public final class MagrittaP1 extends AbstractSkill {
     private final class MagrittaP1Area extends Area<Damageable> {
         private MagrittaP1Area() {
             super(combatUser, MagrittaP1Info.DETECT_RADIUS, EntityCondition.enemy(combatUser)
-                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasType(StatusEffectType.BURNING)));
+                    .and(combatEntity -> combatEntity.getStatusEffectModule().has(Burning.class)));
         }
 
         @Override

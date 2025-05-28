@@ -25,12 +25,6 @@ public class HealBlock implements StatusEffect {
     private static final HealBlock instance = new HealBlock();
 
     @Override
-    @NonNull
-    public final StatusEffectType getStatusEffectType() {
-        return StatusEffectType.HEAL_BLOCK;
-    }
-
-    @Override
     public final boolean isPositive() {
         return false;
     }

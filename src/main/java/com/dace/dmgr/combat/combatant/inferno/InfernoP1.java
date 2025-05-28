@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
+import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Area;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -79,7 +79,7 @@ public final class InfernoP1 extends AbstractSkill {
     private final class InfernoP1Area extends Area<Damageable> {
         private InfernoP1Area() {
             super(combatUser, InfernoP1Info.DETECT_RADIUS, EntityCondition.enemy(combatUser)
-                    .and(combatEntity -> combatEntity.getStatusEffectModule().hasType(StatusEffectType.BURNING)));
+                    .and(combatEntity -> combatEntity.getStatusEffectModule().has(Burning.class)));
         }
 
         @Override

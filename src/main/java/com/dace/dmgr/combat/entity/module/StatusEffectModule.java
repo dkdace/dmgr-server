@@ -6,13 +6,12 @@ import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffectType;
-import com.dace.dmgr.combat.entity.module.statuseffect.ValueStatusEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +34,8 @@ public final class StatusEffectModule {
     @NonNull
     @Getter
     private final AbilityStatus resistanceStatus;
-    /** 상태 변수 상태 효과 목록 (상태 변수 종류 : 상태 효과) */
-    private final HashMap<ValueStatusEffect.Type<?>, ValueStatusEffect> valueStatusEffectMap = new HashMap<>();
-    /** 적용된 상태 효과 목록 (상태 효과 : 상태 효과 정보) */
-    private final HashMap<StatusEffect, StatusEffectInfo> statusEffectMap = new HashMap<>();
+    /** 적용된 상태 효과 정보 목록 (상태 효과 : 상태 효과 정보) */
+    private final HashMap<StatusEffect, StatusEffectInfo> statusEffectInfoMap = new HashMap<>();
 
     /**
      * 상태 효과 모듈 인스턴스를 생성한다.
@@ -51,30 +48,30 @@ public final class StatusEffectModule {
 
         this.combatEntity = combatEntity;
         this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
-        for (ValueStatusEffect.Type<?> type : ValueStatusEffect.Type.values())
-            this.valueStatusEffectMap.put(type, type.createStatusEffect());
 
         combatEntity.addOnRemove(this::clear);
     }
 
     /**
-     * 지정한 상태 변수 종류에 해당하는 상태 효과를 반환한다.
+     * 엔티티의 지정한 상태 효과 클래스에 해당하는 상태 효과를 반환한다.
      *
-     * @param type 상태 변수 종류
-     * @param <T>  {@link ValueStatusEffect}를 상속받는 상태 변수를 가진 상태 효과
-     * @return 상태 변수를 가진 상태 효과
-     * @see ValueStatusEffect.Type
+     * <p>해당하는 상태 효과가 여러개일 경우 하나만 반환한다.</p>
+     *
+     * @param statusEffectClass 상태 효과 클래스
+     * @param <T>               {@link StatusEffect}를 상속받는 상태 효과
+     * @return 상태 효과
      */
-    @NonNull
+    @Nullable
     @SuppressWarnings("unchecked")
-    public <T extends ValueStatusEffect> T getValueStatusEffect(@NonNull ValueStatusEffect.Type<T> type) {
-        return (T) valueStatusEffectMap.get(type);
+    public <T extends StatusEffect> T get(@NonNull Class<T> statusEffectClass) {
+        return (T) statusEffectInfoMap.keySet().stream()
+                .filter(statusEffect -> statusEffect.getClass() == statusEffectClass)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * 엔티티에게 상태 효과를 적용한다.
-     *
-     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이 남은 시간보다 길 경우에만 적용한다.</p>
      *
      * @param statusEffect 적용할 상태 효과
      * @param duration     지속시간
@@ -87,28 +84,9 @@ public final class StatusEffectModule {
 
         Timestamp expiration = Timestamp.now().plus(duration);
 
-        StatusEffectInfo statusEffectInfo = statusEffectMap.computeIfAbsent(statusEffect, k ->
+        StatusEffectInfo statusEffectInfo = statusEffectInfoMap.computeIfAbsent(statusEffect, k ->
                 new StatusEffectInfo(statusEffect, expiration));
         statusEffectInfo.expiration = expiration;
-    }
-
-    /**
-     * 엔티티에게 상태 변수를 가진 상태 효과를 적용한다.
-     *
-     * <p>이미 해당 상태 효과를 가지고 있으면 새로 지정한 지속시간이 남은 시간보다 길 경우에만 적용한다.</p>
-     *
-     * @param type     상태 변수 종류
-     * @param duration 지속시간
-     * @param <T>      {@link ValueStatusEffect}를 상속받는 상태 변수를 가진 상태 효과
-     * @return 적용된 상태 효과
-     * @see ValueStatusEffect.Type
-     */
-    @NonNull
-    public <T extends ValueStatusEffect> T apply(@NonNull ValueStatusEffect.Type<T> type, @NonNull Timespan duration) {
-        T valueStatusEffect = getValueStatusEffect(type);
-        apply(valueStatusEffect, duration);
-
-        return valueStatusEffect;
     }
 
     /**
@@ -119,30 +97,19 @@ public final class StatusEffectModule {
      */
     @NonNull
     public Timespan getDuration(@NonNull StatusEffect statusEffect) {
-        StatusEffectInfo statusEffectInfo = statusEffectMap.get(statusEffect);
+        StatusEffectInfo statusEffectInfo = statusEffectInfoMap.get(statusEffect);
         return statusEffectInfo == null ? Timespan.ZERO : Timestamp.now().until(statusEffectInfo.expiration);
     }
 
     /**
-     * 지정한 상태 변수 종류에 해당하는 상태 효과의 남은 시간을 반환한다.
+     * 엔티티가 지정한 상태 효과 클래스에 해당하는 상태 효과를 가지고 있는지 확인한다.
      *
-     * @param type 상태 변수 종류
-     * @return 남은 시간
-     * @see ValueStatusEffect.Type
-     */
-    @NonNull
-    public Timespan getDuration(@NonNull ValueStatusEffect.Type<?> type) {
-        return getDuration(getValueStatusEffect(type));
-    }
-
-    /**
-     * 엔티티가 지정한 상태 효과 유형에 해당하는 상태 효과를 가지고 있는지 확인한다.
-     *
-     * @param statusEffectType 확인할 상태 효과 유형
+     * @param statusEffectClass 확인할 상태 효과 클래스
+     * @param <T>               {@link StatusEffect}를 상속받는 상태 효과
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
-    public boolean hasType(@NonNull StatusEffectType statusEffectType) {
-        return statusEffectMap.keySet().stream().anyMatch(statusEffect -> statusEffect.getStatusEffectType() == statusEffectType);
+    public <T extends StatusEffect> boolean has(@NonNull Class<T> statusEffectClass) {
+        return statusEffectInfoMap.keySet().stream().anyMatch(statusEffect -> statusEffect.getClass() == statusEffectClass);
     }
 
     /**
@@ -152,18 +119,7 @@ public final class StatusEffectModule {
      * @return 상태 효과를 가지고 있으면 {@code true} 반환
      */
     public boolean has(@NonNull StatusEffect statusEffect) {
-        return statusEffectMap.containsKey(statusEffect);
-    }
-
-    /**
-     * 지정한 상태 변수 종류에 해당하는 상태 효과를 가지고 있는지 확인한다.
-     *
-     * @param type 상태 변수 종류
-     * @return 상태 효과를 가지고 있으면 {@code true} 반환
-     * @see ValueStatusEffect.Type
-     */
-    public boolean has(@NonNull ValueStatusEffect.Type<?> type) {
-        return has(getValueStatusEffect(type));
+        return statusEffectInfoMap.containsKey(statusEffect);
     }
 
     /**
@@ -175,21 +131,9 @@ public final class StatusEffectModule {
      * @see CombatRestriction
      */
     public boolean hasRestriction(@NonNull CombatRestriction combatRestriction) {
-        return statusEffectMap.keySet().stream()
+        return statusEffectInfoMap.keySet().stream()
                 .flatMap(statusEffect -> statusEffect.getCombatRestrictions(combatEntity).stream())
                 .anyMatch(value -> value.restrictionValues().contains(combatRestriction));
-    }
-
-    /**
-     * 엔티티의 지정한 상태 효과 유형에 해당하는 상태 효과를 제거한다.
-     *
-     * @param statusEffectType 제거할 상태 효과 유형
-     */
-    public void removeType(@NonNull StatusEffectType statusEffectType) {
-        new HashSet<>(statusEffectMap.keySet()).forEach(statusEffect -> {
-            if (statusEffect.getStatusEffectType() == statusEffectType)
-                remove(statusEffect);
-        });
     }
 
     /**
@@ -198,26 +142,16 @@ public final class StatusEffectModule {
      * @param statusEffect 제거할 상태 효과
      */
     public void remove(@NonNull StatusEffect statusEffect) {
-        StatusEffectInfo statusEffectInfo = statusEffectMap.get(statusEffect);
+        StatusEffectInfo statusEffectInfo = statusEffectInfoMap.get(statusEffect);
         if (statusEffectInfo != null)
             statusEffectInfo.onFinish();
-    }
-
-    /**
-     * 지정한 상태 변수 종류에 해당하는 상태 효과를 제거한다.
-     *
-     * @param type 상태 변수 종류
-     * @see ValueStatusEffect.Type
-     */
-    public void remove(@NonNull ValueStatusEffect.Type<?> type) {
-        remove(getValueStatusEffect(type));
     }
 
     /**
      * 엔티티의 상태 효과를 모두 제거한다.
      */
     public void clear() {
-        new HashSet<>(statusEffectMap.keySet()).forEach(this::remove);
+        new HashSet<>(statusEffectInfoMap.keySet()).forEach(this::remove);
     }
 
     /**
@@ -226,7 +160,7 @@ public final class StatusEffectModule {
      * @param isPositive {@code true}로 지정 시 이로운 효과, {@code false}로 지정 시 해로운 효과만 제거
      */
     public void clear(boolean isPositive) {
-        new HashSet<>(statusEffectMap.keySet()).forEach(statusEffect -> {
+        new HashSet<>(statusEffectInfoMap.keySet()).forEach(statusEffect -> {
             if (statusEffect.isPositive() == isPositive)
                 remove(statusEffect);
         });
@@ -261,7 +195,7 @@ public final class StatusEffectModule {
         }
 
         private void onFinish() {
-            statusEffectMap.remove(statusEffect);
+            statusEffectInfoMap.remove(statusEffect);
             statusEffect.onEnd(combatEntity);
 
             onTickTask.stop();
