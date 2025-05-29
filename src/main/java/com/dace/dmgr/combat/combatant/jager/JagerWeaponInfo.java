@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.entity.DistantDamage;
-import com.dace.dmgr.combat.entity.combatuser.Recoil;
+import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -40,7 +40,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     /** 조준 시 이동속도 감소량 */
     public static final int AIM_SLOW = 30;
     /** 반동 */
-    public static final Recoil RECOIL = new Recoil(0.8, 0, 0.1, 0.05, Timespan.ofTicks(2), 1);
+    public static final ScreenRecoil RECOIL = new ScreenRecoil(0.8, 0, 0.1, 0.05, Timespan.ofTicks(2), 1);
 
     @Getter
     private static final JagerWeaponInfo instance = new JagerWeaponInfo();
@@ -85,7 +85,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
         /** 확대 레벨 */
         public static final Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L4;
         /** 반동 */
-        public static final Recoil RECOIL = new Recoil(2.8, 0, 0.25, 0.3, Timespan.ofTicks(2), 1);
+        public static final ScreenRecoil RECOIL = new ScreenRecoil(2.8, 0, 0.25, 0.3, Timespan.ofTicks(2), 1);
     }
 
     /**

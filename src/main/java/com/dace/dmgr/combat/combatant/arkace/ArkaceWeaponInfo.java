@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.entity.DistantDamage;
-import com.dace.dmgr.combat.entity.combatuser.Recoil;
+import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     /** 달리기 중 시전 시간 */
     public static final Timespan SPRINT_READY_DURATION = Timespan.ofSeconds(0.25);
     /** 반동 */
-    public static final Recoil RECOIL = new Recoil(0.6, 0.04, 0.1, 0.06, Timespan.ofTicks(2), 2);
+    public static final ScreenRecoil RECOIL = new ScreenRecoil(0.6, 0.04, 0.1, 0.06, Timespan.ofTicks(2), 2);
 
     @Getter
     private static final ArkaceWeaponInfo instance = new ArkaceWeaponInfo();

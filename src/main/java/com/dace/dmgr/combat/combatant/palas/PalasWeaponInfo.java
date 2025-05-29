@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.entity.combatuser.Recoil;
+import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -42,7 +42,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     /** 확대 레벨 */
     public static final Aimable.ZoomLevel ZOOM_LEVEL = Aimable.ZoomLevel.L3;
     /** 반동 */
-    public static final Recoil RECOIL = new Recoil(2.5, 0, 0.15, 0.2, Timespan.ofTicks(2), 1);
+    public static final ScreenRecoil RECOIL = new ScreenRecoil(2.5, 0, 0.15, 0.2, Timespan.ofTicks(2), 1);
 
     @Getter
     private static final PalasWeaponInfo instance = new PalasWeaponInfo();

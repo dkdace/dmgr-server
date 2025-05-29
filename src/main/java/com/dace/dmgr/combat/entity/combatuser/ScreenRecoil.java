@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
  *
  * <p>주로 총기 반동에 사용된다.</p>
  */
-public final class Recoil {
+public final class ScreenRecoil {
     /** 수직 반동 */
     private final double up;
     /** 수평 반동 */
@@ -38,7 +38,7 @@ public final class Recoil {
      * @param firstMultiplier 초탄 반동 배수. 1로 설정 시 차탄과 동일. 1 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public Recoil(double up, double side, double upSpread, double sideSpread, @NonNull Timespan duration, double firstMultiplier) {
+    public ScreenRecoil(double up, double side, double upSpread, double sideSpread, @NonNull Timespan duration, double firstMultiplier) {
         Validate.isTrue(firstMultiplier >= 1, "firstMultiplier >= 1 (%f)", firstMultiplier);
 
         this.up = up;

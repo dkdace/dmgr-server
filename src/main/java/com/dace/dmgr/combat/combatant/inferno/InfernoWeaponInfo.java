@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.DistantTimespan;
-import com.dace.dmgr.combat.entity.combatuser.Recoil;
+import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TimedSoundEffect;
@@ -95,7 +95,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         /** 넉백 강도 */
         public static final double KNOCKBACK = 0.2;
         /** 반동 */
-        public static final Recoil RECOIL = new Recoil(5, 0, 1, 0.8, Timespan.ofTicks(3), 1);
+        public static final ScreenRecoil RECOIL = new ScreenRecoil(5, 0, 1, 0.8, Timespan.ofTicks(3), 1);
     }
 
     /**
