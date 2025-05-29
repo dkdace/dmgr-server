@@ -8,9 +8,8 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -59,7 +58,7 @@ public final class SiliaA1 extends ActiveSkill {
         addActionTask(new IntervalTask(i -> {
             combatUser.getMoveModule().push(location.getDirection().multiply(SiliaA1Info.PUSH), true);
 
-            new SiliaA1Attack(targets).shot();
+            new SiliaA1MeleeHitscan(targets).shot();
 
             combatUser.setYawAndPitch(location.getYaw(), location.getPitch());
 
@@ -91,17 +90,13 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
-    private final class SiliaA1Attack extends Hitscan<Damageable> {
+    private final class SiliaA1MeleeHitscan extends MeleeHitscan<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private SiliaA1Attack(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().maxDistance(SiliaA1Info.DISTANCE).build());
+        private SiliaA1MeleeHitscan(@NonNull HashSet<Damageable> targets) {
+            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
+                    SiliaA1Info.DISTANCE, 0);
             this.targets = targets;
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
         }
 
         @Override
@@ -144,7 +139,7 @@ public final class SiliaA1 extends ActiveSkill {
 
         private final class SiliaA1Area extends Area<Damageable> {
             private SiliaA1Area() {
-                super(combatUser, SiliaA1Info.RADIUS, SiliaA1Attack.this.entityCondition);
+                super(combatUser, SiliaA1Info.RADIUS, SiliaA1MeleeHitscan.this.entityCondition);
             }
 
             @Override
@@ -154,14 +149,13 @@ public final class SiliaA1 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                if (targets.add(target)) {
-                    target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
-                            SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
+                targets.add(target);
 
-                    SiliaA1Info.Particles.HIT_ENTITY.play(location);
-                }
+                target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
+                        SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
 
-                return !(target instanceof Barrier);
+                SiliaA1Info.Particles.HIT_ENTITY.play(location);
+                return true;
             }
         }
     }

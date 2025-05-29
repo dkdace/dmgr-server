@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -71,7 +71,7 @@ public final class QuakerWeapon extends AbstractWeapon {
             int angle = (i + 1) * 20;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, isOpposite ? angle : 180 - angle);
 
-            new QuakerWeaponAttack(targets, isUlt).shot(loc, vec);
+            new QuakerWeaponMeleeHitscan(targets, isUlt).shot(loc, vec);
 
             combatUser.addYawAndPitch(isOpposite ? 0.8 : -0.8, 0.1);
             if (i % 2 == 0)
@@ -96,21 +96,16 @@ public final class QuakerWeapon extends AbstractWeapon {
         setVisible(true);
     }
 
-    private final class QuakerWeaponAttack extends Hitscan<Damageable> {
+    private final class QuakerWeaponMeleeHitscan extends MeleeHitscan<Damageable> {
         private final HashSet<Damageable> targets;
         private final boolean isUlt;
 
-        private QuakerWeaponAttack(@NonNull HashSet<Damageable> targets, boolean isUlt) {
-            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(QuakerWeaponInfo.SIZE)
-                    .maxDistance(QuakerWeaponInfo.DISTANCE).build());
+        private QuakerWeaponMeleeHitscan(@NonNull HashSet<Damageable> targets, boolean isUlt) {
+            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
+                    QuakerWeaponInfo.DISTANCE, QuakerWeaponInfo.SIZE);
 
             this.targets = targets;
             this.isUlt = isUlt;
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
         }
 
         @Override
@@ -154,7 +149,9 @@ public final class QuakerWeapon extends AbstractWeapon {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (!isUlt && targets.add(target)) {
+                if (!isUlt) {
+                    targets.add(target);
+
                     if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true)
                             && target instanceof Movable) {
                         Vector dir = VectorUtil.getPitchAxis(combatUser.getLocation())

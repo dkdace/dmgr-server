@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -65,7 +65,7 @@ public final class No7A1 extends ActiveSkill {
             combatUser.getMoveModule().push(loc.getDirection().multiply(No7A1Info.PUSH), true);
 
             if (length > No7A1Info.PUSH / 2)
-                new No7A1Attack(targets).shot(loc);
+                new No7A1MeleeHitscan(targets).shot(loc);
 
             No7A1Info.Sounds.TICK.play(combatUser.getLocation());
             for (int j = 0; j < 12; j++) {
@@ -87,17 +87,13 @@ public final class No7A1 extends ActiveSkill {
         setDuration(Timespan.ZERO);
     }
 
-    private final class No7A1Attack extends Hitscan<Damageable> {
+    private final class No7A1MeleeHitscan extends MeleeHitscan<Damageable> {
         private final HashMap<Damageable, Timestamp> targets;
 
-        private No7A1Attack(@NonNull HashMap<Damageable, Timestamp> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(No7A1Info.SIZE).maxDistance(No7A1Info.DISTANCE).build());
+        private No7A1MeleeHitscan(@NonNull HashMap<Damageable, Timestamp> targets) {
+            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity ->
+                    !targets.containsKey(combatEntity) || targets.get(combatEntity).isBefore(Timestamp.now())), No7A1Info.DISTANCE, No7A1Info.SIZE);
             this.targets = targets;
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
         }
 
         @Override
@@ -116,20 +112,17 @@ public final class No7A1 extends ActiveSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                Timestamp damageTimestamp = targets.get(target);
+                targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
 
-                if (damageTimestamp == null || damageTimestamp.isBefore(Timestamp.now())) {
-                    if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
-                        combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
+                if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                    combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
 
-                        if (target instanceof Movable)
-                            ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
-                    }
-
-                    No7A1Info.Sounds.HIT_ENTITY.play(location);
-                    No7A1Info.Particles.HIT_ENTITY.play(location);
+                    if (target instanceof Movable)
+                        ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
                 }
+
+                No7A1Info.Sounds.HIT_ENTITY.play(location);
+                No7A1Info.Particles.HIT_ENTITY.play(location);
 
                 return false;
             };

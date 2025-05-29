@@ -4,7 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
@@ -83,14 +83,9 @@ public final class MeleeAttackAction extends AbstractAction {
         combatUser.addTask(new DelayTask(() -> combatUser.getEntity().getInventory().setHeldItemSlot(4), 16));
     }
 
-    private final class MeleeAttack extends Hitscan<Damageable> {
+    private final class MeleeAttack extends MeleeHitscan<Damageable> {
         private MeleeAttack() {
-            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(SIZE).maxDistance(DISTANCE).build());
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
+            super(combatUser, EntityCondition.enemy(combatUser), DISTANCE, SIZE);
         }
 
         @Override
@@ -115,7 +110,8 @@ public final class MeleeAttackAction extends AbstractAction {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true) && target instanceof Movable)
+                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true)
+                        && target instanceof Movable)
                     ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
 
                 HIT_ENTITY_SOUND.play(location);

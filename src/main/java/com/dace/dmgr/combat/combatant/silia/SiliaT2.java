@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Hitscan;
+import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -61,7 +61,7 @@ public final class SiliaT2 extends Trait {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, (isOpposite ? 90 + angle : 90 - angle));
             vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(loc), isOpposite ? 30 : -30);
 
-            new SiliaT2Attack(targets).shot(loc, vec);
+            new SiliaT2MeleeHitscan(targets).shot(loc, vec);
 
             combatUser.addYawAndPitch(isOpposite ? 0.5 : -0.5, 0.15);
             if (i < 3)
@@ -96,17 +96,13 @@ public final class SiliaT2 extends Trait {
         weapon.setDurability(isStrike ? SiliaWeaponInfo.Resource.EXTENDED : SiliaWeaponInfo.Resource.DEFAULT);
     }
 
-    private final class SiliaT2Attack extends Hitscan<Damageable> {
+    private final class SiliaT2MeleeHitscan extends MeleeHitscan<Damageable> {
         private final HashSet<Damageable> targets;
 
-        private SiliaT2Attack(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser), Option.builder().size(SiliaT2Info.SIZE).maxDistance(SiliaT2Info.DISTANCE).build());
+        private SiliaT2MeleeHitscan(@NonNull HashSet<Damageable> targets) {
+            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)), SiliaT2Info.DISTANCE,
+                    SiliaT2Info.SIZE);
             this.targets = targets;
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
         }
 
         @Override
@@ -147,22 +143,22 @@ public final class SiliaT2 extends Trait {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (targets.add(target)) {
-                    if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                            SiliaT1Util.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
+                targets.add(target);
 
-                        if (target instanceof Movable) {
-                            Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
-                            ((Movable) target).getMoveModule().knockback(dir);
-                        }
+                if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
+                        SiliaT1Util.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
 
-                        if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
-                            combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                    if (target instanceof Movable) {
+                        Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
+                        ((Movable) target).getMoveModule().knockback(dir);
                     }
 
-                    SiliaT2Info.Particles.HIT_ENTITY.play(location);
-                    SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
+                    if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
+                        combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }
+
+                SiliaT2Info.Particles.HIT_ENTITY.play(location);
+                SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
 
                 return true;
             };

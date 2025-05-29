@@ -192,7 +192,8 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerA2Projectile(@NonNull HashSet<Damageable> targets) {
-            super(QuakerA2.this, QuakerA2Info.VELOCITY, EntityCondition.enemy(combatUser),
+            super(QuakerA2.this, QuakerA2Info.VELOCITY,
+                    EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
                     Option.builder().size(QuakerA2Info.SIZE).maxDistance(QuakerA2Info.DISTANCE).build());
             this.targets = targets;
         }
@@ -223,19 +224,19 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (targets.add(target)) {
-                    if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        target.getStatusEffectModule().apply(stun, QuakerA2Info.STUN_DURATION);
-                        target.getStatusEffectModule().apply(SLOW, QuakerA2Info.SLOW_DURATION);
+                targets.add(target);
 
-                        if (target.isGoalTarget()) {
-                            combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
-                            bonusScoreModule.addTarget(target, QuakerA2Info.SLOW_DURATION);
-                        }
+                if (target.getDamageModule().damage(this, QuakerA2Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                    target.getStatusEffectModule().apply(stun, QuakerA2Info.STUN_DURATION);
+                    target.getStatusEffectModule().apply(SLOW, QuakerA2Info.SLOW_DURATION);
+
+                    if (target.isGoalTarget()) {
+                        combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
+                        bonusScoreModule.addTarget(target, QuakerA2Info.SLOW_DURATION);
                     }
-
-                    QuakerA2Info.Particles.HIT_ENTITY.play(location);
                 }
+
+                QuakerA2Info.Particles.HIT_ENTITY.play(location);
 
                 return !(target instanceof Barrier);
             };
