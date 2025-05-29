@@ -72,33 +72,8 @@ public abstract class Area<T extends CombatEntity> {
             return;
 
         isUsed = true;
-
         CombatEntityRegistry.getNearCombatEntities(center, radius, entityCondition).forEach(target ->
-                new Hitscan<T>(shooter, entityCondition, Hitscan.Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build()) {
-                    @Override
-                    protected boolean canBeRemoved() {
-                        return false;
-                    }
-
-                    @Override
-                    @NonNull
-                    protected IntervalHandler getIntervalHandler() {
-                        return (location, i) -> true;
-                    }
-
-                    @Override
-                    @NonNull
-                    protected HitBlockHandler getHitBlockHandler() {
-                        return (location, hitBlock) -> onHitBlock(center.clone(), location.clone(), hitBlock);
-                    }
-
-                    @Override
-                    @NonNull
-                    protected HitEntityHandler<T> getHitEntityHandler() {
-                        return (location, areaTarget) ->
-                                penetrationMap.computeIfAbsent(areaTarget, k -> onHitEntity(center.clone(), location.clone(), k));
-                    }
-                }.shot(center, LocationUtil.getDirection(center, target.getHitboxCenter())));
+                new AreaHitscan(center).shot(center, LocationUtil.getDirection(center, target.getHitboxCenter())));
     }
 
     /**
@@ -120,4 +95,37 @@ public abstract class Area<T extends CombatEntity> {
      * @return 관통 여부. {@code true} 반환 시 엔티티 관통
      */
     protected abstract boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull T target);
+
+    private final class AreaHitscan extends Hitscan<T> {
+        private final Location center;
+
+        private AreaHitscan(@NonNull Location center) {
+            super(Area.this.shooter, Area.this.entityCondition, Option.builder().size(SIZE).startDistance(0).maxDistance(radius).build());
+            this.center = center;
+        }
+
+        @Override
+        protected boolean canBeRemoved() {
+            return false;
+        }
+
+        @Override
+        @NonNull
+        protected IntervalHandler getIntervalHandler() {
+            return (location, i) -> true;
+        }
+
+        @Override
+        @NonNull
+        protected HitBlockHandler getHitBlockHandler() {
+            return (location, hitBlock) -> onHitBlock(center.clone(), location.clone(), hitBlock);
+        }
+
+        @Override
+        @NonNull
+        protected HitEntityHandler<T> getHitEntityHandler() {
+            return (location, areaTarget) ->
+                    penetrationMap.computeIfAbsent(areaTarget, k -> onHitEntity(center.clone(), location.clone(), k));
+        }
+    }
 }
