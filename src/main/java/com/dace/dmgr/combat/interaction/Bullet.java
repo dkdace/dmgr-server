@@ -4,6 +4,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 
 /**
  * 총알. 원거리 판정(투사체, 히트스캔) 등을 관리하기 위한 클래스.
@@ -98,6 +100,27 @@ public abstract class Bullet<T extends CombatEntity> {
         this.maxDistance = maxDistance;
         this.size = size;
         this.entityCondition = entityCondition;
+    }
+
+    /**
+     * 동시에 여러 총알을 발사한다.
+     *
+     * @param bulletFunction 발사할 총알 반환에 실행할 작업.
+     *
+     *                       <p>인덱스 (0부터 시작)를 인자로 받으며, 0번째 총알은 탄퍼짐 없이 발사됨</p>
+     * @param amount         산탄 수. 2 이상의 값
+     * @param spread         탄퍼짐. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     */
+    public static void shotgun(@NonNull IntFunction<@NonNull Bullet<?>> bulletFunction, int amount, double spread) {
+        Validate.isTrue(amount >= 2, "amount >= 0 (%f)", amount);
+        Validate.isTrue(spread >= 0, "spread >= 0 (%f)", spread);
+
+        bulletFunction.apply(0).shot();
+        for (int i = 1; i < amount; i++) {
+            Bullet<?> bullet = bulletFunction.apply(i);
+            bullet.shot(VectorUtil.getSpreadedVector(bullet.getShooter().getLocation().getDirection(), spread));
+        }
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
@@ -11,6 +10,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -123,7 +123,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         if (isUlt)
             spread *= 1.25;
 
-        CombatUtil.shotgun(i -> new MagrittaWeaponHitscan(targets, i == 0, isUlt), MagrittaWeaponInfo.PELLET_AMOUNT, spread);
+        Bullet.shotgun(i -> new MagrittaWeaponHitscan(targets, i == 0, isUlt), MagrittaWeaponInfo.PELLET_AMOUNT, spread);
 
         targets.forEach((target, hits) -> {
             if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)

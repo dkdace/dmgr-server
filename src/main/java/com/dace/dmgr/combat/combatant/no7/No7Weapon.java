@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.no7;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -13,6 +12,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -49,7 +49,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        CombatUtil.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
+        Bullet.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
 
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
