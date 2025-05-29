@@ -104,6 +104,16 @@ public final class VectorUtil {
     }
 
     /**
+     * 벡터의 각 성분이 -1에서 1 사이인 무작위 벡터를 반환한다.
+     *
+     * @return 무작위 벡터
+     */
+    @NonNull
+    public static Vector getRandomVector() {
+        return Vector.getRandom().subtract(Vector.getRandom());
+    }
+
+    /**
      * 벡터의 성분을 지정한 값만큼 무작위로 분산시킨 벡터를 반환한다.
      *
      * @param vector 대상 벡터

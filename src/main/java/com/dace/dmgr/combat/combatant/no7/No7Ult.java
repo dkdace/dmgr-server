@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 public final class No7Ult extends UltimateSkill implements HasBonusScore {
     /** 보너스 점수 모듈 */
@@ -59,8 +58,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
             No7UltInfo.Sounds.USE_TICK.play(loc, 1, i / 39.0);
 
             Location loc2 = combatUser.getLocation().add(0, 1, 0);
-            new No7UltEffect(false, 1).shot(loc2,
-                    new Vector(Math.random() - Math.random(), Math.random() - Math.random(), Math.random() - Math.random()));
+            new No7UltEffect(false, 1).shot(loc2, VectorUtil.getRandomVector());
 
             No7UltInfo.Particles.USE_TICK_CORE.play(loc2);
         }, () -> {
@@ -75,8 +73,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
 
             addActionTask(new IntervalTask(i -> {
                 for (int j = 0; j < 6; j++)
-                    new No7UltEffect(true, 2).shot(loc2,
-                            new Vector(Math.random() - Math.random(), Math.random() - Math.random(), Math.random() - Math.random()));
+                    new No7UltEffect(true, 2).shot(loc2, VectorUtil.getRandomVector());
             }, 1, 4));
         }, 1, No7UltInfo.READY_DURATION.toTicks()));
     }

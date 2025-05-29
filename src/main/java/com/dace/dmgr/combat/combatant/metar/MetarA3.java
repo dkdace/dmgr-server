@@ -13,6 +13,7 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -122,8 +123,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
             Vector[] vecs = new Vector[30];
 
             for (int i = 0; i < locs.length; i++) {
-                Vector vec = new Vector(Math.random() - Math.random(), Math.random() - Math.random(), Math.random() - Math.random())
-                        .normalize().multiply(MetarA3Info.RADIUS);
+                Vector vec = VectorUtil.getRandomVector().multiply(MetarA3Info.RADIUS);
                 locs[i] = location.clone().add(vec);
                 vecs[i] = vec.normalize().multiply(-0.35);
             }
