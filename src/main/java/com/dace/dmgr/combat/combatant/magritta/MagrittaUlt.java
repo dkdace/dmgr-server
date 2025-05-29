@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -111,7 +110,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
         MagrittaUltInfo.Sounds.END.play(loc);
         MagrittaUltInfo.Particles.END.play(loc);
-        CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(7));
+        MagrittaUltInfo.SHAKE.send(combatUser);
 
         addTask(new DelayTask(() -> {
             weapon.setVisible(true);

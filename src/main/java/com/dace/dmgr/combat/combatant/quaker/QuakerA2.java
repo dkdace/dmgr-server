@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -145,7 +144,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         }
 
         QuakerA2Info.Sounds.USE_READY.play(loc);
-        CombatUtil.sendShake(combatUser, 7, 6, Timespan.ofTicks(5));
+        QuakerA2Info.SHAKE.send(combatUser);
     }
 
     private final class QuakerA2Effect extends Hitscan<CombatEntity> {

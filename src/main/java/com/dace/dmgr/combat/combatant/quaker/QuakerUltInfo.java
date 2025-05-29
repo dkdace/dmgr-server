@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -36,6 +37,8 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     public static final Timespan SLOW_DURATION = Timespan.ofSeconds(12);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 3;
+    /** 흔들림 */
+    public static final ScreenShake SHAKE = new ScreenShake(10, 8, Timespan.ofTicks(6));
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 15;

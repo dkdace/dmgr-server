@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -27,6 +28,8 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     public static final int VELOCITY = 50;
     /** 기절 시간 */
     public static final Timespan STUN_DURATION = Timespan.ofSeconds(1.8);
+    /** 흔들림 */
+    public static final ScreenShake SHAKE = new ScreenShake(20, 20, Timespan.ofTicks(1));
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 8;

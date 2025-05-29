@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -95,7 +94,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
             super.onTick(combatEntity, i);
 
             if (combatEntity instanceof CombatUser)
-                CombatUtil.sendShake((CombatUser) combatEntity, 20, 20);
+                PalasA1Info.SHAKE.send((CombatUser) combatEntity);
 
             if (i % 2 == 0) {
                 PalasA1Info.Particles.TICK.play(combatEntity.getCenterLocation());

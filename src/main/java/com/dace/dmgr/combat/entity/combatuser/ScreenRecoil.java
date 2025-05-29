@@ -6,7 +6,7 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * 화면 반동 효과를 나타내는 클래스.
@@ -23,7 +23,7 @@ public final class ScreenRecoil {
     /** 수평 반동 분산도 */
     private final double sideSpread;
     /** 반동 진행 시간 (tick) */
-    private final int durationTicks;
+    private final long durationTicks;
     /** 초탄 반동 배수 */
     private final double firstMultiplier;
 
@@ -45,7 +45,7 @@ public final class ScreenRecoil {
         this.side = side;
         this.upSpread = upSpread;
         this.sideSpread = sideSpread;
-        this.durationTicks = (int) Math.min(Integer.MAX_VALUE, duration.toTicks());
+        this.durationTicks = duration.toTicks();
         this.firstMultiplier = firstMultiplier;
     }
 
@@ -58,7 +58,7 @@ public final class ScreenRecoil {
         double finalUpSpread = upSpread * (Math.random() - Math.random()) * 0.5;
         double finalSideSpread = sideSpread * (Math.random() - Math.random()) * 0.5;
         boolean first = combatUser.getWeaponFirstRecoilTimestamp().isBefore(Timestamp.now());
-        long sum = IntStream.rangeClosed(1, durationTicks).sum();
+        long sum = LongStream.rangeClosed(1, durationTicks).sum();
 
         combatUser.setWeaponFirstRecoilTimestamp(Timestamp.now().plus(Timespan.ofTicks(4)));
         combatUser.addTask(new IntervalTask(i -> {

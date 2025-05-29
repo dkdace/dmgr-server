@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -34,6 +35,8 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     public static final int SLOW = 40;
     /** 이동 속도 감소 시간 */
     public static final Timespan SLOW_DURATION = Timespan.ofSeconds(2.8);
+    /** 흔들림 */
+    public static final ScreenShake SHAKE = new ScreenShake(7, 6, Timespan.ofTicks(5));
 
     /** 피해 점수 */
     public static final int DAMAGE_SCORE = 8;

@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
@@ -114,7 +113,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
 
         QuakerUltInfo.Sounds.USE_READY.play(loc);
         QuakerUltInfo.Particles.USE_READY.play(LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5));
-        CombatUtil.sendShake(combatUser, 10, 8, Timespan.ofTicks(6));
+        QuakerUltInfo.SHAKE.send(combatUser);
     }
 
     private final class QuakerUltProjectile extends Projectile<Damageable> {
