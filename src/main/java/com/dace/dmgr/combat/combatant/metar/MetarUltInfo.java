@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -46,53 +47,44 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 시 틱 효과음 */
-        public static final SoundEffect USE_TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.charge").volume(3).pitch(0.5, 1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.5, 1.4).build());
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.energy").volume(5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(5).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.explosion").volume(5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(0.5).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.charge").volume(3).pitch(0.6).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(30, 255, 180);
 
-        /** 사용 시 틱 입자 효과 */
-        public static final ParticleEffect USE_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).horizontalSpread(0.3)
-                        .verticalSpread(0.3).count(5).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(5).speed(0.3).build());
+        /** 사용 시 틱 효과 */
+        public static final PlayableEffect.Function<Long> USE_TICK = i -> PlayableEffect.list(
+                SoundEffect.builder("random.charge").volume(3).pitch(0.5 + i * 0.0334).build(),
+                SoundEffect.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.5 + i * 0.023).build(),
+
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).horizontalSpread(0.3).verticalSpread(0.3).count(5)
+                        .build(),
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(5).speed(0.3).build());
         /** 사용 준비 */
-        public static final ParticleEffect USE_READY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).count(10).horizontalSpread(0.6).verticalSpread(0.6).build());
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder("random.energy").volume(5).pitch(0.5).build(),
+                SoundEffect.builder("new.block.conduit.deactivate").volume(5).pitch(0.8).build(),
+                SoundEffect.builder("random.explosion").volume(5).pitch(0.5).build(),
+                SoundEffect.builder("random.explosion_reverb").volume(7).pitch(0.5).build(),
+
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).count(10).horizontalSpread(0.6).verticalSpread(0.6).build());
+        /** 틱 효과음 */
+        public static final SoundEffect TICK_SOUND =
+                SoundEffect.builder("random.charge").volume(3).pitch(0.6).build();
         /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.PORTAL).count(15).speed(2.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(8).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(15).horizontalSpread(0.3).verticalSpread(0.3).build());
-        /** 총알 궤적 (중심) */
-        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(5).horizontalSpread(0.3).verticalSpread(0.3).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).horizontalSpread(0.7)
-                        .verticalSpread(0.7).count(12).build());
-        /** 총알 궤적 (장식) */
-        public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(2).horizontalSpread(0.08).verticalSpread(0.08).build());
+        public static final PlayableEffect TICK_PARTICLE = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.PORTAL).count(15).speed(2.5).build(),
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(8).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(15).horizontalSpread(0.3).verticalSpread(0.3).build());
+        /** 총알 궤적 - 1 */
+        public static final PlayableEffect BULLET_TRAIL_1 = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(5).horizontalSpread(0.3).verticalSpread(0.3).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).horizontalSpread(0.7).verticalSpread(0.7).count(12)
+                        .build());
+        /** 총알 궤적 - 2 */
+        public static final ParticleEffect BULLET_TRAIL_2 =
+                ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(2).horizontalSpread(0.08).verticalSpread(0.08).build();
     }
 }

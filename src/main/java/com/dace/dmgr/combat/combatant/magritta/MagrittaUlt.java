@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -59,7 +58,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 
-        MagrittaUltInfo.Sounds.USE.play(combatUser.getLocation());
+        MagrittaUltInfo.Effects.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
@@ -71,9 +70,9 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
                 MagrittaUltInfo.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
-                MagrittaUltInfo.Sounds.SHOOT.play(loc);
+                MagrittaUltInfo.Effects.SHOOT.play(loc);
 
-                addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
+                addTask(new DelayTask(() -> MagrittaWeaponInfo.Effects.BULLET_SHELL.play(loc), 8));
             }, this::onEnd, MagrittaUltInfo.ATTACK_COOLDOWN.toTicks(), MagrittaUltInfo.DURATION.divide(2).toTicks()));
         }, MagrittaUltInfo.READY_DURATION.toTicks()));
     }
@@ -108,14 +107,13 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
         Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.5);
 
-        MagrittaUltInfo.Sounds.END.play(loc);
-        MagrittaUltInfo.Particles.END.play(loc);
+        MagrittaUltInfo.Effects.END.play(loc);
         MagrittaUltInfo.SHAKE.send(combatUser);
 
         addTask(new DelayTask(() -> {
             weapon.setVisible(true);
 
-            MagrittaUltInfo.Sounds.USE.play(combatUser.getLocation());
+            MagrittaUltInfo.Effects.USE.play(combatUser.getLocation());
         }, weaponCooldown.toTicks()));
     }
 }

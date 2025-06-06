@@ -69,12 +69,12 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                     reloadModule.consume(1);
 
                     ArkaceWeaponInfo.RECOIL.send(combatUser);
-                    ArkaceWeaponInfo.Sounds.USE.play(loc);
+                    ArkaceWeaponInfo.Effects.USE.play(loc);
 
-                    addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc), 8));
+                    addTask(new DelayTask(() -> ArkaceWeaponInfo.Effects.SHELL_DROP.play(loc), 8));
                 } else {
                     new ArkaceWeaponHitscan(true).shot();
-                    ArkaceUltInfo.Sounds.SHOOT.play(loc);
+                    ArkaceUltInfo.Effects.SHOOT.play(loc);
                 }
 
                 break;
@@ -127,7 +127,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     public void onReloadTick(long i) {
-        ArkaceWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        ArkaceWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -148,7 +148,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(14, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                (isUlt ? ArkaceUltInfo.Particles.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+                (isUlt ? ArkaceUltInfo.Effects.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
             });
         }
 
@@ -156,7 +156,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                CombatEffectUtil.BULLET_HIT_EFFECT.apply(hitBlock).play(location);
                 return false;
             };
         }

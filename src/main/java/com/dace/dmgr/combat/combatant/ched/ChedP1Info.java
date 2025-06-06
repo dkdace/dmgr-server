@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -42,38 +43,29 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(1).pitch(0.525).pitchVariance(0.05).build());
-        /** 사용 (매달리기) */
-        public static final SoundEffect USE_HANG = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.85).build());
-        /** 해제 (매달리기) */
-        public static final SoundEffect DISABLE_HANG = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(186, 55, 30);
 
-        /** 사용 (매달리기) */
-        public static final ParticleEffect USE_HANG = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(40)
-                        .horizontalSpread(0.65).build());
-        /** 틱 입자 효과 (매달리기) */
-        public static final ParticleEffect TICK_HANG = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).horizontalSpread(0.24)
-                        .build());
+        /** 사용 */
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(1).pitch(0.525).pitchVariance(0.05).build();
+        /** 매달리기 - 사용 */
+        public static final ParticleEffect HANG_USE =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(40).horizontalSpread(0.65).build();
+        /** 매달리기 - 활성화 */
+        public static final PlayableEffect HANG_ON = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build(),
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.85).build());
+        /** 매달리기 - 틱 효과 */
+        public static final ParticleEffect HANG_TICK =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).horizontalSpread(0.24).build();
+        /** 매달리기 - 비활성화 */
+        public static final PlayableEffect HANG_OFF = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build());
     }
 }

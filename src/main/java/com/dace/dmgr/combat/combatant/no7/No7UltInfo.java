@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -46,39 +47,29 @@ public final class No7UltInfo extends UltimateSkillInfo<No7Ult> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 시 틱 효과음 */
-        public static final SoundEffect USE_TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.charge").volume(3).pitch(0.8, 1.6).build());
+        public static final PlayableEffect.Function<Long> USE_TICK_SOUND = i ->
+                SoundEffect.builder("random.charge").volume(3).pitch(0.8 + i * 0.021).build();
+        /** 사용 시 틱 입자 효과 */
+        public static final ParticleEffect USE_TICK_PARTICLE =
+                ParticleEffect.Normal.builder(Particle.FIREWORKS_SPARK).count(3).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1).build();
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LIGHTNING_THUNDER).volume(5).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LIGHTNING_THUNDER).volume(5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("random.explosion").volume(5).pitch(2).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(0.9).build());
-    }
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_LIGHTNING_THUNDER).volume(5).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_LIGHTNING_THUNDER).volume(5).pitch(1.4).build(),
+                SoundEffect.builder("random.explosion").volume(5).pitch(2).build(),
+                SoundEffect.builder("random.explosion_reverb").volume(7).pitch(0.9).build(),
 
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 (중심) */
-        public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(3).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1)
-                        .build());
-        /** 사용 시 틱 입자 효과 (장식) */
-        public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, No7A3Info.Particles.COLOR).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build());
-        /** 사용 준비 (중심) */
-        public static final ParticleEffect USE_READY_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(500).horizontalSpread(0.2).verticalSpread(0.2).speed(0.5)
-                        .build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(600).horizontalSpread(0.3).verticalSpread(0.3).speed(1.2).build());
+                ParticleEffect.Normal.builder(Particle.FIREWORKS_SPARK).count(500).horizontalSpread(0.2).verticalSpread(0.2).speed(0.5).build(),
+                ParticleEffect.Normal.builder(Particle.CRIT).count(600).horizontalSpread(0.3).verticalSpread(0.3).speed(1.2).build());
+        /** 틱 효과 */
+        public static final PlayableEffect TICK = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, No7A3Info.Effects.COLOR).build(),
+                ParticleEffect.Normal.builder(Particle.CRIT).build());
     }
 }

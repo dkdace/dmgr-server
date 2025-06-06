@@ -74,7 +74,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
-                InfernoWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+                InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -92,7 +92,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
                 InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);
-                InfernoWeaponInfo.Sounds.USE_FIREBALL.play(combatUser.getLocation());
+                InfernoWeaponInfo.Effects.FIREBALL_USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -126,7 +126,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     public void onReloadTick(long i) {
-        InfernoWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        InfernoWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -154,7 +154,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                InfernoWeaponInfo.Particles.BULLET_TRAIL.play(loc, getVelocity(), distance / 5.0);
+                InfernoWeaponInfo.Effects.BULLET_TRAIL.apply(getVelocity(), distance).play(loc);
             });
         }
 
@@ -162,7 +162,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                InfernoWeaponInfo.Particles.HIT_BLOCK.play(location);
+                InfernoWeaponInfo.Effects.HIT_BLOCK.play(location);
                 return false;
             };
         }
@@ -175,7 +175,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                         false, true))
                     target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.FIRE_DURATION);
 
-                InfernoWeaponInfo.Particles.HIT_ENTITY.play(location);
+                InfernoWeaponInfo.Effects.HIT_ENTITY.play(location);
                 return true;
             };
         }
@@ -195,8 +195,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
             Location loc = location.add(0, 0.1, 0);
             new InfernoWeaponLArea().emit(loc);
 
-            InfernoWeaponInfo.Sounds.FIREBALL_EXPLODE.play(loc);
-            InfernoWeaponInfo.Particles.FIREBALL_EXPLODE.play(loc);
+            InfernoWeaponInfo.Effects.FIREBALL_EXPLODE.play(loc);
         }
 
         @Override
@@ -204,7 +203,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(13, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                InfernoWeaponInfo.Particles.BULLET_TRAIL_FIREBALL.play(loc);
+                InfernoWeaponInfo.Effects.FIREBALL_BULLET_TRAIL.play(loc);
             });
         }
 

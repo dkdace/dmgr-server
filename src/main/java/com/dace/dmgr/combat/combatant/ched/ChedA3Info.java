@@ -7,12 +7,14 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
     /** 쿨타임 */
@@ -50,47 +52,34 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.7).build());
+        /** 사용 시 틱 효과 */
+        public static final PlayableEffect.Function<Vector> USE_TICK = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.CRIT_MAGIC, velocity.clone().multiply(-0.25)),
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.12)));
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_CHARGE).volume(1.5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.5).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.3).build());
-    }
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ENTITY_VEX_CHARGE).volume(1.5).pitch(1.3).build(),
+                SoundEffect.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.7).build(),
+                SoundEffect.builder(Sound.ENTITY_VEX_AMBIENT).volume(1.5).pitch(1.5).build());
+        /** 총알 궤적 - 1 */
+        public static final PlayableEffect BULLET_TRAIL_1 = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.3).build(),
 
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 */
-        public static final ParticleEffect USE_TICK = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT_MAGIC)
-                        .speedMultiplier(-0.25).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.12).build());
-        /** 총알 궤적 (중심) */
-        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(20).horizontalSpread(0.28).verticalSpread(0.28).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(64, 160, 184)).count(15).horizontalSpread(2.5).verticalSpread(1.5).build());
-        /** 총알 궤적 (모양) */
-        public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(8)
-                        .horizontalSpread(0, 0, 1)
-                        .verticalSpread(1, 0, 1)
-                        .build());
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(20).horizontalSpread(0.28).verticalSpread(0.28).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, Color.fromRGB(64, 160, 184)).count(15)
+                        .horizontalSpread(2.5).verticalSpread(1.5).build());
+        /** 총알 궤적 - 2 */
+        public static final PlayableEffect.BiFunction<Double, Double> BULLET_TRAIL_2 = (horizontalSpread, verticalSpread) ->
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(8).horizontalSpread(horizontalSpread).verticalSpread(verticalSpread).build();
     }
 }

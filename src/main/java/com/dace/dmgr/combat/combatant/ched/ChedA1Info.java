@@ -7,11 +7,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     /** 쿨타임 */
@@ -58,32 +60,29 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.crossbow.loading_end").volume(0.7).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.7).pitch(2).build());
-        /** 사격 */
-        public static final SoundEffect SHOOT = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(1.4).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.gun.bow").volume(1.4).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder("new.item.crossbow.loading_end").volume(0.7).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.7).pitch(2).build());
+        /** 발사 */
+        public static final PlayableEffect SHOOT = PlayableEffect.list(
+                SoundEffect.builder("new.item.crossbow.shoot").volume(1.4).pitch(1.6).build(),
+                SoundEffect.builder("random.gun.bow").volume(1.4).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_GHAST_SHOOT).volume(1.6).pitch(1.4).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).build());
+        public static final PlayableEffect BULLET_TRAIL = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.CRIT).build(),
+                ParticleEffect.Normal.builder(Particle.FLAME).build());
+        /** 타격 */
+        public static final PlayableEffect HIT =
+                ChedWeaponInfo.Effects.HIT.apply(1.0);
         /** 블록 타격 */
-        public static final ParticleEffect HIT_BLOCK = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).build());
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block -> PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.LAVA).count(3).build(),
+                ChedWeaponInfo.Effects.HIT_BLOCK.apply(block, 1.0));
     }
 }

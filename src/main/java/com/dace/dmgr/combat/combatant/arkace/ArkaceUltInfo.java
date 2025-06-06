@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -37,25 +38,17 @@ public final class ArkaceUltInfo extends UltimateSkillInfo<ArkaceUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사격 */
-        public static final SoundEffect SHOOT = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
-                SoundEffect.SoundInfo.builder("random.energy").volume(4).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
+        /** 발사 */
+        public static final PlayableEffect SHOOT = PlayableEffect.list(
+                SoundEffect.builder("new.block.beacon.deactivate").volume(4).pitch(2).build(),
+                SoundEffect.builder("random.energy").volume(4).pitch(1.6).build(),
+                SoundEffect.builder("random.gun_reverb").volume(5).pitch(1.2).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(0, 230, 255)).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(0, 230, 255)).build();
     }
 }

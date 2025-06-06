@@ -16,6 +16,7 @@ import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.game.Game;
 import com.dace.dmgr.game.Team;
@@ -31,22 +32,23 @@ import org.jetbrains.annotations.Nullable;
  * 더미(훈련용 봇) 엔티티 클래스.
  */
 public final class Dummy extends TemporaryEntity<Player> implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
-    /** 생성 입자 효과 */
-    private static final FireworkEffect SPAWN_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
-            Color.fromRGB(255, 255, 255)).fadeColor(Color.fromRGB(255, 255, 0)).build();
-    /** 사망 입자 효과 */
-    private static final ParticleEffect DEATH_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
-            ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(150)
-                    .horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build());
+    /** 생성 폭죽 효과 */
+    private static final FireworkEffect SPAWN_FIREWORK =
+            FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL, Color.fromRGB(255, 255, 255))
+                    .fadeColor(Color.fromRGB(255, 255, 0)).build();
     /** 피격 효과음 */
-    private static final SoundEffect DAMAGE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.1).pitch(1.5).pitchVariance(0.2).build());
+    private static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
+            SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.1 + damage * 0.001).pitch(1.5).pitchVariance(0.2).build();
+    /** 사망 입자 효과 */
+    private static final PlayableEffect DEATH_PARTICLE = PlayableEffect.list(
+            ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).build(),
+            ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(150).horizontalSpread(0.2)
+                    .verticalSpread(0.2).speed(0.25).build());
     /** 사망 효과음 */
-    private static final SoundEffect DEATH_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
-            SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
+    private static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
+            SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.8).build(),
+            SoundEffect.builder("random.metalhit").volume(2).pitch(0.7).build(),
+            SoundEffect.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.7).build());
     /** 더미 플레이어 스킨 */
     private static final PlayerSkin PLAYER_SKIN = PlayerSkin.fromName("dummy");
 
@@ -117,7 +119,7 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
         if (!isEnemy)
             entity.getEquipment().setHelmet(new ItemStack(Material.STAINED_GLASS, 1, (short) 5));
 
-        SPAWN_PARTICLE.play(getCenterLocation());
+        SPAWN_FIREWORK.play(getCenterLocation());
 
         dummyBehavior.onInit(this);
     }
@@ -180,8 +182,8 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
 
     @Override
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-        DAMAGE_SOUND.play(getLocation(), 1 + damage * 0.001);
-        CombatEffectUtil.playBreakParticle(this, location, damage);
+        DAMAGE_SOUND.apply(damage).play(getLocation());
+        CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
     }
 
     @Override

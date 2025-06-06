@@ -40,15 +40,15 @@ public final class MagrittaT1Info extends TraitInfo {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.trident.hit").volume(2).pitch(0.8).pitchVariance(0.1).build());
+        public static final SoundEffect USE =
+                SoundEffect.builder("new.item.trident.hit").volume(2).pitch(0.8).pitchVariance(0.1).build();
         /** 최대치 */
-        public static final SoundEffect MAX = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SKELETON_DEATH).volume(2).pitch(1.5).pitchVariance(0.1).build());
+        public static final SoundEffect MAX =
+                SoundEffect.builder(Sound.ENTITY_WITHER_SKELETON_DEATH).volume(2).pitch(1.5).pitchVariance(0.1).build();
     }
 }

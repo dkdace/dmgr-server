@@ -71,9 +71,9 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
                 JagerWeaponInfo.Scope.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
-                JagerWeaponInfo.Sounds.USE_SCOPE.play(loc);
+                JagerWeaponInfo.Effects.SCOPE_USE.play(loc);
 
-                addTask(new DelayTask(() -> CombatEffectUtil.SHELL_DROP_SOUND.play(loc, 1, 0.75), 8));
+                addTask(new DelayTask(() -> JagerWeaponInfo.Effects.SCOPE_BULLET_SHELL.play(loc), 8));
 
                 break;
             }
@@ -140,7 +140,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                CombatEffectUtil.BULLET_HIT_EFFECT.apply(hitBlock).play(location);
                 return false;
             };
         }

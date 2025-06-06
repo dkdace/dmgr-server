@@ -46,7 +46,7 @@ public final class No7A3 extends ActiveSkill {
 
         Location location = combatUser.getLocation();
 
-        No7A3Info.Sounds.USE.play(location);
+        No7A3Info.Effects.USE.play(location);
 
         long durationTicks = No7A3Info.DURATION.toTicks();
 
@@ -61,7 +61,7 @@ public final class No7A3 extends ActiveSkill {
             if (size > 0)
                 combatUser.addScore("보호막 획득", (double) (No7A3Info.SHIELD_SCORE * size) / durationTicks);
 
-            No7A3Info.Sounds.TICK.play(loc);
+            No7A3Info.Effects.TICK_SOUND.play(loc);
             playTickEffect(i);
         }, 1, durationTicks));
     }
@@ -94,10 +94,10 @@ public final class No7A3 extends ActiveSkill {
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
             Location loc2 = loc.clone().add(vec);
 
-            No7A3Info.Particles.TICK_CORE.play(loc2);
+            No7A3Info.Effects.TICK_PARTICLE_1.play(loc2);
             for (int k = 0; k < 2; k++) {
                 Location loc3 = loc2.clone().add(0, -0.5 + k, 0);
-                No7A3Info.Particles.TICK_DECO.play(loc3, LocationUtil.getDirection(loc3, loc).normalize());
+                No7A3Info.Effects.TICK_PARTICLE_2.apply(LocationUtil.getDirection(loc3, loc)).play(loc3);
             }
         }
     }

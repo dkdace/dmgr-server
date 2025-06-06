@@ -56,14 +56,11 @@ public final class UserData implements Initializable<Void> {
     /** Yaml 파일 경로의 디렉터리 이름 */
     private static final String DIRECTORY_NAME = "User";
     /** 레벨 업 효과음 */
-    private static final SoundEffect LEVEL_UP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("random.good").volume(1000).pitch(1).build());
+    private static final SoundEffect LEVEL_UP_SOUND = SoundEffect.builder("random.good").volume(1000).pitch(1).build();
     /** 티어 승급 효과음 */
-    private static final SoundEffect TIER_UP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
+    private static final SoundEffect TIER_UP_SOUND = SoundEffect.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build();
     /** 티어 강등 효과음 */
-    private static final SoundEffect TIER_DOWN_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
+    private static final SoundEffect TIER_DOWN_SOUND = SoundEffect.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build();
 
     static {
         try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {

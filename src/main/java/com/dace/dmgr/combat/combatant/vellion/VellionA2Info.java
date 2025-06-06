@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -57,55 +58,42 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("new.entity.squid.squirt").volume(2).pitch(1.2).build());
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_CURSE).volume(2).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.8).build());
-        /** 발동 */
-        public static final SoundEffect TRIGGER = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(0.6).pitch(0.7).pitchVariance(0.1).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 색상 */
-        public static final Color USE_TICK_COLOR = Color.fromRGB(200, 130, 230);
+    public static final class Effects {
         /** 표식 색상 */
         public static final Color MARK_COLOR = Color.fromRGB(160, 150, 152);
 
-        /** 사용 시 틱 입자 효과 - 1 */
-        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, USE_TICK_COLOR,
-                        Color.fromRGB(140, 130, 155)).build());
-        /** 사용 시 틱 입자 효과 - 2 */
-        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).build());
-        /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, USE_TICK_COLOR,
-                        Color.fromRGB(140, 130, 155)).build());
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.builder("new.entity.squid.squirt").volume(2).pitch(1.2).build());
+        /** 사용 시 틱 효과 - 1 */
+        public static final PlayableEffect.Function<Long> USE_TICK_1 = i ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE,
+                        Color.fromRGB((int) (200 - i * 4), 130, (int) (230 - i * 5))).build();
+        /** 사용 시 틱 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 =
+                ParticleEffect.Normal.builder(Particle.SPELL_WITCH).build();
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ELDER_GUARDIAN_CURSE).volume(2).pitch(1).build(),
+                SoundEffect.builder("new.block.respawn_anchor.charge").volume(2).pitch(0.8).build());
         /** 표식 */
-        public static final ParticleEffect MARK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, MARK_COLOR).count(4)
-                        .horizontalSpread(0.2).verticalSpread(0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, MARK_COLOR).build());
-        /** 엔티티 타격 (표식 - 중심) */
-        public static final ParticleEffect HIT_ENTITY_MARK_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(15).speed(0.3).build());
-        /** 엔티티 타격 (표식 - 장식) */
-        public static final ParticleEffect HIT_ENTITY_MARK_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).build());
+        public static final PlayableEffect MARK = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, MARK_COLOR).count(4).horizontalSpread(0.2)
+                        .verticalSpread(0.2).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, MARK_COLOR).build());
+        /** 발동 */
+        public static final SoundEffect TRIGGER =
+                SoundEffect.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(0.6).pitch(0.7).pitchVariance(0.1).build();
+        /** 표식 - 엔티티 타격 - 1 */
+        public static final ParticleEffect MARK_HIT_ENTITY_1 =
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(15).speed(0.3).build();
+        /** 표식 - 엔티티 타격 - 2 */
+        public static final ParticleEffect MARK_HIT_ENTITY_2 =
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).build();
     }
 }

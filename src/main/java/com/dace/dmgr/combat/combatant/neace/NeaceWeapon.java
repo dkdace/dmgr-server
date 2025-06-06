@@ -62,7 +62,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
                 new NeaceWeaponLProjectile().shot();
 
-                NeaceWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+                NeaceWeaponInfo.Effects.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -89,7 +89,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                         target.getName());
                 combatUser.getUser().sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
 
-                NeaceWeaponInfo.Sounds.USE_HEAL.play(combatUser.getLocation());
+                NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
 
                 healTarget(target);
 
@@ -115,7 +115,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
             target.getDamageModule().heal(combatUser, NeaceWeaponInfo.Heal.HEAL_PER_SECOND / 20.0, true);
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.8))
-            (isAmplifying ? NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL_AMPLIFY : NeaceWeaponInfo.Particles.HIT_ENTITY_HEAL).play(loc);
+            (isAmplifying ? NeaceWeaponInfo.Effects.HEAL_AMPLIFY_USE_PARTICLE : NeaceWeaponInfo.Effects.HEAL_USE_PARTICLE).play(loc);
     }
 
     /**
@@ -148,7 +148,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            NeaceWeaponInfo.Particles.HIT.play(location);
+            NeaceWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
@@ -156,7 +156,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(10, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                NeaceWeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                NeaceWeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 

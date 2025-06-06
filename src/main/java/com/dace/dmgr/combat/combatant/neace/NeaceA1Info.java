@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -44,38 +45,31 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.note_block.chime").volume(2).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(215, 255, 130);
 
-        /** 사용 */
-        public static final ParticleEffect USE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).count(2).build());
-        /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(2)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_HAPPY).build());
+        /** 사용 효과음 */
+        public static final PlayableEffect USE_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
+                SoundEffect.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
+                SoundEffect.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
+                SoundEffect.builder("new.block.note_block.chime").volume(2).pitch(1.2).build());
+        /** 사용 입자 효과 - 1 */
+        public static final PlayableEffect USE_PARTICLE_1 = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(2).horizontalSpread(0.1).verticalSpread(0.1)
+                        .build(),
+                ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).build());
+        /** 사용 입자 효과 - 2 */
+        public static final ParticleEffect USE_PARTICLE_2 =
+                ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(2).build();
         /** 표식 */
-        public static final ParticleEffect MARK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(4)
-                        .horizontalSpread(0.2).verticalSpread(0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).build());
+        public static final PlayableEffect MARK = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(4).horizontalSpread(0.2).verticalSpread(0.2)
+                        .build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).build());
     }
 }

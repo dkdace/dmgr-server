@@ -26,12 +26,15 @@ public final class SiliaP2Info extends PassiveSkillInfo<SiliaP2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.1, 0.9).pitch(0.55, 0.8).pitchVariance(0.05).build());
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.9).pitch(0.55).pitchVariance(0.05).build();
+        /** 액티브 3번 사용 중 사용 */
+        public static final SoundEffect USE_A3 =
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.1).pitch(0.8).pitchVariance(0.05).build();
     }
 }

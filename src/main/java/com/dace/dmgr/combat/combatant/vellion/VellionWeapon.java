@@ -39,7 +39,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         new VellionWeaponProjectile().shot();
 
-        VellionWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+        VellionWeaponInfo.Effects.USE.play(combatUser.getLocation());
     }
 
     private final class VellionWeaponProjectile extends Projectile<Damageable> {
@@ -50,7 +50,7 @@ public final class VellionWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            VellionWeaponInfo.Particles.HIT.play(location);
+            VellionWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
@@ -58,7 +58,7 @@ public final class VellionWeapon extends AbstractWeapon {
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(12, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                VellionWeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                VellionWeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 

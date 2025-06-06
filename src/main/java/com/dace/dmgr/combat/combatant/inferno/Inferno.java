@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,9 +30,9 @@ public final class Inferno extends Vanguard {
     @Getter
     private static final Inferno instance = new Inferno();
     /** 발소리 */
-    private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("new.entity.panda.step").volume(0.4).pitch(0.9).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build());
+    private static final PlayableEffect.Function<Double> FOOTSTEP_SOUND = volumeMultiplier -> PlayableEffect.list(
+            SoundEffect.builder("new.entity.panda.step").volume(0.4 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build(),
+            SoundEffect.builder(Sound.ENTITY_LLAMA_STEP).volume(0.3 * volumeMultiplier).pitch(0.7).pitchVariance(0.1).build());
 
     private Inferno() {
         super("인페르노", "화염 돌격병", "ch_inferno", null, Species.HUMAN, '\u32D7', 1,
@@ -124,7 +125,7 @@ public final class Inferno extends Vanguard {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+        FOOTSTEP_SOUND.apply(volume).play(combatUser.getLocation());
     }
 
     @Override
@@ -134,9 +135,9 @@ public final class Inferno extends Vanguard {
         if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 
-        InfernoUltInfo.Sounds.DAMAGE.play(victim.getLocation(), 1 + damage * 0.001);
+        InfernoUltInfo.Effects.DAMAGE_SOUND.apply(damage).play(victim.getLocation());
         if (location != null)
-            InfernoUltInfo.Particles.DAMAGE.play(location, damage * 0.04);
+            InfernoUltInfo.Effects.DAMAGE_PARTICLE.apply(damage).play(location);
     }
 
     @Override

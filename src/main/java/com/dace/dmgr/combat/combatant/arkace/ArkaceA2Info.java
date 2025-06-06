@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -39,26 +40,18 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                                Color.fromRGB(220, 255, 36), Color.fromRGB(160, 255, 36))
-                        .count(3).verticalSpread(0.4).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(0.9).build(),
+                SoundEffect.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ITEM_ARMOR_EQUIP_DIAMOND).volume(1.5).pitch(1.2).build());
+        /** 틱 효과 */
+        public static final PlayableEffect.Function<Integer> TICK = i ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(220 - i * 30, 255, 36))
+                        .count(3).verticalSpread(0.4).build();
     }
 }

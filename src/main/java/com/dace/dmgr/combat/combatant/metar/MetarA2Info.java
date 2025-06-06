@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -48,37 +49,28 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder("random.charge").volume(1).pitch(0.7).build());
-        /** 피격 */
-        public static final SoundEffect DAMAGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_POP).volume(0.4).pitch(1.5).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.4).pitch(1.4).pitchVariance(0.1).build());
-        /** 파괴 */
-        public static final SoundEffect DEATH = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(2).pitch(2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 피격 */
-        public static final ParticleEffect DAMAGE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC)
-                        .count(0, 0, 1)
-                        .speed(0.2).build());
-        /** 파괴 */
-        public static final ParticleEffect DEATH = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(60).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
+                SoundEffect.builder("random.charge").volume(1).pitch(0.7).build());
+        /** 피격 효과음 */
+        public static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage -> PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.4 + damage * 0.001).pitch(1.5).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.4 + damage * 0.001).pitch(1.4).pitchVariance(0.1).build());
+        /** 피격 입자 효과 */
+        public static final PlayableEffect.Function<Double> DAMAGE_PARTICLE = damage ->
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count((int) (damage * 0.04)).speed(0.2).build();
+        /** 파괴 효과음 */
+        public static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),
+                SoundEffect.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(2).pitch(2).build());
+        /** 파괴 입자 효과 */
+        public static final ParticleEffect DEATH_PARTICLE =
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(60).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build();
     }
 }

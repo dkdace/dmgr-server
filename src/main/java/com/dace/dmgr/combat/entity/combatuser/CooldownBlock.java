@@ -5,6 +5,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.effect.FireworkEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
@@ -81,8 +82,7 @@ public abstract class CooldownBlock extends FunctionalBlock {
      */
     private static final class HealPack extends CooldownBlock {
         /** 사용 효과음 */
-        private static final SoundEffect USE_SOUND = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.2).build());
+        private static final SoundEffect USE_SOUND = SoundEffect.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.5).pitch(1.2).build();
 
         private HealPack() {
             super(GeneralConfig.getCombatConfig().getHealPackBlock(), GeneralConfig.getCombatConfig().getHealPackCooldown());
@@ -108,13 +108,13 @@ public abstract class CooldownBlock extends FunctionalBlock {
      * 궁극기 팩 블록 클래스.
      */
     private static final class UltPack extends CooldownBlock {
-        /** 사용 입자 효과 */
-        private static final FireworkEffect USE_PARTICLE = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
-                Color.fromRGB(48, 85, 251)).fadeColor(Color.fromRGB(255, 255, 255)).build();
         /** 사용 효과음 */
-        private static final SoundEffect USE_SOUND = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(1).pitch(2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_ARMOR_EQUIP_GOLD).volume(1).pitch(1.3).build());
+        private static final PlayableEffect USE_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(1).pitch(2).build(),
+                SoundEffect.builder(Sound.ITEM_ARMOR_EQUIP_GOLD).volume(1).pitch(1.3).build());
+        /** 사용 폭죽 효과 */
+        private static final FireworkEffect USE_FIREWORK = FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL,
+                Color.fromRGB(48, 85, 251)).fadeColor(Color.fromRGB(255, 255, 255)).build();
 
         private UltPack() {
             super(GeneralConfig.getCombatConfig().getUltPackBlock(), GeneralConfig.getCombatConfig().getUltPackCooldown());
@@ -132,7 +132,7 @@ public abstract class CooldownBlock extends FunctionalBlock {
 
             combatUser.addUltGauge(GeneralConfig.getCombatConfig().getUltPackCharge());
 
-            USE_PARTICLE.play(location.clone().add(0.5, 1.1, 0.5));
+            USE_FIREWORK.play(location.clone().add(0.5, 1.1, 0.5));
             USE_SOUND.play(location);
         }
     }

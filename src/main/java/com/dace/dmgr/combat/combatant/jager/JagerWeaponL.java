@@ -85,7 +85,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 reloadModule.consume(1);
 
                 JagerWeaponInfo.RECOIL.send(combatUser);
-                JagerWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+                JagerWeaponInfo.Effects.USE.play(combatUser.getLocation());
 
                 break;
             }
@@ -135,7 +135,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadTick(long i) {
-        JagerWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        JagerWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -158,7 +158,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        JagerWeaponInfo.Sounds.AIM_ON.play(combatUser.getLocation());
+        JagerWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
@@ -166,7 +166,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        JagerWeaponInfo.Sounds.AIM_OFF.play(combatUser.getLocation());
+        JagerWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
 
     private final class JagerWeaponLProjectile extends Projectile<Damageable> {
@@ -177,7 +177,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
         @Override
         protected void onHit(@NonNull Location location) {
-            JagerWeaponInfo.Particles.HIT.play(location);
+            JagerWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
@@ -185,7 +185,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(10, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                JagerWeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                JagerWeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 

@@ -1,13 +1,16 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -66,50 +69,43 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.8).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder("new.block.chain.place").volume(0.8).pitch(1.2).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CURE).volume(4).pitch(1.5).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(6).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(120, 220, 240);
 
+        /** 사용 */
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build();
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.8).pitch(1.2).build(),
+                SoundEffect.builder("new.block.chain.place").volume(0.8).pitch(1.2).build());
+        /** 투척 */
+        public static final PlayableEffect THROW =
+                CombatEffectUtil.THROW_SOUND.apply(0.8);
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(3)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(3).horizontalSpread(0.1).verticalSpread(0.1)
+                        .build();
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.ICE, 0).count(300)
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.6).build(),
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CURE).volume(4).pitch(1.5).build(),
+                SoundEffect.builder("random.explosion_reverb").volume(6).pitch(1.2).build(),
+
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.ICE, 0).count(300).horizontalSpread(0.2)
+                        .verticalSpread(0.2).speed(0.5).build(),
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.PACKED_ICE, 0).count(300)
                         .horizontalSpread(0.2).verticalSpread(0.2).speed(0.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.PACKED_ICE, 0).count(300)
-                        .horizontalSpread(0.2).verticalSpread(0.2).speed(0.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(200).speed(0.3).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build());
-        /** 틱 입자 효과 (빙결) */
-        public static final ParticleEffect FREEZE_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(5)
-                        .horizontalSpread(0, 0, 0.5)
-                        .verticalSpread(1, 0, 0.5)
-                        .build());
+                ParticleEffect.Normal.builder(Particle.FIREWORKS_SPARK).count(200).speed(0.3).build(),
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).build());
+        /** 빙결 - 틱 효과 */
+        public static final PlayableEffect.Function<CombatEntity> FREEZE_TICK = combatEntity ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(5)
+                        .horizontalSpread(combatEntity.getWidth() * 0.5).verticalSpread(combatEntity.getHeight() * 0.5).build();
     }
 }

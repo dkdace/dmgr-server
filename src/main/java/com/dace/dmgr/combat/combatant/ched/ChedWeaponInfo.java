@@ -1,15 +1,18 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     /** 쿨타임 */
@@ -49,20 +52,24 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 충전 */
-        public static final SoundEffect CHARGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.crossbow.loading_middle").volume(0.6).pitch(1).build());
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.crossbow.shoot").volume(0.3, 0.8).pitch(1.1, 1.25).build(),
-                SoundEffect.SoundInfo.builder("random.gun.bow").volume(0.3, 0.8).pitch(0.7, 0.85).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(0.4, 0.9).pitch(0.75, 0.9).build());
+        public static final SoundEffect CHARGE =
+                SoundEffect.builder("new.item.crossbow.loading_middle").volume(0.6).pitch(1).build();
+        /** 발사 */
+        public static final PlayableEffect.Function<Double> SHOOT = power -> PlayableEffect.list(
+                SoundEffect.builder("new.item.crossbow.shoot").volume(0.3 + power * 0.5).pitch(1.1 + power * 0.15).build(),
+                SoundEffect.builder("random.gun.bow").volume(0.3 + power * 0.5).pitch(0.7 + power * 0.15).build(),
+                SoundEffect.builder("random.gun2.shovel_leftclick").volume(0.4 + power * 0.5).pitch(0.75 + power * 0.15).build());
         /** 타격 */
-        public static final SoundEffect HIT = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.gun.arrowhit").volume(0.3, 0.8).pitch(1).build());
+        public static final PlayableEffect.Function<Double> HIT = power ->
+                SoundEffect.builder("random.gun.arrowhit").volume(0.3 + power * 0.5).pitch(1).build();
+        /** 블록 타격 */
+        public static final PlayableEffect.BiFunction<Block, Double> HIT_BLOCK = (block, power) -> PlayableEffect.list(
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, power),
+                CombatEffectUtil.HIT_BLOCK_SMALL_PARTICLE.apply(block, power * 1.5));
     }
 }

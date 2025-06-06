@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -48,7 +47,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
             new SiliaWeaponProjectile().shot();
 
-            SiliaWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+            SiliaWeaponInfo.Effects.USE.play(combatUser.getLocation());
         }
 
         combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
@@ -67,7 +66,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            SiliaWeaponInfo.Particles.HIT.play(location);
+            SiliaWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
@@ -80,7 +79,7 @@ public final class SiliaWeapon extends AbstractWeapon {
 
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
                     vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(location), isOpposite ? -30 : 30);
-                    SiliaWeaponInfo.Particles.BULLET_TRAIL.play(location.clone().add(vec));
+                    SiliaWeaponInfo.Effects.BULLET_TRAIL.play(location.clone().add(vec));
                 }
             });
         }
@@ -89,10 +88,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                SiliaWeaponInfo.Sounds.HIT_BLOCK.play(location);
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1.5);
-
+                SiliaWeaponInfo.Effects.HIT_BLOCK.apply(hitBlock).play(location);
                 return false;
             };
         }
@@ -104,8 +100,7 @@ public final class SiliaWeapon extends AbstractWeapon {
                 target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
                         SiliaT1Util.getCritMultiplier(getVelocity(), target), true);
 
-                SiliaWeaponInfo.Particles.HIT_ENTITY.play(location);
-                SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
+                SiliaWeaponInfo.Effects.HIT_ENTITY.play(location);
 
                 return false;
             };

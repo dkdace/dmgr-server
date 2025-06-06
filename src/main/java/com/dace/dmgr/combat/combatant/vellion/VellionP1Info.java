@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -45,36 +46,27 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.7).build());
-        /** 해제 */
-        public static final SoundEffect DISABLE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.5).build(),
-                SoundEffect.SoundInfo.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(150, 110, 170);
 
         /** 사용 */
-        public static final ParticleEffect USE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(50)
-                        .horizontalSpread(0.8).build());
-        /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(2)
-                        .horizontalSpread(0.3).build());
+        public static final ParticleEffect USE =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(50).horizontalSpread(0.8).build();
+        /** 활성화 */
+        public static final PlayableEffect ON = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.4).build(),
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.6).build(),
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.7).build());
+        /** 틱 효과 */
+        public static final ParticleEffect TICK =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(2).horizontalSpread(0.3).build();
+        /** 비활성화 */
+        public static final PlayableEffect OFF = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.5).build(),
+                SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build());
     }
 }

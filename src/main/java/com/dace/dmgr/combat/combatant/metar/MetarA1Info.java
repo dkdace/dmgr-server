@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -8,12 +9,15 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     /** 쿨타임 */
@@ -54,49 +58,39 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1.5).pitch(0.8).build());
-        /** 사격 */
-        public static final SoundEffect SHOOT = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(3).pitch(0.8).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(4).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(6).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 색상 */
-        public static final Color COLOR = Color.fromRGB(40, 160, 200);
-
-        /** 사용 시 틱 입자 효과 (중심) */
-        public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(90, 94, 121)).count(3).horizontalSpread(0.2).verticalSpread(0.1).build());
-        /** 사용 시 틱 입자 효과 (모양) */
-        public static final ParticleEffect USE_TICK_SHAPE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(200, 10, 10)).horizontalSpread(0).verticalSpread(0).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.6).build(),
+                SoundEffect.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1.5).pitch(0.8).build());
+        /** 사용 시 틱 효과 - 1 */
+        public static final ParticleEffect USE_TICK_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(90, 94, 121)).count(3)
+                        .horizontalSpread(0.2).verticalSpread(0.1).build();
+        /** 사용 시 틱 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(200, 10, 10)).build();
+        /** 발사 */
+        public static final PlayableEffect SHOOT = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(3).pitch(0.6).build(),
+                SoundEffect.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(3).pitch(0.8).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(-0.2).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
+        public static final PlayableEffect.Function<Vector> BULLET_TRAIL = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(-0.2)),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(40, 160, 200)).build());
+        /** 블록 타격 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block ->
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 4.0);
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(25).speed(0.25).build());
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(4).pitch(0.8).build(),
+                SoundEffect.builder("random.gun_reverb2").volume(6).pitch(1.2).build(),
+
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(25).speed(0.25).build());
     }
 }

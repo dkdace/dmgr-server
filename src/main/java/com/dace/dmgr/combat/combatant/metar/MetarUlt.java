@@ -50,25 +50,21 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
         addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
                     0, 0, 0.3);
-
-            MetarUltInfo.Sounds.USE_TICK.play(loc, 1, i / 39.0);
-            MetarUltInfo.Particles.USE_TICK.play(loc);
+            MetarUltInfo.Effects.USE_TICK.apply(i).play(loc);
         }, () -> {
             cancel();
 
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
-
-            MetarUltInfo.Sounds.USE_READY.play(loc);
-            MetarUltInfo.Particles.USE_READY.play(loc);
+            MetarUltInfo.Effects.USE_READY.play(loc);
 
             addTask(new IntervalTask(i -> {
                 if (i % 4 == 0) {
                     new MetarUltHitscan().shot(loc, loc.getDirection());
 
-                    MetarUltInfo.Sounds.TICK.play(loc);
+                    MetarUltInfo.Effects.TICK_SOUND.play(loc);
                 }
 
-                MetarUltInfo.Particles.TICK.play(loc);
+                MetarUltInfo.Effects.TICK_PARTICLE.play(loc);
             }, 1, MetarUltInfo.DURATION.toTicks()));
         }, 1, MetarUltInfo.READY_DURATION.toTicks()));
     }
@@ -103,7 +99,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
-                    .chain(createPeriodIntervalHandler(16, MetarUltInfo.Particles.BULLET_TRAIL_CORE::play))
+                    .chain(createPeriodIntervalHandler(16, MetarUltInfo.Effects.BULLET_TRAIL_1::play))
                     .next(createPeriodIntervalHandler(42, location -> {
                         Vector vector = VectorUtil.getYawAxis(location).multiply(2);
                         Vector axis = VectorUtil.getRollAxis(location);
@@ -112,7 +108,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
                             int angle = 360 / 16 * i;
                             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-                            MetarUltInfo.Particles.BULLET_TRAIL_DECO.play(location.clone().add(vec));
+                            MetarUltInfo.Effects.BULLET_TRAIL_2.play(location.clone().add(vec));
                         }
                     }));
         }

@@ -81,17 +81,17 @@ public final class JagerA3 extends ActiveSkill {
         weapon.cancel();
         weapon.setVisible(false);
 
-        JagerA3Info.Sounds.USE.play(combatUser.getLocation());
+        JagerA3Info.Effects.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
             explodeTimestamp = Timestamp.now().plus(JagerA3Info.EXPLODE_DURATION);
 
-            JagerA3Info.Sounds.USE_READY.play(combatUser.getLocation());
+            JagerA3Info.Effects.USE_READY.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 0.3);
-                JagerA3Info.Particles.BULLET_TRAIL.play(loc);
+                JagerA3Info.Effects.BULLET_TRAIL.play(loc);
             }, () -> {
                 forceCancel();
 
@@ -125,7 +125,7 @@ public final class JagerA3 extends ActiveSkill {
         Location loc = combatUser.getArmLocation(MainHand.RIGHT);
         new JagerA3Projectile().shot(loc);
 
-        CombatEffectUtil.THROW_SOUND.play(loc);
+        JagerA3Info.Effects.THROW.play(loc);
     }
 
     /**
@@ -138,8 +138,7 @@ public final class JagerA3 extends ActiveSkill {
         Location loc = location.clone().add(0, 0.1, 0);
         new JagerA3Area(projectile).emit(loc);
 
-        JagerA3Info.Sounds.EXPLODE.play(loc);
-        JagerA3Info.Particles.EXPLODE.play(loc);
+        JagerA3Info.Effects.EXPLODE.play(loc);
     }
 
     /**
@@ -155,7 +154,7 @@ public final class JagerA3 extends ActiveSkill {
                 ((CombatUser) combatEntity).getUser().sendTitle("§c§l얼어붙음!", "", Timespan.ZERO, Timespan.ofTicks(2), Timespan.ofTicks(10));
 
             if (combatEntity.isCreature())
-                JagerA3Info.Particles.FREEZE_TICK.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
+                JagerA3Info.Effects.FREEZE_TICK.apply(combatEntity).play(combatEntity.getCenterLocation());
         }
     }
 
@@ -177,7 +176,7 @@ public final class JagerA3 extends ActiveSkill {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGravityIntervalHandler())
-                    .next(createPeriodIntervalHandler(8, JagerA3Info.Particles.BULLET_TRAIL::play));
+                    .next(createPeriodIntervalHandler(8, JagerA3Info.Effects.BULLET_TRAIL::play));
         }
 
         @Override
@@ -185,7 +184,7 @@ public final class JagerA3 extends ActiveSkill {
         protected HitBlockHandler getPreHitBlockHandler() {
             return (location, hitBlock) -> {
                 if (getVelocity().length() > 0.01)
-                    CombatEffectUtil.THROW_BOUNCE_SOUND.play(location, 1 + getVelocity().length() * 2);
+                    CombatEffectUtil.THROW_BOUNCE_SOUND.apply(getVelocity().length()).play(location);
 
                 return true;
             };

@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.item.ItemBuilder;
 import lombok.AllArgsConstructor;
@@ -602,10 +603,10 @@ public abstract class Combatant {
         }
 
         private static class HumanReaction implements Reaction {
-            /** 치명상 효과 */
-            private static final ParticleEffect LOW_HEALTH_PARTICLE = new ParticleEffect(
-                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.REDSTONE_BLOCK, 0)
-                            .horizontalSpread(0.15).verticalSpread(0.45).speed(0.03).build());
+            /** 치명상 입자 효과 */
+            private static final ParticleEffect LOW_HEALTH_PARTICLE =
+                    ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.REDSTONE_BLOCK, 0)
+                            .horizontalSpread(0.15).verticalSpread(0.45).speed(0.03).build();
 
             @Override
             public void onTickLowHealth(@NonNull CombatUser combatUser) {
@@ -614,7 +615,7 @@ public abstract class Combatant {
 
             @Override
             public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
-                CombatEffectUtil.playBleedingParticle(combatUser, location, damage);
+                CombatEffectUtil.DamageParticle.BLOOD.play(combatUser, location, damage);
             }
 
             @Override
@@ -624,25 +625,25 @@ public abstract class Combatant {
         }
 
         private static class RobotReaction implements Reaction {
-            /** 치명상 효과 */
-            private static final ParticleEffect LOW_HEALTH_PARTICLE = new ParticleEffect(
-                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.COAL_BLOCK, 0)
-                            .horizontalSpread(0.15).verticalSpread(0.45).speed(0.03).build(),
-                    ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).horizontalSpread(0.15).verticalSpread(0.45).speed(0.2).build());
+            /** 치명상 입자 효과 */
+            private static final PlayableEffect LOW_HEALTH_PARTICLE = PlayableEffect.list(
+                    ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.COAL_BLOCK, 0).horizontalSpread(0.15)
+                            .verticalSpread(0.45).speed(0.03).build(),
+                    ParticleEffect.Normal.builder(Particle.CRIT).horizontalSpread(0.15).verticalSpread(0.45).speed(0.2).build());
             /** 피격 효과음 */
-            private static final SoundEffect DAMAGE_SOUND = new SoundEffect(
-                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.15).pitch(1.3).pitchVariance(0.2).build());
-            /** 사망 효과 */
-            private static final ParticleEffect DEATH_PARTICLE = new ParticleEffect(
-                    ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_LARGE).build(),
-                    ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(300)
-                            .horizontalSpread(0.2).verticalSpread(0.2).speed(0.3).build());
+            private static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
+                    SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.15 + damage * 0.001).pitch(1.3).pitchVariance(0.2).build();
             /** 사망 효과음 */
-            private static final SoundEffect DEATH_SOUND = new SoundEffect(
-                    SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(0.5).build(),
-                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.5).build(),
-                    SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.5).build(),
-                    SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.5).build());
+            private static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
+                    SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(0.5).build(),
+                    SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.5).build(),
+                    SoundEffect.builder("random.metalhit").volume(2).pitch(0.5).build(),
+                    SoundEffect.builder(Sound.ENTITY_ITEM_BREAK).volume(2).pitch(0.5).build());
+            /** 사망 입자 효과 */
+            private static final PlayableEffect DEATH_PARTICLE = PlayableEffect.list(
+                    ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).build(),
+                    ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(300)
+                            .horizontalSpread(0.2).verticalSpread(0.2).speed(0.3).build());
 
             @Override
             public void onTickLowHealth(@NonNull CombatUser combatUser) {
@@ -651,8 +652,8 @@ public abstract class Combatant {
 
             @Override
             public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
-                CombatEffectUtil.playBreakParticle(combatUser, location, damage);
-                DAMAGE_SOUND.play(combatUser.getLocation(), 1 + damage * 0.001);
+                CombatEffectUtil.DamageParticle.METAL.play(combatUser, location, damage);
+                DAMAGE_SOUND.apply(damage).play(combatUser.getLocation());
             }
 
             @Override

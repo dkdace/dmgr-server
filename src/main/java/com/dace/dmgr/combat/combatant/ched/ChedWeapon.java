@@ -59,7 +59,7 @@ public final class ChedWeapon extends AbstractWeapon {
                         weapon.setVisible(true);
                     }
 
-                    ChedWeaponInfo.Sounds.CHARGE.play(combatUser.getLocation());
+                    ChedWeaponInfo.Effects.CHARGE.play(combatUser.getLocation());
                 }
 
                 break;
@@ -68,7 +68,7 @@ public final class ChedWeapon extends AbstractWeapon {
                 new ChedWeaponProjectile(power).shot();
                 setCanShoot(false);
 
-                ChedWeaponInfo.Sounds.USE.play(combatUser.getLocation(), power, power);
+                ChedWeaponInfo.Effects.SHOOT.apply(power).play(combatUser.getLocation());
 
                 break;
             }
@@ -96,7 +96,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            ChedWeaponInfo.Sounds.HIT.play(location, power);
+            ChedWeaponInfo.Effects.HIT.apply(power).play(location);
         }
 
         @Override
@@ -114,9 +114,7 @@ public final class ChedWeapon extends AbstractWeapon {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, power);
-                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, power * 1.5);
-
+                ChedWeaponInfo.Effects.HIT_BLOCK.apply(hitBlock, power).play(location);
                 return false;
             };
         }

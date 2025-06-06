@@ -6,11 +6,13 @@ import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.NonNull;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
 /**
@@ -18,18 +20,19 @@ import org.bukkit.inventory.MainHand;
  */
 public final class MeleeAttackAction extends AbstractAction {
     /** 사용 효과음 */
-    private static final SoundEffect USE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(0.6).pitch(1.1).pitchVariance(0.1).build());
-    /** 엔티티 타격 효과음 */
-    private static final SoundEffect HIT_ENTITY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 */
-    private static final SoundEffect HIT_BLOCK_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
+    private static final SoundEffect USE_SOUND =
+            SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(0.6).pitch(1.1).pitchVariance(0.1).build();
     /** 엔티티 타격 효과 */
-    private static final ParticleEffect HIT_ENTITY_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(10).speed(0.4).build());
+    private static final PlayableEffect HIT_ENTITY_EFFECT = PlayableEffect.list(
+            SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
+            SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(1).pitch(1.1).pitchVariance(0.1).build(),
+
+            ParticleEffect.Normal.builder(Particle.CRIT).count(10).speed(0.4).build());
+    /** 블록 타격 효과 */
+    private static final PlayableEffect.Function<Block> HIT_BLOCK_EFFECT = block -> PlayableEffect.list(
+            SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build(),
+            CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0),
+            CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 1.0));
 
     /** 쿨타임 */
     private static final Timespan COOLDOWN = Timespan.ofSeconds(1);
@@ -98,10 +101,7 @@ public final class MeleeAttackAction extends AbstractAction {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                HIT_BLOCK_SOUND.play(location);
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1);
-
+                HIT_BLOCK_EFFECT.apply(hitBlock).play(location);
                 return false;
             };
         }
@@ -114,9 +114,7 @@ public final class MeleeAttackAction extends AbstractAction {
                         && target instanceof Movable)
                     ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
 
-                HIT_ENTITY_SOUND.play(location);
-                HIT_ENTITY_PARTICLE.play(location);
-
+                HIT_ENTITY_EFFECT.play(location);
                 return false;
             };
         }

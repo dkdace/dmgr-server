@@ -1,7 +1,7 @@
 package com.dace.dmgr.event.listener;
 
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.effect.TimedSoundEffect;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.StringFormUtil;
@@ -27,10 +27,16 @@ public final class OnPlayerJoin extends EventListener<PlayerJoinEvent> {
     private static final OnPlayerJoin instance = new OnPlayerJoin();
 
     /** 입장 효과음 */
-    private static final TimedSoundEffect JOIN_SOUND = TimedSoundEffect.builder()
-            .add(0, SoundEffect.SoundInfo.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, -6 / 12.0)).build())
-            .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, 1 / 12.0)).build())
-            .build();
+    private static final PlayableEffect.Function<Long> JOIN_SOUND = i -> {
+        switch (i.intValue()) {
+            case 0:
+                return SoundEffect.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, -6 / 12.0)).build();
+            case 3:
+                return SoundEffect.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, 1 / 12.0)).build();
+            default:
+                return SoundEffect.NONE;
+        }
+    };
     /** 접속 전체 메시지 */
     private static final String BROADCAST_MESSAGE = "{0}현재 인원수는 §3§l{1}명§b입니다.";
 
@@ -47,7 +53,7 @@ public final class OnPlayerJoin extends EventListener<PlayerJoinEvent> {
             Bukkit.broadcastMessage(MessageFormat.format(BROADCAST_MESSAGE, StringFormUtil.ADD_PREFIX, Bukkit.getOnlinePlayers().size()));
 
             new IntervalTask((LongConsumer) i ->
-                    Bukkit.getOnlinePlayers().forEach(target -> JOIN_SOUND.play(i, target)), 1, 4);
+                    Bukkit.getOnlinePlayers().forEach(target -> JOIN_SOUND.apply(i).play(target)), 1, 4);
         }, 1);
     }
 }

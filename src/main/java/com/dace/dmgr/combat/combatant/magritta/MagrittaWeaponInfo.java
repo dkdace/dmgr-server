@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -9,13 +10,14 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     /** 쿨타임 */
@@ -64,40 +66,53 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.xm1014_1").volume(3).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.spas_12_1").volume(3).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(5).pitch(0.8).build());
-        /** 재장전 */
-        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
-                .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(0.6).pitch(1.3).build())
-                .add(5, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.3).build())
-                .add(20, SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build())
-                .add(21, SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build())
-                .add(22, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.7).build())
-                .add(28, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(0.9).build())
-                .add(33, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.9).build())
-                .build();
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder("random.gun2.xm1014_1").volume(3).pitch(1).build(),
+                SoundEffect.builder("random.gun2.xm1014_1").volume(3).pitch(0.8).build(),
+                SoundEffect.builder("random.gun2.spas_12_1").volume(3).pitch(1).build(),
+                SoundEffect.builder("random.gun_reverb").volume(5).pitch(0.9).build(),
+                SoundEffect.builder("random.gun_reverb").volume(5).pitch(0.8).build());
+        /** 탄피 효과음 */
+        public static final PlayableEffect BULLET_SHELL =
+                CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.apply(1.0);
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).build());
+        public static final ParticleEffect HIT =
+                ParticleEffect.Normal.builder(Particle.LAVA).build();
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.BONE_BLOCK, 0).count(4)
-                        .speed(0.08).build());
+        public static final ParticleEffect HIT_ENTITY =
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.BONE_BLOCK, 0).count(4).speed(0.08).build();
+        /** 블록 타격 효과음 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK_SOUND = block -> PlayableEffect.list(
+                CombatEffectUtil.BULLET_HIT_BLOCK_SOUND,
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0));
+        /** 블록 타격 입자 효과 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK_PARTICLE = block ->
+                CombatEffectUtil.HIT_BLOCK_SMALL_PARTICLE.apply(block, 1.0);
+        /** 재장전 */
+        public static final PlayableEffect.Function<Long> RELOAD = i -> {
+            switch (i.intValue()) {
+                case 3:
+                    return SoundEffect.builder(Sound.BLOCK_PISTON_EXTEND).volume(0.6).pitch(1.3).build();
+                case 5:
+                    return SoundEffect.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.3).build();
+                case 20:
+                    return SoundEffect.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build();
+                case 21:
+                    return SoundEffect.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build();
+                case 22:
+                    return SoundEffect.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.7).build();
+                case 28:
+                    return SoundEffect.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(0.9).build();
+                case 33:
+                    return SoundEffect.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.9).build();
+                default:
+                    return SoundEffect.NONE;
+            }
+        };
     }
 }

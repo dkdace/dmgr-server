@@ -86,11 +86,9 @@ public final class User {
     /** Tabbed 인스턴스 */
     private static final Tabbed TABBED = new Tabbed(DMGR.getPlugin());
     /** 경고 액션바 효과음 */
-    private static final SoundEffect ALERT_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build());
+    private static final SoundEffect ALERT_SOUND = SoundEffect.builder("new.block.note_block.bit").volume(0.25).pitch(0.7).build();
     /** 타자기 효과 타이틀 효과음 */
-    private static final SoundEffect TYPEWRITER_TITLE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("new.block.note_block.bass").volume(1).pitch(1.5).build());
+    private static final SoundEffect TYPEWRITER_TITLE_SOUND = SoundEffect.builder("new.block.note_block.bass").volume(1).pitch(1.5).build();
 
     /** 플레이어 인스턴스 */
     @NonNull

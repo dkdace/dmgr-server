@@ -8,11 +8,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     /** 궁극기 필요 충전량 */
@@ -67,83 +69,66 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("new.entity.squid.squirt").volume(2).pitch(0.7).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(0.8).build(),
+                SoundEffect.builder("new.entity.squid.squirt").volume(2).pitch(0.7).build());
+        /** 사용 시 틱 효과 - 1 */
+        public static final PlayableEffect.BiFunction<Long, Vector> USE_TICK_1 = (i, velocity) -> PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.DRIP_LAVA).build(),
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.02 + i * 0.0014)));
+        /** 사용 시 틱 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> USE_TICK_2 = velocity -> PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.DRIP_LAVA).build(),
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.1)),
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.16)));
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.phantom.death").volume(3).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder("new.entity.phantom.death").volume(3).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SHOOT).volume(3).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_VEX_CHARGE).volume(3).pitch(0.85).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.2).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ITEM_TOTEM_USE).volume(5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(5).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(5).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(0.6).build());
-        /** 화염 지대 틱 효과음 */
-        public static final SoundEffect FIRE_FLOOR_TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.75).pitchVariance(0.1).build());
-    }
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder("new.entity.phantom.death").volume(3).pitch(0.7).build(),
+                SoundEffect.builder("new.entity.phantom.death").volume(3).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_WITHER_SHOOT).volume(3).pitch(0.5).build(),
+                SoundEffect.builder(Sound.ENTITY_VEX_CHARGE).volume(3).pitch(0.85).build());
+        /** 총알 궤적 - 1 */
+        public static final PlayableEffect BULLET_TRAIL_1 = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.5).pitch(1.2).build(),
 
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 - 1 */
-        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(1, 0.02, 0.1)
-                        .build());
-        /** 사용 시 틱 입자 효과 - 2 */
-        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.DRIP_LAVA).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(0.1).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(0.16).build());
-        /** 총알 궤적 (중심) */
-        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.REDSTONE).count(20).horizontalSpread(0.28).verticalSpread(0.28).build());
-        /** 총알 궤적 (모양) */
-        public static final ParticleEffect BULLET_TRAIL_SHAPE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.REDSTONE).count(8)
-                        .horizontalSpread(0, 0, 1)
-                        .verticalSpread(1, 0, 1)
-                        .build());
-        /** 총알 궤적 (장식) - 1 */
-        public static final ParticleEffect BULLET_TRAIL_DECO_1 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).build());
-        /** 총알 궤적 (장식) - 2 */
-        public static final ParticleEffect BULLET_TRAIL_DECO_2 = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(-0.25).build());
+                ParticleEffect.Normal.builder(Particle.REDSTONE).count(20).horizontalSpread(0.28).verticalSpread(0.28).build());
+        /** 총알 궤적 - 2 */
+        public static final PlayableEffect.BiFunction<Double, Double> BULLET_TRAIL_2 = (horizontalSpread, verticalSpread) ->
+                ParticleEffect.Normal.builder(Particle.REDSTONE).count(8).horizontalSpread(horizontalSpread).verticalSpread(verticalSpread).build();
+        /** 총알 궤적 - 3 */
+        public static final ParticleEffect BULLET_TRAIL_3 =
+                ParticleEffect.Normal.builder(Particle.LAVA).count(3).build();
+        /** 총알 궤적 - 4 */
+        public static final PlayableEffect.Function<Vector> BULLET_TRAIL_4 = velocity ->
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(-0.25));
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(5).horizontalSpread(0.05).verticalSpread(0.05).build());
+        public static final ParticleEffect HIT_ENTITY =
+                ParticleEffect.Normal.builder(Particle.FLAME).count(5).horizontalSpread(0.05).verticalSpread(0.05).build();
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_HUGE).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(400).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(600).horizontalSpread(0.4).verticalSpread(0.4).speed(0.4).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(150).horizontalSpread(3).verticalSpread(3).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(400).horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build());
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ITEM_TOTEM_USE).volume(5).pitch(1.3).build(),
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_GHAST_SHOOT).volume(5).pitch(0.6).build(),
+                SoundEffect.builder(Sound.ENTITY_GHAST_SHOOT).volume(5).pitch(0.8).build(),
+                SoundEffect.builder("random.explosion_reverb").volume(7).pitch(0.6).build(),
+
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_HUGE).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_LARGE).count(400).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(600).horizontalSpread(0.4).verticalSpread(0.4).speed(0.4).build(),
+                ParticleEffect.Normal.builder(Particle.LAVA).count(150).horizontalSpread(3).verticalSpread(3).build(),
+                ParticleEffect.Normal.builder(Particle.FLAME).count(400).horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build());
+        /** 화염 지대 틱 효과음 */
+        public static final SoundEffect FIRE_FLOOR_TICK_SOUND =
+                SoundEffect.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.75).pitchVariance(0.1).build();
         /** 화염 지대 틱 입자 효과 */
-        public static final ParticleEffect FIRE_FLOOR_TICK = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(20).horizontalSpread(4).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(4).build());
+        public static final PlayableEffect FIRE_FLOOR_TICK_PARTICLE = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.FLAME).count(20).horizontalSpread(4).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(4).build());
     }
 }

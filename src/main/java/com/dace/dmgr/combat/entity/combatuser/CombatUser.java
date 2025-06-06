@@ -17,6 +17,7 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.interaction.HasCritHitbox;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.effect.BossBarDisplay;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.effect.TextHologram;
 import com.dace.dmgr.game.Game;
@@ -403,7 +404,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             if (fallDistance > 0.5) {
                 volume = 1.2 + fallDistance * 0.05;
-                SoundEffect fallSound;
+                PlayableEffect.Function<Double> fallSound;
                 if (fallDistance > 6)
                     fallSound = Sounds.FALL_HIGH;
                 else if (fallDistance > 3)
@@ -411,7 +412,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 else
                     fallSound = Sounds.FALL_LOW;
 
-                fallSound.play(loc, volume);
+                fallSound.apply(volume).play(loc);
             }
 
             combatant.onFootstep(this, volume);
@@ -496,7 +497,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         hitSoundTimestamp = Timestamp.now().plus(Timespan.ofTicks(1));
         String title;
-        SoundEffect sound;
+        PlayableEffect sound;
         if (isCrit) {
             title = "§c§l×";
             sound = Sounds.ATTACK_CRIT;
@@ -1132,29 +1133,29 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @UtilityClass
     private static final class Sounds {
         /** 추락 (낮음) */
-        private static final SoundEffect FALL_LOW = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.3).pitch(0.9).pitchVariance(0.1).build());
+        private static final PlayableEffect.Function<Double> FALL_LOW = volumeMultiplier ->
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.3 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build();
         /** 추락 (중간) */
-        private static final SoundEffect FALL_MID = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.4).pitch(0.9).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(0.4).pitch(0.9).pitchVariance(0.1).build());
+        private static final PlayableEffect.Function<Double> FALL_MID = volumeMultiplier -> PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.4 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(0.4 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build());
         /** 추락 (높음) */
-        private static final SoundEffect FALL_HIGH = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.5).pitch(0.8).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_STEP).volume(0.5).pitch(0.9).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(0.5).pitch(0.9).pitchVariance(0.1).build());
+        private static final PlayableEffect.Function<Double> FALL_HIGH = volumeMultiplier -> PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.5 * volumeMultiplier).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(0.5 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(0.5 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build());
         /** 공격 */
-        private static final SoundEffect ATTACK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.8).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BIG_FALL).volume(1).pitch(0.7).build());
+        private static final PlayableEffect ATTACK = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_HURT).volume(0.8).pitch(1.4).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_BIG_FALL).volume(1).pitch(0.7).build());
         /** 치명타 */
-        private static final SoundEffect ATTACK_CRIT = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BIG_FALL).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_PLACE).volume(0.5).pitch(1.8).build());
+        private static final PlayableEffect ATTACK_CRIT = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_BIG_FALL).volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.BLOCK_ANVIL_PLACE).volume(0.5).pitch(1.8).build());
         /** 처치 */
-        private static final SoundEffect KILL = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(2).pitch(1.25).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1).pitch(1.25).build());
+        private static final PlayableEffect KILL = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(2).pitch(1.25).build(),
+                SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1).pitch(1.25).build());
     }
 
     /**

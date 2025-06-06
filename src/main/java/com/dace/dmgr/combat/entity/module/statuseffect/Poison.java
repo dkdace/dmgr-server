@@ -1,9 +1,11 @@
 package com.dace.dmgr.combat.entity.module.statuseffect;
 
 import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import lombok.NonNull;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -16,11 +18,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public class Poison implements StatusEffect {
     /** 틱 입자 효과 */
-    private static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(Particle.DAMAGE_INDICATOR)
-                    .horizontalSpread(0, 0, 0.25)
-                    .verticalSpread(1, 0, 0.25)
-                    .speed(0.3).build());
+    private static final PlayableEffect.Function<CombatEntity> TICK_PARTICLE = combatEntity ->
+            ParticleEffect.Normal.builder(Particle.DAMAGE_INDICATOR).horizontalSpread(combatEntity.getWidth() * 0.25)
+                    .verticalSpread(combatEntity.getHeight() * 0.25).speed(0.3).build();
 
     /** 공격자 */
     private final Attacker attacker;
@@ -68,7 +68,7 @@ public class Poison implements StatusEffect {
                     new PotionEffect(PotionEffectType.POISON, 4, 0, false, false), true);
 
         if (i % 2 == 0)
-            TICK_PARTICLE.play(combatEntity.getCenterLocation(), combatEntity.getWidth(), combatEntity.getHeight());
+            TICK_PARTICLE.apply(combatEntity).play(combatEntity.getCenterLocation());
 
         if (i % 10 == 0)
             combatEntity.getDamageModule().damage(attacker, damagePerSecond * 10 / 20.0, DamageType.IGNORE_DEFENSE, null, false, isUlt);

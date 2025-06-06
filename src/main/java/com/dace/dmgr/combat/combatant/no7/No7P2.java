@@ -58,8 +58,7 @@ public final class No7P2 extends AbstractSkill {
 
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
 
-            No7P2Info.Particles.HIT_ENTITY.play(location, power);
-            No7P2Info.Sounds.HIT_ENTITY.play(location, power);
+            No7P2Info.Effects.HIT_ENTITY.apply(power).play(location);
             for (Location loc : LocationUtil.getLine(center, location, 0.4))
                 CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
 

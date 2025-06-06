@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -71,44 +72,35 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(0.8).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GHAST_SHOOT).volume(1).pitch(1.5).build());
-        /** 사용 (치유 광선) */
-        public static final SoundEffect USE_HEAL = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(0.2).pitch(2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 255, 200);
 
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(0.8).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_GHAST_SHOOT).volume(1).pitch(1.5).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(255, 255, 235)).horizontalSpread(0.05).verticalSpread(0.05).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(3)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build());
+        public static final PlayableEffect BULLET_TRAIL = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, Color.fromRGB(255, 255, 235))
+                        .horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(3).horizontalSpread(0.1).verticalSpread(0.1)
+                        .build());
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(15)
-                        .horizontalSpread(0.2).verticalSpread(0.2).build());
-        /** 엔티티 타격 (치유 광선) */
-        public static final ParticleEffect HIT_ENTITY_HEAL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 255, 140)).build());
-        /** 엔티티 타격 (치유 광선 - 축복) */
-        public static final ParticleEffect HIT_ENTITY_HEAL_AMPLIFY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(140, 255, 245)).build());
+        public static final ParticleEffect HIT =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(15).horizontalSpread(0.2)
+                        .verticalSpread(0.2).build();
+        /** 치유 광선 - 사용 효과음 */
+        public static final SoundEffect HEAL_USE_SOUND =
+                SoundEffect.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(0.2).pitch(2).build();
+        /** 치유 광선 - 사용 입자 효과 */
+        public static final ParticleEffect HEAL_USE_PARTICLE =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(255, 255, 140)).build();
+        /** 치유 광선 - 축복 - 사용 입자 효과 */
+        public static final ParticleEffect HEAL_AMPLIFY_USE_PARTICLE =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(140, 255, 245)).build();
     }
 }

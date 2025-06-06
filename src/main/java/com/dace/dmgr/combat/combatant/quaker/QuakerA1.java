@@ -75,7 +75,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        QuakerA1Info.Sounds.USE.play(combatUser.getLocation());
+        QuakerA1Info.Effects.ON.play(combatUser.getLocation());
 
         entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
     }
@@ -92,7 +92,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         entityModule.removeEntity();
 
-        QuakerA1Info.Sounds.DISABLE.play(combatUser.getLocation());
+        QuakerA1Info.Effects.OFF.play(combatUser.getLocation());
     }
 
     /**
@@ -137,9 +137,9 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
-            QuakerA1Info.Sounds.DAMAGE.play(location == null ? getLocation() : location, 1 + damage * 0.001);
+            QuakerA1Info.Effects.DAMAGE.apply(damage).play(location == null ? getLocation() : location);
             if (location != null)
-                CombatEffectUtil.playBreakParticle(this, location, damage);
+                CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
         }
 
         @Override
@@ -150,11 +150,11 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             setStateValue(0);
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
-            QuakerA1Info.Sounds.DEATH.play(getCenterLocation());
+            QuakerA1Info.Effects.DEATH_SOUND.play(getCenterLocation());
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 2; j++) {
                     Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
-                    QuakerA1Info.Particles.DEATH.play(loc);
+                    QuakerA1Info.Effects.DEATH_PARTICLE.play(loc);
                 }
             }
         }

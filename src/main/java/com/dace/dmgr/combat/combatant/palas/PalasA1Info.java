@@ -6,8 +6,10 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -51,48 +53,39 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ARROW_SHOOT).volume(1.5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun.m1911_silencer").volume(1.5).pitch(0.8).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_TWINKLE).volume(2).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.stab").volume(2).pitch(2).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(240, 230, 50);
 
+        /** 사용 */
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build();
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ARROW_SHOOT).volume(1.5).pitch(0.5).build(),
+                SoundEffect.builder("random.gun.m1911_silencer").volume(1.5).pitch(0.8).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
-        /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(20)
-                        .horizontalSpread(0, 0, 0.5)
-                        .verticalSpread(1, 0, 0.5)
-                        .build());
-        /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(20).speed(0.6).build());
+        public static final PlayableEffect BULLET_TRAIL = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.CRIT).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).build());
+        /** 엔티티 타격 효과음 */
+        public static final PlayableEffect HIT_ENTITY_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_TWINKLE).volume(2).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
+                SoundEffect.builder("random.stab").volume(2).pitch(2).build());
+        /** 엔티티 타격 입자 효과 */
+        public static final PlayableEffect.Function<CombatEntity> HIT_ENTITY_PARTICLE = combatEntity ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(20)
+                        .horizontalSpread(combatEntity.getWidth() * 0.5).verticalSpread(combatEntity.getHeight() * 0.5).build();
+        /** 기절 - 틱 효과음 */
+        public static final PlayableEffect STUN_TICK_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build());
+        /** 기절 - 틱 입자 효과 */
+        public static final ParticleEffect STUN_TICK_PARTICLE =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(20).speed(0.6).build();
     }
 }

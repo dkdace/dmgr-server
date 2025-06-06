@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -50,29 +51,22 @@ public final class VellionWeaponInfo extends WeaponInfo<VellionWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(0.8).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_HURT).volume(0.8).pitch(0.5).build(),
+                SoundEffect.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.8).build(),
+                SoundEffect.builder(Sound.BLOCK_END_PORTAL_FRAME_FILL).volume(1).pitch(0.9).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(4).horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(80, 30, 110)).count(6).horizontalSpread(0.25).verticalSpread(0.25).build());
+        public static final PlayableEffect BULLET_TRAIL = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.SPELL_WITCH).count(4).horizontalSpread(0.1).verticalSpread(0.1).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(80, 30, 110)).count(6)
+                        .horizontalSpread(0.25).verticalSpread(0.25).build());
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(30).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1).build());
+        public static final ParticleEffect HIT =
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(30).horizontalSpread(0.1).verticalSpread(0.1).speed(0.1).build();
     }
 }

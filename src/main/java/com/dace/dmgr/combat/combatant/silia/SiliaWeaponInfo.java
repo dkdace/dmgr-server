@@ -1,18 +1,21 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /** 피해량 */
@@ -53,41 +56,34 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.gun2.knife_leftclick").volume(0.8).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(0.7).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_1").volume(0.6).pitch(1.3).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.stab").volume(1).pitch(0.8).pitchVariance(0.05).build());
-        /** 블록 타격 */
-        public static final SoundEffect HIT_BLOCK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 255, 255);
 
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder("random.gun2.knife_leftclick").volume(0.8).pitch(1).build(),
+                SoundEffect.builder("random.swordhit").volume(0.7).pitch(1.2).build(),
+                SoundEffect.builder("new.item.trident.riptide_1").volume(0.6).pitch(1.3).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(2)
-                        .horizontalSpread(0.05).verticalSpread(0.05).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(2).horizontalSpread(0.05)
+                        .verticalSpread(0.05).build();
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15)
-                        .build());
+        public static final ParticleEffect HIT =
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(10).horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build();
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).speed(0.4).build());
+        public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
+                SoundEffect.builder("random.stab").volume(1).pitch(0.8).pitchVariance(0.05).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT).count(15).speed(0.4).build());
+        /** 블록 타격 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block -> PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build(),
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0),
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 1.5));
     }
 }

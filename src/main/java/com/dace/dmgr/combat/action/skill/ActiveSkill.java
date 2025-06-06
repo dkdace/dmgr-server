@@ -20,8 +20,7 @@ import java.util.function.LongConsumer;
  */
 public abstract class ActiveSkill extends AbstractSkill {
     /** 스킬 준비 효과음 */
-    static final SoundEffect READY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(0.2).pitch(2).build());
+    static final SoundEffect READY_SOUND = SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(0.2).pitch(2).build();
 
     /** 스킬 인벤토리 슬롯 */
     private final int slot;

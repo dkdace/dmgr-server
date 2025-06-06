@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -23,10 +24,8 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public final class HealModule extends DamageModule {
     /** 회복 입자 효과 */
-    private static final ParticleEffect HEAL_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(Particle.HEART)
-                    .count(0, 0, 1)
-                    .horizontalSpread(0.3).verticalSpread(0.1).build());
+    private static final PlayableEffect.Function<Double> HEAL_PARTICLE = amount ->
+            ParticleEffect.Normal.builder(Particle.HEART).count((int) (amount / 100.0)).horizontalSpread(0.3).verticalSpread(0.1).build();
     /** 회복량 배수 기본값 */
     private static final double DEFAULT_VALUE = 1;
 
@@ -75,7 +74,7 @@ public final class HealModule extends DamageModule {
         ((Healable) combatEntity).onTakeHeal(provider, finalAmount);
 
         if (finalAmount >= 100 || finalAmount / 100.0 > Math.random())
-            HEAL_PARTICLE.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.3, 0), finalAmount / 100.0);
+            HEAL_PARTICLE.apply(finalAmount).play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.3, 0));
 
         return true;
     }

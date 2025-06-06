@@ -1,18 +1,21 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     /** 쿨타임 */
@@ -52,41 +55,37 @@ public final class QuakerWeaponInfo extends WeaponInfo<QuakerWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.6).pitchVariance(0.1).build());
-        /** 타격 */
-        public static final SoundEffect HIT = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(0.8).pitch(0.75).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.6).pitch(0.85).pitchVariance(0.1).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(1).pitch(0.9).pitchVariance(0.05).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(1).pitch(1.2).pitchVariance(0.1).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(200, 200, 200);
 
-        /** 총알 궤적 (중심) */
-        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(12)
-                        .horizontalSpread(0.3).verticalSpread(0.3).build());
-        /** 총알 궤적 (장식) */
-        public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(30).horizontalSpread(0.15).verticalSpread(0.15).speed(0.05).build());
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
+                SoundEffect.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.6).pitchVariance(0.1).build());
+        /** 총알 궤적 - 1 */
+        public static final ParticleEffect BULLET_TRAIL_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(12).horizontalSpread(0.3).verticalSpread(0.3)
+                        .build();
+        /** 총알 궤적 - 2 */
+        public static final ParticleEffect BULLET_TRAIL_2 =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(30).horizontalSpread(0.15).verticalSpread(0.15).speed(0.05).build();
+        /** 타격 */
+        public static final PlayableEffect HIT = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(0.8).pitch(0.75).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.6).pitch(0.85).pitchVariance(0.1).build());
+        /** 블록 타격 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block -> PlayableEffect.list(
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 2.0),
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0));
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(20).speed(0.4).build());
+        public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_STRONG).volume(1).pitch(0.9).pitchVariance(0.05).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(1).pitch(1.2).pitchVariance(0.1).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT).count(20).speed(0.4).build());
     }
 }

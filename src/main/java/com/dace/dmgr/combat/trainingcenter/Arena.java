@@ -31,14 +31,11 @@ public final class Arena {
     /** 아레나 설정 */
     private static final GeneralConfig.TrainingConfig.ArenaConfig CONFIG = GeneralConfig.getTrainingConfig().getArenaConfig();
     /** 타이머 효과음 */
-    private static final SoundEffect TIMER_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1000).pitch(1).build());
+    private static final SoundEffect TIMER_SOUND = SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1000).pitch(1).build();
     /** 시작 효과음 */
-    private static final SoundEffect ON_PLAY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(1).build());
+    private static final SoundEffect ON_PLAY_SOUND = SoundEffect.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(1).build();
     /** 종료 효과음 */
-    private static final SoundEffect ON_FINISH_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build());
+    private static final SoundEffect ON_FINISH_SOUND = SoundEffect.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build();
     @Getter
     private static final Arena instance = new Arena();
 

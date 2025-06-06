@@ -24,9 +24,9 @@ public final class OnInventoryClick extends EventListener<InventoryClickEvent> {
     @Getter
     private static final OnInventoryClick instance = new OnInventoryClick();
     /** GUI 클릭 성공 효과음 */
-    private static final SoundEffect GUI_CLICK_PASS_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder(Sound.UI_BUTTON_CLICK).build());
+    private static final SoundEffect GUI_CLICK_PASS_SOUND = SoundEffect.builder(Sound.UI_BUTTON_CLICK).build();
     /** GUI 클릭 실패 효과음 */
-    private static final SoundEffect GUI_CLICK_FAIL_SOUND = new SoundEffect(SoundEffect.SoundInfo.builder("new.block.note_block.bit").pitch(0.7).build());
+    private static final SoundEffect GUI_CLICK_FAIL_SOUND = SoundEffect.builder("new.block.note_block.bit").pitch(0.7).build();
 
     @Override
     @EventHandler

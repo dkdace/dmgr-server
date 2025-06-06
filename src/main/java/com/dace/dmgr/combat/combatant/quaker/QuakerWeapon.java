@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -75,7 +74,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
             combatUser.addYawAndPitch(isOpposite ? 0.8 : -0.8, 0.1);
             if (i % 2 == 0)
-                QuakerWeaponInfo.Sounds.USE.play(loc.add(vec));
+                QuakerWeaponInfo.Effects.USE.play(loc.add(vec));
             if (i == 7)
                 combatUser.addYawAndPitch(isOpposite ? -1 : 1, -0.7);
         };
@@ -111,13 +110,13 @@ public final class QuakerWeapon extends AbstractWeapon {
         @Override
         protected void onHit(@NonNull Location location) {
             if (!isUlt)
-                QuakerWeaponInfo.Sounds.HIT.play(location);
+                QuakerWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
         protected void onDestroy(@NonNull Location location, boolean isForce) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            QuakerWeaponInfo.Particles.BULLET_TRAIL_DECO.play(loc);
+            QuakerWeaponInfo.Effects.BULLET_TRAIL_2.play(loc);
         }
 
         @Override
@@ -128,7 +127,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-                QuakerWeaponInfo.Particles.BULLET_TRAIL_CORE.play(loc);
+                QuakerWeaponInfo.Effects.BULLET_TRAIL_1.play(loc);
             });
         }
 
@@ -136,10 +135,8 @@ public final class QuakerWeapon extends AbstractWeapon {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                if (!isUlt) {
-                    CombatEffectUtil.playHitBlockParticle(location, hitBlock, 2);
-                    CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                }
+                if (!isUlt)
+                    QuakerWeaponInfo.Effects.HIT_BLOCK.apply(hitBlock).play(location);
 
                 return false;
             };
@@ -159,8 +156,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                         ((Movable) target).getMoveModule().knockback(dir);
                     }
 
-                    QuakerWeaponInfo.Particles.HIT_ENTITY.play(location);
-                    QuakerWeaponInfo.Sounds.HIT_ENTITY.play(location);
+                    QuakerWeaponInfo.Effects.HIT_ENTITY.play(location);
                 }
 
                 return true;

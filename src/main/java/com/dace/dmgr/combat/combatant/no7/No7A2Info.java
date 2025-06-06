@@ -7,12 +7,14 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class No7A2Info extends ActiveSkillInfo<No7A2> {
     /** 쿨타임 */
@@ -44,38 +46,28 @@ public final class No7A2Info extends ActiveSkillInfo<No7A2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("new.block.beacon.activate").volume(1.5).pitch(1.4).build());
-        /** 해제 */
-        public static final SoundEffect DISABLE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(1.5).pitch(0.5).build());
+    public static final class Effects {
+        /** 활성화 */
+        public static final PlayableEffect ON = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_PISTON_EXTEND).volume(1.5).pitch(0.5).build(),
+                SoundEffect.builder("new.block.beacon.activate").volume(1.5).pitch(1.4).build());
         /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(1).pitch(1.5).build());
-        /** 피격 */
-        public static final SoundEffect DAMAGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.puffer_fish.blow_out").volume(0.5).pitch(1.2).pitchVariance(0.05).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final SoundEffect TICK_SOUND =
+                SoundEffect.builder(Sound.ENTITY_GUARDIAN_ATTACK).volume(1).pitch(1.5).build();
         /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 255, 176)).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT)
-                        .speedMultiplier(-0.5).build());
+        public static final PlayableEffect.Function<Vector> TICK_PARTICLE = velocity -> PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(255, 255, 176)).build(),
+                ParticleEffect.Directional.create(Particle.CRIT, velocity.clone().multiply(-0.5)));
+        /** 비활성화 */
+        public static final PlayableEffect OFF = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(1.5).pitch(0.5).build());
         /** 피격 */
-        public static final ParticleEffect DAMAGE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(5).speed(0.05).build());
+        public static final PlayableEffect DAMAGE = PlayableEffect.list(
+                SoundEffect.builder("new.entity.puffer_fish.blow_out").volume(0.5).pitch(1.2).pitchVariance(0.05).build(),
+
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(5).speed(0.05).build());
     }
 }

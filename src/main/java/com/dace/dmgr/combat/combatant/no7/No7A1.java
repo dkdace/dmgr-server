@@ -67,12 +67,12 @@ public final class No7A1 extends ActiveSkill {
             if (length > No7A1Info.PUSH / 2)
                 new No7A1MeleeHitscan(targets).shot(loc);
 
-            No7A1Info.Sounds.TICK.play(combatUser.getLocation());
+            No7A1Info.Effects.TICK_SOUND.play(combatUser.getLocation());
             for (int j = 0; j < 12; j++) {
                 Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, -0.3);
                 Vector vec = VectorUtil.getSpreadedVector(loc.getDirection().multiply(-1), 60);
 
-                No7A1Info.Particles.TICK.play(loc2, vec, Math.random());
+                No7A1Info.Effects.TICK_PARTICLE.apply(vec).play(loc2);
             }
         }, 1, No7A1Info.DURATION.toTicks()));
     }
@@ -121,8 +121,7 @@ public final class No7A1 extends ActiveSkill {
                         ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
                 }
 
-                No7A1Info.Sounds.HIT_ENTITY.play(location);
-                No7A1Info.Particles.HIT_ENTITY.play(location);
+                No7A1Info.Effects.HIT_ENTITY.play(location);
 
                 return false;
             };

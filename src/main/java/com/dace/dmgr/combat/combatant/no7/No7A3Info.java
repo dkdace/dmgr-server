@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -14,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class No7A3Info extends ActiveSkillInfo<No7A3> {
     /** 쿨타임 */
@@ -44,34 +46,25 @@ public final class No7A3Info extends ActiveSkillInfo<No7A3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(1.5).pitch(1.6).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.charge").volume(0.6).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 255, 43);
 
-        /** 틱 입자 효과 (중심) */
-        public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(5)
-                        .verticalSpread(0.7).build());
-        /** 틱 입자 효과 (장식) */
-        public static final ParticleEffect TICK_DECO = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.CRIT)
-                        .speedMultiplier(0.5).build());
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(1.4).build(),
+                SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(1.5).pitch(1.6).build());
+        /** 틱 효과음 */
+        public static final SoundEffect TICK_SOUND =
+                SoundEffect.builder("random.charge").volume(0.6).pitch(1.2).build();
+        /** 틱 입자 효과 - 1 */
+        public static final ParticleEffect TICK_PARTICLE_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(5).verticalSpread(0.7).build();
+        /** 틱 입자 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity ->
+                ParticleEffect.Directional.create(Particle.CRIT, velocity.clone().multiply(0.5));
     }
 }

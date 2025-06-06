@@ -7,12 +7,15 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class No7A1Info extends ActiveSkillInfo<No7A1> {
     /** 쿨타임 */
@@ -55,36 +58,24 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(2).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(1.5).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.7).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect TICK_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(2).pitch(0.5).build(),
+                SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(1.5).build());
         /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(1, 0.2, 0.35)
-                        .build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(1, 0.1, 0.25)
-                        .build());
+        public static final PlayableEffect.Function<Vector> TICK_PARTICLE = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(RandomUtils.nextDouble(0.2, 0.35))),
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(RandomUtils.nextDouble(0.1, 0.25))));
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(40).speed(0.4).build());
+        public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.7).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT).count(40).speed(0.4).build());
     }
 }

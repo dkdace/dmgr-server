@@ -72,7 +72,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        VellionA1Info.Sounds.USE.play(combatUser.getLocation());
+        VellionA1Info.Effects.USE.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
             cancel();
@@ -80,7 +80,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
             entityModule.set(new VellionA1Entity(loc));
 
-            VellionA1Info.Sounds.USE_READY.play(loc);
+            VellionA1Info.Effects.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION.toTicks()));
     }
 
@@ -117,9 +117,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                 Location loc2 = loc.clone().add(vec);
 
                 if (i == 9)
-                    VellionA1Info.Particles.USE_TICK_2.play(loc2);
+                    VellionA1Info.Effects.USE_TICK_2.play(loc2);
                 else
-                    VellionA1Info.Particles.USE_TICK_1.play(loc2, i / 8.0);
+                    VellionA1Info.Effects.USE_TICK_1.apply(i).play(loc2);
             }
         }
     }
@@ -191,7 +191,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
             new VellionA1Area().emit(loc);
 
-            VellionA1Info.Particles.DISPLAY.play(getLocation());
+            VellionA1Info.Effects.DISPLAY.play(getLocation());
         }
 
         private final class VellionA1Area extends Area<Damageable> {
@@ -231,8 +231,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
                     target.getStatusEffectModule().apply(Snare.getInstance(), VellionA1Info.SNARE_DURATION);
                 }
 
-                VellionA1Info.Particles.HIT_ENTITY.play(location);
-                VellionA1Info.Sounds.HIT_ENTITY.play(location);
+                VellionA1Info.Effects.HIT_ENTITY.play(location);
             }
         }
     }

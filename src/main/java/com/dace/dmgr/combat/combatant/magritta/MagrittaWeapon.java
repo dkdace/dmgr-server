@@ -68,9 +68,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 MagrittaWeaponInfo.RECOIL.send(combatUser);
 
                 Location loc = combatUser.getLocation();
-                MagrittaWeaponInfo.Sounds.USE.play(loc);
+                MagrittaWeaponInfo.Effects.USE.play(loc);
 
-                addTask(new DelayTask(() -> CombatEffectUtil.SHOTGUN_SHELL_DROP_SOUND.play(loc), 8));
+                addTask(new DelayTask(() -> MagrittaWeaponInfo.Effects.BULLET_SHELL.play(loc), 8));
 
                 break;
             }
@@ -104,7 +104,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public void onReloadTick(long i) {
-        MagrittaWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        MagrittaWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -146,7 +146,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            (isUlt ? MagrittaUltInfo.Particles.HIT : MagrittaWeaponInfo.Particles.HIT).play(location);
+            (isUlt ? MagrittaUltInfo.Effects.HIT : MagrittaWeaponInfo.Effects.HIT).play(location);
         }
 
         @Override
@@ -155,7 +155,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
             return createPeriodIntervalHandler((isUlt ? 15 : 14), location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
 
-                (isUlt ? MagrittaUltInfo.Particles.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
+                (isUlt ? MagrittaUltInfo.Effects.BULLET_TRAIL : CombatEffectUtil.BULLET_TRAIL_PARTICLE).play(loc);
             });
         }
 
@@ -163,14 +163,12 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1);
-                if (isUlt)
-                    MagrittaUltInfo.Particles.HIT_BLOCK.play(location);
+                MagrittaWeaponInfo.Effects.HIT_BLOCK_PARTICLE.apply(hitBlock).play(location);
+                if (isFirst)
+                    MagrittaWeaponInfo.Effects.HIT_BLOCK_SOUND.apply(hitBlock).play(location);
 
-                if (isFirst) {
-                    CombatEffectUtil.BULLET_HIT_BLOCK_SOUND.play(location);
-                    CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                }
+                if (isUlt)
+                    MagrittaUltInfo.Effects.HIT_BLOCK.play(location);
 
                 return false;
             };
@@ -194,7 +192,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                                 .addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
-                MagrittaWeaponInfo.Particles.HIT_ENTITY.play(location);
+                MagrittaWeaponInfo.Effects.HIT_ENTITY.play(location);
+
                 return false;
             };
         }

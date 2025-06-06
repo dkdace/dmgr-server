@@ -8,11 +8,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     /** 궁극기 필요 충전량 */
@@ -63,33 +65,26 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_DEATH).volume(5).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_PLACE).volume(5).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.explosion_reverb").volume(7).pitch(1.4).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 준비 */
-        public static final ParticleEffect USE_READY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(100).horizontalSpread(0.2).verticalSpread(0.2).speed(0.6).build());
+    public static final class Effects {
+        /** 사용 준비 효과음 */
+        public static final PlayableEffect USE_READY_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(5).pitch(0.5).build(),
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_DEATH).volume(5).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(5).pitch(0.7).build(),
+                SoundEffect.builder(Sound.BLOCK_ANVIL_PLACE).volume(5).pitch(0.5).build(),
+                SoundEffect.builder("random.explosion_reverb").volume(7).pitch(1.4).build());
+        /** 사용 준비 입자 효과 */
+        public static final ParticleEffect USE_READY_PARTICLE =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(100).horizontalSpread(0.2).verticalSpread(0.2).speed(0.6).build();
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(4).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build());
+        public static final PlayableEffect.Function<Vector> BULLET_TRAIL = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity),
+                ParticleEffect.Normal.builder(Particle.CRIT).count(4).horizontalSpread(0.2).verticalSpread(0.2).speed(0.15).build());
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(60).speed(0.4).build());
+        public static final ParticleEffect HIT_ENTITY =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(60).speed(0.4).build();
     }
 }

@@ -82,7 +82,7 @@ public final class ChatSoundOption extends ChestGUI {
         private final DefinedItem definedItem;
 
         ChatSound(String name, String sound, Material material) {
-            this.sound = new SoundEffect(SoundEffect.SoundInfo.builder("new.block.note_block." + sound).volume(1000).pitch(Math.sqrt(2)).build());
+            this.sound = SoundEffect.builder("new.block.note_block." + sound).volume(1000).pitch(Math.sqrt(2)).build();
 
             this.definedItem = new DefinedItem(new ItemBuilder(material).setName("§e§l" + name).build(),
                     new DefinedItem.ClickHandler(ClickType.LEFT, player -> {

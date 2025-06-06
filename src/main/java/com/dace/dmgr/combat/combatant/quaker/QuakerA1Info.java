@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -57,38 +58,31 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1).pitch(0.7).build());
-        /** 해제 */
-        public static final SoundEffect DISABLE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_SHULKER_BOX_CLOSE).volume(1).pitch(1.4).build());
+    public static final class Effects {
+        /** 활성화 */
+        public static final PlayableEffect ON = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(0.6).build(),
+                SoundEffect.builder(Sound.BLOCK_SHULKER_BOX_OPEN).volume(1).pitch(0.7).build());
+        /** 비활성화 */
+        public static final SoundEffect OFF =
+                SoundEffect.builder(Sound.BLOCK_SHULKER_BOX_CLOSE).volume(1).pitch(1.4).build();
         /** 피격 */
-        public static final SoundEffect DAMAGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25).pitch(1.2).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(0.3).pitch(0.85).pitchVariance(0.1).build());
-        /** 파괴 */
-        public static final SoundEffect DEATH = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 파괴 */
-        public static final ParticleEffect DEATH = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
+        public static final PlayableEffect.Function<Double> DAMAGE = damage -> PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
+                SoundEffect.builder("random.metalhit").volume(0.3 + damage * 0.001).pitch(0.85).pitchVariance(0.1).build());
+        /** 파괴 효과음 */
+        public static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
+                SoundEffect.builder("random.metalhit").volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build());
+        /** 파괴 입자 효과 */
+        public static final PlayableEffect DEATH_PARTICLE = PlayableEffect.list(
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.2).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
+                ParticleEffect.Normal.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
     }
 }

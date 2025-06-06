@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -52,38 +53,29 @@ public final class ArkaceA1Info extends ActiveSkillInfo<ArkaceA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.gun.grenade").volume(3).pitch(1.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.2).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb2").volume(6).pitch(0.9).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(32, 250, 225);
 
+        /** 발사 */
+        public static final PlayableEffect SHOOT = PlayableEffect.list(
+                SoundEffect.builder("random.gun.grenade").volume(3).pitch(1.5).build(),
+                SoundEffect.builder(Sound.ENTITY_SHULKER_SHOOT).volume(3).pitch(1.2).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).build());
+        public static final PlayableEffect BULLET_TRAIL = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).build());
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2)
-                        .build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(200)
-                        .horizontalSpread(2.5).verticalSpread(2.5).build());
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_LARGE_BLAST).volume(4).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(4).pitch(1.4).build(),
+                SoundEffect.builder("random.gun_reverb2").volume(6).pitch(0.9).build(),
+
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(200).horizontalSpread(2.5)
+                        .verticalSpread(2.5).build());
     }
 }

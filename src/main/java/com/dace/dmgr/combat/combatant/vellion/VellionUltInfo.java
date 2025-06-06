@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -56,77 +57,67 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GUARDIAN_HURT).volume(2).pitch(1.8).build());
-        /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK).volume(3).pitch(0.85).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(0.7).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.8).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(90, 0, 55);
 
-        /** 사용 시 틱 입자 효과 */
-        public static final ParticleEffect USE_TICK = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(70, 0, 45)).build());
-        /** 틱 입자 효과 (중심) - 1 */
-        public static final ParticleEffect TICK_CORE_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(4)
-                        .horizontalSpread(0.3).build());
-        /** 틱 입자 효과 (중심) - 2 */
-        public static final ParticleEffect TICK_CORE_2 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.PORTAL).count(40).speed(1.5).build());
-        /** 틱 입자 효과 (장식) - 1 */
-        public static final ParticleEffect TICK_DECO_1 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).count(20).verticalSpread(2).build());
-        /** 틱 입자 효과 (장식) - 2 */
-        public static final ParticleEffect TICK_DECO_2 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(30, 0, 18), Color.fromRGB(126, 0, 98)).build());
-        /** 틱 입자 효과 (장식) - 3 */
-        public static final ParticleEffect TICK_DECO_3 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 14).build());
-        /** 틱 입자 효과 (장식) - 4 */
-        public static final ParticleEffect TICK_DECO_4 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(3)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build());
-        /** 틱 입자 효과 (장식) - 5 */
-        public static final ParticleEffect TICK_DECO_5 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.MYCEL, 0).count(4)
-                        .horizontalSpread(0.15).verticalSpread(0.4).build());
+        /** 사용 */
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.builder(Sound.BLOCK_ENCHANTMENT_TABLE_USE).volume(2).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_GUARDIAN_HURT).volume(2).pitch(1.8).build());
+        /** 사용 시 틱 효과 */
+        public static final PlayableEffect USE_TICK = PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.SPELL_WITCH).count(3).horizontalSpread(0.05).verticalSpread(0.05).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, Color.fromRGB(70, 0, 45)).build());
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_BLINDNESS).volume(3).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_ATTACK).volume(3).pitch(0.85).build(),
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_PREPARE_SUMMON).volume(3).pitch(0.7).build());
+        /** 틱 효과 - 1 */
+        public static final ParticleEffect TICK_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(4).horizontalSpread(0.3).build();
+        /** 틱 효과 - 2 */
+        public static final ParticleEffect TICK_2 =
+                ParticleEffect.Normal.builder(Particle.PORTAL).count(40).speed(1.5).build();
+        /** 틱 효과 - 3 */
+        public static final ParticleEffect TICK_3 =
+                ParticleEffect.Normal.builder(Particle.SPELL_WITCH).count(20).verticalSpread(2).build();
+        /** 틱 효과 - 4 */
+        public static final PlayableEffect.Function<Long> TICK_4 = i ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE,
+                        Color.fromRGB((int) (30 + i * 1.95), 0, (int) (18 + i * 1.64))).build();
+        /** 틱 효과 - 5 */
+        public static final ParticleEffect TICK_5 =
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 14).build();
+        /** 틱 효과 - 6 */
+        public static final ParticleEffect TICK_6 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(3).horizontalSpread(0.1).verticalSpread(0.1)
+                        .build();
+        /** 틱 효과 - 7 */
+        public static final ParticleEffect TICK_7 =
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.MYCEL, 0).count(4).horizontalSpread(0.15)
+                        .verticalSpread(0.4).build();
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 2).count(300)
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder("new.block.conduit.deactivate").volume(3).pitch(0.6).build(),
+                SoundEffect.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.6).build(),
+                SoundEffect.builder("new.block.respawn_anchor.deplete").volume(3).pitch(0.8).build(),
+
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 2).count(300)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build(),
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 14).count(200)
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 14).count(200)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
-        /** 엔티티 타격 (중심) */
-        public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(50).speed(0.4).build());
-        /** 엔티티 타격 (장식) */
-        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).build());
+        /** 엔티티 타격 - 1 */
+        public static final ParticleEffect HIT_ENTITY_1 =
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(50).speed(0.4).build();
+        /** 엔티티 타격 - 2 */
+        public static final ParticleEffect HIT_ENTITY_2 =
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).build();
     }
 }

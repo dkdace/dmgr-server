@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.Trait;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -65,7 +64,7 @@ public final class SiliaT2 extends Trait {
 
             combatUser.addYawAndPitch(isOpposite ? 0.5 : -0.5, 0.15);
             if (i < 3)
-                SiliaT2Info.Sounds.USE.play(loc.add(vec), 1, i / 2.0);
+                SiliaT2Info.Effects.USE.apply(i).play(loc.add(vec));
             if (i == 7) {
                 combatUser.addYawAndPitch(isOpposite ? -0.7 : 0.7, -0.85);
                 weapon.cancel();
@@ -107,13 +106,13 @@ public final class SiliaT2 extends Trait {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            SiliaT2Info.Particles.HIT.play(location);
+            SiliaT2Info.Effects.HIT.play(location);
         }
 
         @Override
         protected void onDestroy(@NonNull Location location, boolean isForce) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            SiliaT2Info.Particles.BULLET_TRAIL_DECO.play(loc);
+            SiliaT2Info.Effects.BULLET_TRAIL_2.play(loc);
         }
 
         @Override
@@ -124,7 +123,7 @@ public final class SiliaT2 extends Trait {
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-                SiliaT2Info.Particles.BULLET_TRAIL_CORE.play(loc);
+                SiliaT2Info.Effects.BULLET_TRAIL_1.play(loc);
             });
         }
 
@@ -132,9 +131,7 @@ public final class SiliaT2 extends Trait {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playHitBlockParticle(location, hitBlock, 1.5);
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-
+                SiliaT2Info.Effects.HIT_BLOCK.apply(hitBlock).play(location);
                 return false;
             };
         }
@@ -157,8 +154,7 @@ public final class SiliaT2 extends Trait {
                         combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                 }
 
-                SiliaT2Info.Particles.HIT_ENTITY.play(location);
-                SiliaWeaponInfo.Sounds.HIT_ENTITY.play(location);
+                SiliaT2Info.Effects.HIT_ENTITY.play(location);
 
                 return true;
             };

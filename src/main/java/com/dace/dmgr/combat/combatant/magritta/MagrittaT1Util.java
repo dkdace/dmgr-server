@@ -34,13 +34,13 @@ public final class MagrittaT1Util {
         if (valueEffect.value == MagrittaT1Info.MAX) {
             victim.getStatusEffectModule().apply(valueEffect.burning, MagrittaT1Info.DURATION);
 
-            MagrittaT1Info.Sounds.MAX.play(victim.getLocation());
+            MagrittaT1Info.Effects.MAX.play(victim.getLocation());
 
             if (victim.isGoalTarget())
                 attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 
-        MagrittaT1Info.Sounds.USE.play(victim.getLocation());
+        MagrittaT1Info.Effects.USE.play(victim.getLocation());
     }
 
     /**

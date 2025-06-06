@@ -7,11 +7,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     /** 쿨타임 */
@@ -47,33 +49,24 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.6).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.5).build(),
+                SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.6).build());
         /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.55).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.6).pitchVariance(0.1).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 틱 입자 효과 (중심) */
-        public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(2).horizontalSpread(0.1).verticalSpread(0.1).speed(0.2).build());
-        /** 틱 입자 효과 (장식) */
-        public static final ParticleEffect TICK_DECO = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.32).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(0.2).build());
+        public static final PlayableEffect TICK_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.55).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.6).pitchVariance(0.1).build());
+        /** 틱 입자 효과 - 1 */
+        public static final ParticleEffect TICK_PARTICLE_1 =
+                ParticleEffect.Normal.builder(Particle.FLAME).count(2).horizontalSpread(0.1).verticalSpread(0.1).speed(0.2).build();
+        /** 틱 입자 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.32)),
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.2)));
     }
 }

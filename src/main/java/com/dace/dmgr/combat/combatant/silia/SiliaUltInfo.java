@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
-import com.dace.dmgr.combat.combatant.quaker.QuakerWeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -46,29 +46,22 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
+        /** 사용 시 틱 효과 - 1 */
+        public static final ParticleEffect USE_TICK_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, SiliaWeaponInfo.Effects.COLOR).count(2)
+                        .horizontalSpread(0.15).verticalSpread(0.15).build();
+        /** 사용 시 틱 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(2).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build();
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(2).pitch(1).build(),
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.4).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(2.5).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 입자 효과 (중심) */
-        public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.Particles.COLOR)
-                        .count(2).horizontalSpread(0.15).verticalSpread(0.15).build());
-        /** 사용 시 입자 효과 (장식) */
-        public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(2).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder("random.swordhit").volume(2).pitch(1).build(),
+                SoundEffect.builder("random.swordhit").volume(2).pitch(0.7).build(),
+                SoundEffect.builder("new.item.trident.return").volume(2.5).pitch(1.4).build(),
+                SoundEffect.builder("new.item.trident.return").volume(2.5).pitch(1.2).build());
     }
 }

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -61,47 +62,39 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(2).pitch(1.5).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_ENDEREYE_DEATH).volume(2).pitch(0.8).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(2).pitch(1.5).build());
+        /** 사용 시 틱 효과 - 1 */
+        public static final PlayableEffect.Function<Long> USE_TICK_1 = i ->
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE,
+                        Color.fromRGB((int) (45 + i * 8), 0, (int) (240 - i * 6))).build();
+        /** 사용 시 틱 효과 - 2 */
+        public static final ParticleEffect USE_TICK_2 =
+                ParticleEffect.Normal.builder(Particle.SPELL_WITCH).build();
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHULKER_SHOOT).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ELDER_GUARDIAN_DEATH).volume(2).pitch(1.8).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 - 1 */
-        public static final ParticleEffect USE_TICK_1 = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(0, ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(45, 0, 240), Color.fromRGB(109, 0, 192)).build());
-        /** 사용 시 틱 입자 효과 - 2 */
-        public static final ParticleEffect USE_TICK_2 = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_WITCH).build());
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_SHULKER_SHOOT).volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.ENTITY_ILLUSION_ILLAGER_PREPARE_MIRROR).volume(2).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_ELDER_GUARDIAN_DEATH).volume(2).pitch(1.8).build());
         /** 표시 */
-        public static final ParticleEffect DISPLAY = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(120, 0, 220)).count(20).horizontalSpread(0.5).verticalSpread(0.5).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB,
-                        Color.fromRGB(140, 120, 180)).count(10).horizontalSpread(1.5).verticalSpread(1.5).build(),
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 10).count(8)
-                        .horizontalSpread(0.5).verticalSpread(0.5).speed(0.05).build());
+        public static final PlayableEffect DISPLAY = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(120, 0, 220)).count(20)
+                        .horizontalSpread(0.5).verticalSpread(0.5).build(),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, Color.fromRGB(140, 120, 180)).count(10)
+                        .horizontalSpread(1.5).verticalSpread(1.5).build(),
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 10).count(8).horizontalSpread(0.5)
+                        .verticalSpread(0.5).speed(0.05).build());
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(30).speed(0.4).build());
+        public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(30).speed(0.4).build());
     }
 }

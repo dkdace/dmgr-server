@@ -9,8 +9,8 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.Aimable;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -74,53 +74,66 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.gun.vssvintorez").volume(2.5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.qbz_95_1").volume(2.5).pitch(0.9).build(),
-                SoundEffect.SoundInfo.builder("random.gun_reverb").volume(3.5).pitch(1.1).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder("random.gun.vssvintorez").volume(2.5).pitch(1.3).build(),
+                SoundEffect.builder("random.gun2.qbz_95_1").volume(2.5).pitch(0.9).build(),
+                SoundEffect.builder("random.gun_reverb").volume(3.5).pitch(1.1).build());
         /** 조준 활성화 */
-        public static final SoundEffect AIM_ON = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.4).pitch(2).build());
+        public static final SoundEffect AIM_ON =
+                SoundEffect.builder(Sound.ENTITY_WOLF_HOWL).volume(0.4).pitch(2).build();
         /** 조준 비활성화 */
-        public static final SoundEffect AIM_OFF = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.4).pitch(2).build());
-        /** 사용 후 쿨타임 */
-        public static final TimedSoundEffect ACTION = TimedSoundEffect.builder()
-                .add(1, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(1.2).build())
-                .add(3, SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.5).pitch(1.4).build())
-                .add(5, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.2).build())
-                .build();
-        /** 재장전 */
-        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
-                .add(3, SoundEffect.SoundInfo.builder("new.ui.stonecutter.take_result").volume(0.6).pitch(1.5).build())
-                .add(6, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.3).build())
-                .add(10, SoundEffect.SoundInfo.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build())
-                .add(12, SoundEffect.SoundInfo.builder(Sound.ITEM_BOTTLE_EMPTY).volume(0.6).pitch(1.4).build())
-                .add(14, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_OPEN).volume(0.6).pitch(1.3).build())
-                .add(22, SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build())
-                .add(24, SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.6).pitch(1.8).build())
-                .add(32, SoundEffect.SoundInfo.builder(Sound.ITEM_BOTTLE_FILL).volume(0.6).pitch(1.4).build())
-                .add(38, SoundEffect.SoundInfo.builder("new.block.chain.place").volume(0.6).pitch(1.6).build())
-                .add(41, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(1.2).build())
-                .build();
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final SoundEffect AIM_OFF =
+                SoundEffect.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.4).pitch(2).build();
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(210, 160, 70)).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(210, 160, 70)).build();
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(15).build());
+        public static final ParticleEffect HIT_ENTITY =
+                ParticleEffect.Normal.builder(Particle.WATER_SPLASH).count(15).build();
+        /** 사용 후 쿨타임 */
+        public static final PlayableEffect.Function<Long> ACTION = i -> {
+            switch (i.intValue()) {
+                case 1:
+                    return SoundEffect.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(1.2).build();
+                case 3:
+                    return SoundEffect.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.5).pitch(1.4).build();
+                case 5:
+                    return SoundEffect.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.2).build();
+                default:
+                    return SoundEffect.NONE;
+            }
+        };
+        /** 재장전 */
+        public static final PlayableEffect.Function<Long> RELOAD = i -> {
+            switch (i.intValue()) {
+                case 3:
+                    return SoundEffect.builder("new.ui.stonecutter.take_result").volume(0.6).pitch(1.5).build();
+                case 6:
+                    return SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(0.6).pitch(1.3).build();
+                case 10:
+                    return SoundEffect.builder(Sound.ITEM_FLINTANDSTEEL_USE).volume(0.6).pitch(0.8).build();
+                case 12:
+                    return SoundEffect.builder(Sound.ITEM_BOTTLE_EMPTY).volume(0.6).pitch(1.4).build();
+                case 14:
+                    return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_OPEN).volume(0.6).pitch(1.3).build();
+                case 22:
+                    return SoundEffect.builder(Sound.ENTITY_PLAYER_HURT).volume(0.6).pitch(0.5).build();
+                case 24:
+                    return SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.6).pitch(1.8).build();
+                case 32:
+                    return SoundEffect.builder(Sound.ITEM_BOTTLE_FILL).volume(0.6).pitch(1.4).build();
+                case 38:
+                    return SoundEffect.builder("new.block.chain.place").volume(0.6).pitch(1.6).build();
+                case 41:
+                    return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(1.2).build();
+                default:
+                    return SoundEffect.NONE;
+            }
+        };
     }
 }

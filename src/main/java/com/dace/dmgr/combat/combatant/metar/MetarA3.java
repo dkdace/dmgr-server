@@ -63,7 +63,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         if (!isDurationFinished()) {
             forceCancel();
-            MetarA3Info.Sounds.DETONATE.play(combatUser.getLocation());
+            MetarA3Info.Effects.DETONATE.play(combatUser.getLocation());
 
             return;
         }
@@ -73,12 +73,12 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA3Info.READY_DURATION);
 
-        MetarA3Info.Sounds.USE.play(combatUser.getLocation());
+        MetarA3Info.Effects.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
 
-            MetarA3Info.Sounds.USE_READY.play(combatUser.getLocation());
+            MetarA3Info.Effects.USE_READY.play(combatUser.getLocation());
 
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0);
             projectile = new MetarA3Projectile();
@@ -123,7 +123,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
             Vector[] vecs = new Vector[30];
 
             for (int i = 0; i < locs.length; i++) {
-                Vector vec = VectorUtil.getRandomVector().multiply(MetarA3Info.RADIUS);
+                Vector vec = VectorUtil.getRandomVector().normalize().multiply(MetarA3Info.RADIUS);
                 locs[i] = location.clone().add(vec);
                 vecs[i] = vec.normalize().multiply(-0.35);
             }
@@ -134,11 +134,10 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
                 for (int j = 0; j < locs.length; j++) {
                     Vector vec = vecs[j];
-                    MetarA3Info.Particles.DETONATE_TICK_DECO.play(locs[j].add(vec), i / 13.0, vec);
+                    MetarA3Info.Effects.DETONATE_TICK_1.apply(i, vec).play(locs[j].add(vec));
                 }
 
-                MetarA3Info.Particles.DETONATE_TICK_CORE.play(loc);
-                MetarA3Info.Sounds.DETONATE_TICK.play(loc, 1, i / 13.0);
+                MetarA3Info.Effects.DETONATE_TICK_2.apply(i).play(loc);
             }, 1, MetarA3Info.DURATION.toTicks()));
         }
 
@@ -150,9 +149,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
                 @Override
                 public void accept(Location location) {
-                    MetarA3Info.Particles.BULLET_TRAIL.play(location);
+                    MetarA3Info.Effects.BULLET_TRAIL_1.play(location);
                     if (i % 4 == 0)
-                        MetarA3Info.Sounds.TICK.play(location);
+                        MetarA3Info.Effects.BULLET_TRAIL_2.play(location);
 
                     i++;
                 }

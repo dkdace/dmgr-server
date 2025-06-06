@@ -51,7 +51,7 @@ public final class NeaceUlt extends UltimateSkill {
         combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        NeaceUltInfo.Sounds.USE.play(combatUser.getLocation());
+        NeaceUltInfo.Effects.USE.play(combatUser.getLocation());
 
         EffectManager effectManager = new EffectManager();
 
@@ -63,15 +63,15 @@ public final class NeaceUlt extends UltimateSkill {
             setDuration();
             combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
-            NeaceUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
-            NeaceUltInfo.Particles.USE_READY.play(combatUser.getLocation());
+            NeaceUltInfo.Effects.USE_READY_SOUND.play(combatUser.getLocation());
+            NeaceUltInfo.Effects.USE_READY_FIREWORK.play(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 new NeaceUltArea().emit(loc);
 
                 playTickEffect(i);
-                NeaceWeaponInfo.Sounds.USE_HEAL.play(combatUser.getLocation());
+                NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
             }, 1, NeaceUltInfo.DURATION.toTicks()));
         }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
     }
@@ -110,7 +110,7 @@ public final class NeaceUlt extends UltimateSkill {
             angle += 360 / 3;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
 
-            NeaceUltInfo.Particles.TICK.play(loc.clone().add(vec));
+            NeaceUltInfo.Effects.TICK.play(loc.clone().add(vec));
         }
     }
 
@@ -147,7 +147,7 @@ public final class NeaceUlt extends UltimateSkill {
                     Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
                     Location loc2 = loc.clone().add(vec).add(0, up, 0);
 
-                    NeaceUltInfo.Particles.USE_TICK.play(loc2);
+                    NeaceUltInfo.Effects.USE_TICK.play(loc2);
                 }
             }
 

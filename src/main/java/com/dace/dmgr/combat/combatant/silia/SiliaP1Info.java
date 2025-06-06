@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.combatant.silia;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -26,13 +27,17 @@ public final class SiliaP1Info extends PassiveSkillInfo<SiliaP1> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.1, 0.8).pitch(1.2, 1.4).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_STEP).volume(0.1, 0.8).pitch(1.2, 1.4).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.8).pitch(1.2).build(),
+                SoundEffect.builder(Sound.BLOCK_CLOTH_STEP).volume(0.8).pitch(1.2).build());
+        /** 액티브 3번 사용 중 사용 */
+        public static final PlayableEffect USE_A3 = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.1).pitch(1.4).build(),
+                SoundEffect.builder(Sound.BLOCK_CLOTH_STEP).volume(0.1).pitch(1.4).build());
     }
 }

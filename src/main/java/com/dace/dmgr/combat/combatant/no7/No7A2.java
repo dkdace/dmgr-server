@@ -69,10 +69,10 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
         Location loc = combatUser.getLocation();
         entityModule.set(new No7A2Entity(loc));
 
-        No7A2Info.Sounds.USE.play(loc);
+        No7A2Info.Effects.ON.play(loc);
 
         addActionTask(new IntervalTask(i -> {
-            No7A2Info.Sounds.TICK.play(combatUser.getLocation());
+            No7A2Info.Effects.TICK_SOUND.play(combatUser.getLocation());
             playTickEffect(i, loc.getYaw());
         }, 1, No7A2Info.DURATION.toTicks()));
     }
@@ -82,7 +82,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
         super.onDurationFinished();
 
         entityModule.removeEntity();
-        No7A2Info.Sounds.DISABLE.play(combatUser.getLocation());
+        No7A2Info.Effects.OFF.play(combatUser.getLocation());
     }
 
     @Override
@@ -119,7 +119,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
                 Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, pitch), yaw2);
                 Location loc2 = loc.clone().add(vec.clone().multiply(2.5));
 
-                No7A2Info.Particles.TICK.play(loc2, vec);
+                No7A2Info.Effects.TICK_PARTICLE.apply(vec).play(loc2);
             }
         }
     }
@@ -153,8 +153,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
         @Override
         public void onRemove(@NonNull Bullet<?> bullet, @NonNull Location location) {
-            No7A2Info.Sounds.DAMAGE.play(location);
-            No7A2Info.Particles.DAMAGE.play(location);
+            No7A2Info.Effects.DAMAGE.play(location);
 
             if (bulletClasses.add(bullet.getClass()))
                 combatUser.addScore("피해 흡수", No7A2Info.BLOCK_SCORE);

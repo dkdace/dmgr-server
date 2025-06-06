@@ -1,17 +1,19 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
-import com.dace.dmgr.combat.combatant.quaker.QuakerWeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class SiliaT2Info extends DynamicTraitInfo<SiliaT2> {
     /** 전역 쿨타임 */
@@ -41,35 +43,33 @@ public final class SiliaT2Info extends DynamicTraitInfo<SiliaT2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(1.5).pitch(1, 1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1.5).pitch(0.8, 1).build(),
-                SoundEffect.SoundInfo.builder("random.swordhit").volume(1.5).pitch(0.7, 0.9).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 총알 궤적 (중심) */
-        public static final ParticleEffect BULLET_TRAIL_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, QuakerWeaponInfo.Particles.COLOR)
-                        .count(8).horizontalSpread(0.15).verticalSpread(0.15).build());
-        /** 총알 궤적 (장식) */
-        public static final ParticleEffect BULLET_TRAIL_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(15).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build());
+        public static final PlayableEffect.Function<Integer> USE = i -> PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(1.5).pitch(1 + i * 0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1.5).pitch(0.8 + i * 0.1).build(),
+                SoundEffect.builder("random.swordhit").volume(1.5).pitch(0.7 + i * 0.1).build());
+        /** 총알 궤적 - 1 */
+        public static final ParticleEffect BULLET_TRAIL_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, SiliaWeaponInfo.Effects.COLOR).count(8)
+                        .horizontalSpread(0.15).verticalSpread(0.15).build();
+        /** 총알 궤적 - 2 */
+        public static final ParticleEffect BULLET_TRAIL_2 =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(15).horizontalSpread(0.08).verticalSpread(0.08).speed(0.08).build();
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).speed(0.05)
-                        .build());
+        public static final ParticleEffect HIT =
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).speed(0.05).build();
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(40).speed(0.4).build());
+        public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
+                SoundEffect.builder("random.stab").volume(1).pitch(0.8).pitchVariance(0.05).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT).count(40).speed(0.4).build());
+        /** 블록 타격 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block -> PlayableEffect.list(
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 1.5),
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0));
     }
 }

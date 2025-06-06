@@ -13,8 +13,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
  */
 public class Burning implements StatusEffect {
     /** 화염 피해 효과음 */
-    private static final SoundEffect BURNING_DAMAGE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build());
+    private static final SoundEffect BURNING_DAMAGE_SOUND =
+            SoundEffect.builder(Sound.ENTITY_PLAYER_HURT_ON_FIRE).volume(0.7).pitch(1).pitchVariance(0.1).build();
 
     /** 공격자 */
     private final Attacker attacker;

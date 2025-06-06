@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -41,27 +42,20 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1.2).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.2).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(1.2).pitch(0.7).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 틱 입자 효과 (중심) */
-        public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FIREWORKS_SPARK).count(6).horizontalSpread(0.2).horizontalSpread(0.4).speed(0.1).build());
-        /** 틱 입자 효과 (장식) */
-        public static final ParticleEffect TICK_DECO = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1.2).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1.2).pitch(1.6).build(),
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(1.2).pitch(0.7).build());
+        /** 틱 효과 - 1 */
+        public static final ParticleEffect TICK_1 =
+                ParticleEffect.Normal.builder(Particle.FIREWORKS_SPARK).count(6).horizontalSpread(0.2).horizontalSpread(0.4).speed(0.1).build();
+        /** 틱 효과 - 2 */
+        public static final ParticleEffect TICK_2 =
+                ParticleEffect.Normal.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build();
     }
 }

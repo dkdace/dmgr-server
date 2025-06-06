@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -53,36 +55,31 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
-        /** 폭발 */
-        public static final SoundEffect EXPLODE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(2).pitch(1.2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build();
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY =
+                CombatEffectUtil.THROW_SOUND.apply(0.8);
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(220, 161, 43)).count(5).horizontalSpread(0.15).verticalSpread(0.15).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(220, 161, 43)).count(5)
+                        .horizontalSpread(0.15).verticalSpread(0.15).build();
         /** 폭발 */
-        public static final ParticleEffect EXPLODE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 4)
-                        .count(400).horizontalSpread(0.1).verticalSpread(0.1).speed(0.25).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.TOTEM).count(200).horizontalSpread(0.15).verticalSpread(0.15).speed(0.6).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).count(300).horizontalSpread(1.5).verticalSpread(1.5).speed(1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.WATER_SPLASH).count(300).horizontalSpread(0.6).verticalSpread(0.6).build());
+        public static final PlayableEffect EXPLODE = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.7).build(),
+                SoundEffect.builder(Sound.BLOCK_BREWING_STAND_BREW).volume(2).pitch(1.2).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.2).build(),
+                SoundEffect.builder(Sound.BLOCK_GLASS_BREAK).volume(2).pitch(1.2).build(),
+
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.STAINED_GLASS, 4).count(400)
+                        .horizontalSpread(0.1).verticalSpread(0.1).speed(0.25).build(),
+                ParticleEffect.Normal.builder(Particle.TOTEM).count(200).horizontalSpread(0.15).verticalSpread(0.15).speed(0.6).build(),
+                ParticleEffect.Normal.builder(Particle.SPELL_INSTANT).count(300).horizontalSpread(1.5).verticalSpread(1.5).speed(1).build(),
+                ParticleEffect.Normal.builder(Particle.WATER_SPLASH).count(300).horizontalSpread(0.6).verticalSpread(0.6).build());
     }
 }

@@ -47,7 +47,7 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = combatUser.getArmLocation(MainHand.LEFT);
             new ArkaceA1Projectile().shot(loc);
 
-            ArkaceA1Info.Sounds.USE.play(loc);
+            ArkaceA1Info.Effects.SHOOT.play(loc);
         }, () -> addActionTask(new DelayTask(this::cancel, 4)), 5, 3));
     }
 
@@ -71,14 +71,13 @@ public final class ArkaceA1 extends ActiveSkill {
             Location loc = location.add(0, 0.1, 0);
             new ArkaceA1Area().emit(loc);
 
-            ArkaceA1Info.Sounds.EXPLODE.play(loc);
-            ArkaceA1Info.Particles.EXPLODE.play(loc);
+            ArkaceA1Info.Effects.EXPLODE.play(loc);
         }
 
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(10, ArkaceA1Info.Particles.BULLET_TRAIL::play);
+            return createPeriodIntervalHandler(10, ArkaceA1Info.Effects.BULLET_TRAIL::play);
         }
 
         @Override

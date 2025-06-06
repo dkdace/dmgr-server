@@ -80,7 +80,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
                 } else
                     slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
 
-                MetarWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+                MetarWeaponInfo.Effects.USE.play(combatUser.getLocation());
                 break;
             }
             case DROP: {
@@ -113,7 +113,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
     @Override
     public void onReloadTick(long i) {
-        MetarWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        MetarWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -141,8 +141,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
         @Override
         protected void onHit(@NonNull Location location) {
-            MetarWeaponInfo.Particles.HIT.play(location);
-            MetarWeaponInfo.Sounds.HIT.play(location);
+            MetarWeaponInfo.Effects.HIT.play(location);
         }
 
         @Override
@@ -150,7 +149,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(13, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, isOpposite ? -0.25 : 0.25, -0.2, 0);
-                MetarWeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                MetarWeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 

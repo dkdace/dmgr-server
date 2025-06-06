@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -8,11 +9,13 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 
 public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     /** 쿨타임 */
@@ -59,32 +62,26 @@ public final class QuakerA2Info extends ActiveSkillInfo<QuakerA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.55).pitchVariance(0.1).build());
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(1).pitch(0.5).build(),
+                SoundEffect.builder("random.gun2.shovel_leftclick").volume(1).pitch(0.55).pitchVariance(0.1).build());
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(3).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder(Sound.ITEM_TOTEM_USE).volume(3).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.7).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(3).pitch(0.5).build(),
+                SoundEffect.builder(Sound.ITEM_TOTEM_USE).volume(3).pitch(1.6).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.6).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_CRIT).volume(3).pitch(0.7).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(20).horizontalSpread(0.2).verticalSpread(0.05).speed(0.25).build());
+        public static final PlayableEffect.Function<Block> BULLET_TRAIL = block -> PlayableEffect.list(
+                ParticleEffect.Normal.builder(Particle.CRIT).count(20).horizontalSpread(0.2).verticalSpread(0.05).speed(0.25).build(),
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 3.0));
         /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).count(50).speed(0.4).build());
+        public static final ParticleEffect HIT_ENTITY =
+                ParticleEffect.Normal.builder(Particle.CRIT).count(50).speed(0.4).build();
     }
 }

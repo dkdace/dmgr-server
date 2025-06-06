@@ -55,12 +55,12 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
-            No7UltInfo.Sounds.USE_TICK.play(loc, 1, i / 39.0);
+            No7UltInfo.Effects.USE_TICK_SOUND.apply(i).play(loc);
 
             Location loc2 = combatUser.getLocation().add(0, 1, 0);
             new No7UltEffect(false, 1).shot(loc2, VectorUtil.getRandomVector());
 
-            No7UltInfo.Particles.USE_TICK_CORE.play(loc2);
+            No7UltInfo.Effects.USE_TICK_PARTICLE.play(loc2);
         }, () -> {
             cancel();
 
@@ -68,8 +68,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
             new No7UltArea().emit(loc);
 
             Location loc2 = loc.add(0, 1, 0);
-            No7UltInfo.Sounds.USE_READY.play(loc2);
-            No7UltInfo.Particles.USE_READY_CORE.play(loc2);
+            No7UltInfo.Effects.USE_READY.play(loc2);
 
             addActionTask(new IntervalTask(i -> {
                 for (int j = 0; j < 6; j++)
@@ -120,7 +119,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(2, No7UltInfo.Particles.USE_TICK_DECO::play);
+            return createPeriodIntervalHandler(2, No7UltInfo.Effects.TICK::play);
         }
 
         @Override

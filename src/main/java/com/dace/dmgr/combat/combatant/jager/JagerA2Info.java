@@ -1,12 +1,14 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -55,58 +57,52 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build());
-        /** 소환 */
-        public static final SoundEffect SUMMON = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_HORSE_ARMOR).volume(0.5).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.craft").volume(0.5).pitch(1.3).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
-        /** 소환 준비 */
-        public static final SoundEffect SUMMON_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
-        /** 발동 */
-        public static final SoundEffect TRIGGER = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_SHEEP_SHEAR).volume(2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder("new.entity.player.hurt_sweet_berry_bush").volume(2).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(2).pitch(1.2).build());
-        /** 피격 */
-        public static final SoundEffect DAMAGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(0.4).pitch(1.1).pitchVariance(0.1).build());
-        /** 파괴 */
-        public static final SoundEffect DEATH = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder("random.metalhit").volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_BREAK).volume(1).pitch(0.8).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(120, 120, 135);
 
+        /** 사용 */
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.ENTITY_CAT_PURREOW).volume(0.5).pitch(1.6).build();
+        /** 사용 준비 */
+        public static final PlayableEffect USE_READY =
+                CombatEffectUtil.THROW_SOUND.apply(0.8);
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(17)
-                        .horizontalSpread(0.7).build());
-        /** 소환 준비 대기 틱 입자 효과 */
-        public static final ParticleEffect SUMMON_BEFORE_READY_TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.SPELL_MOB, COLOR).count(5)
-                        .horizontalSpread(0.2).verticalSpread(0.2).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(17).horizontalSpread(0.7).build();
+        /** 소환 */
+        public static final PlayableEffect SUMMON = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_HORSE_ARMOR).volume(0.5).pitch(1.6).build(),
+                SoundEffect.builder("random.craft").volume(0.5).pitch(1.3).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
+        /** 소환 준비 대기 틱 효과 */
+        public static final ParticleEffect SUMMON_BEFORE_READY_TICK =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(5).horizontalSpread(0.2).verticalSpread(0.2)
+                        .build();
+        /** 소환 준비 */
+        public static final PlayableEffect SUMMON_READY = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_HURT).volume(0.5).pitch(0.5).build());
         /** 표시 */
-        public static final ParticleEffect DISPLAY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA).build());
+        public static final ParticleEffect DISPLAY =
+                ParticleEffect.Normal.builder(Particle.TOWN_AURA).build();
+        /** 발동 */
+        public static final PlayableEffect TRIGGER = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_SHEEP_SHEAR).volume(2).pitch(1.2).build(),
+                SoundEffect.builder("new.entity.player.hurt_sweet_berry_bush").volume(2).pitch(0.8).build(),
+                SoundEffect.builder("random.metalhit").volume(2).pitch(1.2).build());
+        /** 피격 */
+        public static final PlayableEffect.Function<Double> DAMAGE = damage ->
+                SoundEffect.builder("random.metalhit").volume(0.4 + damage * 0.001).pitch(1.1).pitchVariance(0.1).build();
         /** 파괴 */
-        public static final ParticleEffect DEATH = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(80)
+        public static final PlayableEffect DEATH = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(1).pitch(0.8).build(),
+                SoundEffect.builder("random.metalhit").volume(1).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_ITEM_BREAK).volume(1).pitch(0.8).build(),
+
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(80)
                         .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build());
     }
 }

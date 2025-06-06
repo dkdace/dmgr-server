@@ -5,7 +5,9 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
@@ -36,14 +38,13 @@ public final class JagerT1Info extends TraitInfo {
     }
 
     /**
-     * 입자 효과 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Particles {
-        /** 틱 입자 효과 */
-        public static final ParticleEffect TICK_PARTICLE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 3)
-                        .horizontalSpread(0, 0, 0.5)
-                        .build());
+    public static final class Effects {
+        /** 틱 효과 */
+        public static final PlayableEffect.Function<CombatEntity> TICK = combatEntity ->
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.CONCRETE, 3)
+                        .horizontalSpread(combatEntity.getWidth() * 0.5).build();
     }
 }

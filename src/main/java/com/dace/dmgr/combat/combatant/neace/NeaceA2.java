@@ -62,13 +62,13 @@ public final class NeaceA2 extends ChargeableSkill {
         setDuration();
         combatUser.getActionManager().getWeapon().setGlowing(true);
 
-        NeaceA2Info.Sounds.USE.play(combatUser.getLocation());
+        NeaceA2Info.Effects.ON.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
             if (getStateValue() <= 0)
                 return false;
 
-            NeaceA2Info.Particles.TICK.play(combatUser.getCenterLocation());
+            NeaceA2Info.Effects.TICK.play(combatUser.getCenterLocation());
             if (i < 10)
                 playUseTickEffect(i);
 
@@ -87,7 +87,7 @@ public final class NeaceA2 extends ChargeableSkill {
 
         combatUser.getActionManager().getWeapon().setGlowing(false);
 
-        NeaceA2Info.Sounds.DISABLE.play(combatUser.getLocation());
+        NeaceA2Info.Effects.OFF.play(combatUser.getLocation());
     }
 
     /**
@@ -108,7 +108,7 @@ public final class NeaceA2 extends ChargeableSkill {
             double up = (i * 4 + j) * 0.05;
             Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
 
-            NeaceA2Info.Particles.USE_TICK.play(loc.clone().add(vec).add(0, up, 0), i / 9.0);
+            NeaceA2Info.Effects.USE_TICK.apply(i).play(loc.clone().add(vec).add(0, up, 0));
         }
     }
 

@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
@@ -9,10 +10,12 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.block.Block;
 
 public final class No7WeaponInfo extends WeaponInfo<No7Weapon> {
     /** 연사속도 */
@@ -58,23 +61,22 @@ public final class No7WeaponInfo extends WeaponInfo<No7Weapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.energy").volume(2.5).pitch(2).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final SoundEffect USE =
+                SoundEffect.builder("random.energy").volume(2.5).pitch(2).build();
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 40, 40)).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(255, 40, 40)).build();
+        /** 블록 타격 효과음 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK_SOUND = block -> PlayableEffect.list(
+                CombatEffectUtil.BULLET_HIT_BLOCK_SOUND,
+                CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0));
+        /** 블록 타격 입자 효과 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK_PARTICLE = block ->
+                CombatEffectUtil.HIT_BLOCK_SMALL_PARTICLE.apply(block, 1.0);
     }
 }

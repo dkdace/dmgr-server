@@ -9,8 +9,8 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
-import com.dace.dmgr.effect.TimedSoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
@@ -67,44 +67,50 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BREATH).volume(2.5).pitch(1.6).build(),
-                SoundEffect.SoundInfo.builder("random.gun2.gatling_1").volume(2.5).pitch(0.9).build());
-        /** 타격 */
-        public static final SoundEffect HIT = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_POP).volume(0.6).pitch(0.55).pitchVariance(0.1).build());
-        /** 재장전 */
-        public static final TimedSoundEffect RELOAD = TimedSoundEffect.builder()
-                .add(3, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(0.5).build())
-                .add(6, SoundEffect.SoundInfo.builder("new.block.beacon.deactivate").volume(0.6).pitch(1.7).build())
-                .add(15, SoundEffect.SoundInfo.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(0.55).build())
-                .add(19, SoundEffect.SoundInfo.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.5).build())
-                .add(30, SoundEffect.SoundInfo.builder(Sound.BLOCK_PISTON_EXTEND).volume(0.6).pitch(0.8).build())
-                .add(35, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_OPEN).volume(0.6).pitch(0.6).build())
-                .add(40, SoundEffect.SoundInfo.builder(Sound.ENTITY_RABBIT_DEATH).volume(0.6).pitch(1.9).build())
-                .add(42, SoundEffect.SoundInfo.builder("new.block.conduit.attack.target").volume(0.6).pitch(1.8).build())
-                .add(45, SoundEffect.SoundInfo.builder(Sound.ENTITY_SKELETON_STEP).volume(0.6).pitch(0.5).build())
-                .add(50, SoundEffect.SoundInfo.builder("new.block.beacon.activate").volume(0.6).pitch(1.7).build())
-                .add(57, SoundEffect.SoundInfo.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(0.65).build())
-                .build();
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+        public static final PlayableEffect USE = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_BREATH).volume(2.5).pitch(1.6).build(),
+                SoundEffect.builder("random.gun2.gatling_1").volume(2.5).pitch(0.9).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(30, 255, 180)).build());
+        public static final ParticleEffect BULLET_TRAIL =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(30, 255, 180)).build();
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT_MAGIC).count(6).speed(0.1).build());
+        public static final PlayableEffect HIT = PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.6).pitch(0.55).pitchVariance(0.1).build(),
+
+                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(6).speed(0.1).build());
+        /** 재장전 */
+        public static final PlayableEffect.Function<Long> RELOAD = i -> {
+            switch (i.intValue()) {
+                case 3:
+                    return SoundEffect.builder(Sound.ENTITY_WOLF_HOWL).volume(0.6).pitch(0.5).build();
+                case 6:
+                    return SoundEffect.builder("new.block.beacon.deactivate").volume(0.6).pitch(1.7).build();
+                case 15:
+                    return SoundEffect.builder(Sound.ENTITY_VILLAGER_YES).volume(0.6).pitch(0.55).build();
+                case 19:
+                    return SoundEffect.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.5).build();
+                case 30:
+                    return SoundEffect.builder(Sound.BLOCK_PISTON_EXTEND).volume(0.6).pitch(0.8).build();
+                case 35:
+                    return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_OPEN).volume(0.6).pitch(0.6).build();
+                case 40:
+                    return SoundEffect.builder(Sound.ENTITY_RABBIT_DEATH).volume(0.6).pitch(1.9).build();
+                case 42:
+                    return SoundEffect.builder("new.block.conduit.attack.target").volume(0.6).pitch(1.8).build();
+                case 45:
+                    return SoundEffect.builder(Sound.ENTITY_SKELETON_STEP).volume(0.6).pitch(0.5).build();
+                case 50:
+                    return SoundEffect.builder("new.block.beacon.activate").volume(0.6).pitch(1.7).build();
+                case 57:
+                    return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(0.65).build();
+                default:
+                    return SoundEffect.NONE;
+            }
+        };
     }
 }

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -43,40 +44,31 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_SHOOT).volume(2).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(2).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.entity.puffer_fish.blow_out").volume(2).pitch(1.8).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
+    public static final class Effects {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(255, 230, 90);
 
-        /** 엔티티 타격 (중심) */
-        public static final ParticleEffect HIT_ENTITY_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2)
-                        .build());
-        /** 엔티티 타격 (장식) */
-        public static final ParticleEffect HIT_ENTITY_DECO = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(2)
-                        .horizontalSpread(0.1).verticalSpread(0.1).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SPELL_INSTANT).build());
-        /** 틱 입자 효과 */
-        public static final ParticleEffect TICK = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, COLOR).count(4).horizontalSpread(1)
-                        .verticalSpread(1.5).build());
+        /** 사용 - 1 */
+        public static final PlayableEffect USE_1 = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_SHOOT).volume(2).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(1.8).build(),
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SWIM).volume(2).pitch(2).build());
+        /** 사용 - 2 */
+        public static final PlayableEffect USE_2 = PlayableEffect.list(
+                SoundEffect.builder("new.entity.puffer_fish.blow_out").volume(2).pitch(1.8).build(),
+
+                ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(40).horizontalSpread(0.5).verticalSpread(0.5).speed(0.2).build());
+        /** 사용 - 3 */
+        public static final PlayableEffect USE_3 = PlayableEffect.list(
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(2).horizontalSpread(0.1).verticalSpread(0.1)
+                        .build(),
+                ParticleEffect.Normal.builder(Particle.SPELL_INSTANT).build());
+        /** 면역 - 틱 효과 */
+        public static final ParticleEffect IMMUNE_TICK =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(4).horizontalSpread(1).verticalSpread(1.5)
+                        .build();
     }
 }

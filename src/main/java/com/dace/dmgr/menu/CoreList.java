@@ -3,6 +3,7 @@ package com.dace.dmgr.menu;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.entity.combatuser.Core;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
@@ -24,9 +25,9 @@ import java.util.Set;
  */
 public final class CoreList extends ChestGUI {
     /** 코어 구매 효과음 */
-    private static final SoundEffect CORE_PURCHASE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("random.craft").pitch(0.8).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).pitch(2).build());
+    private static final PlayableEffect CORE_PURCHASE_SOUND = PlayableEffect.list(
+            SoundEffect.builder("random.craft").pitch(0.8).build(),
+            SoundEffect.builder(Sound.ENTITY_PLAYER_LEVELUP).pitch(2).build());
 
     /**
      * 코어 목록 GUI 인스턴스를 생성한다.

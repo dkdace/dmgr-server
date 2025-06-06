@@ -94,7 +94,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         combatUser.setGlobalCooldown(VellionA2Info.READY_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(SPEED_MODIFIER);
 
-        VellionA2Info.Sounds.USE.play(combatUser.getLocation());
+        VellionA2Info.Effects.USE.play(combatUser.getLocation());
 
         Damageable target = targetModule.getCurrentTarget();
 
@@ -103,7 +103,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
                 return false;
 
             for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.7))
-                VellionA2Info.Particles.USE_TICK_1.play(loc, i / 15.0);
+                VellionA2Info.Effects.USE_TICK_1.apply(i).play(loc);
 
             playUseTickEffect(target, i);
 
@@ -127,10 +127,10 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
         target.getStatusEffectModule().apply(VellionA2Mark.instance, Timespan.MAX);
 
-        VellionA2Info.Sounds.USE_READY.play(combatUser.getLocation());
+        VellionA2Info.Effects.USE_READY.play(combatUser.getLocation());
 
         for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.4))
-            VellionA2Info.Particles.USE_TICK_2.play(loc);
+            VellionA2Info.Effects.USE_TICK_2.play(loc);
 
         addActionTask(new IntervalTask(i -> {
             if (isInvalid(target) || !target.getStatusEffectModule().has(VellionA2Mark.instance))
@@ -203,9 +203,9 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
                 Location loc2 = loc.clone().add(vec);
 
                 if (i != 15)
-                    VellionA2Info.Particles.USE_TICK_1.play(loc2, i / 15.0);
+                    VellionA2Info.Effects.USE_TICK_1.apply(i).play(loc2);
                 else
-                    VellionA2Info.Particles.USE_TICK_2.play(loc2);
+                    VellionA2Info.Effects.USE_TICK_2.play(loc2);
             }
         }
     }
@@ -240,7 +240,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
         @Override
         public void onTick(@NonNull Damageable combatEntity, long i) {
-            VellionA2Info.Particles.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
+            VellionA2Info.Effects.MARK.play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.5, 0));
         }
 
         @Override
@@ -272,12 +272,12 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
             if (!isActivated) {
                 isActivated = true;
-                VellionA2Info.Sounds.TRIGGER.play(effectLoc);
+                VellionA2Info.Effects.TRIGGER.play(effectLoc);
             }
 
-            VellionA2Info.Particles.HIT_ENTITY_MARK_CORE.play(location);
+            VellionA2Info.Effects.MARK_HIT_ENTITY_1.play(location);
             for (Location loc : LocationUtil.getLine(effectLoc, location, 0.4))
-                VellionA2Info.Particles.HIT_ENTITY_MARK_DECO.play(loc);
+                VellionA2Info.Effects.MARK_HIT_ENTITY_2.play(loc);
 
             return !(target instanceof Barrier);
         }

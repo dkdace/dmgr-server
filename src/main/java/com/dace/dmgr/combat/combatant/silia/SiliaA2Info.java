@@ -1,17 +1,22 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     /** 쿨타임 */
@@ -50,45 +55,37 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(1).build());
+        public static final SoundEffect USE =
+                SoundEffect.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(1).pitch(1).build();
+        /** 사용 시 틱 효과 */
+        public static final PlayableEffect.Function<Vector> USE_TICK = velocity ->
+                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity.clone().multiply(0.2));
         /** 사용 준비 */
-        public static final SoundEffect USE_READY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.swing").volume(1.5).pitch(0.6).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_3").volume(1.5).pitch(0.8).build());
-        /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder("random.swing").volume(1).pitch(0.7).build(),
-                SoundEffect.SoundInfo.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build());
-    }
-
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 */
-        public static final ParticleEffect USE_TICK = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
-                        .speedMultiplier(0.2).build());
+        public static final PlayableEffect USE_READY = PlayableEffect.list(
+                SoundEffect.builder("random.swing").volume(1.5).pitch(0.6).build(),
+                SoundEffect.builder("new.item.trident.riptide_3").volume(1.5).pitch(0.8).build());
         /** 총알 궤적 */
-        public static final ParticleEffect BULLET_TRAIL = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
-                        .speedMultiplier(0.25).build(),
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE, SiliaWeaponInfo.Particles.COLOR)
-                        .count(3).horizontalSpread(0.3).verticalSpread(0.3).build());
+        public static final PlayableEffect.Function<Vector> BULLET_TRAIL = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity.clone().multiply(0.25)),
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, SiliaWeaponInfo.Effects.COLOR).count(3)
+                        .horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 타격 */
-        public static final ParticleEffect HIT = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.EXPLOSION_NORMAL)
-                        .speedMultiplier(1, 0.3, 0.4)
-                        .build());
-        /** 엔티티 타격 */
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.END_ROD).count(3).speed(0.05).build());
+        public static final PlayableEffect.Function<Vector> HIT = velocity ->
+                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity.clone().multiply(RandomUtils.nextDouble(0.3, 0.4)));
+        /** 엔티티 타격 효과음 */
+        public static final PlayableEffect HIT_ENTITY_SOUND = PlayableEffect.list(
+                SoundEffect.builder("random.swing").volume(1).pitch(0.7).build(),
+                SoundEffect.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build());
+        /** 엔티티 타격 입자 효과 */
+        public static final ParticleEffect HIT_ENTITY_PARTICLE =
+                ParticleEffect.Normal.builder(Particle.END_ROD).count(3).speed(0.05).build();
+        /** 블록 타격 */
+        public static final PlayableEffect.Function<Block> HIT_BLOCK = block ->
+                CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 3.0);
     }
 }

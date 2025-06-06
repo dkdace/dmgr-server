@@ -7,10 +7,12 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.*;
+import org.bukkit.util.Vector;
 
 public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     /** 궁극기 필요 충전량 */
@@ -42,57 +44,45 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.block.respawn_anchor.ambient").volume(3).pitch(1.2, 1.7).build());
+    public static final class Effects {
+        /** 사용 시 틱 효과음 */
+        public static final PlayableEffect.Function<Long> USE_TICK_SOUND = i ->
+                SoundEffect.builder("new.block.respawn_anchor.ambient").volume(3).pitch(1.2 + i * 0.022).build();
+        /** 사용 시 틱 입자 효과 - 1 */
+        public static final ParticleEffect USE_TICK_PARTICLE_1 =
+                ParticleEffect.Normal.builder(Particle.LAVA).count(3).horizontalSpread(1).verticalSpread(1.5).speed(0.2).build();
+        /** 사용 시 틱 입자 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> USE_TICK_PARTICLE_2 = velocity -> PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.2)),
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.2)));
         /** 틱 효과음 */
-        public static final SoundEffect TICK = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_AMBIENT).volume(2).pitch(0.9).pitchVariance(0.1).build());
-        /** 피격 */
-        public static final SoundEffect DAMAGE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_POP).volume(0.3).pitch(1.2).pitchVariance(0.1).build());
+        public static final SoundEffect TICK_SOUND =
+                SoundEffect.builder(Sound.BLOCK_LAVA_AMBIENT).volume(2).pitch(0.9).pitchVariance(0.1).build();
+        /** 틱 입자 효과 - 1 */
+        public static final ParticleEffect TICK_PARTICLE_1 =
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(255, 70, 0)).count(3)
+                        .verticalSpread(1).build();
+        /** 틱 입자 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity ->
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.15));
+        /** 피격 효과음 */
+        public static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
+                SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.3 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build();
+        /** 피격 입자 효과 */
+        public static final PlayableEffect.Function<Double> DAMAGE_PARTICLE = damage ->
+                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0).count((int) (damage * 0.04))
+                        .speed(0.1).build();
         /** 파괴 */
-        public static final SoundEffect DEATH = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
-                SoundEffect.SoundInfo.builder("new.block.conduit.deactivate").volume(3).pitch(0.8).build());
-    }
+        public static final PlayableEffect DEATH = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(0.8).build(),
+                SoundEffect.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(3).pitch(0.5).build(),
+                SoundEffect.builder("new.block.conduit.deactivate").volume(3).pitch(0.8).build(),
 
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        /** 사용 시 틱 입자 효과 (중심) */
-        public static final ParticleEffect USE_TICK_CORE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.LAVA).count(3).horizontalSpread(1).verticalSpread(1.5).speed(0.2).build());
-        /** 사용 시 틱 입자 효과 (장식) */
-        public static final ParticleEffect USE_TICK_DECO = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.FLAME)
-                        .speedMultiplier(0.2).build(),
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.2).build());
-        /** 틱 입자 효과 (중심) */
-        public static final ParticleEffect TICK_CORE = new ParticleEffect(
-                ParticleEffect.ColoredParticleInfo.builder(ParticleEffect.ColoredParticleInfo.ParticleType.REDSTONE,
-                        Color.fromRGB(255, 70, 0)).count(3).verticalSpread(1).build());
-        /** 틱 입자 효과 (장식) */
-        public static final ParticleEffect TICK_DECO = new ParticleEffect(
-                ParticleEffect.DirectionalParticleInfo.builder(0, Particle.SMOKE_NORMAL)
-                        .speedMultiplier(0.15).build());
-        /** 피격 */
-        public static final ParticleEffect DAMAGE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0)
-                        .count(0, 0, 1)
-                        .speed(0.1).build());
-        /** 파괴 */
-        public static final ParticleEffect DEATH = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.FLAME).count(300).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_NORMAL).count(250).horizontalSpread(0.3).verticalSpread(0.3).speed(0.25).build(),
-                ParticleEffect.NormalParticleInfo.builder(Particle.SMOKE_LARGE).count(150).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build());
+                ParticleEffect.Normal.builder(Particle.FLAME).count(300).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(250).horizontalSpread(0.3).verticalSpread(0.3).speed(0.25).build(),
+                ParticleEffect.Normal.builder(Particle.SMOKE_LARGE).count(150).horizontalSpread(0.4).verticalSpread(0.4).speed(0.2).build());
     }
 }

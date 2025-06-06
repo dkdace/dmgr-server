@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
@@ -68,7 +67,7 @@ public final class ChedA1 extends StackableSkill {
         Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
 
-        ChedA1Info.Sounds.USE.play(combatUser.getLocation());
+        ChedA1Info.Effects.USE.play(combatUser.getLocation());
 
         addActionTask(new DelayTask(() -> {
             isEnabled = true;
@@ -106,7 +105,7 @@ public final class ChedA1 extends StackableSkill {
 
         new ChedA1Projectile().shot();
 
-        ChedA1Info.Sounds.SHOOT.play(combatUser.getLocation());
+        ChedA1Info.Effects.SHOOT.play(combatUser.getLocation());
     }
 
     private final class ChedA1Projectile extends Projectile<Damageable> {
@@ -116,7 +115,7 @@ public final class ChedA1 extends StackableSkill {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            ChedWeaponInfo.Sounds.HIT.play(location);
+            ChedA1Info.Effects.HIT.play(location);
         }
 
         @Override
@@ -126,7 +125,7 @@ public final class ChedA1 extends StackableSkill {
                     .chain(createGravityIntervalHandler())
                     .next(createPeriodIntervalHandler(9, location -> {
                         Location loc = LocationUtil.getLocationFromOffset(location, 0.2, 0, 0);
-                        ChedA1Info.Particles.BULLET_TRAIL.play(loc);
+                        ChedA1Info.Effects.BULLET_TRAIL.play(loc);
                     }));
         }
 
@@ -134,10 +133,7 @@ public final class ChedA1 extends StackableSkill {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1.5);
-                ChedA1Info.Particles.HIT_BLOCK.play(location);
-
+                ChedA1Info.Effects.HIT_BLOCK.apply(hitBlock).play(location);
                 return false;
             };
         }

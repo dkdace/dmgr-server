@@ -18,11 +18,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 @Getter
 public abstract class UltimateSkill extends ActiveSkill {
     /** 궁극기 준비 효과음 */
-    private static final SoundEffect ULTIMATE_READY_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(0.5).pitch(2).build());
+    private static final SoundEffect ULTIMATE_READY_SOUND = SoundEffect.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(0.5).pitch(2).build();
     /** 궁극기 사용 효과음 */
-    private static final SoundEffect ULTIMATE_USE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(2).build());
+    private static final SoundEffect ULTIMATE_USE_SOUND = SoundEffect.builder(Sound.ENTITY_WITHER_SPAWN).volume(1000).pitch(2).build();
 
     /** 필요 충전량 */
     protected final int cost;

@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -33,24 +34,14 @@ public final class No7P2Info extends PassiveSkillInfo<No7P2> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
+    public static final class Effects {
         /** 엔티티 타격 */
-        public static final SoundEffect HIT_ENTITY = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_FIREWORK_BLAST).volume(0.4, 0.8).pitch(1.6).build());
-    }
+        public static final PlayableEffect.Function<Double> HIT_ENTITY = power -> PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(0.4 + power * 0.4).pitch(1.6).build(),
 
-    /**
-     * 입자 효과 정보.
-     */
-    @UtilityClass
-    public static final class Particles {
-        public static final ParticleEffect HIT_ENTITY = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.CRIT)
-                        .count(0, 10, 30)
-                        .speed(0, 0.2, 0.6)
-                        .build());
+                ParticleEffect.Normal.builder(Particle.CRIT).count((int) (10 + power * 20)).speed(0.2 + power * 0.4).build());
     }
 }

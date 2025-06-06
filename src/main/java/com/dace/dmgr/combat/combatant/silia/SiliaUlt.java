@@ -63,7 +63,7 @@ public final class SiliaUlt extends UltimateSkill {
             actionManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
             weapon.setVisible(true);
 
-            SiliaUltInfo.Sounds.USE_READY.play(combatUser.getLocation());
+            SiliaUltInfo.Effects.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaUltInfo.READY_DURATION.toTicks()));
     }
 
@@ -123,9 +123,9 @@ public final class SiliaUlt extends UltimateSkill {
                     Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, forward - 0.4 * j);
 
                     if (j == 2)
-                        SiliaUltInfo.Particles.USE_TICK_DECO.play(loc2);
+                        SiliaUltInfo.Effects.USE_TICK_2.play(loc2);
                     else
-                        SiliaUltInfo.Particles.USE_TICK_CORE.play(loc2);
+                        SiliaUltInfo.Effects.USE_TICK_1.play(loc2);
                 }
             }
 

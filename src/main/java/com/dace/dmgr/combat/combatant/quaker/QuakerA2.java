@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -84,7 +83,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             new QuakerA2Effect().shot(loc, vec);
 
             if (i % 2 == 0)
-                QuakerA2Info.Sounds.USE.play(loc.add(vec));
+                QuakerA2Info.Effects.USE.play(loc.add(vec));
             if (i == 11)
                 addActionTask(new IntervalTask(j -> !combatUser.getEntity().isOnGround(), this::onReady, 1));
         };
@@ -143,7 +142,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
             new QuakerA2Projectile(targets).shot(loc, vec);
         }
 
-        QuakerA2Info.Sounds.USE_READY.play(loc);
+        QuakerA2Info.Effects.USE_READY.play(loc);
         QuakerA2Info.SHAKE.send(combatUser);
     }
 
@@ -160,7 +159,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         @Override
         protected void onDestroy(@NonNull Location location, boolean isForce) {
             Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-            QuakerWeaponInfo.Particles.BULLET_TRAIL_DECO.play(loc);
+            QuakerWeaponInfo.Effects.BULLET_TRAIL_2.play(loc);
         }
 
         @Override
@@ -171,7 +170,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                     return;
 
                 Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.3, 0);
-                QuakerWeaponInfo.Particles.BULLET_TRAIL_CORE.play(loc);
+                QuakerWeaponInfo.Effects.BULLET_TRAIL_1.play(loc);
             });
         }
 
@@ -208,10 +207,8 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
                     .chain(createGroundIntervalHandler())
-                    .next(createPeriodIntervalHandler(10, location -> {
-                        CombatEffectUtil.playHitBlockParticle(location, location.clone().subtract(0, 0.5, 0).getBlock(), 3);
-                        QuakerA2Info.Particles.BULLET_TRAIL.play(location);
-                    }));
+                    .next(createPeriodIntervalHandler(10, location ->
+                            QuakerA2Info.Effects.BULLET_TRAIL.apply(location.clone().subtract(0, 0.5, 0).getBlock()).play(location)));
         }
 
         @Override
@@ -236,7 +233,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                     }
                 }
 
-                QuakerA2Info.Particles.HIT_ENTITY.play(location);
+                QuakerA2Info.Effects.HIT_ENTITY.play(location);
 
                 return !(target instanceof Barrier);
             };

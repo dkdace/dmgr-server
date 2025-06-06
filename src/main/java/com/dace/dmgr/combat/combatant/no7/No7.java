@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Vanguard;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,9 +30,9 @@ public final class No7 extends Vanguard {
     @Getter
     private static final No7 instance = new No7();
     /** 발소리 */
-    private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_SHEEP_STEP).volume(0.3).pitch(0.7).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.6).pitch(1).pitchVariance(0.1).build());
+    private static final PlayableEffect.Function<Double> FOOTSTEP_SOUND = volumeMultiplier -> PlayableEffect.list(
+            SoundEffect.builder(Sound.ENTITY_SHEEP_STEP).volume(0.3 * volumeMultiplier).pitch(0.7).pitchVariance(0.1).build(),
+            SoundEffect.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.6 * volumeMultiplier).pitch(1).pitchVariance(0.1).build());
 
     private No7() {
         super("No.7", "전기 깡통 로봇", "ch_no7", Role.GUARDIAN, Species.ROBOT, '\u32DB', 2,
@@ -117,7 +118,7 @@ public final class No7 extends Vanguard {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+        FOOTSTEP_SOUND.apply(volume).play(combatUser.getLocation());
     }
 
     @Override

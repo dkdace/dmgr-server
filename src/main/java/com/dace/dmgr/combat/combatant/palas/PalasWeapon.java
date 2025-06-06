@@ -84,7 +84,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 isActionCooldown = false;
 
                 PalasWeaponInfo.RECOIL.send(combatUser);
-                PalasWeaponInfo.Sounds.USE.play(combatUser.getLocation());
+                PalasWeaponInfo.Effects.USE.play(combatUser.getLocation());
 
                 addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));
 
@@ -132,7 +132,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     public void onReloadTick(long i) {
-        PalasWeaponInfo.Sounds.RELOAD.play(i, combatUser.getLocation());
+        PalasWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
     }
 
     @Override
@@ -145,7 +145,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
 
-        PalasWeaponInfo.Sounds.AIM_ON.play(combatUser.getLocation());
+        PalasWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
@@ -153,7 +153,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
 
-        PalasWeaponInfo.Sounds.AIM_OFF.play(combatUser.getLocation());
+        PalasWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
 
     /**
@@ -166,7 +166,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         reloadModule.cancel();
 
         addActionTask(new IntervalTask(i -> {
-            PalasWeaponInfo.Sounds.ACTION.play(i, combatUser.getLocation());
+            PalasWeaponInfo.Effects.ACTION.apply(i).play(combatUser.getLocation());
 
             switch ((int) i) {
                 case 1:
@@ -201,7 +201,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(8, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, (aimModule.isAiming() ? 0 : 0.2), -0.2, 0);
-                PalasWeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                PalasWeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 
@@ -209,7 +209,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playBulletHitBlockEffect(location, hitBlock);
+                CombatEffectUtil.BULLET_HIT_EFFECT.apply(hitBlock).play(location);
                 return false;
             };
         }
@@ -221,7 +221,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 if (target.isEnemy(combatUser)) {
                     target.getDamageModule().damage(combatUser, PalasWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true);
 
-                    PalasWeaponInfo.Particles.HIT_ENTITY.play(location);
+                    PalasWeaponInfo.Effects.HIT_ENTITY.play(location);
                 }
 
                 return false;
@@ -261,7 +261,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                     ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 
-                    PalasWeaponInfo.Particles.HIT_ENTITY.play(location);
+                    PalasWeaponInfo.Effects.HIT_ENTITY.play(location);
                 }
 
                 return false;

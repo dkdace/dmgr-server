@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -60,7 +59,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
         } else
             slowTimestamp = Timestamp.now().plus(No7WeaponInfo.SLOW_DURATION);
 
-        No7WeaponInfo.Sounds.USE.play(combatUser.getLocation());
+        No7WeaponInfo.Effects.USE.play(combatUser.getLocation());
     }
 
     /**
@@ -85,7 +84,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(14, location -> {
                 Location loc = LocationUtil.getLocationFromOffset(location, 0.2, -0.2, 0);
-                No7WeaponInfo.Particles.BULLET_TRAIL.play(loc);
+                No7WeaponInfo.Effects.BULLET_TRAIL.play(loc);
             });
         }
 
@@ -93,12 +92,9 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
         @NonNull
         protected HitBlockHandler getHitBlockHandler() {
             return (location, hitBlock) -> {
-                CombatEffectUtil.playSmallHitBlockParticle(location, hitBlock, 1);
-
-                if (isFirst) {
-                    CombatEffectUtil.BULLET_HIT_BLOCK_SOUND.play(location);
-                    CombatEffectUtil.playHitBlockSound(location, hitBlock, 1);
-                }
+                No7WeaponInfo.Effects.HIT_BLOCK_PARTICLE.apply(hitBlock).play(location);
+                if (isFirst)
+                    No7WeaponInfo.Effects.HIT_BLOCK_SOUND.apply(hitBlock).play(location);
 
                 return false;
             };

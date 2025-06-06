@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity.combatuser;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -76,10 +77,10 @@ public abstract class FunctionalBlock {
      */
     private static final class JumpPad extends FunctionalBlock {
         /** 사용 효과음 */
-        private static final SoundEffect USE_SOUND = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(1.5).pitch(1.5).pitchVariance(0.1).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_PICKUP).volume(1.5).pitch(0.8).pitchVariance(0.05).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_PICKUP).volume(1.5).pitch(1.4).pitchVariance(0.05).build());
+        private static final PlayableEffect USE_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_SMALL_FALL).volume(1.5).pitch(1.5).pitchVariance(0.1).build(),
+                SoundEffect.builder(Sound.ENTITY_ITEM_PICKUP).volume(1.5).pitch(0.8).pitchVariance(0.05).build(),
+                SoundEffect.builder(Sound.ENTITY_ITEM_PICKUP).volume(1.5).pitch(1.4).pitchVariance(0.05).build());
 
         private JumpPad() {
             super(GeneralConfig.getCombatConfig().getJumpPadBlock());

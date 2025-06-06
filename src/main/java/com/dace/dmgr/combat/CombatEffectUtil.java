@@ -2,6 +2,7 @@ package com.dace.dmgr.combat;
 
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -19,165 +20,29 @@ import org.jetbrains.annotations.Nullable;
 @UtilityClass
 public final class CombatEffectUtil {
     /** 총기 탄피 효과음 */
-    public static final SoundEffect SHELL_DROP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(0.6, 1).pitchVariance(0.1).build());
+    public static final PlayableEffect.Function<Double> SHELL_DROP_SOUND = pitch ->
+            SoundEffect.builder(Sound.ENTITY_MAGMACUBE_JUMP).volume(0.8).pitch(pitch).pitchVariance(0.1).build();
     /** 산탄총 탄피 효과음 */
-    public static final SoundEffect SHOTGUN_SHELL_DROP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_HORSE_DEATH).volume(1).pitch(1).pitchVariance(0.1).build());
+    public static final PlayableEffect.Function<Double> SHOTGUN_SHELL_DROP_SOUND = pitch ->
+            SoundEffect.builder(Sound.ENTITY_ZOMBIE_HORSE_DEATH).volume(1).pitch(pitch).pitchVariance(0.1).build();
     /** 총알 블록 타격 효과음 */
-    public static final SoundEffect BULLET_HIT_BLOCK_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("random.gun.ricochet").volume(0.8).pitch(0.975).pitchVariance(0.05).build());
+    public static final SoundEffect BULLET_HIT_BLOCK_SOUND =
+            SoundEffect.builder("random.gun.ricochet").volume(0.8).pitch(0.975).pitchVariance(0.05).build();
     /** 엔티티 소환 효과음 */
-    public static final SoundEffect ENTITY_SUMMON_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.8).pitch(1).build());
+    public static final SoundEffect ENTITY_SUMMON_SOUND =
+            SoundEffect.builder(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED).volume(0.8).pitch(1).build();
     /** 투척 효과음 */
-    public static final SoundEffect THROW_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(0.6, 0.8).build());
+    public static final PlayableEffect.Function<Double> THROW_SOUND = pitch ->
+            SoundEffect.builder(Sound.ENTITY_WITCH_THROW).volume(0.8).pitch(pitch).build();
     /** 투척물 튕김 효과음 */
-    public static final SoundEffect THROW_BOUNCE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.1).pitch(1.2).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.1).pitch(2).build());
+    public static final PlayableEffect.Function<Double> THROW_BOUNCE_SOUND = speed -> PlayableEffect.list(
+            SoundEffect.builder("random.metalhit").volume(0.1 + speed * 2).pitch(1.2).pitchVariance(0.1).build(),
+            SoundEffect.builder(Sound.BLOCK_GLASS_BREAK).volume(0.1 + speed * 2).pitch(2).build());
     /** 총알 궤적 효과 */
-    public static final ParticleEffect BULLET_TRAIL_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(Particle.CRIT).build());
-
-    /** 블록 타격 효과음 (잔디) */
-    private static final SoundEffect HIT_BLOCK_GRASS_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_GRASS_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (흙) */
-    private static final SoundEffect HIT_BLOCK_DIRT_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_GRAVEL_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (돌) */
-    private static final SoundEffect HIT_BLOCK_STONE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_STONE_BREAK).volume(1).pitch(0.9).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (금속) */
-    private static final SoundEffect HIT_BLOCK_METAL_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.5).pitch(1.95).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder("random.metalhit").volume(0.8).pitch(1.95).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (목재) */
-    private static final SoundEffect HIT_BLOCK_WOOD_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_WOOD_BREAK).volume(0.8).pitch(0.8).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder("random.stab").volume(0.8).pitch(1.95).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (유리) */
-    private static final SoundEffect HIT_BLOCK_GLASS_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_GLASS_BREAK).volume(0.8).pitch(0.7).pitchVariance(0.1).build());
-    /** 블록 타격 효과음 (양털) */
-    private static final SoundEffect HIT_BLOCK_WOOL_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.BLOCK_CLOTH_BREAK).volume(1).pitch(0.8).pitchVariance(0.1).build());
-    /** 출혈 효과 */
-    private static final ParticleEffect BLEEDING_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.REDSTONE_BLOCK, 0)
-                    .count(0, 0, 1)
-                    .horizontalSpread(1, 0, 0.25)
-                    .verticalSpread(2, 0, 0.25)
-                    .speed(0.1).build());
-    /** 파괴 효과 */
-    private static final ParticleEffect BREAK_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0)
-                    .count(0, 0, 1)
-                    .horizontalSpread(1, 0, 0.25)
-                    .verticalSpread(2, 0, 0.25)
-                    .speed(0.1).build());
-    /** 블록 타격 효과 */
-    private static final ParticleEffect HIT_BLOCK_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(0, ParticleEffect.BlockParticleType.BLOCK_DUST)
-                    .count(1, 0, 6)
-                    .horizontalSpread(1, 0, 0.06)
-                    .verticalSpread(1, 0, 0.06)
-                    .speed(0.1).build(),
-            ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA)
-                    .count(1, 0, 25)
-                    .horizontalSpread(1, 0, 0.05)
-                    .verticalSpread(1, 0, 0.05)
-                    .build());
-    /** 블록 타격 효과 (소형) */
-    private static final ParticleEffect HIT_BLOCK_SMALL_PARTICLE = new ParticleEffect(
-            ParticleEffect.NormalParticleInfo.builder(0, ParticleEffect.BlockParticleType.BLOCK_DUST)
-                    .count(1, 0, 3)
-                    .speed(0.1).build(),
-            ParticleEffect.NormalParticleInfo.builder(Particle.TOWN_AURA)
-                    .count(1, 0, 10)
-                    .build());
-
-    /**
-     * 지정한 위치 또는 엔티티에 출혈 입자 효과를 재생한다.
-     *
-     * @param combatEntity 대상 엔티티
-     * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
-     * @param damage       피해량. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 {@code location}과 {@code combatEntity}가 모두 {@code null}이면 발생
-     */
-    public static void playBleedingParticle(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
-        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-
-        if (location == null)
-            BLEEDING_PARTICLE.play(combatEntity.getCenterLocation(), damage * 0.1, combatEntity.getWidth(), combatEntity.getHeight());
-        else
-            BLEEDING_PARTICLE.play(location, damage * 0.06, 0, 0);
-    }
-
-    /**
-     * 지정한 위치 또는 엔티티에 파편 입자 효과를 재생한다.
-     *
-     * @param combatEntity 대상 엔티티
-     * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
-     * @param damage       피해량. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static void playBreakParticle(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
-        Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-
-        if (location == null)
-            BREAK_PARTICLE.play(combatEntity.getCenterLocation(), damage * 0.07, combatEntity.getWidth(), combatEntity.getHeight());
-        else
-            BREAK_PARTICLE.play(location, damage * 0.04, 0, 0);
-    }
-
-    /**
-     * 지정한 위치에 블록 타격 입자 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param block    블록
-     * @param scale    입자 규모(입자의 양, 범위). 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static void playHitBlockParticle(@NonNull Location location, @NonNull Block block, double scale) {
-        HIT_BLOCK_PARTICLE.play(location, block.getState().getData(), scale);
-    }
-
-    /**
-     * 지정한 위치에 소형 블록 타격 입자 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param block    블록
-     * @param scale    입자 규모(입자의 양). 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static void playSmallHitBlockParticle(@NonNull Location location, @NonNull Block block, double scale) {
-        HIT_BLOCK_SMALL_PARTICLE.play(location, block.getState().getData(), scale);
-    }
-
-    /**
-     * 지정한 위치에 총알 타격 효과를 재생한다.
-     *
-     * @param location 대상 위치
-     * @param block    블록
-     */
-    public static void playBulletHitBlockEffect(@NonNull Location location, @NonNull Block block) {
-        BULLET_HIT_BLOCK_SOUND.play(location);
-        playSmallHitBlockParticle(location, block, 1);
-        playHitBlockSound(location, block, 1);
-    }
-
-    /**
-     * 지정한 위치에 블록 타격 효과음을 재생한다.
-     *
-     * @param location    대상 위치
-     * @param block       블록
-     * @param volumeScale 음량 규모. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    public static void playHitBlockSound(@NonNull Location location, @NonNull Block block, double volumeScale) {
+    public static final ParticleEffect BULLET_TRAIL_PARTICLE =
+            ParticleEffect.Normal.builder(Particle.CRIT).build();
+    /** 블록 타격 효과음 */
+    public static final PlayableEffect.BiFunction<Block, Double> HIT_BLOCK_SOUND = (block, volumeMultiplier) -> {
         switch (block.getType()) {
             case GRASS:
             case LEAVES:
@@ -185,14 +50,12 @@ public final class CombatEffectUtil {
             case SPONGE:
             case HAY_BLOCK:
             case GRASS_PATH:
-                HIT_BLOCK_GRASS_SOUND.play(location, volumeScale);
-                break;
+                return SoundEffect.builder(Sound.BLOCK_GRASS_BREAK).volume(0.8 * volumeMultiplier).pitch(0.7).pitchVariance(0.1).build();
             case DIRT:
             case GRAVEL:
             case SAND:
             case CLAY:
-                HIT_BLOCK_DIRT_SOUND.play(location, volumeScale);
-                break;
+                return SoundEffect.builder(Sound.BLOCK_GRAVEL_BREAK).volume(0.8 * volumeMultiplier).pitch(0.7).pitchVariance(0.1).build();
             case STONE:
             case COBBLESTONE:
             case COBBLESTONE_STAIRS:
@@ -219,8 +82,7 @@ public final class CombatEffectUtil {
             case STONE_SLAB2:
             case DOUBLE_STONE_SLAB2:
             case CONCRETE:
-                HIT_BLOCK_STONE_SOUND.play(location, volumeScale);
-                break;
+                return SoundEffect.builder(Sound.BLOCK_STONE_BREAK).volume(1 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build();
             case IRON_BLOCK:
             case GOLD_BLOCK:
             case IRON_DOOR_BLOCK:
@@ -228,8 +90,9 @@ public final class CombatEffectUtil {
             case IRON_TRAPDOOR:
             case CAULDRON:
             case HOPPER:
-                HIT_BLOCK_METAL_SOUND.play(location, volumeScale);
-                break;
+                return PlayableEffect.list(
+                        SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.5 * volumeMultiplier).pitch(1.95).pitchVariance(0.1).build(),
+                        SoundEffect.builder("random.metalhit").volume(0.8 * volumeMultiplier).pitch(1.95).pitchVariance(0.1).build());
             case WOOD:
             case LOG:
             case LOG_2:
@@ -263,8 +126,9 @@ public final class CombatEffectUtil {
             case ACACIA_DOOR:
             case CHEST:
             case BOOKSHELF:
-                HIT_BLOCK_WOOD_SOUND.play(location, volumeScale);
-                break;
+                return PlayableEffect.list(
+                        SoundEffect.builder(Sound.BLOCK_WOOD_BREAK).volume(0.8 * volumeMultiplier).pitch(0.8).pitchVariance(0.1).build(),
+                        SoundEffect.builder("random.stab").volume(0.8 * volumeMultiplier).pitch(1.95).pitchVariance(0.1).build());
             case GLASS:
             case THIN_GLASS:
             case STAINED_GLASS:
@@ -275,14 +139,75 @@ public final class CombatEffectUtil {
             case REDSTONE_LAMP_OFF:
             case REDSTONE_LAMP_ON:
             case SEA_LANTERN:
-                HIT_BLOCK_GLASS_SOUND.play(location, volumeScale);
-                break;
+                return SoundEffect.builder(Sound.BLOCK_GLASS_BREAK).volume(0.8 * volumeMultiplier).pitch(0.7).pitchVariance(0.1).build();
             case WOOL:
             case CARPET:
-                HIT_BLOCK_WOOL_SOUND.play(location, volumeScale);
-                break;
+                return SoundEffect.builder(Sound.BLOCK_CLOTH_BREAK).volume(1 * volumeMultiplier).pitch(0.8).pitchVariance(0.1).build();
             default:
-                break;
+                return SoundEffect.NONE;
+        }
+    };
+    /** 블록 타격 효과 */
+    public static final PlayableEffect.BiFunction<Block, Double> HIT_BLOCK_PARTICLE = (block, scale) -> PlayableEffect.list(
+            ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, block)
+                    .count((int) (scale * 6))
+                    .horizontalSpread(scale * 0.06)
+                    .verticalSpread(scale * 0.06)
+                    .speed(0.1).build(),
+            ParticleEffect.Normal.builder(Particle.TOWN_AURA)
+                    .count((int) (scale * 25))
+                    .horizontalSpread(scale * 0.05)
+                    .verticalSpread(scale * 0.05)
+                    .build());
+    /** 소형 블록 타격 효과 */
+    public static final PlayableEffect.BiFunction<Block, Double> HIT_BLOCK_SMALL_PARTICLE = (block, scale) -> PlayableEffect.list(
+            ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, block)
+                    .count((int) (scale * 3))
+                    .speed(0.1).build(),
+            ParticleEffect.Normal.builder(Particle.TOWN_AURA)
+                    .count((int) (scale * 10))
+                    .build());
+    /** 총알 타격 효과 */
+    public static final PlayableEffect.Function<Block> BULLET_HIT_EFFECT = block -> PlayableEffect.list(
+            BULLET_HIT_BLOCK_SOUND,
+            HIT_BLOCK_SMALL_PARTICLE.apply(block, 1.0),
+            HIT_BLOCK_SOUND.apply(block, 1.0));
+
+    /**
+     * 피해 입자 효과의 종류.
+     */
+    public enum DamageParticle {
+        /** 출혈 */
+        BLOOD(Material.REDSTONE_BLOCK, 0.06, 0.1),
+        /** 금속 파편 */
+        METAL(Material.IRON_BLOCK, 0.04, 0.07);
+
+        private final PlayableEffect.BiFunction<@Nullable CombatEntity, Double> effectFunction;
+
+        DamageParticle(Material material, double countHitMultiplier, double countMultiplier) {
+            this.effectFunction = (combatEntity, damage) ->
+                    ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, material, 0)
+                            .count((int) (damage * (combatEntity == null ? countHitMultiplier : countMultiplier)))
+                            .horizontalSpread(combatEntity == null ? 0 : combatEntity.getWidth() * 0.25)
+                            .verticalSpread(combatEntity == null ? 0 : combatEntity.getHeight() * 0.25)
+                            .speed(0.1).build();
+        }
+
+        /**
+         * 지정한 엔티티에 피해 입자 효과를 재생한다.
+         *
+         * @param combatEntity 대상 엔티티
+         * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
+         * @param damage       피해량. 0 이상의 값
+         * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+         */
+        public void play(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
+            Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
+
+            if (location == null)
+                effectFunction.apply(combatEntity, damage).play(combatEntity.getCenterLocation());
+            else
+                effectFunction.apply(null, damage).play(location);
         }
     }
 }

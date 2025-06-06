@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.temporary.dummy.Dummy;
 import com.dace.dmgr.combat.entity.temporary.dummy.MovingBehavior;
 import com.dace.dmgr.combat.entity.temporary.dummy.ShootingBehavior;
 import com.dace.dmgr.effect.ParticleEffect;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.User;
 import com.dace.dmgr.util.EntityUtil;
@@ -112,13 +113,12 @@ public final class TrainingCenter {
         /** 블록 위치별 디버프 적용에 실행할 작업의 목록 (위치 : 디버프 적용에 실행할 작업) */
         private static final HashMap<Location, Consumer<CombatUser>> USE_EFFECT_MAP = new HashMap<>();
 
-        /** 사용 입자 효과 */
-        private static final ParticleEffect USE_PARTICLE = new ParticleEffect(
-                ParticleEffect.NormalParticleInfo.builder(Particle.VILLAGER_ANGRY).build());
         /** 사용 효과음 */
-        private static final SoundEffect USE_SOUND = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_BREATH).volume(1).pitch(0.8).build(),
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_ITEM_PICKUP).volume(1).pitch(0.7).build());
+        private static final PlayableEffect USE_SOUND = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_PLAYER_BREATH).volume(1).pitch(0.8).build(),
+                SoundEffect.builder(Sound.ENTITY_ITEM_PICKUP).volume(1).pitch(0.7).build());
+        /** 사용 입자 효과 */
+        private static final ParticleEffect USE_PARTICLE = ParticleEffect.Normal.builder(Particle.VILLAGER_ANGRY).build();
 
         static {
             USE_EFFECT_MAP.put(CONFIG.getStunLocation(), combatUser ->

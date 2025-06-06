@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,9 +28,9 @@ public final class Metar extends Guardian {
     @Getter
     private static final Metar instance = new Metar();
     /** 발소리 */
-    private static final SoundEffect FOOTSTEP_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder("new.entity.hoglin.step").volume(0.4).pitch(0.8).pitchVariance(0.1).build(),
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7).pitch(0.85).pitchVariance(0.1).build());
+    private static final PlayableEffect.Function<Double> FOOTSTEP_SOUND = volumeMultiplier -> PlayableEffect.list(
+            SoundEffect.builder("new.entity.hoglin.step").volume(0.4 * volumeMultiplier).pitch(0.8).pitchVariance(0.1).build(),
+            SoundEffect.builder(Sound.ENTITY_IRONGOLEM_STEP).volume(0.7 * volumeMultiplier).pitch(0.85).pitchVariance(0.1).build());
 
     private Metar() {
         super("METAR", "군용 차세대 전술 돌격 로봇", "ch_metar", null, Species.ROBOT, '\u32DA', 2,
@@ -114,7 +115,7 @@ public final class Metar extends Guardian {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        FOOTSTEP_SOUND.play(combatUser.getLocation(), volume);
+        FOOTSTEP_SOUND.apply(volume).play(combatUser.getLocation());
     }
 
     @Override

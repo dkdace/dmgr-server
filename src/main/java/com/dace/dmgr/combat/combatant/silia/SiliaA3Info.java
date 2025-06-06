@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -47,20 +48,20 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
     }
 
     /**
-     * 효과음 정보.
+     * 효과 정보.
      */
     @UtilityClass
-    public static final class Sounds {
-        /** 사용 */
-        public static final SoundEffect USE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.5).build());
-        /** 해제 */
-        public static final SoundEffect DISABLE = new SoundEffect(
-                SoundEffect.SoundInfo.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1.2).build(),
-                SoundEffect.SoundInfo.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.7).build());
+    public static final class Effects {
+        /** 활성화 */
+        public static final PlayableEffect ON = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1).build(),
+                SoundEffect.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.5).build());
+        /** 비활성화 */
+        public static final PlayableEffect OFF = PlayableEffect.list(
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.2).pitch(1.2).build(),
+                SoundEffect.builder(Sound.BLOCK_LAVA_EXTINGUISH).volume(0.15).pitch(1.7).build());
         /** 일격 활성화 */
-        public static final SoundEffect ACTIVATE = new SoundEffect(
-                SoundEffect.SoundInfo.builder("new.item.trident.return").volume(1).pitch(1.2).build());
+        public static final SoundEffect STRIKE_ACTIVATE =
+                SoundEffect.builder("new.item.trident.return").volume(1).pitch(1.2).build();
     }
 }

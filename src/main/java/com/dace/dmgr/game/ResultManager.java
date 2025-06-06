@@ -23,14 +23,11 @@ import java.util.function.ToIntFunction;
  */
 public final class ResultManager {
     /** 승리 효과음 */
-    private static final SoundEffect WIN_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build());
+    private static final SoundEffect WIN_SOUND = SoundEffect.builder(Sound.UI_TOAST_CHALLENGE_COMPLETE).volume(1000).pitch(1.5).build();
     /** 패배 효과음 */
-    private static final SoundEffect LOSE_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build());
+    private static final SoundEffect LOSE_SOUND = SoundEffect.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build();
     /** 무승부 효과음 */
-    private static final SoundEffect DRAW_SOUND = new SoundEffect(
-            SoundEffect.SoundInfo.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build());
+    private static final SoundEffect DRAW_SOUND = SoundEffect.builder(Sound.ENTITY_PLAYER_LEVELUP).volume(1000).pitch(1).build();
 
     /** 게임 */
     private final Game game;
