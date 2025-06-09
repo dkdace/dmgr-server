@@ -258,8 +258,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-            JagerUltInfo.Effects.DAMAGE.apply(damage).play(getLocation());
-            CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
+            JagerUltInfo.Effects.DAMAGE.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }
 
         @Override

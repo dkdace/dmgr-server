@@ -1,17 +1,20 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 
 public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
@@ -86,8 +89,10 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
         public static final SoundEffect ENEMY_DETECT =
                 SoundEffect.builder(Sound.ENTITY_WOLF_GROWL).volume(2).pitch(0.85).build();
         /** 피격 */
-        public static final PlayableEffect.Function<Double> DAMAGE = damage ->
-                SoundEffect.builder(Sound.ENTITY_WOLF_HURT).volume(0.4 + damage * 0.001).pitch(1).pitchVariance(0.1).build();
+        public static final PlayableEffect.TriFunction<CombatEntity, Location, Double> DAMAGE =
+                (combatEntity, location, damage) -> PlayableEffect.list(
+                        SoundEffect.builder(Sound.ENTITY_WOLF_HURT).volume(0.4 + damage * 0.001).pitch(1).pitchVariance(0.1).build(),
+                        CombatEffectUtil.DamageParticle.BLOOD.apply(combatEntity, location, damage));
         /** 사망 */
         public static final SoundEffect DEATH =
                 SoundEffect.builder(Sound.ENTITY_WOLF_DEATH).volume(1).pitch(1).pitchVariance(0.1).build();

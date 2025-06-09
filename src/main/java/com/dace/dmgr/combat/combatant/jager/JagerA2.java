@@ -244,8 +244,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-            JagerA2Info.Effects.DAMAGE.apply(damage).play(getLocation());
-            CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
+            JagerA2Info.Effects.DAMAGE.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }
 
         @Override

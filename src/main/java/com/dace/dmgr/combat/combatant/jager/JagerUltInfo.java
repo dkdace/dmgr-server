@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -111,8 +112,10 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
         public static final ParticleEffect TICK_PARTICLE_2 =
                 ParticleEffect.Normal.builder(Particle.SNOW_SHOVEL).count(3).verticalSpread(1.4).speed(0.04).build();
         /** 피격 */
-        public static final PlayableEffect.Function<Double> DAMAGE = damage ->
-                SoundEffect.builder("random.metalhit").volume(0.4 + damage * 0.001).pitch(1.1).pitchVariance(0.1).build();
+        public static final PlayableEffect.TriFunction<CombatEntity, Location, Double> DAMAGE =
+                (combatEntity, location, damage) -> PlayableEffect.list(
+                        SoundEffect.builder("random.metalhit").volume(0.4 + damage * 0.001).pitch(1.1).pitchVariance(0.1).build(),
+                        CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
         /** 파괴 */
         public static final PlayableEffect DEATH = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),

@@ -615,7 +615,7 @@ public abstract class Combatant {
 
             @Override
             public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
-                CombatEffectUtil.DamageParticle.BLOOD.play(combatUser, location, damage);
+                CombatEffectUtil.DamageParticle.BLOOD.apply(combatUser, location, damage).play(CombatEffectUtil.getHitLocation(combatUser, location));
             }
 
             @Override
@@ -630,9 +630,11 @@ public abstract class Combatant {
                     ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.COAL_BLOCK, 0).horizontalSpread(0.15)
                             .verticalSpread(0.45).speed(0.03).build(),
                     ParticleEffect.Normal.builder(Particle.CRIT).horizontalSpread(0.15).verticalSpread(0.45).speed(0.2).build());
-            /** 피격 효과음 */
-            private static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
-                    SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.15 + damage * 0.001).pitch(1.3).pitchVariance(0.2).build();
+            /** 피격 효과 */
+            private static final PlayableEffect.TriFunction<CombatUser, Location, Double> DAMAGE_EFFECT =
+                    (combatUser, location, damage) -> PlayableEffect.list(
+                            SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.15 + damage * 0.001).pitch(1.3).pitchVariance(0.2).build(),
+                            CombatEffectUtil.DamageParticle.METAL.apply(combatUser, location, damage));
             /** 사망 효과음 */
             private static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
                     SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(2).pitch(0.5).build(),
@@ -652,8 +654,7 @@ public abstract class Combatant {
 
             @Override
             public void onDamage(@NonNull CombatUser combatUser, double damage, @Nullable Location location) {
-                CombatEffectUtil.DamageParticle.METAL.play(combatUser, location, damage);
-                DAMAGE_SOUND.apply(damage).play(combatUser.getLocation());
+                DAMAGE_EFFECT.apply(combatUser, location, damage).play(CombatEffectUtil.getHitLocation(combatUser, location));
             }
 
             @Override

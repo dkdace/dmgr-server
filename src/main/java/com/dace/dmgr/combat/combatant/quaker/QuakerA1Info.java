@@ -1,16 +1,19 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -70,9 +73,12 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
         public static final SoundEffect OFF =
                 SoundEffect.builder(Sound.BLOCK_SHULKER_BOX_CLOSE).volume(1).pitch(1.4).build();
         /** 피격 */
-        public static final PlayableEffect.Function<Double> DAMAGE = damage -> PlayableEffect.list(
-                SoundEffect.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
-                SoundEffect.builder("random.metalhit").volume(0.3 + damage * 0.001).pitch(0.85).pitchVariance(0.1).build());
+        public static final PlayableEffect.TriFunction<CombatEntity, Location, Double> DAMAGE =
+                (combatEntity, location, damage) -> PlayableEffect.list(
+                        SoundEffect.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
+                        SoundEffect.builder("random.metalhit").volume(0.3 + damage * 0.001).pitch(0.85).pitchVariance(0.1).build(),
+
+                        location == null ? SoundEffect.NONE : CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
         /** 파괴 효과음 */
         public static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),

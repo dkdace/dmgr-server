@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.MultiSummonable;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
@@ -94,9 +95,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
 
             combatUser.addScore("피해 막음", damage * MetarA2Info.BLOCK_SCORE / MetarA2Info.HEALTH);
 
-            MetarA2Info.Effects.DAMAGE_SOUND.apply(damage).play(location == null ? getLocation() : location);
-            if (location != null)
-                MetarA2Info.Effects.DAMAGE_PARTICLE.apply(damage).play(location);
+            MetarA2Info.Effects.DAMAGE.apply(location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }
 
         @Override

@@ -36,9 +36,11 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
     private static final FireworkEffect SPAWN_FIREWORK =
             FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL, Color.fromRGB(255, 255, 255))
                     .fadeColor(Color.fromRGB(255, 255, 0)).build();
-    /** 피격 효과음 */
-    private static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
-            SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.1 + damage * 0.001).pitch(1.5).pitchVariance(0.2).build();
+    /** 피격 효과 */
+    private static final PlayableEffect.TriFunction<CombatEntity, Location, Double> DAMAGE_EFFECT =
+            (combatEntity, location, damage) -> PlayableEffect.list(
+                    SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(0.1 + damage * 0.001).pitch(1.5).pitchVariance(0.2).build(),
+                    CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
     /** 사망 입자 효과 */
     private static final PlayableEffect DEATH_PARTICLE = PlayableEffect.list(
             ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).build(),
@@ -182,8 +184,7 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
 
     @Override
     public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
-        DAMAGE_SOUND.apply(damage).play(getLocation());
-        CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
+        DAMAGE_EFFECT.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
     }
 
     @Override

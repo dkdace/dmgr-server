@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
@@ -135,9 +136,7 @@ public final class Inferno extends Vanguard {
         if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             return;
 
-        InfernoUltInfo.Effects.DAMAGE_SOUND.apply(damage).play(victim.getLocation());
-        if (location != null)
-            InfernoUltInfo.Effects.DAMAGE_PARTICLE.apply(damage).play(location);
+        InfernoUltInfo.Effects.DAMAGE.apply(location, damage).play(CombatEffectUtil.getHitLocation(victim, location));
     }
 
     @Override

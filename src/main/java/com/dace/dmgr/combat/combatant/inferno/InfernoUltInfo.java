@@ -68,13 +68,12 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
         /** 틱 입자 효과 - 2 */
         public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity ->
                 ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.15));
-        /** 피격 효과음 */
-        public static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage ->
-                SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.3 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build();
-        /** 피격 입자 효과 */
-        public static final PlayableEffect.Function<Double> DAMAGE_PARTICLE = damage ->
-                ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0).count((int) (damage * 0.04))
-                        .speed(0.1).build();
+        /** 피격 */
+        public static final PlayableEffect.BiFunction<Location, Double> DAMAGE = (location, damage) -> PlayableEffect.list(
+                SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.3 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
+
+                location == null ? SoundEffect.NONE : ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0)
+                        .count((int) (damage * 0.04)).speed(0.1).build());
         /** 파괴 */
         public static final PlayableEffect DEATH = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_GENERIC_EXPLODE).volume(3).pitch(0.8).build(),

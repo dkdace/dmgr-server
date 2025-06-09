@@ -137,9 +137,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
             combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
 
-            QuakerA1Info.Effects.DAMAGE.apply(damage).play(location == null ? getLocation() : location);
-            if (location != null)
-                CombatEffectUtil.DamageParticle.METAL.play(this, location, damage);
+            QuakerA1Info.Effects.DAMAGE.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }
 
         @Override

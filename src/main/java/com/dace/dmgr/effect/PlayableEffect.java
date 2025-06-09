@@ -96,4 +96,27 @@ public abstract class PlayableEffect {
         @NonNull
         PlayableEffect apply(T value1, U value2);
     }
+
+    /**
+     * 재생 가능한 효과를 처리하는 인터페이스.
+     *
+     * <p>세 개의 입력값을 받아 효과를 반환한다.</p>
+     *
+     * @param <T> 첫 번째 입력값의 타입
+     * @param <U> 두 번째 입력값의 타입
+     * @param <V> 세 번째 입력값의 타입
+     */
+    @FunctionalInterface
+    public interface TriFunction<T, U, V> {
+        /**
+         * 효과를 반환한다.
+         *
+         * @param value1 첫 번째 입력값
+         * @param value2 두 번째 입력값
+         * @param value3 세 번째 입력값
+         * @return 효과
+         */
+        @NonNull
+        PlayableEffect apply(T value1, U value2, V value3);
+    }
 }

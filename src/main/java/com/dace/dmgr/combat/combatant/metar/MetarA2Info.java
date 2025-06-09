@@ -11,6 +11,7 @@ import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -57,13 +58,12 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
         public static final PlayableEffect USE = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(1).pitch(1.3).build(),
                 SoundEffect.builder("random.charge").volume(1).pitch(0.7).build());
-        /** 피격 효과음 */
-        public static final PlayableEffect.Function<Double> DAMAGE_SOUND = damage -> PlayableEffect.list(
+        /** 피격 */
+        public static final PlayableEffect.BiFunction<Location, Double> DAMAGE = (location, damage) -> PlayableEffect.list(
                 SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.4 + damage * 0.001).pitch(1.5).pitchVariance(0.1).build(),
-                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.4 + damage * 0.001).pitch(1.4).pitchVariance(0.1).build());
-        /** 피격 입자 효과 */
-        public static final PlayableEffect.Function<Double> DAMAGE_PARTICLE = damage ->
-                ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count((int) (damage * 0.04)).speed(0.2).build();
+                SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.4 + damage * 0.001).pitch(1.4).pitchVariance(0.1).build(),
+
+                location == null ? SoundEffect.NONE : ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count((int) (damage * 0.04)).speed(0.2).build());
         /** 파괴 효과음 */
         public static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),

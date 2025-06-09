@@ -274,9 +274,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         @Override
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
             setStateValue(damageModule.getHealth());
-
-            JagerA1Info.Effects.DAMAGE.apply(damage).play(getLocation());
-            CombatEffectUtil.DamageParticle.BLOOD.play(this, location, damage);
+            JagerA1Info.Effects.DAMAGE.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }
 
         @Override

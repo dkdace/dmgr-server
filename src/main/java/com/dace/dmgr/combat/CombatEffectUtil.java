@@ -174,6 +174,18 @@ public final class CombatEffectUtil {
             HIT_BLOCK_SOUND.apply(block, 1.0));
 
     /**
+     * 엔티티가 피해를 입었을 때 효과 재생에 사용할 위치를 반환한다.
+     *
+     * @param combatEntity 대상 엔티티
+     * @param location     맞은 위치. {@code null}로 지정 시 {@link CombatEntity#getCenterLocation()} 사용
+     * @return 최종 위치
+     */
+    @NonNull
+    public static Location getHitLocation(@NonNull CombatEntity combatEntity, @Nullable Location location) {
+        return location == null ? combatEntity.getCenterLocation() : location;
+    }
+
+    /**
      * 피해 입자 효과의 종류.
      */
     public enum DamageParticle {
@@ -189,25 +201,21 @@ public final class CombatEffectUtil {
                     ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, material, 0)
                             .count((int) (damage * (combatEntity == null ? countHitMultiplier : countMultiplier)))
                             .horizontalSpread(combatEntity == null ? 0 : combatEntity.getWidth() * 0.25)
-                            .verticalSpread(combatEntity == null ? 0 : combatEntity.getHeight() * 0.25)
-                            .speed(0.1).build();
+                            .verticalSpread(combatEntity == null ? 0 : combatEntity.getHeight() * 0.25).speed(0.1).build();
         }
 
         /**
-         * 지정한 엔티티에 피해 입자 효과를 재생한다.
+         * 피해 입자 효과를 반환한다.
          *
          * @param combatEntity 대상 엔티티
-         * @param location     대상 위치. {@code null}로 지정 시 {@code combatEntity}의 위치 사용
+         * @param location     대상 위치
          * @param damage       피해량. 0 이상의 값
          * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
          */
-        public void play(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
+        @NonNull
+        public PlayableEffect apply(@NonNull CombatEntity combatEntity, @Nullable Location location, double damage) {
             Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
-
-            if (location == null)
-                effectFunction.apply(combatEntity, damage).play(combatEntity.getCenterLocation());
-            else
-                effectFunction.apply(null, damage).play(location);
+            return effectFunction.apply(location == null ? combatEntity : null, damage);
         }
     }
 }
