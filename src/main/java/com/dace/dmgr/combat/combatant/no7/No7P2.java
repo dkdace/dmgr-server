@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -10,7 +9,6 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -58,9 +56,7 @@ public final class No7P2 extends AbstractSkill {
 
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);
 
-            No7P2Info.Effects.HIT_ENTITY.apply(power).play(location);
-            for (Location loc : LocationUtil.getLine(center, location, 0.4))
-                CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+            No7P2Info.Effects.playHitEntity(center, location, power);
 
             return !(target instanceof Barrier);
         }

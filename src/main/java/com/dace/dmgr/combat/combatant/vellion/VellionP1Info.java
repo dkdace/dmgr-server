@@ -9,10 +9,14 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
     /** 쿨타임 */
@@ -68,5 +72,27 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
         public static final PlayableEffect OFF = PlayableEffect.list(
                 SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.5).build(),
                 SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build());
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playTick(@NonNull Location location) {
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location).multiply(0.8);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int i = 0; i < 8; i++) {
+                double angle = 360 / 8.0 * i;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc = location.clone().add(vec);
+
+                TICK.play(loc);
+            }
+        }
     }
 }

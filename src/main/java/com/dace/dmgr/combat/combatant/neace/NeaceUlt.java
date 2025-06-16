@@ -9,15 +9,12 @@ import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 @Getter(AccessLevel.PACKAGE)
@@ -53,9 +50,7 @@ public final class NeaceUlt extends UltimateSkill {
 
         NeaceUltInfo.Effects.USE.play(combatUser.getLocation());
 
-        EffectManager effectManager = new EffectManager();
-
-        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
+        addActionTask(new IntervalTask(i -> NeaceUltInfo.Effects.playUseTick(i, combatUser.getLocation()), () -> {
             cancel();
 
             isEnabled = true;
@@ -63,15 +58,13 @@ public final class NeaceUlt extends UltimateSkill {
             setDuration();
             combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
-            NeaceUltInfo.Effects.USE_READY_SOUND.play(combatUser.getLocation());
-            NeaceUltInfo.Effects.USE_READY_FIREWORK.play(combatUser.getLocation());
+            NeaceUltInfo.Effects.playUseReady(combatUser.getLocation());
 
             addActionTask(new IntervalTask(i -> {
                 Location loc = combatUser.getEntity().getEyeLocation();
                 new NeaceUltArea().emit(loc);
 
-                playTickEffect(i);
-                NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
+                NeaceUltInfo.Effects.playTick(i, combatUser.getLocation());
             }, 1, NeaceUltInfo.DURATION.toTicks()));
         }, 1, NeaceUltInfo.READY_DURATION.toTicks()));
     }
@@ -91,68 +84,6 @@ public final class NeaceUlt extends UltimateSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playTickEffect(long i) {
-        Location loc = combatUser.getLocation();
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(1.5);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        long angle = i * 5;
-        for (int j = 0; j < 6; j++) {
-            angle += 360 / 3;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 3 ? angle : -angle);
-
-            NeaceUltInfo.Effects.TICK.play(loc.clone().add(vec));
-        }
-    }
-
-    /**
-     * 효과를 재생하는 클래스.
-     */
-    @NoArgsConstructor
-    private final class EffectManager {
-        private int index = 0;
-        private int angle = 0;
-        private double distance = 0;
-        private double up = 0;
-
-        /**
-         * 효과를 재생한다.
-         */
-        private void playEffect() {
-            Location loc = combatUser.getLocation().add(0, 0.1, 0);
-            loc.setYaw(0);
-            loc.setPitch(0);
-            Vector vector = VectorUtil.getRollAxis(loc);
-            Vector axis = VectorUtil.getYawAxis(loc);
-
-            for (int j = 0; j < 3; j++) {
-                angle += index > 9 ? -31 : 7;
-
-                if (index > 9)
-                    up += 0.2;
-                else
-                    distance += 0.35;
-
-                for (int k = 0; k < 8; k++) {
-                    angle += 360 / 4;
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(distance);
-                    Location loc2 = loc.clone().add(vec).add(0, up, 0);
-
-                    NeaceUltInfo.Effects.USE_TICK.play(loc2);
-                }
-            }
-
-            index++;
-        }
     }
 
     private final class NeaceUltArea extends Area<Healable> {

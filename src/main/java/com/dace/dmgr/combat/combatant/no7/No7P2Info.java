@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.no7;
 
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
@@ -7,8 +8,11 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -43,5 +47,18 @@ public final class No7P2Info extends PassiveSkillInfo<No7P2> {
                 SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(0.4 + power * 0.4).pitch(1.6).build(),
 
                 ParticleEffect.Normal.builder(Particle.CRIT).count((int) (10 + power * 20)).speed(0.2 + power * 0.4).build());
+
+        /**
+         * 엔티티 타격 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param target   대상 위치
+         * @param power    위력
+         */
+        public static void playHitEntity(@NonNull Location location, @NonNull Location target, double power) {
+            HIT_ENTITY.apply(power).play(target);
+            for (Location loc : LocationUtil.getLine(location, target, 0.4))
+                CombatEffectUtil.BULLET_TRAIL_PARTICLE.play(loc);
+        }
     }
 }

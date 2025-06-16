@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -46,19 +45,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         SiliaA2Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(i -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
-            Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
-            Vector axis = VectorUtil.getRollAxis(loc);
-
-            long angle = i * 23;
-            for (int j = 0; j < 6; j++) {
-                angle += 360 / 6;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(1.6 - i * 0.2);
-
-                SiliaA2Info.Effects.USE_TICK.apply(vec).play(loc.clone().add(vec));
-            }
-        }, () -> {
+        addActionTask(new IntervalTask(i -> SiliaA2Info.Effects.playUseTick(i, combatUser.getEntity().getEyeLocation()), () -> {
             cancel();
 
             new SiliaA2Projectile().shot();
@@ -85,8 +72,7 @@ public final class SiliaA2 extends ActiveSkill {
 
         @Override
         protected void onHit(@NonNull Location location) {
-            for (int i = 0; i < 40; i++)
-                SiliaA2Info.Effects.HIT.apply(VectorUtil.getSpreadedVector(new Vector(0, 1, 0), 60)).play(location);
+            SiliaA2Info.Effects.playHit(location);
         }
 
         @Override
@@ -97,19 +83,7 @@ public final class SiliaA2 extends ActiveSkill {
 
                 @Override
                 public void accept(Location location) {
-                    Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
-                    Vector axis = VectorUtil.getRollAxis(location);
-
-                    int angle = i * 12;
-                    for (int j = 0; j < 2; j++) {
-                        angle += 360 / 2;
-                        Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
-                        Location loc = location.clone().add(vec);
-
-                        SiliaA2Info.Effects.BULLET_TRAIL.apply(vec).play(loc);
-                    }
-
-                    i++;
+                    SiliaA2Info.Effects.playBulletTrail(i++, location);
                 }
             });
         }
@@ -137,9 +111,7 @@ public final class SiliaA2 extends ActiveSkill {
                     loc.setPitch(0);
                     loc = LocationUtil.getLocationFromOffset(loc, 0, 0, -1.5);
 
-                    SiliaA2Info.Effects.HIT_ENTITY_SOUND.play(location);
-                    for (Location loc2 : LocationUtil.getLine(combatUser.getLocation(), loc, 0.5))
-                        SiliaA2Info.Effects.HIT_ENTITY_PARTICLE.play(loc2.clone().add(0, 1, 0));
+                    SiliaA2Info.Effects.playHitEntity(location, combatUser.getLocation(), loc);
 
                     knockback(loc, target);
                 }

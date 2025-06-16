@@ -10,11 +10,8 @@ import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 public final class NeaceA2 extends ChargeableSkill {
     /** 공격력 수정자 */
@@ -70,7 +67,7 @@ public final class NeaceA2 extends ChargeableSkill {
 
             NeaceA2Info.Effects.TICK.play(combatUser.getCenterLocation());
             if (i < 10)
-                playUseTickEffect(i);
+                NeaceA2Info.Effects.playUseTick(i, combatUser.getLocation());
 
             return true;
         }, this::forceCancel, 1));
@@ -88,28 +85,6 @@ public final class NeaceA2 extends ChargeableSkill {
         combatUser.getActionManager().getWeapon().setGlowing(false);
 
         NeaceA2Info.Effects.OFF.play(combatUser.getLocation());
-    }
-
-    /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playUseTickEffect(long i) {
-        Location loc = combatUser.getLocation();
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(1.3);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        long angle = i * 14;
-        for (int j = 0; j < 4; j++) {
-            angle += 360 / 4;
-            double up = (i * 4 + j) * 0.05;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-
-            NeaceA2Info.Effects.USE_TICK.apply(i).play(loc.clone().add(vec).add(0, up, 0));
-        }
     }
 
     /**

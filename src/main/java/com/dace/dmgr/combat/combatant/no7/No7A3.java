@@ -8,13 +8,10 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class No7A3 extends ActiveSkill {
@@ -61,8 +58,7 @@ public final class No7A3 extends ActiveSkill {
             if (size > 0)
                 combatUser.addScore("보호막 획득", (double) (No7A3Info.SHIELD_SCORE * size) / durationTicks);
 
-            No7A3Info.Effects.TICK_SOUND.play(loc);
-            playTickEffect(i);
+            No7A3Info.Effects.playTick(i, combatUser.getLocation());
         }, 1, durationTicks));
     }
 
@@ -74,32 +70,6 @@ public final class No7A3 extends ActiveSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playTickEffect(long i) {
-        Location loc = combatUser.getLocation().add(0, 1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(3 - i * 0.12);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        long angle = i * 4;
-        for (int j = 0; j < 6; j++) {
-            angle += 360 / 6;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-            Location loc2 = loc.clone().add(vec);
-
-            No7A3Info.Effects.TICK_PARTICLE_1.play(loc2);
-            for (int k = 0; k < 2; k++) {
-                Location loc3 = loc2.clone().add(0, -0.5 + k, 0);
-                No7A3Info.Effects.TICK_PARTICLE_2.apply(LocationUtil.getDirection(loc3, loc)).play(loc3);
-            }
-        }
     }
 
     private final class No7A3Area extends Area<Damageable> {

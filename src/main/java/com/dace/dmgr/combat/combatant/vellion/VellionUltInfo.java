@@ -9,12 +9,13 @@ import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.util.Vector;
 
 public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
     /** 궁극기 필요 충전량 */
@@ -119,5 +120,103 @@ public final class VellionUltInfo extends UltimateSkillInfo<VellionUlt> {
         /** 엔티티 타격 - 2 */
         public static final ParticleEffect HIT_ENTITY_2 =
                 ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(3).horizontalSpread(0.05).verticalSpread(0.05).build();
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            location = location.clone().add(0, 0.1, 0);
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int j = 0; j < 2; j++) {
+                long index = i * 2 + j;
+                long index1 = Math.min(index, 14);
+                double angle = index * 6.0;
+                double up = 0;
+                double distance = index1 * 0.15;
+
+                if (index1 == 14)
+                    up += (index - index1) * 0.15;
+
+                for (int k = 0; k < 6; k++) {
+                    angle += 360 / 3.0;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
+                    Location loc = location.clone().add(vec).add(0, up, 0);
+
+                    USE_TICK.play(loc);
+                }
+            }
+        }
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 사용 위치
+         * @param target   대상 위치
+         */
+        public static void playTick(long i, @NonNull Location location, @NonNull Location target) {
+            target = target.clone().add(0, 1, 0);
+
+            TICK_1.play(target);
+            if (i < 8)
+                TICK_2.play(target);
+
+            location = location.clone().add(0, 0.1, 0);
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (long j = (i >= 5 ? i - 5 : 0); j < i; j++) {
+                double angle = j * (j > 30 ? -3.0 : 5.0);
+                double distance = j * 0.16;
+
+                for (int k = 0; k < 12; k++) {
+                    angle += 360 / 6.0;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(distance);
+                    Location loc = location.clone().add(vec);
+
+                    if (j > 0 && j % 10 == 0)
+                        TICK_3.play(loc.clone().add(0, 2.5, 0));
+                    else if (i > 20)
+                        TICK_5.play(loc);
+                    else
+                        TICK_4.apply(j).play(loc);
+                }
+            }
+
+            double angle = i * 4.0;
+            for (int j = 0; j < 8; j++) {
+                angle += 360 / 4.0;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
+                Location loc1 = location.clone().add(vec);
+                Location loc2 = loc1.clone().add(0, 2, 0);
+
+                TICK_6.play(loc1);
+                TICK_7.play(loc2);
+            }
+        }
+
+        /**
+         * 엔티티 타격 효과를 재생한다.
+         *
+         * @param hit   피격 위치
+         * @param start 시작 위치
+         * @param end   끝 위치
+         */
+        public static void playHitEntity(@NonNull Location hit, @NonNull Location start, @NonNull Location end) {
+            HIT_ENTITY_1.play(hit);
+            for (Location loc : LocationUtil.getLine(start.clone().add(0, 1, 0), end, 0.4))
+                HIT_ENTITY_2.play(loc);
+        }
     }
 }

@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -80,7 +79,8 @@ public final class VellionP1 extends AbstractSkill {
                 return false;
 
             combatUser.getEntity().setFallDistance(0);
-            playTickEffect();
+
+            VellionP1Info.Effects.playTick(combatUser.getLocation());
 
             return true;
         }, isCancelled -> cancel(), 1, VellionP1Info.DURATION.toTicks()));
@@ -112,23 +112,5 @@ public final class VellionP1 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     */
-    private void playTickEffect() {
-        Location loc = combatUser.getLocation();
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(0.8);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int i = 0; i < 8; i++) {
-            int angle = 360 / 8 * i;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-
-            VellionP1Info.Effects.TICK.play(loc.clone().add(vec));
-        }
     }
 }

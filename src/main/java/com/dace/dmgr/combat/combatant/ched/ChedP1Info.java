@@ -9,10 +9,14 @@ import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
     /** 벽타기 이동 강도 */
@@ -67,5 +71,27 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
         public static final PlayableEffect HANG_OFF = PlayableEffect.list(
                 SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
                 SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build());
+
+        /**
+         * 매달리기 - 틱 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playHangTick(@NonNull Location location) {
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location).multiply(0.65);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int i = 0; i < 7; i++) {
+                double angle = 360 / 7.0 * i;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc = location.clone().add(vec);
+
+                HANG_TICK.play(loc);
+            }
+        }
     }
 }

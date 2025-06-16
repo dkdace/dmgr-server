@@ -16,15 +16,11 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class VellionUlt extends UltimateSkill implements HasBonusScore {
@@ -74,9 +70,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
         VellionUltInfo.Effects.USE.play(combatUser.getLocation());
 
-        EffectManager effectManager = new EffectManager();
-
-        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () ->
+        addActionTask(new IntervalTask(i -> VellionUltInfo.Effects.playUseTick(i, combatUser.getLocation()), () ->
                 addActionTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), this::onReady, 1)),
                 1, VellionUltInfo.READY_DURATION.toTicks()));
     }
@@ -117,10 +111,11 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         VellionUltInfo.Effects.USE_READY.play(combatUser.getLocation());
 
         addActionTask(new IntervalTask(i -> {
+            Location loc = combatUser.getEntity().getEyeLocation();
             if (i % 4 == 0)
-                new VellionUltArea().emit(combatUser.getEntity().getEyeLocation());
+                new VellionUltArea().emit(loc);
 
-            playTickEffect(i);
+            VellionUltInfo.Effects.playTick(i, combatUser.getLocation(), loc);
         }, () -> {
             forceCancel();
 
@@ -129,93 +124,6 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
             VellionUltInfo.Effects.EXPLODE.play(loc.add(0, 1, 0));
         }, 1, VellionUltInfo.DURATION.toTicks()));
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playTickEffect(long i) {
-        VellionUltInfo.Effects.TICK_1.play(combatUser.getEntity().getEyeLocation().add(0, 1, 0));
-        if (i < 8)
-            VellionUltInfo.Effects.TICK_2.play(combatUser.getEntity().getEyeLocation().add(0, 1, 0));
-
-        Location loc = combatUser.getLocation().add(0, 0.1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-
-        Vector vector = VectorUtil.getRollAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (long j = (i >= 5 ? i - 5 : 0); j < i; j++) {
-            long angle = j * (j > 30 ? -3 : 5);
-            double distance = j * 0.16;
-
-            for (int k = 0; k < 12; k++) {
-                angle += 360 / 6;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(distance);
-                Location loc2 = loc.clone().add(vec);
-
-                if (j > 0 && j % 10 == 0)
-                    VellionUltInfo.Effects.TICK_3.play(loc2.clone().add(0, 2.5, 0));
-                else if (i > 20)
-                    VellionUltInfo.Effects.TICK_5.play(loc2);
-                else
-                    VellionUltInfo.Effects.TICK_4.apply(j).play(loc2);
-            }
-        }
-
-        long angle = i * 4;
-        for (int j = 0; j < 8; j++) {
-            angle += 360 / 4;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 4 ? angle : -angle).multiply(8);
-            Location loc2 = loc.clone().add(vec);
-
-            VellionUltInfo.Effects.TICK_6.play(loc2);
-            VellionUltInfo.Effects.TICK_7.play(loc2.clone().add(0, 2, 0));
-        }
-    }
-
-    /**
-     * 효과를 재생하는 클래스.
-     */
-    @NoArgsConstructor
-    private final class EffectManager {
-        private int index = 0;
-        private int angle = 0;
-        private double distance = 0;
-        private double up = 0;
-
-        /**
-         * 효과를 재생한다.
-         */
-        private void playEffect() {
-            Location loc = combatUser.getLocation().add(0, 0.1, 0);
-            loc.setYaw(0);
-            loc.setPitch(0);
-            Vector vector = VectorUtil.getRollAxis(loc);
-            Vector axis = VectorUtil.getYawAxis(loc);
-
-            for (int j = 0; j < 2; j++) {
-                angle += 6;
-
-                if (index > 7)
-                    up += 0.15;
-                else
-                    distance += 0.15;
-
-                for (int k = 0; k < 6; k++) {
-                    angle += 360 / 3;
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 3 ? angle : -angle).multiply(distance);
-                    Location loc2 = loc.clone().add(vec).add(0, up, 0);
-
-                    VellionUltInfo.Effects.USE_TICK.play(loc2);
-                }
-            }
-
-            index++;
-        }
     }
 
     private final class VellionUltArea extends Area<Damageable> {
@@ -264,11 +172,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 }
             }
 
-            VellionUltInfo.Effects.HIT_ENTITY_1.play(location);
-
-            Location loc = combatUser.getEntity().getEyeLocation().add(0, 1, 0);
-            for (Location loc2 : LocationUtil.getLine(loc, target.getCenterLocation(), 0.4))
-                VellionUltInfo.Effects.HIT_ENTITY_2.play(loc2);
+            VellionUltInfo.Effects.playHitEntity(location, combatUser.getEntity().getEyeLocation(), target.getCenterLocation());
 
             return true;
         }

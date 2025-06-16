@@ -21,6 +21,8 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.LongConsumer;
+
 public final class MetarA1 extends ActiveSkill {
     /** 발사 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
@@ -49,21 +51,7 @@ public final class MetarA1 extends ActiveSkill {
 
         MetarA1Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(i -> {
-            for (int j = 0; j < 2; j++) {
-                for (int k = 0; k < Math.min(6, i); k++) {
-                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().add(0, -0.3 + k * 0.15, 0),
-                            -0.5 + j, 0, -0.5);
-                    MetarA1Info.Effects.USE_TICK_1.play(loc);
-                }
-
-                if (i > 5) {
-                    Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().add(0, 0.6, 0),
-                            -0.5 + j, 0, -0.25);
-                    MetarA1Info.Effects.USE_TICK_2.play(loc);
-                }
-            }
-        }, 1));
+        addActionTask(new IntervalTask((LongConsumer) i -> MetarA1Info.Effects.playUseTick(i, combatUser.getEntity().getEyeLocation()), 1));
 
         double[] offsetYs = {-0.2, -0.2, 0.1, 0.1, 0.4, 0.4};
 
@@ -115,7 +103,7 @@ public final class MetarA1 extends ActiveSkill {
                 else
                     target = null;
 
-                MetarA1Info.Effects.BULLET_TRAIL.apply(getVelocity().normalize()).play(location);
+                MetarA1Info.Effects.BULLET_TRAIL.apply(getVelocity()).play(location);
             });
         }
 

@@ -9,10 +9,14 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -62,14 +66,18 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
      */
     @UtilityClass
     public static final class Effects {
-        /** 틱 효과음 */
-        public static final PlayableEffect TICK_SOUND = PlayableEffect.list(
+        /** 틱 효과 - 1 */
+        public static final PlayableEffect TICK_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_ENDERDRAGON_FLAP).volume(2).pitch(0.5).build(),
                 SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(1.5).build());
-        /** 틱 입자 효과 */
-        public static final PlayableEffect.Function<Vector> TICK_PARTICLE = velocity -> PlayableEffect.list(
-                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(RandomUtils.nextDouble(0.2, 0.35))),
-                ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(RandomUtils.nextDouble(0.1, 0.25))));
+        /** 틱 효과 - 2 */
+        public static final PlayableEffect.Function<Vector> TICK_2 = velocity -> {
+            velocity = VectorUtil.getSpreadedVector(velocity, 60);
+
+            return PlayableEffect.list(
+                    ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(RandomUtils.nextDouble(0.2, 0.35))),
+                    ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(RandomUtils.nextDouble(0.1, 0.25))));
+        };
         /** 엔티티 타격 */
         public static final PlayableEffect HIT_ENTITY = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK).volume(2).pitch(0.8).build(),
@@ -77,5 +85,20 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
                 SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.7).build(),
 
                 ParticleEffect.Normal.builder(Particle.CRIT).count(40).speed(0.4).build());
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playTick(@NonNull Location location) {
+            TICK_1.play(location);
+
+            location = LocationUtil.getLocationFromOffset(location.clone().add(0, 1.2, 0), 0, 0, 0.5);
+            Vector vector = location.getDirection().multiply(-1);
+
+            for (int i = 0; i < 12; i++)
+                TICK_2.apply(vector).play(location);
+        }
     }
 }

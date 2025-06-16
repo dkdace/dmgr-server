@@ -8,11 +8,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 public final class SiliaWeapon extends AbstractWeapon {
     /** 검기 방향의 반대 방향 여부 */
@@ -72,16 +70,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(10, location -> {
-                for (int i = 0; i < 8; i++) {
-                    Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
-                    Vector axis = VectorUtil.getPitchAxis(location);
-
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 20 * (i - 3.5)).multiply(0.8);
-                    vec = VectorUtil.getRotatedVector(vec, VectorUtil.getRollAxis(location), isOpposite ? -30 : 30);
-                    SiliaWeaponInfo.Effects.BULLET_TRAIL.play(location.clone().add(vec));
-                }
-            });
+            return createPeriodIntervalHandler(10, location -> SiliaWeaponInfo.Effects.playBulletTrail(location, isOpposite));
         }
 
         @Override

@@ -9,12 +9,13 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.util.Vector;
 
 public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     /** 쿨타임 */
@@ -96,5 +97,33 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
                 SoundEffect.builder(Sound.ENTITY_ZOMBIE_INFECT).volume(1).pitch(0.7).pitchVariance(0.05).build(),
 
                 ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(30).speed(0.4).build());
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            location = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (int j = 0; j < i; j++) {
+                double angle = j * 8.0;
+
+                for (int k = 0; k < 12; k++) {
+                    angle += 360 / 6.0;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(0.8 + j * 0.25);
+                    Location loc = location.clone().add(vec);
+
+                    if (i == 9)
+                        USE_TICK_2.play(loc);
+                    else
+                        USE_TICK_1.apply(i).play(loc);
+                }
+            }
+        }
     }
 }

@@ -12,8 +12,10 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -80,12 +82,23 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
         public static final PlayableEffect.Function<CombatEntity> HIT_ENTITY_PARTICLE = combatEntity ->
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(20)
                         .horizontalSpread(combatEntity.getWidth() * 0.5).verticalSpread(combatEntity.getHeight() * 0.5).build();
-        /** 기절 - 틱 효과음 */
-        public static final PlayableEffect STUN_TICK_SOUND = PlayableEffect.list(
+        /** 기절 - 틱 효과 - 1 */
+        public static final PlayableEffect STUN_TICK_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.6).build(),
                 SoundEffect.builder(Sound.ENTITY_FIREWORK_BLAST).volume(2).pitch(1.8).build());
-        /** 기절 - 틱 입자 효과 */
-        public static final ParticleEffect STUN_TICK_PARTICLE =
+        /** 기절 - 틱 효과 - 2 */
+        public static final ParticleEffect STUN_TICK_2 =
                 ParticleEffect.Normal.builder(Particle.CRIT).count(20).speed(0.6).build();
+
+        /**
+         * 기절 - 틱 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param center   중심 위치
+         */
+        public static void playStunTick(@NonNull Location location, @NonNull Location center) {
+            STUN_TICK_1.play(location);
+            STUN_TICK_2.play(center);
+        }
     }
 }

@@ -10,9 +10,12 @@ import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -82,5 +85,21 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
                         .build(),
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, Color.fromRGB(255, 50, 24)).count(2)
                         .horizontalSpread(1).verticalSpread(1.5).build());
+
+        /**
+         * 사용 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param start    시작 위치
+         * @param end      끝 위치
+         */
+        public static void playUse(@NonNull Location location, @NonNull Location start, @NonNull Location end) {
+            USE_1.play(location);
+            USE_2.play(end);
+            USE_FIREWORK.play(end);
+
+            for (Location loc : LocationUtil.getLine(start, end, 0.4))
+                USE_3.play(loc);
+        }
     }
 }

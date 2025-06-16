@@ -8,12 +8,9 @@ import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class InfernoUlt extends UltimateSkill {
@@ -59,12 +56,11 @@ public final class InfernoUlt extends UltimateSkill {
             if (shield != null && shield.getHealth() == 0)
                 return false;
 
-            playTickEffect(i);
             Location loc = combatUser.getLocation();
+
+            InfernoUltInfo.Effects.playTick(i, loc);
             if (i < 24)
-                InfernoUltInfo.Effects.USE_TICK_SOUND.apply(i).play(loc);
-            if (i % 12 == 0)
-                InfernoUltInfo.Effects.TICK_SOUND.play(loc);
+                InfernoUltInfo.Effects.playUseTick(i, loc);
 
             return true;
         }, isCancelled -> {
@@ -96,72 +92,5 @@ public final class InfernoUlt extends UltimateSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playTickEffect(long i) {
-        if (i < 24)
-            playUseTickEffect(i);
-
-        Location loc = combatUser.getLocation().add(0, 1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(2);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 2; j++) {
-            long index = i * 2 + j;
-            long angle = index * 7;
-            double up = index * 0.04 % 1 - 0.5;
-
-            for (int k = 0; k < 4; k++) {
-                angle += 360 / 4;
-                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
-
-                Location loc2 = loc.clone().add(vec1);
-                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
-
-                InfernoUltInfo.Effects.TICK_PARTICLE_1.play(loc2);
-                InfernoUltInfo.Effects.TICK_PARTICLE_2.apply(dir).play(loc2.clone().add(0, up, 0));
-            }
-        }
-    }
-
-    /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playUseTickEffect(long i) {
-        Location loc = combatUser.getLocation().add(0, 1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-
-        InfernoUltInfo.Effects.USE_TICK_PARTICLE_1.play(loc);
-
-        Vector vector = VectorUtil.getRollAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 3; j++) {
-            long index = i * 3 + j;
-            long yaw = index * 6;
-            long pitch = index * 5;
-
-            for (int k = 0; k < 5; k++) {
-                yaw += 360 / 5;
-                Vector vec1 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
-                Vector vec2 = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw + 10.0), pitch + 10.0);
-
-                Location loc2 = loc.clone().add(vec1.clone().multiply(2.5));
-                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
-
-                InfernoUltInfo.Effects.USE_TICK_PARTICLE_2.apply(dir).play(loc2);
-            }
-        }
     }
 }

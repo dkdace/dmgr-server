@@ -15,15 +15,12 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
     /** 수정자 */
@@ -134,11 +131,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
         VellionA3Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(i -> {
-            VellionA3Info.Effects.USE_TICK_1.play(location);
-            for (Location loc2 : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), location, 0.7))
-                VellionA3Info.Effects.USE_TICK_2.play(loc2);
-        }, () -> {
+        addActionTask(new IntervalTask(i -> VellionA3Info.Effects.playUseTick(combatUser.getArmLocation(MainHand.RIGHT), location), () -> {
             cancel();
 
             Location loc = location.clone().add(0, 0.1, 0);
@@ -149,53 +142,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 if (i % 4 == 0)
                     new VellionA3Area().emit(loc);
 
-                playTickEffect(loc, i);
+                VellionA3Info.Effects.playTick(i, loc);
             }, 1, VellionA3Info.DURATION.toTicks()));
         }, 1, VellionA3Info.READY_DURATION.toTicks()));
-    }
-
-    /**
-     * 범위 표시 효과를 재생한다.
-     *
-     * @param location 사용 위치
-     * @param i        인덱스
-     */
-    private void playTickEffect(@NonNull Location location, long i) {
-        Location loc = location.clone();
-        loc.setYaw(0);
-        loc.setPitch(0);
-
-        VellionA3Info.Effects.TICK_1.play(loc);
-
-        Vector vector = VectorUtil.getRollAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 2; j++) {
-            long index = i * 2 + j;
-            long angle = index * 3;
-            double distance = index * 0.2 % 5;
-
-            for (int k = 0; k < 12; k++) {
-                angle += distance > 3 ? 360 / 4 : 360 / 6;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
-                Location loc2 = loc.clone().add(vec.clone().multiply(distance));
-
-                VellionA3Info.Effects.TICK_2.apply(vec.setY(0.4)).play(loc2);
-            }
-
-            long angle2 = index * 44;
-            double distance2 = index * 0.1 % 2.5;
-
-            for (int k = 0; k < 3; k++) {
-                angle2 += 360 / 3;
-                Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle2);
-                Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
-                Vector dir = LocationUtil.getDirection(loc.clone().add(vec1), loc.clone().add(vec2));
-
-                VellionA3Info.Effects.TICK_3.apply(dir.setY(distance2 * 0.1))
-                        .play(loc.clone().add(vec1.clone().multiply(5)).add(0, distance2 * 0.5, 0));
-            }
-        }
     }
 
     private final class VellionA3Area extends Area<Damageable> {

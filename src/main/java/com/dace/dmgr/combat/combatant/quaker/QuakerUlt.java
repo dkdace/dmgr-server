@@ -111,8 +111,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
             }
         }
 
-        QuakerUltInfo.Effects.USE_READY_SOUND.play(loc);
-        QuakerUltInfo.Effects.USE_READY_PARTICLE.play(LocationUtil.getLocationFromOffset(loc, 0, 0, 1.5));
+        QuakerUltInfo.Effects.playUseReady(loc);
         QuakerUltInfo.SHAKE.send(combatUser);
     }
 
@@ -134,10 +133,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(15, location -> {
-                Vector vec = VectorUtil.getSpreadedVector(getVelocity().normalize(), 20);
-                QuakerUltInfo.Effects.BULLET_TRAIL.apply(vec).play(location);
-            });
+            return createPeriodIntervalHandler(15, location -> QuakerUltInfo.Effects.BULLET_TRAIL.apply(getVelocity()).play(location));
         }
 
         @Override

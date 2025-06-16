@@ -21,7 +21,6 @@ import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
@@ -31,7 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -178,49 +176,21 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
 
         private void onTick(long i) {
             JagerUltInfo.Effects.DISPLAY.play(getLocation());
+
             if (!readyTimeModule.isReady())
                 return;
 
             double minRadius = JagerUltInfo.MIN_RADIUS;
             double maxRadius = JagerUltInfo.MAX_RADIUS;
             double range = Math.min(minRadius + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION.toTicks()) * (maxRadius - minRadius), maxRadius);
-            playTickEffect(i, range);
+
+            JagerUltInfo.Effects.playTick(i, getLocation(), range);
 
             if (i % 4 == 0)
                 new JagerUltArea(range).emit(getLocation());
 
             if (i >= JagerUltInfo.DURATION.toTicks())
                 remove();
-        }
-
-        /**
-         * 발생기 표시 효과를 재생한다.
-         *
-         * @param i     인덱스
-         * @param range 현재 범위 (단위: 블록)
-         */
-        private void playTickEffect(long i, double range) {
-            Location loc = getLocation();
-            if (i <= JagerUltInfo.DURATION.toTicks() - 100 && i % 30 == 0)
-                JagerUltInfo.Effects.TICK_SOUND.play(loc);
-
-            loc.setYaw(0);
-            loc.setPitch(0);
-            Vector vector = VectorUtil.getRollAxis(loc);
-            Vector axis = VectorUtil.getYawAxis(loc);
-
-            long angle = i * 14;
-            for (int j = 1; j <= 6; j++) {
-                angle += 19;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-                Location loc1 = loc.clone().add(vec.clone().multiply(range / 6 * j));
-                Location loc2 = loc.clone().subtract(vec.clone().multiply(range / 6 * j));
-
-                JagerUltInfo.Effects.TICK_PARTICLE_1.apply(j, vec.setY(-0.6)).play(loc1);
-                JagerUltInfo.Effects.TICK_PARTICLE_1.apply(j, vec.multiply(-1).setY(-0.6)).play(loc2);
-                JagerUltInfo.Effects.TICK_PARTICLE_2.play(loc1.subtract(0, 2.5, 0));
-                JagerUltInfo.Effects.TICK_PARTICLE_2.play(loc2.subtract(0, 2.5, 0));
-            }
         }
 
         @Override

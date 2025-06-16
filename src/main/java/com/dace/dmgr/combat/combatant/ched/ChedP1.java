@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -178,28 +177,10 @@ public final class ChedP1 extends AbstractSkill {
 
             combatUser.getMoveModule().push(new Vector(), true);
 
-            playHangTickEffect();
+            ChedP1Info.Effects.playHangTick(combatUser.getLocation());
 
             return true;
         }, 1));
-    }
-
-    /**
-     * 매달리기 사용 중 효과를 재생한다.
-     */
-    private void playHangTickEffect() {
-        Location loc = combatUser.getLocation();
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(0.65);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int i = 0; i < 7; i++) {
-            int angle = 360 / 7 * i;
-            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-
-            ChedP1Info.Effects.HANG_TICK.play(loc.clone().add(vec));
-        }
     }
 
     /**

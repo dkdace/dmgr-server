@@ -19,7 +19,6 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -28,7 +27,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>, HasBonusScore {
@@ -102,10 +100,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
             if (!target.canBeTargeted() || isInvalid(target))
                 return false;
 
-            for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation(), 0.7))
-                VellionA2Info.Effects.USE_TICK_1.apply(i).play(loc);
-
-            playUseTickEffect(target, i);
+            VellionA2Info.Effects.playUseTick(i, combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation());
 
             return true;
         }, isCancelled -> {
@@ -182,35 +177,6 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     }
 
     /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param target 사용 대상
-     * @param i      인덱스
-     */
-    private void playUseTickEffect(@NonNull Damageable target, long i) {
-        Location location = combatUser.getArmLocation(MainHand.RIGHT);
-        Location loc = LocationUtil.getLocationFromOffset(location, LocationUtil.getDirection(location, target.getCenterLocation()),
-                0, 0, 1.5);
-        Vector vector = VectorUtil.getYawAxis(loc);
-        Vector axis = VectorUtil.getRollAxis(loc);
-
-        for (long j = (i >= 6 ? i - 6 : 0); j < i; j++) {
-            long angle = j * (j > 5 ? 4 : 12);
-
-            for (int k = 0; k < 8; k++) {
-                angle += 360 / 4;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(j * 0.2);
-                Location loc2 = loc.clone().add(vec);
-
-                if (i != 15)
-                    VellionA2Info.Effects.USE_TICK_1.apply(i).play(loc2);
-                else
-                    VellionA2Info.Effects.USE_TICK_2.play(loc2);
-            }
-        }
-    }
-
-    /**
      * 저주 효과를 유지할 수 없는지 확인한다.
      *
      * @param target 사용 대상
@@ -275,9 +241,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
                 VellionA2Info.Effects.TRIGGER.play(effectLoc);
             }
 
-            VellionA2Info.Effects.MARK_HIT_ENTITY_1.play(location);
-            for (Location loc : LocationUtil.getLine(effectLoc, location, 0.4))
-                VellionA2Info.Effects.MARK_HIT_ENTITY_2.play(loc);
+            VellionA2Info.Effects.playMarkHitEntity(effectLoc, location);
 
             return !(target instanceof Barrier);
         }

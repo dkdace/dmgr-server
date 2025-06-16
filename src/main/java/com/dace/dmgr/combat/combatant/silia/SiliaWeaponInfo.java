@@ -10,12 +10,16 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.util.Vector;
 
 public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
     /** 피해량 */
@@ -85,5 +89,24 @@ public final class SiliaWeaponInfo extends WeaponInfo<SiliaWeapon> {
                 SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_WEAK).volume(1).pitch(0.9).pitchVariance(0.05).build(),
                 CombatEffectUtil.HIT_BLOCK_SOUND.apply(block, 1.0),
                 CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 1.5));
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param location   위치
+         * @param isOpposite 검기 방향의 반대 방향 여부
+         */
+        public static void playBulletTrail(@NonNull Location location, boolean isOpposite) {
+            Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
+            Vector axis = VectorUtil.getPitchAxis(location);
+
+            for (int i = 0; i < 8; i++) {
+                Vector vec = VectorUtil.getRotatedVector(VectorUtil.getRotatedVector(vector, axis, 90 + 20 * (i - 3.5)).multiply(0.8),
+                        VectorUtil.getRollAxis(location), isOpposite ? -30 : 30);
+                Location loc = location.clone().add(vec);
+
+                BULLET_TRAIL.play(loc);
+            }
+        }
     }
 }

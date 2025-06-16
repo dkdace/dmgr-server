@@ -11,9 +11,12 @@ import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -80,7 +83,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
                 SoundEffect.builder(Sound.ENTITY_FIREWORK_LAUNCH).volume(3).pitch(0.8).build());
         /** 총알 궤적 */
         public static final PlayableEffect.Function<Vector> BULLET_TRAIL = velocity -> PlayableEffect.list(
-                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(-0.2)),
+                ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.normalize().multiply(-0.2)),
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(40, 160, 200)).build());
         /** 블록 타격 */
         public static final PlayableEffect.Function<Block> HIT_BLOCK = block ->
@@ -92,5 +95,27 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
                 SoundEffect.builder("random.gun_reverb2").volume(6).pitch(1.2).build(),
 
                 ParticleEffect.Normal.builder(Particle.EXPLOSION_NORMAL).count(25).speed(0.25).build());
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < Math.min(6, i); k++) {
+                    Location loc = LocationUtil.getLocationFromOffset(location.clone().add(0, -0.3 + k * 0.15, 0),
+                            -0.5 + j, 0, -0.5);
+                    USE_TICK_1.play(loc);
+                }
+
+                if (i > 5) {
+                    Location loc = LocationUtil.getLocationFromOffset(location.clone().add(0, 0.6, 0),
+                            -0.5 + j, 0, -0.25);
+                    USE_TICK_2.play(loc);
+                }
+            }
+        }
     }
 }

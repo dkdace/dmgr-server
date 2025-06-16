@@ -10,8 +10,12 @@ import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -130,5 +134,87 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
         public static final PlayableEffect FIRE_FLOOR_TICK_PARTICLE = PlayableEffect.list(
                 ParticleEffect.Normal.builder(Particle.FLAME).count(20).horizontalSpread(4).build(),
                 ParticleEffect.Normal.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(4).build());
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            location = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
+
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (int j = 0; j < 2; j++) {
+                long index = i * 2 + j;
+                long index1 = Math.min(index, 20);
+                long index2 = Math.min(index, 60);
+                double angle = index1 * 3.0;
+                double distance = 0.6 + index2 * 0.035;
+                double forward = 0;
+
+                if (index1 == 20) {
+                    long subIndex = index - index1;
+                    angle -= subIndex * 3;
+                }
+
+                if (index2 == 60) {
+                    long subIndex = index - index2;
+                    forward = subIndex * 0.2;
+                    distance -= subIndex * 0.01;
+                }
+
+                int angles = (index > 30 ? 4 : 6);
+                for (int k = 0; k < angles * 2; k++) {
+                    angle += 360.0 / angles;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < angles ? angle : -angle);
+                    Location loc = location.clone()
+                            .add(vec.clone().multiply(distance))
+                            .add(location.getDirection().multiply(forward));
+
+                    if (index2 == 60)
+                        USE_TICK_2.apply(vec).play(loc);
+                    else
+                        USE_TICK_1.apply(index, vec).play(loc);
+                }
+            }
+        }
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param location 위치
+         * @param velocity 총알 속력
+         */
+        public static void playBulletTrail(@NonNull Location location, @NonNull Vector velocity) {
+            location.setPitch(0);
+
+            BULLET_TRAIL_1.play(location);
+
+            BULLET_TRAIL_2.apply(0.2, 0.12).play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6));
+            BULLET_TRAIL_2.apply(0.16, 0.08).play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2));
+            BULLET_TRAIL_2.apply(0.12, 0.04).play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8));
+
+            BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8));
+            BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1));
+            BULLET_TRAIL_2.apply(0.18, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4));
+            BULLET_TRAIL_2.apply(0.24, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6));
+
+            BULLET_TRAIL_3.play(LocationUtil.getLocationFromOffset(location, -2.8, 1.7, 0));
+            BULLET_TRAIL_3.play(LocationUtil.getLocationFromOffset(location, 2.8, 1.7, 0));
+
+            for (int i = 0; i < 6; i++) {
+                Location loc1 = LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
+                Location loc2 = LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
+                Vector vec = VectorUtil.getSpreadedVector(velocity.normalize(), 20);
+
+                BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04).play(loc1);
+                BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04).play(loc2);
+                BULLET_TRAIL_4.apply(vec).play(loc1);
+                BULLET_TRAIL_4.apply(vec).play(loc2);
+            }
+        }
     }
 }

@@ -18,7 +18,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
@@ -74,7 +73,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
         VellionA1Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(this::playUseTickEffect, () -> {
+        addActionTask(new IntervalTask(i -> VellionA1Info.Effects.playUseTick(i, combatUser.getArmLocation(MainHand.RIGHT)), () -> {
             cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
@@ -96,32 +95,6 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         entityModule.removeEntity();
 
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playUseTickEffect(long i) {
-        Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-        Vector vector = VectorUtil.getYawAxis(loc);
-        Vector axis = VectorUtil.getRollAxis(loc);
-
-        for (int j = 0; j < i; j++) {
-            int angle = j * 8;
-
-            for (int k = 0; k < 12; k++) {
-                angle += 360 / 6;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle).multiply(0.8 + j * 0.25);
-                Location loc2 = loc.clone().add(vec);
-
-                if (i == 9)
-                    VellionA1Info.Effects.USE_TICK_2.play(loc2);
-                else
-                    VellionA1Info.Effects.USE_TICK_1.apply(i).play(loc2);
-            }
-        }
     }
 
     /**

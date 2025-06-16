@@ -10,13 +10,9 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 @Getter
 public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
@@ -52,8 +48,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
         target.getStatusEffectModule().apply(valueEffect, NeaceA1Info.DURATION);
 
-        NeaceA1Info.Effects.USE_SOUND.play(combatUser.getLocation());
-        playUseEffect(target);
+        NeaceA1Info.Effects.playUse(combatUser.getLocation(), combatUser.getArmLocation(MainHand.RIGHT), target.getCenterLocation());
     }
 
     @Override
@@ -66,38 +61,6 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     public EntityCondition<Healable> getEntityCondition() {
         return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueEffect.class));
-    }
-
-    /**
-     * 사용 시 효과를 재생한다.
-     *
-     * @param target 사용 대상
-     */
-    private void playUseEffect(@NonNull Healable target) {
-        Location location = combatUser.getArmLocation(MainHand.RIGHT);
-        for (Location loc : LocationUtil.getLine(location, target.getCenterLocation(), 0.4))
-            NeaceA1Info.Effects.USE_PARTICLE_1.play(loc);
-
-        Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, 1.5);
-        Vector vector = VectorUtil.getYawAxis(loc).multiply(0.8);
-        Vector axis = VectorUtil.getRollAxis(loc);
-
-        for (int i = 0; i < 8; i++) {
-            int angle = i * 10;
-
-            for (int j = 0; j < 10; j++) {
-                angle += 360 / 5;
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
-
-                NeaceA1Info.Effects.USE_PARTICLE_2.play(loc.clone().add(vec));
-            }
-        }
-        for (int i = 0; i < 7; i++) {
-            Location loc1 = LocationUtil.getLocationFromOffset(loc, -0.525 + i * 0.15, 0, 0);
-            Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, -0.525 + i * 0.15, 0);
-            NeaceA1Info.Effects.USE_PARTICLE_2.play(loc1);
-            NeaceA1Info.Effects.USE_PARTICLE_2.play(loc2);
-        }
     }
 
     /**

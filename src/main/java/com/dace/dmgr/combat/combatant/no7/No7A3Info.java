@@ -9,12 +9,12 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.util.Vector;
 
 public final class No7A3Info extends ActiveSkillInfo<No7A3> {
@@ -57,14 +57,47 @@ public final class No7A3Info extends ActiveSkillInfo<No7A3> {
         public static final PlayableEffect USE = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(1.5).pitch(1.4).build(),
                 SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(1.5).pitch(1.6).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK_SOUND =
+        /** 틱 효과 - 1 */
+        public static final SoundEffect TICK_1 =
                 SoundEffect.builder("random.charge").volume(0.6).pitch(1.2).build();
-        /** 틱 입자 효과 - 1 */
-        public static final ParticleEffect TICK_PARTICLE_1 =
+        /** 틱 효과 - 2 */
+        public static final ParticleEffect TICK_2 =
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(5).verticalSpread(0.7).build();
-        /** 틱 입자 효과 - 2 */
-        public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity ->
+        /** 틱 효과 - 3 */
+        public static final PlayableEffect.Function<Vector> TICK_3 = velocity ->
                 ParticleEffect.Directional.create(Particle.CRIT, velocity.clone().multiply(0.5));
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playTick(long i, @NonNull Location location) {
+            TICK_1.play(location);
+
+            location = location.clone().add(0, 1, 0);
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location).multiply(3 - i * 0.12);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            double angle = i * 4.0;
+            for (int j = 0; j < 6; j++) {
+                angle += 360 / 6.0;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc = location.clone().add(vec);
+
+                TICK_2.play(loc);
+
+                for (int k = 0; k < 2; k++) {
+                    Location loc2 = loc.clone().add(0, -0.5 + k, 0);
+                    Vector vec2 = LocationUtil.getDirection(loc2, location);
+
+                    TICK_3.apply(vec2).play(loc2);
+                }
+            }
+        }
     }
 }

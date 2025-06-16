@@ -10,9 +10,13 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.RandomUtils;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -76,16 +80,82 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
                         .horizontalSpread(0.3).verticalSpread(0.3).build());
         /** 타격 */
         public static final PlayableEffect.Function<Vector> HIT = velocity ->
-                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity.clone().multiply(RandomUtils.nextDouble(0.3, 0.4)));
-        /** 엔티티 타격 효과음 */
-        public static final PlayableEffect HIT_ENTITY_SOUND = PlayableEffect.list(
+                ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL,
+                        VectorUtil.getSpreadedVector(velocity, 60).multiply(RandomUtils.nextDouble(0.3, 0.4)));
+        /** 엔티티 타격 - 1 */
+        public static final PlayableEffect HIT_ENTITY_1 = PlayableEffect.list(
                 SoundEffect.builder("random.swing").volume(1).pitch(0.7).build(),
                 SoundEffect.builder("new.item.trident.riptide_2").volume(1).pitch(0.9).build());
-        /** 엔티티 타격 입자 효과 */
-        public static final ParticleEffect HIT_ENTITY_PARTICLE =
+        /** 엔티티 타격 - 2 */
+        public static final ParticleEffect HIT_ENTITY_2 =
                 ParticleEffect.Normal.builder(Particle.END_ROD).count(3).speed(0.05).build();
         /** 블록 타격 */
         public static final PlayableEffect.Function<Block> HIT_BLOCK = block ->
                 CombatEffectUtil.HIT_BLOCK_PARTICLE.apply(block, 3.0);
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            location = LocationUtil.getLocationFromOffset(location, 0, 0, 1);
+
+            Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            double angle = i * 23.0;
+            for (int j = 0; j < 6; j++) {
+                angle += 360 / 6.0;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle).multiply(1.6 - i * 0.2);
+                Location loc = location.clone().add(vec);
+
+                USE_TICK.apply(vec).play(loc);
+            }
+        }
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playBulletTrail(long i, @NonNull Location location) {
+            Vector vector = VectorUtil.getYawAxis(location).multiply(0.8);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            double angle = i * 12.0;
+            for (int j = 0; j < 2; j++) {
+                angle += 360 / 2.0;
+                Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
+                Location loc = location.clone().add(vec);
+
+                BULLET_TRAIL.apply(vec).play(loc);
+            }
+        }
+
+        /**
+         * 타격 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playHit(@NonNull Location location) {
+            for (int i = 0; i < 40; i++)
+                HIT.apply(new Vector(0, 1, 0)).play(location);
+        }
+
+        /**
+         * 엔티티 타격 효과를 재생한다.
+         *
+         * @param hit   피격 위치
+         * @param start 시작 위치
+         * @param end   끝 위치
+         */
+        public static void playHitEntity(@NonNull Location hit, @NonNull Location start, @NonNull Location end) {
+            HIT_ENTITY_1.play(hit);
+            for (Location loc : LocationUtil.getLine(start, end, 0.5))
+                HIT_ENTITY_2.play(loc.add(0, 1, 0));
+        }
     }
 }

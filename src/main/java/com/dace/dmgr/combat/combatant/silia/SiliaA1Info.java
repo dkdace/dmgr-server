@@ -9,8 +9,12 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
@@ -69,5 +73,43 @@ public final class SiliaA1Info extends ActiveSkillInfo<SiliaA1> {
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY =
                 ParticleEffect.Normal.builder(Particle.CRIT).count(40).speed(0.4).build();
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param location 위치
+         * @param prev     이전 위치
+         */
+        public static void playTick(@NonNull Location location, @NonNull Location prev) {
+            for (Location loc : LocationUtil.getLine(prev, location.clone().subtract(0, 0.5, 0), 0.3))
+                TICK.play(loc);
+        }
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param location 위치
+         * @param velocity 총알 속력
+         */
+        public static void playBulletTrail(@NonNull Location location, @NonNull Vector velocity) {
+            location = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
+
+            Vector vector = VectorUtil.getPitchAxis(location).multiply(1.5);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int i = 0; i < 12; i++) {
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 15 * (i - 5.5));
+
+                for (int j = 0; j < 3; j++) {
+                    Location loc = LocationUtil.getLocationFromOffset(location.clone().add(vec), 0, 0.3 - j * 0.3, 0);
+                    BULLET_TRAIL_1.play(loc);
+
+                    if ((i == 0 || i == 11) && j == 1) {
+                        Vector vec2 = VectorUtil.getSpreadedVector(velocity.clone().normalize(), 10);
+                        BULLET_TRAIL_2.apply(vec2).play(loc);
+                    }
+                }
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.*;
 
@@ -104,5 +105,19 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
 
                 ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(80)
                         .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build());
+
+        /**
+         * 표시 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playDisplay(@NonNull Location location) {
+            for (int i = 0; i < 7; i++) {
+                DISPLAY.play(location.clone().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
+                DISPLAY.play(location.clone().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
+            }
+            for (int i = 0; i < 5; i++)
+                DISPLAY.play(location.clone().add(0, 0, 0.4 - i * 0.2));
+        }
     }
 }

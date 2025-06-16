@@ -9,9 +9,12 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -96,5 +99,39 @@ public final class MetarA3Info extends ActiveSkillInfo<MetarA3> {
                 SoundEffect.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(1.2 + i * 0.04).build(),
 
                 ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(30).horizontalSpread(0.25).verticalSpread(0.25).build());
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playBulletTrail(long i, @NonNull Location location) {
+            BULLET_TRAIL_1.play(location);
+            if (i % 4 == 0)
+                BULLET_TRAIL_2.play(location);
+        }
+
+        /**
+         * 격발 시 틱 효과를 재생한다.
+         *
+         * @param i         인덱스
+         * @param location  위치
+         * @param locations 효과 재생 위치 목록
+         */
+        public static void playDetonateTick(long i, @NonNull Location location, @NonNull Location @NonNull [] locations) {
+            if (i == 0)
+                for (int j = 0; j < locations.length; j++) {
+                    Vector vec = VectorUtil.getRandomVector().normalize().multiply(RADIUS);
+                    locations[j] = location.clone().add(vec).setDirection(vec.normalize());
+                }
+
+            for (Location loc : locations) {
+                Vector vec = loc.getDirection().multiply(-0.35);
+                DETONATE_TICK_1.apply(i, vec).play(loc.add(vec));
+            }
+
+            DETONATE_TICK_2.apply(i).play(location);
+        }
     }
 }

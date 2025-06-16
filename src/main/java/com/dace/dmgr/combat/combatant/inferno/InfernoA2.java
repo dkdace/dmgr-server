@@ -15,13 +15,11 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
@@ -68,8 +66,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
             if (i % 4 == 0)
                 new InfernoA2Area().emit(combatUser.getEntity().getEyeLocation());
 
-            InfernoA2Info.Effects.TICK_SOUND.play(combatUser.getLocation());
-            playTickEffect(i);
+            InfernoA2Info.Effects.playTick(i, combatUser.getLocation());
         }, 1, InfernoA2Info.DURATION.toTicks()));
     }
 
@@ -86,37 +83,6 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     @Override
     public boolean isAssistMode() {
         return true;
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i 인덱스
-     */
-    private void playTickEffect(long i) {
-        Location loc = combatUser.getLocation().add(0, 1, 0);
-        loc.setYaw(0);
-        loc.setPitch(0);
-
-        InfernoA2Info.Effects.TICK_PARTICLE_1.play(loc);
-
-        Vector vector = VectorUtil.getRollAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 3; j++) {
-            long index = i * 3 + j;
-            long yaw = index * 5;
-            long pitch = index * 7;
-
-            for (int k = 0; k < 3; k++) {
-                yaw += 120;
-                pitch -= 120;
-                Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
-                Location loc2 = loc.clone().add(vec.clone().multiply(1.8));
-
-                InfernoA2Info.Effects.TICK_PARTICLE_2.apply(vec).play(loc2);
-            }
-        }
     }
 
     /**

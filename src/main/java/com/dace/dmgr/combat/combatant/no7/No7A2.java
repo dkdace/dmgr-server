@@ -11,15 +11,14 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.function.LongConsumer;
 
 @Getter
 public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2Entity> {
@@ -71,10 +70,8 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
         No7A2Info.Effects.ON.play(loc);
 
-        addActionTask(new IntervalTask(i -> {
-            No7A2Info.Effects.TICK_SOUND.play(combatUser.getLocation());
-            playTickEffect(i, loc.getYaw());
-        }, 1, No7A2Info.DURATION.toTicks()));
+        addActionTask(new IntervalTask((LongConsumer) i -> No7A2Info.Effects.playTick(i, combatUser.getLocation(), loc), 1,
+                No7A2Info.DURATION.toTicks()));
     }
 
     @Override
@@ -93,35 +90,6 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-    }
-
-    /**
-     * 사용 중 효과를 재생한다.
-     *
-     * @param i   인덱스
-     * @param yaw 원본 Yaw 값
-     */
-    private void playTickEffect(long i, float yaw) {
-        Location loc = combatUser.getLocation().add(0, 1, 0);
-        loc.setYaw(yaw);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getPitchAxis(loc);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int j = 0; j < 4; j++) {
-            long index = i * 3 + j;
-            long yaw2 = index * 7;
-            long pitch = -90;
-
-            for (int k = 0; k < 4; k++) {
-                yaw2 += 360 / 4;
-                pitch += 180 / 4;
-                Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, pitch), yaw2);
-                Location loc2 = loc.clone().add(vec.clone().multiply(2.5));
-
-                No7A2Info.Effects.TICK_PARTICLE.apply(vec).play(loc2);
-            }
-        }
     }
 
     /**

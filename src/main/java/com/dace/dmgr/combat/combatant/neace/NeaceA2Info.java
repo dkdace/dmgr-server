@@ -9,10 +9,14 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
     /** 쿨타임 */
@@ -75,5 +79,29 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
         /** 비활성화 */
         public static final SoundEffect OFF =
                 SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(1).pitch(1.8).build();
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location) {
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location).multiply(1.3);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            double angle = i * 14.0;
+            for (int j = 0; j < 4; j++) {
+                angle += 360 / 4.0;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc = location.clone().add(vec).add(0, (i * 4 + j) * 0.05, 0);
+
+                USE_TICK.apply(i).play(loc);
+            }
+        }
     }
 }

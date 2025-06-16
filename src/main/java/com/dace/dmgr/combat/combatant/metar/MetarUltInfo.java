@@ -9,11 +9,15 @@ import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
     /** 궁극기 필요 충전량 */
@@ -70,14 +74,14 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
                 SoundEffect.builder("random.explosion_reverb").volume(7).pitch(0.5).build(),
 
                 ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).count(10).horizontalSpread(0.6).verticalSpread(0.6).build());
-        /** 틱 효과음 */
-        public static final SoundEffect TICK_SOUND =
-                SoundEffect.builder("random.charge").volume(3).pitch(0.6).build();
-        /** 틱 입자 효과 */
-        public static final PlayableEffect TICK_PARTICLE = PlayableEffect.list(
+        /** 틱 효과 - 1 */
+        public static final PlayableEffect TICK_1 = PlayableEffect.list(
                 ParticleEffect.Normal.builder(Particle.PORTAL).count(15).speed(2.5).build(),
                 ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count(8).horizontalSpread(0.2).verticalSpread(0.2).speed(0.2).build(),
                 ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(15).horizontalSpread(0.3).verticalSpread(0.3).build());
+        /** 틱 효과 - 2 */
+        public static final SoundEffect TICK_2 =
+                SoundEffect.builder("random.charge").volume(3).pitch(0.6).build();
         /** 총알 궤적 - 1 */
         public static final PlayableEffect BULLET_TRAIL_1 = PlayableEffect.list(
                 ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(5).horizontalSpread(0.3).verticalSpread(0.3).build(),
@@ -86,5 +90,40 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
         /** 총알 궤적 - 2 */
         public static final ParticleEffect BULLET_TRAIL_2 =
                 ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(2).horizontalSpread(0.08).verticalSpread(0.08).build();
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playTick(long i, @NonNull Location location) {
+            TICK_1.play(location);
+            if (i % 4 == 0)
+                TICK_2.play(location);
+        }
+
+        /**
+         * 총알 궤적을 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playBulletTrail(long i, @NonNull Location location) {
+            BULLET_TRAIL_1.play(location);
+
+            if (i % 3 == 0) {
+                Vector vector = VectorUtil.getYawAxis(location).multiply(2);
+                Vector axis = VectorUtil.getRollAxis(location);
+
+                for (int j = 0; j < 16; j++) {
+                    double angle = 360 / 16.0 * j;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                    Location loc = location.clone().add(vec);
+
+                    BULLET_TRAIL_2.play(loc);
+                }
+            }
+        }
     }
 }

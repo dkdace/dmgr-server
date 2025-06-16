@@ -7,9 +7,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
@@ -48,10 +46,9 @@ public final class SiliaUlt extends UltimateSkill {
 
         actionManager.getSkill(SiliaA3Info.getInstance()).cancel();
 
-        float yaw = combatUser.getLocation().getYaw();
-        EffectManager effectManager = new EffectManager();
+        Location loc = combatUser.getLocation();
 
-        addActionTask(new IntervalTask(i -> effectManager.playEffect(yaw), () -> {
+        addActionTask(new IntervalTask(i -> SiliaUltInfo.Effects.playUseTick(i, combatUser.getLocation(), loc), () -> {
             cancel();
 
             isEnabled = true;
@@ -86,50 +83,5 @@ public final class SiliaUlt extends UltimateSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getActionManager().getWeapon().setVisible(true);
-    }
-
-    /**
-     * 효과를 재생하는 클래스.
-     */
-    @NoArgsConstructor
-    private final class EffectManager {
-        private int index = 0;
-        private float angle = 0;
-        private float pitch = 0;
-        private double forward = -1;
-
-        /**
-         * 효과를 재생한다.
-         *
-         * @param yaw 원본 Yaw 값
-         */
-        private void playEffect(float yaw) {
-            Location loc = combatUser.getLocation().add(0, 1, 0);
-
-            for (int i = 0; i < 6; i++) {
-                if (index > 11) {
-                    forward += 0.0025;
-                    angle -= 2.3F;
-                    pitch += 5;
-                } else {
-                    angle += 1.7F;
-                    pitch += 4;
-                }
-
-                loc.setYaw(yaw + angle);
-                loc.setPitch(pitch);
-
-                for (int j = 0; j < 3; j++) {
-                    Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, forward - 0.4 * j);
-
-                    if (j == 2)
-                        SiliaUltInfo.Effects.USE_TICK_2.play(loc2);
-                    else
-                        SiliaUltInfo.Effects.USE_TICK_1.play(loc2);
-                }
-            }
-
-            index++;
-        }
     }
 }

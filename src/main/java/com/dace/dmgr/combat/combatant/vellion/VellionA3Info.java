@@ -9,9 +9,13 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -85,5 +89,62 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
         /** 틱 효과 - 3 */
         public static final PlayableEffect.Function<Vector> TICK_3 = velocity ->
                 ParticleEffect.Directional.create(Particle.SMOKE_LARGE, velocity.clone().multiply(0.3));
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param target   대상 위치
+         */
+        public static void playUseTick(@NonNull Location location, @NonNull Location target) {
+            USE_TICK_1.play(target);
+            for (Location loc : LocationUtil.getLine(location, target, 0.7))
+                USE_TICK_2.play(loc);
+        }
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playTick(long i, @NonNull Location location) {
+            TICK_1.play(location);
+
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int j = 0; j < 2; j++) {
+                long index = i * 2 + j;
+                double angle = index * 3.0;
+                double distance = index * 0.2 % 5;
+
+                for (int k = 0; k < 12; k++) {
+                    angle += 360 / (distance > 3 ? 4.0 : 6.0);
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 6 ? angle : -angle);
+                    Location loc = location.clone().add(vec.clone().multiply(distance));
+
+                    TICK_2.apply(vec.setY(0.4)).play(loc);
+                }
+
+                double angle2 = index * 44.0;
+                double up = index * 0.1 % 2.5;
+
+                for (int k = 0; k < 3; k++) {
+                    angle2 += 360 / 3.0;
+                    Vector vec1 = VectorUtil.getRotatedVector(vector, axis, angle2);
+                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle2 + 10.0);
+
+                    Vector vec = LocationUtil.getDirection(location.clone().add(vec1), location.clone().add(vec2)).setY(up * 0.1);
+                    Location loc = location.clone().add(vec1.clone().multiply(5)).add(0, up * 0.5, 0);
+
+                    TICK_3.apply(vec).play(loc);
+                }
+            }
+        }
     }
 }

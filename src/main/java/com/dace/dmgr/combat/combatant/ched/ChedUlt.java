@@ -19,11 +19,9 @@ import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -77,18 +75,18 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
         ChedUltInfo.Effects.USE.play(combatUser.getLocation());
 
-        EffectManager effectManager = new EffectManager();
+        long durationTicks = ChedUltInfo.READY_DURATION.toTicks();
 
-        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
+        addActionTask(new IntervalTask(i -> ChedUltInfo.Effects.playUseTick(i, combatUser.getArmLocation(MainHand.RIGHT)), () -> {
             cancel();
 
-            Location location = combatUser.getArmLocation(MainHand.RIGHT);
-            new ChedUltProjectile().shot(location);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
+            new ChedUltProjectile().shot(loc);
 
-            ChedUltInfo.Effects.USE_READY.play(location);
+            ChedUltInfo.Effects.USE_READY.play(loc);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, 20));
-        }, 1, ChedUltInfo.READY_DURATION.toTicks()));
+            addActionTask(new IntervalTask((LongConsumer) i -> ChedUltInfo.Effects.playUseTick(i + durationTicks, loc), 1, 20));
+        }, 1, durationTicks));
     }
 
     @Override
@@ -100,51 +98,6 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 효과를 재생하는 클래스.
-     */
-    @NoArgsConstructor
-    private final class EffectManager {
-        private long index = 0;
-        private int angle = 0;
-        private double distance = 0.6;
-        private double forward = 0;
-
-        /**
-         * 효과를 재생한다.
-         */
-        private void playEffect() {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            Vector vector = VectorUtil.getYawAxis(loc);
-            Vector axis = VectorUtil.getRollAxis(loc);
-
-            for (int i = 0; i < 2; i++) {
-                angle += index > 10 ? -3 : 3;
-
-                if (index > 30) {
-                    forward += 0.2;
-                    distance -= 0.01;
-                } else
-                    distance += 0.035;
-
-                int angles = (index > 15 ? 4 : 6);
-                for (int j = 0; j < angles * 2; j++) {
-                    angle += 360 / angles;
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < angles ? angle : -angle);
-                    Vector vec2 = vec.clone().multiply(distance);
-                    Location loc2 = loc.clone().add(vec2).add(loc.getDirection().multiply(forward));
-
-                    if (index <= 30)
-                        ChedUltInfo.Effects.USE_TICK_1.apply(index, vec).play(loc2);
-                    else
-                        ChedUltInfo.Effects.USE_TICK_2.apply(vec).play(loc2);
-                }
-            }
-
-            index++;
-        }
     }
 
     private final class ChedUltProjectile extends Projectile<Damageable> {
@@ -161,34 +114,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(15, location -> {
-                location.setPitch(0);
-
-                ChedUltInfo.Effects.BULLET_TRAIL_1.play(location);
-
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.2, 0.12).play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6));
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.16, 0.08).play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2));
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.12, 0.04).play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8));
-
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8));
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1));
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.18, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4));
-                ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.24, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6));
-
-                ChedUltInfo.Effects.BULLET_TRAIL_3.play(LocationUtil.getLocationFromOffset(location, -2.8, 1.7, 0));
-                ChedUltInfo.Effects.BULLET_TRAIL_3.play(LocationUtil.getLocationFromOffset(location, 2.8, 1.7, 0));
-
-                for (int i = 0; i < 6; i++) {
-                    Location loc1 = LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
-                    Location loc2 = LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0);
-                    Vector vec = VectorUtil.getSpreadedVector(getVelocity().normalize(), 20);
-
-                    ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04).play(loc1);
-                    ChedUltInfo.Effects.BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04).play(loc2);
-                    ChedUltInfo.Effects.BULLET_TRAIL_4.apply(vec).play(loc1);
-                    ChedUltInfo.Effects.BULLET_TRAIL_4.apply(vec).play(loc2);
-                }
-            });
+            return createPeriodIntervalHandler(15, location -> ChedUltInfo.Effects.playBulletTrail(location, getVelocity()));
         }
 
         @Override

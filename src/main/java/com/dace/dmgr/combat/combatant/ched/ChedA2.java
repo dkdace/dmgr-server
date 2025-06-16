@@ -35,8 +35,7 @@ public final class ChedA2 extends ActiveSkill {
         Location location = combatUser.getLocation();
         location.setPitch(0);
 
-        ChedA2Info.Effects.USE_SOUND.play(location);
-        ChedA2Info.Effects.USE_PARTICLE.play(location.clone().add(0, 0.5, 0));
+        ChedA2Info.Effects.playUse(location);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();

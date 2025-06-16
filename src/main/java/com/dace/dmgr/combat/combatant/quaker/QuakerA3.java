@@ -4,15 +4,16 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -56,16 +57,7 @@ public final class QuakerA3 extends ActiveSkill {
 
         QuakerA3Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(i -> {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation(), 0, 0, 1);
-            Vector vector = VectorUtil.getYawAxis(loc).multiply(-1);
-            Vector axis = VectorUtil.getPitchAxis(loc);
-
-            for (int j = 0; j < i; j++) {
-                Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (j - 2.5));
-                new QuakerA3Effect().shot(loc.clone().add(vec), vec);
-            }
-        }, () -> {
+        addActionTask(new IntervalTask(i -> QuakerA3Info.Effects.playUseTick(i, combatUser.getEntity().getEyeLocation()), () -> {
             cancel();
 
             new QuakerA3Projectile().shot();
@@ -87,51 +79,6 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
-    private final class QuakerA3Effect extends Hitscan<CombatEntity> {
-        private QuakerA3Effect() {
-            super(combatUser, EntityCondition.all(), Option.builder().maxDistance(0.6).build());
-        }
-
-        @Override
-        protected boolean canBeRemoved() {
-            return false;
-        }
-
-        @Override
-        protected void onDestroy(@NonNull Location location, boolean isForce) {
-            for (int i = 0; i < 3; i++) {
-                Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + i * 0.25, 0, 0);
-                QuakerA3Info.Effects.USE_TICK_2.play(loc);
-            }
-        }
-
-        @Override
-        @NonNull
-        protected IntervalHandler getIntervalHandler() {
-            return (location, i) -> {
-                if (i == 0)
-                    for (int j = 0; j < 3; j++) {
-                        Location loc = LocationUtil.getLocationFromOffset(location, -0.25 + j * 0.25, 0, 0);
-                        QuakerA3Info.Effects.USE_TICK_1.play(loc);
-                    }
-
-                return true;
-            };
-        }
-
-        @Override
-        @NonNull
-        protected HitBlockHandler getHitBlockHandler() {
-            return (location, hitBlock) -> false;
-        }
-
-        @Override
-        @NonNull
-        protected HitEntityHandler<CombatEntity> getHitEntityHandler() {
-            return (location, target) -> true;
-        }
-    }
-
     private final class QuakerA3Projectile extends Projectile<Damageable> {
         private final HashSet<Damageable> targets = new HashSet<>();
 
@@ -148,21 +95,7 @@ public final class QuakerA3 extends ActiveSkill {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(16, location -> {
-                Vector vector = VectorUtil.getYawAxis(location).multiply(-1);
-                Vector axis = VectorUtil.getPitchAxis(location);
-
-                for (int i = 0; i < 8; i++) {
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 30 * (i - 3.5)).multiply(0.6);
-                    Location loc = location.clone().add(vec);
-                    new QuakerA3Effect().shot(loc, vec);
-
-                    Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().normalize(), 30);
-                    QuakerA3Info.Effects.BULLET_TRAIL_PARTICLE.apply(vec2).play(location);
-                }
-
-                QuakerA3Info.Effects.BULLET_TRAIL_SOUND.play(location);
-            });
+            return createPeriodIntervalHandler(16, location -> QuakerA3Info.Effects.playBulletTrail(location, getVelocity()));
         }
 
         @Override
@@ -204,7 +137,7 @@ public final class QuakerA3 extends ActiveSkill {
                     combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
             }
 
-            QuakerA3Info.Effects.HIT_ENTITY_1.play(location);
+            QuakerA3Info.Effects.HIT_ENTITY.play(location);
         }
 
         /**
@@ -213,22 +146,17 @@ public final class QuakerA3 extends ActiveSkill {
          * @param target 대상 엔티티
          */
         private void knockback(@NonNull Movable target) {
-            Vector dir = getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK);
-
             target.addTask(new IntervalTask(i -> {
                 if (!target.canBeTargeted())
                     return false;
 
                 if (i < 3)
-                    target.getMoveModule().knockback(dir, true);
+                    target.getMoveModule().knockback(getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
 
                 Location loc = target.getCenterLocation().add(0, 0.1, 0);
                 new QuakerA3Area().emit(loc);
 
-                for (int j = 0; j < 5; j++) {
-                    Vector vec = VectorUtil.getSpreadedVector(dir.clone().normalize(), 20);
-                    QuakerA3Info.Effects.HIT_ENTITY_2.apply(vec).play(target.getCenterLocation());
-                }
+                QuakerA3Info.Effects.playHitEntityKnockback(target.getCenterLocation(), getVelocity());
 
                 Location hitLoc = loc.clone().add(getVelocity().normalize());
                 if (!LocationUtil.isNonSolid(hitLoc)) {

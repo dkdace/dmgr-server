@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -53,20 +52,18 @@ public final class InfernoA1 extends ActiveSkill {
         combatUser.getMoveModule().push(vec, true);
 
         addActionTask(new DelayTask(() -> addActionTask(new IntervalTask(i -> {
-            if (i < 15) {
-                Location loc = combatUser.getLocation();
-                loc.setPitch(0);
-
-                for (int j = 0; j < 2; j++) {
-                    Location loc2 = LocationUtil.getLocationFromOffset(loc, -0.3 + j * 0.6, 0.8, -0.5);
-                    InfernoA1Info.Effects.USE_TICK.play(loc2);
-                }
-            }
+            if (i < 15)
+                InfernoA1Info.Effects.playUseTick(combatUser.getLocation());
 
             return !combatUser.getEntity().isOnGround();
         }, () -> {
             cancel();
-            addActionTask(new DelayTask(this::onLand, 1));
+            addActionTask(new DelayTask(() -> {
+                Location loc = combatUser.getLocation().add(0, 0.1, 0);
+                new InfernoA1Area().emit(loc);
+
+                InfernoA1Info.Effects.playLand(loc);
+            }, 1));
         }, 1)), 4));
     }
 
@@ -81,32 +78,6 @@ public final class InfernoA1 extends ActiveSkill {
             setDuration(Timespan.ZERO);
         else
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));
-    }
-
-    /**
-     * 점프 후 착지 시 실행할 작업.
-     */
-    private void onLand() {
-        Location loc = combatUser.getLocation().add(0, 0.1, 0);
-        new InfernoA1Area().emit(loc);
-
-        InfernoA1Info.Effects.LAND_1.apply(loc.clone().subtract(0, 0.5, 0).getBlock()).play(loc);
-
-        loc.setYaw(0);
-        loc.setPitch(0);
-        Vector vector = VectorUtil.getRollAxis(loc).multiply(0.8);
-        Vector axis = VectorUtil.getYawAxis(loc);
-
-        for (int i = 0; i < 18; i++) {
-            int angle = 360 / 18 * i;
-            Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
-            Location loc2 = loc.clone().add(vec.clone().multiply(1.5));
-            Location loc3 = loc.clone().add(vec);
-
-            InfernoA1Info.Effects.LAND_2.play(loc2);
-            for (int j = 0; j < 2; j++)
-                InfernoA1Info.Effects.LAND_3.apply(vec.setY(vec.getY() + 0.1)).play(loc3);
-        }
     }
 
     private final class InfernoA1Area extends Area<Damageable> {

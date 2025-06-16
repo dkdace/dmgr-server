@@ -9,9 +9,12 @@ import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 
 public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
@@ -102,5 +105,17 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
         /** 치유 광선 - 축복 - 사용 입자 효과 */
         public static final ParticleEffect HEAL_AMPLIFY_USE_PARTICLE =
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(140, 255, 245)).build();
+
+        /**
+         * 치유 광선 - 사용 효과를 재생한다.
+         *
+         * @param start        시작 위치
+         * @param end          끝 위치
+         * @param isAmplifying 축복 여부
+         */
+        public static void playHealUse(@NonNull Location start, @NonNull Location end, boolean isAmplifying) {
+            for (Location loc : LocationUtil.getLine(start, end, 0.8))
+                (isAmplifying ? HEAL_AMPLIFY_USE_PARTICLE : HEAL_USE_PARTICLE).play(loc);
+        }
     }
 }

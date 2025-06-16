@@ -9,11 +9,16 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
     /** 쿨타임 */
@@ -52,24 +57,61 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
         /** 색상 */
         public static final Color COLOR = Color.fromRGB(215, 255, 130);
 
-        /** 사용 효과음 */
-        public static final PlayableEffect USE_SOUND = PlayableEffect.list(
+        /** 사용 - 1 */
+        public static final PlayableEffect USE_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(2).pitch(1.6).build(),
                 SoundEffect.builder("new.block.respawn_anchor.charge").volume(2).pitch(1.4).build(),
                 SoundEffect.builder("new.block.note_block.chime").volume(2).pitch(1.6).build(),
                 SoundEffect.builder("new.block.note_block.chime").volume(2).pitch(1.2).build());
-        /** 사용 입자 효과 - 1 */
-        public static final PlayableEffect USE_PARTICLE_1 = PlayableEffect.list(
+        /** 사용 - 2 */
+        public static final PlayableEffect USE_2 = PlayableEffect.list(
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(2).horizontalSpread(0.1).verticalSpread(0.1)
                         .build(),
                 ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).build());
-        /** 사용 입자 효과 - 2 */
-        public static final ParticleEffect USE_PARTICLE_2 =
+        /** 사용 - 3 */
+        public static final ParticleEffect USE_3 =
                 ParticleEffect.Normal.builder(Particle.VILLAGER_HAPPY).count(2).build();
         /** 표식 */
         public static final PlayableEffect MARK = PlayableEffect.list(
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(4).horizontalSpread(0.2).verticalSpread(0.2)
                         .build(),
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).build());
+
+        /**
+         * 사용 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param start    시작 위치
+         * @param end      끝 위치
+         */
+        public static void playUse(@NonNull Location location, @NonNull Location start, @NonNull Location end) {
+            USE_1.play(location);
+
+            start = LocationUtil.getLocationFromOffset(start, 0, 0, 1.5);
+
+            for (Location loc : LocationUtil.getLine(start, end, 0.4))
+                USE_2.play(loc);
+
+            Vector vector = VectorUtil.getYawAxis(start).multiply(0.8);
+            Vector axis = VectorUtil.getRollAxis(start);
+
+            for (int i = 0; i < 8; i++) {
+                double angle = i * 10.0;
+
+                for (int j = 0; j < 10; j++) {
+                    angle += 360 / 5.0;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, j < 5 ? angle : -angle).multiply(1 + i * 0.2);
+                    Location loc = start.clone().add(vec);
+
+                    USE_3.play(loc);
+                }
+            }
+            for (int i = 0; i < 7; i++) {
+                Location loc1 = LocationUtil.getLocationFromOffset(start, -0.525 + i * 0.15, 0, 0);
+                Location loc2 = LocationUtil.getLocationFromOffset(start, 0, -0.525 + i * 0.15, 0);
+                USE_3.play(loc1);
+                USE_3.play(loc2);
+            }
+        }
     }
 }

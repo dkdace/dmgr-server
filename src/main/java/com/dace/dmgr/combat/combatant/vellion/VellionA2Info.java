@@ -9,11 +9,16 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     /** 쿨타임 */
@@ -95,5 +100,49 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
         /** 표식 - 엔티티 타격 - 2 */
         public static final ParticleEffect MARK_HIT_ENTITY_2 =
                 ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).build();
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 사용 위치
+         * @param target   대상 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location, @NonNull Location target) {
+            for (Location loc : LocationUtil.getLine(location, target, 0.7))
+                USE_TICK_1.apply(i).play(loc);
+
+            location = LocationUtil.getLocationFromOffset(location, LocationUtil.getDirection(location, target), 0, 0, 1.5);
+
+            Vector vector = VectorUtil.getYawAxis(location);
+            Vector axis = VectorUtil.getRollAxis(location);
+
+            for (long j = (i >= 6 ? i - 6 : 0); j < i; j++) {
+                double angle = j * (j > 5 ? 4.0 : 12.0);
+
+                for (int k = 0; k < 8; k++) {
+                    angle += 360 / 4.0;
+                    Vector vec = VectorUtil.getRotatedVector(vector, axis, k < 4 ? angle : -angle).multiply(j * 0.2);
+                    Location loc = location.clone().add(vec);
+
+                    if (i == 15)
+                        USE_TICK_2.play(loc);
+                    else
+                        USE_TICK_1.apply(i).play(loc);
+                }
+            }
+        }
+
+        /**
+         * 표식 - 엔티티 타격 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param target   대상 위치
+         */
+        public static void playMarkHitEntity(@NonNull Location location, @NonNull Location target) {
+            MARK_HIT_ENTITY_1.play(target);
+            for (Location loc : LocationUtil.getLine(location, target, 0.4))
+                MARK_HIT_ENTITY_2.play(loc);
+        }
     }
 }

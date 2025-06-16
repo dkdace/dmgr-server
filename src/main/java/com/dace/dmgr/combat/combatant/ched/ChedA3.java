@@ -12,15 +12,11 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 import java.util.function.LongConsumer;
 
@@ -63,17 +59,16 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         ChedA3Info.Effects.USE.play(combatUser.getLocation());
 
         long durationTicks = ChedA3Info.READY_DURATION.toTicks();
-        EffectManager effectManager = new EffectManager();
 
-        addActionTask(new IntervalTask(i -> effectManager.playEffect(), () -> {
+        addActionTask(new IntervalTask(i -> ChedA3Info.Effects.playUseTick(i, combatUser.getArmLocation(MainHand.RIGHT)), () -> {
             cancel();
 
-            Location location = combatUser.getArmLocation(MainHand.RIGHT);
-            new ChedA3Projectile().shot(location);
+            Location loc = combatUser.getArmLocation(MainHand.RIGHT);
+            new ChedA3Projectile().shot(loc);
 
-            ChedA3Info.Effects.USE_READY.play(location);
+            ChedA3Info.Effects.USE_READY.play(loc);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> effectManager.playEffect(), 1, durationTicks));
+            addActionTask(new IntervalTask((LongConsumer) i -> ChedA3Info.Effects.playUseTick(i + durationTicks, loc), 1, durationTicks));
         }, 1, durationTicks));
     }
 
@@ -86,51 +81,6 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
-    }
-
-    /**
-     * 효과를 재생하는 클래스.
-     */
-    @NoArgsConstructor
-    private final class EffectManager {
-        private long index = 0;
-        private int angle = 0;
-        private double distance = 0;
-        private double forward = 0;
-
-        /**
-         * 효과를 재생한다.
-         */
-        private void playEffect() {
-            Location loc = LocationUtil.getLocationFromOffset(combatUser.getArmLocation(MainHand.RIGHT), 0, 0, 1.5);
-            Vector vector = VectorUtil.getYawAxis(loc);
-            Vector axis = VectorUtil.getRollAxis(loc);
-
-            for (int i = 0; i < 2; i++) {
-                if (index > 12) {
-                    angle += 4;
-                    distance -= 0.03;
-                    forward += 0.2;
-                } else {
-                    angle += 8;
-                    distance += 0.04;
-                }
-
-                for (int j = 0; j < 10; j++) {
-                    angle += 360 / 5;
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-                    Vector vec2 = VectorUtil.getRotatedVector(vector, axis, angle + 10.0);
-                    Vector vec3 = vec.clone().multiply(distance + (j < 5 ? 0 : 1.4));
-
-                    Location loc2 = loc.clone().add(vec3).add(loc.getDirection().multiply(forward));
-                    Vector dir = LocationUtil.getDirection(loc.clone().add(vec), loc.clone().add(vec2));
-
-                    ChedA3Info.Effects.USE_TICK.apply(dir).play(loc2);
-                }
-            }
-
-            index++;
-        }
     }
 
     private final class ChedA3Projectile extends Projectile<Damageable> {
@@ -147,27 +97,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         @Override
         @NonNull
         protected IntervalHandler getIntervalHandler() {
-            return createPeriodIntervalHandler(18, location -> {
-                location.setPitch(0);
-
-                ChedA3Info.Effects.BULLET_TRAIL_1.play(location);
-
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.2, 0.12).play(LocationUtil.getLocationFromOffset(location, 0, -0.5, -0.6));
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.16, 0.08).play(LocationUtil.getLocationFromOffset(location, 0, -0.7, -1.2));
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.12, 0.04).play(LocationUtil.getLocationFromOffset(location, 0, -0.9, -1.8));
-
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.4, 0.8));
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.1, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.6, 1));
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.18, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.4));
-                ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.24, 0.16).play(LocationUtil.getLocationFromOffset(location, 0, 0.8, 1.6));
-
-                for (int i = 0; i < 6; i++) {
-                    ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04)
-                            .play(LocationUtil.getLocationFromOffset(location, 0.7 + i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0));
-                    ChedA3Info.Effects.BULLET_TRAIL_2.apply(0.1, 0.1 + i * 0.04)
-                            .play(LocationUtil.getLocationFromOffset(location, -0.7 - i * 0.4, 0.3 + i * (i < 3 ? 0.2 : 0.25), 0));
-                }
-            });
+            return createPeriodIntervalHandler(18, ChedA3Info.Effects::playBulletTrail);
         }
 
         @Override

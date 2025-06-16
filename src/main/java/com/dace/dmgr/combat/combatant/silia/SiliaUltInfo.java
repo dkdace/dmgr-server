@@ -9,8 +9,11 @@ import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 
 public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
@@ -63,5 +66,43 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                 SoundEffect.builder("random.swordhit").volume(2).pitch(0.7).build(),
                 SoundEffect.builder("new.item.trident.return").volume(2.5).pitch(1.4).build(),
                 SoundEffect.builder("new.item.trident.return").volume(2.5).pitch(1.2).build());
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 사용 위치
+         * @param prev     이전 위치
+         */
+        public static void playUseTick(long i, @NonNull Location location, @NonNull Location prev) {
+            location = location.clone().add(0, 1, 0);
+
+            for (int j = 0; j < 6; j++) {
+                long index = i * 6 + j;
+                long index1 = Math.min(index, 66);
+                double angle = index1 * 1.7;
+                double forward = -1.4;
+                float pitch = index1 * 4F;
+
+                if (index1 == 66) {
+                    long subIndex = index - index1;
+                    angle -= subIndex * 2.3;
+                    forward += subIndex * 0.0025;
+                    pitch += subIndex * 5;
+                }
+
+                location.setYaw((float) (prev.getYaw() + angle));
+                location.setPitch(pitch);
+
+                for (int k = 0; k < 3; k++) {
+                    Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, forward * k);
+
+                    if (k == 2)
+                        USE_TICK_2.play(loc);
+                    else
+                        USE_TICK_1.play(loc);
+                }
+            }
+        }
     }
 }

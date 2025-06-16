@@ -103,13 +103,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
             remove();
             cancel();
 
-            MetarA2Info.Effects.DEATH_SOUND.play(getCenterLocation());
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 2; j++) {
-                    Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -2.2 + i * 2.2, -0.9 + j * 1.8, 0);
-                    MetarA2Info.Effects.DEATH_PARTICLE.play(loc);
-                }
-            }
+            MetarA2Info.Effects.playDeath(getCenterLocation());
         }
     }
 }

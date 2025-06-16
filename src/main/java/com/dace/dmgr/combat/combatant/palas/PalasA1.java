@@ -96,10 +96,8 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
             if (combatEntity instanceof CombatUser)
                 PalasA1Info.SHAKE.send((CombatUser) combatEntity);
 
-            if (i % 2 == 0) {
-                PalasA1Info.Effects.STUN_TICK_PARTICLE.play(combatEntity.getCenterLocation());
-                PalasA1Info.Effects.STUN_TICK_SOUND.play(combatEntity.getLocation());
-            }
+            if (i % 2 == 0)
+                PalasA1Info.Effects.playStunTick(combatEntity.getLocation(), combatEntity.getCenterLocation());
         }
     }
 

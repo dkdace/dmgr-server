@@ -80,13 +80,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
             combatUser.getMoveModule().push(distance < 3.5 ? vec.clone().multiply(0.5) : vec, true);
 
-            NeaceA3Info.Effects.TICK_1.play(loc);
-
-            addTask(new DelayTask(() -> {
-                Location loc2 = combatUser.getLocation().add(0, 1, 0);
-                for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.4))
-                    NeaceA3Info.Effects.TICK_2.play(loc3);
-            }, 1));
+            addTask(new DelayTask(() -> NeaceA3Info.Effects.playTick(combatUser.getLocation(), loc), 1));
 
             return true;
         }, isCancelled -> onEnd(), 1, NeaceA3Info.DURATION.toTicks()));

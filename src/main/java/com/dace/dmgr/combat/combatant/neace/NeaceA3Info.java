@@ -9,8 +9,11 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -57,5 +60,20 @@ public final class NeaceA3Info extends ActiveSkillInfo<NeaceA3> {
         /** 틱 효과 - 2 */
         public static final ParticleEffect TICK_2 =
                 ParticleEffect.Normal.builder(Particle.END_ROD).horizontalSpread(0.02).verticalSpread(0.02).build();
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param prev     이전 위치
+         */
+        public static void playTick(@NonNull Location location, @NonNull Location prev) {
+            location = location.clone().add(0, 1, 0);
+
+            TICK_1.play(location);
+
+            for (Location loc : LocationUtil.getLine(prev, location, 0.4))
+                TICK_2.play(loc);
+        }
     }
 }

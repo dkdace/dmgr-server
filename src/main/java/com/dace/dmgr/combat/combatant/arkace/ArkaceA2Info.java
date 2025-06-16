@@ -9,10 +9,14 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.util.Vector;
 
 public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
     /** 쿨타임 */
@@ -53,5 +57,29 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
         public static final PlayableEffect.Function<Integer> TICK = i ->
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(220 - i * 30, 255, 36))
                         .count(3).verticalSpread(0.4).build();
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playTick(long i, @NonNull Location location) {
+            location = location.clone().add(0, 1, 0);
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            double angle = i * 10.0;
+            for (int j = 0; j < 3; j++) {
+                angle += 360 / 3.0;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc = location.clone().add(vec);
+
+                TICK.apply(j).play(loc);
+            }
+        }
     }
 }

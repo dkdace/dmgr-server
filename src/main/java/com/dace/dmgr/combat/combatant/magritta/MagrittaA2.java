@@ -10,10 +10,11 @@ import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.LongConsumer;
 
 public final class MagrittaA2 extends ActiveSkill {
     /** 수정자 */
@@ -55,12 +56,8 @@ public final class MagrittaA2 extends ActiveSkill {
 
         MagrittaA2Info.Effects.USE.play(combatUser.getLocation());
 
-        addActionTask(new IntervalTask(i -> {
-            Location loc = combatUser.getLocation().add(0, 0.1, 0);
-
-            MagrittaA2Info.Effects.TICK_1.play(loc);
-            MagrittaA2Info.Effects.TICK_2.play(combatUser.getCenterLocation());
-        }, 1, MagrittaA2Info.DURATION.toTicks()));
+        addActionTask(new IntervalTask((LongConsumer) i -> MagrittaA2Info.Effects.playTick(combatUser.getLocation()), 1,
+                MagrittaA2Info.DURATION.toTicks()));
     }
 
     @Override

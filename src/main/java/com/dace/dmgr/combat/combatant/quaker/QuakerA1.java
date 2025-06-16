@@ -148,13 +148,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
             setStateValue(0);
             setCooldown(QuakerA1Info.COOLDOWN_DEATH);
 
-            QuakerA1Info.Effects.DEATH_SOUND.play(getCenterLocation());
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 2; j++) {
-                    Location loc = LocationUtil.getLocationFromOffset(getCenterLocation(), -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
-                    QuakerA1Info.Effects.DEATH_PARTICLE.play(loc);
-                }
-            }
+            QuakerA1Info.Effects.playDeath(getCenterLocation());
         }
     }
 }

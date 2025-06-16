@@ -9,8 +9,11 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.util.Vector;
@@ -57,16 +60,50 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
         public static final PlayableEffect USE = PlayableEffect.list(
                 SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.5).build(),
                 SoundEffect.builder(Sound.BLOCK_PISTON_CONTRACT).volume(2).pitch(0.6).build());
-        /** 틱 효과음 */
-        public static final PlayableEffect TICK_SOUND = PlayableEffect.list(
+        /** 틱 효과 - 1 */
+        public static final PlayableEffect TICK_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.BLOCK_FIRE_EXTINGUISH).volume(2).pitch(0.55).pitchVariance(0.1).build(),
                 SoundEffect.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.6).pitchVariance(0.1).build());
-        /** 틱 입자 효과 - 1 */
-        public static final ParticleEffect TICK_PARTICLE_1 =
+        /** 틱 효과 - 2 */
+        public static final ParticleEffect TICK_2 =
                 ParticleEffect.Normal.builder(Particle.FLAME).count(2).horizontalSpread(0.1).verticalSpread(0.1).speed(0.2).build();
-        /** 틱 입자 효과 - 2 */
-        public static final PlayableEffect.Function<Vector> TICK_PARTICLE_2 = velocity -> PlayableEffect.list(
+        /** 틱 효과 - 3 */
+        public static final PlayableEffect.Function<Vector> TICK_3 = velocity -> PlayableEffect.list(
                 ParticleEffect.Directional.create(Particle.SMOKE_NORMAL, velocity.clone().multiply(0.32)),
                 ParticleEffect.Directional.create(Particle.FLAME, velocity.clone().multiply(0.2)));
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playTick(long i, @NonNull Location location) {
+            TICK_1.play(location);
+
+            location = location.clone().add(0, 1, 0);
+            location.setYaw(0);
+            location.setPitch(0);
+
+            TICK_2.play(location);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int j = 0; j < 3; j++) {
+                long index = i * 3 + j;
+                double yaw = index * 5.0;
+                double pitch = index * 7.0;
+
+                for (int k = 0; k < 3; k++) {
+                    yaw += 360 / 3.0;
+                    pitch -= 360 / 3.0;
+                    Vector vec = VectorUtil.getRotatedVector(axis, VectorUtil.getRotatedVector(vector, axis, yaw), pitch);
+                    Location loc = location.clone().add(vec.clone().multiply(1.8));
+
+                    TICK_3.apply(vec).play(loc);
+                }
+            }
+        }
     }
 }

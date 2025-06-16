@@ -10,8 +10,12 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -81,5 +85,49 @@ public final class InfernoA1Info extends ActiveSkillInfo<InfernoA1> {
         /** 엔티티 타격 */
         public static final ParticleEffect HIT_ENTITY =
                 ParticleEffect.Normal.builder(Particle.CRIT).count(50).speed(0.4).build();
+
+        /**
+         * 사용 시 틱 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playUseTick(@NonNull Location location) {
+            location = location.clone();
+            location.setPitch(0);
+
+            for (int i = 0; i < 2; i++) {
+                Location loc = LocationUtil.getLocationFromOffset(location, -0.3 + i * 0.6, 0.8, -0.5);
+                USE_TICK.play(loc);
+            }
+        }
+
+        /**
+         * 착지 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playLand(@NonNull Location location) {
+            LAND_1.apply(location.clone().subtract(0, 0.5, 0).getBlock()).play(location);
+
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location).multiply(0.8);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            for (int i = 0; i < 18; i++) {
+                double angle = 360 / 18.0 * i;
+                Vector vec = VectorUtil.getSpreadedVector(VectorUtil.getRotatedVector(vector, axis, angle), 8);
+                Location loc = location.clone().add(vec.clone().multiply(1.5));
+
+                LAND_2.play(loc);
+
+                for (int j = 0; j < 2; j++) {
+                    Location loc2 = location.clone().add(vec);
+                    LAND_3.apply(vec.setY(vec.getY() + 0.1)).play(loc2);
+                }
+            }
+        }
     }
 }

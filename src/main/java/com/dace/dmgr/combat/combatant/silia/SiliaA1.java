@@ -10,7 +10,6 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -64,11 +63,7 @@ public final class SiliaA1 extends ActiveSkill {
 
             Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
 
-            addTask(new DelayTask(() -> {
-                Location loc2 = combatUser.getEntity().getEyeLocation().subtract(0, 0.5, 0);
-                for (Location loc3 : LocationUtil.getLine(loc, loc2, 0.3))
-                    SiliaA1Info.Effects.TICK.play(loc3);
-            }, 1));
+            addTask(new DelayTask(() -> SiliaA1Info.Effects.playTick(combatUser.getEntity().getEyeLocation(), loc), 1));
         }, () -> {
             forceCancel();
             combatUser.getMoveModule().push(new Vector(), true);
@@ -103,25 +98,8 @@ public final class SiliaA1 extends ActiveSkill {
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(12, location -> {
-                Location loc = LocationUtil.getLocationFromOffset(location, 0, -0.2, 1);
-                Vector vector = VectorUtil.getPitchAxis(loc).multiply(1.5);
-                Vector axis = VectorUtil.getYawAxis(loc);
-
-                for (int i = 0; i < 12; i++) {
-                    Vector vec = VectorUtil.getRotatedVector(vector, axis, 90 + 15 * (i - 5.5));
-
-                    for (int j = 0; j < 3; j++) {
-                        Location loc2 = LocationUtil.getLocationFromOffset(loc.clone().add(vec), 0, 0.3 - j * 0.3, 0);
-                        SiliaA1Info.Effects.BULLET_TRAIL_1.play(loc2);
-
-                        if ((i == 0 || i == 11) && j == 1) {
-                            Vector vec2 = VectorUtil.getSpreadedVector(getVelocity().normalize(), 10);
-                            SiliaA1Info.Effects.BULLET_TRAIL_2.apply(vec2).play(loc2);
-                        }
-                    }
-                }
-
                 new SiliaA1Area().emit(location);
+                SiliaA1Info.Effects.playBulletTrail(location, getVelocity());
             });
         }
 

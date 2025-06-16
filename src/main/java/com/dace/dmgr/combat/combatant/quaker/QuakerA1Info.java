@@ -11,7 +11,9 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -79,16 +81,32 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                         SoundEffect.builder("random.metalhit").volume(0.3 + damage * 0.001).pitch(0.85).pitchVariance(0.1).build(),
 
                         location == null ? SoundEffect.NONE : CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
-        /** 파괴 효과음 */
-        public static final PlayableEffect DEATH_SOUND = PlayableEffect.list(
+        /** 파괴 - 1 */
+        public static final PlayableEffect DEATH_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),
                 SoundEffect.builder(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR).volume(2).pitch(0.7).build(),
                 SoundEffect.builder("random.metalhit").volume(2).pitch(0.7).build(),
                 SoundEffect.builder(Sound.ITEM_SHIELD_BLOCK).volume(2).pitch(0.5).build());
-        /** 파괴 입자 효과 */
-        public static final PlayableEffect DEATH_PARTICLE = PlayableEffect.list(
+        /** 파괴 - 2 */
+        public static final PlayableEffect DEATH_2 = PlayableEffect.list(
                 ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.IRON_BLOCK, 0).count(50)
                         .horizontalSpread(0.3).verticalSpread(0.3).speed(0.2).build(),
                 ParticleEffect.Normal.builder(Particle.CRIT).count(50).horizontalSpread(0.3).verticalSpread(0.3).speed(0.4).build());
+
+        /**
+         * 파괴 효과를 재생한다.
+         *
+         * @param location 위치
+         */
+        public static void playDeath(@NonNull Location location) {
+            DEATH_1.play(location);
+
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 2; j++) {
+                    Location loc = LocationUtil.getLocationFromOffset(location, -1.8 + i * 1.8, -0.8 + j * 1.6, 0);
+                    DEATH_2.play(loc);
+                }
+            }
+        }
     }
 }

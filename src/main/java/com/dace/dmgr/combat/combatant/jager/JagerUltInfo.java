@@ -11,7 +11,9 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.VectorUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.*;
 import org.bukkit.util.Vector;
@@ -101,15 +103,15 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                         .build(),
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(80, 80, 100)).count(3)
                         .horizontalSpread(0.15).verticalSpread(0.02).build());
-        /** 틱 효과음 */
-        public static final PlayableEffect TICK_SOUND = PlayableEffect.list(
+        /** 틱 효과 - 1 */
+        public static final PlayableEffect TICK_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ITEM_ELYTRA_FLYING).volume(3).pitch(1.3).pitchVariance(0.2).build(),
                 SoundEffect.builder(Sound.ITEM_ELYTRA_FLYING).volume(3).pitch(1.7).pitchVariance(0.2).build());
-        /** 틱 입자 효과 - 1 */
-        public static final PlayableEffect.BiFunction<Integer, Vector> TICK_PARTICLE_1 = (range, velocity) ->
+        /** 틱 효과 - 2 */
+        public static final PlayableEffect.BiFunction<Integer, Vector> TICK_2 = (range, velocity) ->
                 ParticleEffect.Directional.create(Particle.EXPLOSION_NORMAL, velocity.clone().multiply(0.35 - range * 0.05));
-        /** 틱 입자 효과 - 2 */
-        public static final ParticleEffect TICK_PARTICLE_2 =
+        /** 틱 효과 - 3 */
+        public static final ParticleEffect TICK_3 =
                 ParticleEffect.Normal.builder(Particle.SNOW_SHOVEL).count(3).verticalSpread(1.4).speed(0.04).build();
         /** 피격 */
         public static final PlayableEffect.TriFunction<CombatEntity, Location, Double> DAMAGE =
@@ -126,5 +128,37 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
                         .horizontalSpread(0.1).verticalSpread(0.1).speed(0.15).build(),
                 ParticleEffect.Normal.builder(Particle.CRIT).count(80).horizontalSpread(0.1).verticalSpread(0.1).speed(0.5).build(),
                 ParticleEffect.Normal.builder(Particle.EXPLOSION_LARGE).build());
+
+        /**
+         * 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         * @param range    현재 범위
+         */
+        public static void playTick(long i, @NonNull Location location, double range) {
+            if (i <= DURATION.toTicks() - 100 && i % 30 == 0)
+                TICK_1.play(location);
+
+            location = location.clone();
+            location.setYaw(0);
+            location.setPitch(0);
+
+            Vector vector = VectorUtil.getRollAxis(location);
+            Vector axis = VectorUtil.getYawAxis(location);
+
+            double angle = i * 14.0;
+            for (int j = 1; j <= 6; j++) {
+                angle += 19;
+                Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
+                Location loc1 = location.clone().add(vec.clone().multiply(range / 6 * j));
+                Location loc2 = location.clone().subtract(vec.clone().multiply(range / 6 * j));
+
+                TICK_2.apply(j, vec.setY(-0.6)).play(loc1);
+                TICK_2.apply(j, vec.multiply(-1).setY(-0.6)).play(loc2);
+                TICK_3.play(loc1.subtract(0, 2.5, 0));
+                TICK_3.play(loc2.subtract(0, 2.5, 0));
+            }
+        }
     }
 }

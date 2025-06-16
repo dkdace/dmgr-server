@@ -11,13 +11,13 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
+
+import java.util.function.Consumer;
 
 @Getter
 public final class MetarUlt extends UltimateSkill implements HasBonusScore {
@@ -58,13 +58,10 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
             MetarUltInfo.Effects.USE_READY.play(loc);
 
             addTask(new IntervalTask(i -> {
-                if (i % 4 == 0) {
+                if (i % 4 == 0)
                     new MetarUltHitscan().shot(loc, loc.getDirection());
 
-                    MetarUltInfo.Effects.TICK_SOUND.play(loc);
-                }
-
-                MetarUltInfo.Effects.TICK_PARTICLE.play(loc);
+                MetarUltInfo.Effects.playTick(i, loc);
             }, 1, MetarUltInfo.DURATION.toTicks()));
         }, 1, MetarUltInfo.READY_DURATION.toTicks()));
     }
@@ -99,16 +96,12 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return IntervalHandler
-                    .chain(createPeriodIntervalHandler(16, MetarUltInfo.Effects.BULLET_TRAIL_1::play))
-                    .next(createPeriodIntervalHandler(42, location -> {
-                        Vector vector = VectorUtil.getYawAxis(location).multiply(2);
-                        Vector axis = VectorUtil.getRollAxis(location);
+                    .chain(createPeriodIntervalHandler(15, new Consumer<Location>() {
+                        private long i = 0;
 
-                        for (int i = 0; i < 16; i++) {
-                            int angle = 360 / 16 * i;
-                            Vector vec = VectorUtil.getRotatedVector(vector, axis, angle);
-
-                            MetarUltInfo.Effects.BULLET_TRAIL_2.play(location.clone().add(vec));
+                        @Override
+                        public void accept(Location location) {
+                            MetarUltInfo.Effects.playBulletTrail(i++, location);
                         }
                     }));
         }

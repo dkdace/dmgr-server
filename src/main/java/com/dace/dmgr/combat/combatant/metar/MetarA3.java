@@ -13,7 +13,6 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -120,24 +119,12 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
                 forceCancel();
 
             Location[] locs = new Location[30];
-            Vector[] vecs = new Vector[30];
-
-            for (int i = 0; i < locs.length; i++) {
-                Vector vec = VectorUtil.getRandomVector().normalize().multiply(MetarA3Info.RADIUS);
-                locs[i] = location.clone().add(vec);
-                vecs[i] = vec.normalize().multiply(-0.35);
-            }
 
             addTask(new IntervalTask(i -> {
                 Location loc = location.clone().add(0, 0.1, 0);
                 new MetarA3Area().emit(loc);
 
-                for (int j = 0; j < locs.length; j++) {
-                    Vector vec = vecs[j];
-                    MetarA3Info.Effects.DETONATE_TICK_1.apply(i, vec).play(locs[j].add(vec));
-                }
-
-                MetarA3Info.Effects.DETONATE_TICK_2.apply(i).play(loc);
+                MetarA3Info.Effects.playDetonateTick(i, loc, locs);
             }, 1, MetarA3Info.DURATION.toTicks()));
         }
 
@@ -145,15 +132,11 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
         @NonNull
         protected IntervalHandler getIntervalHandler() {
             return createPeriodIntervalHandler(13, new Consumer<Location>() {
-                private int i = 0;
+                private long i = 0;
 
                 @Override
                 public void accept(Location location) {
-                    MetarA3Info.Effects.BULLET_TRAIL_1.play(location);
-                    if (i % 4 == 0)
-                        MetarA3Info.Effects.BULLET_TRAIL_2.play(location);
-
-                    i++;
+                    MetarA3Info.Effects.playBulletTrail(i++, location);
                 }
             });
         }

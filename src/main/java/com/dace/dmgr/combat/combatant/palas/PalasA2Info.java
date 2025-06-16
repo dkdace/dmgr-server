@@ -9,9 +9,12 @@ import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
+import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
@@ -70,5 +73,20 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
         public static final ParticleEffect IMMUNE_TICK =
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).count(4).horizontalSpread(1).verticalSpread(1.5)
                         .build();
+
+        /**
+         * 사용 효과를 재생한다.
+         *
+         * @param location 사용 위치
+         * @param start    시작 위치
+         * @param end      끝 위치
+         */
+        public static void playUse(@NonNull Location location, @NonNull Location start, @NonNull Location end) {
+            USE_1.play(location);
+            USE_2.play(end);
+
+            for (Location loc : LocationUtil.getLine(start, end, 0.4))
+                USE_3.play(loc);
+        }
     }
 }

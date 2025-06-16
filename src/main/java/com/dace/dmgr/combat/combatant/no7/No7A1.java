@@ -11,12 +11,9 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
-import com.dace.dmgr.util.VectorUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -67,13 +64,7 @@ public final class No7A1 extends ActiveSkill {
             if (length > No7A1Info.PUSH / 2)
                 new No7A1MeleeHitscan(targets).shot(loc);
 
-            No7A1Info.Effects.TICK_SOUND.play(combatUser.getLocation());
-            for (int j = 0; j < 12; j++) {
-                Location loc2 = LocationUtil.getLocationFromOffset(loc, 0, 0, -0.3);
-                Vector vec = VectorUtil.getSpreadedVector(loc.getDirection().multiply(-1), 60);
-
-                No7A1Info.Effects.TICK_PARTICLE.apply(vec).play(loc2);
-            }
+            No7A1Info.Effects.playTick(combatUser.getLocation());
         }, 1, No7A1Info.DURATION.toTicks()));
     }
 

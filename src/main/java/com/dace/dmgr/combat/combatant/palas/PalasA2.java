@@ -12,12 +12,10 @@ import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AbilityStatus;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
 @Getter
@@ -64,13 +62,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         if (target.isGoalTarget())
             combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
 
-        PalasA2Info.Effects.USE_1.play(combatUser.getLocation());
-
-        Location location = target.getCenterLocation();
-        PalasA2Info.Effects.USE_2.play(location);
-
-        for (Location loc : LocationUtil.getLine(combatUser.getArmLocation(MainHand.LEFT), location, 0.4))
-            PalasA2Info.Effects.USE_3.play(loc);
+        PalasA2Info.Effects.playUse(combatUser.getLocation(), combatUser.getArmLocation(MainHand.LEFT), target.getCenterLocation());
     }
 
     @Override

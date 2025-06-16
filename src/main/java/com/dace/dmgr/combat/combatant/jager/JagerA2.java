@@ -167,7 +167,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         }
 
         private void onTick(long i) {
-            playTickEffect();
+            JagerA2Info.Effects.playDisplay(getLocation());
+
             if (!readyTimeModule.isReady())
                 return;
 
@@ -176,18 +177,6 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
             if (target != null)
                 onCatchEnemy(target);
-        }
-
-        /**
-         * 덫 표시 효과를 재생한다.
-         */
-        private void playTickEffect() {
-            for (int i = 0; i < 7; i++) {
-                JagerA2Info.Effects.DISPLAY.play(getLocation().add(i % 2 == 0 ? 0.4 : 0.55, 0, 0.6 - i * 0.2));
-                JagerA2Info.Effects.DISPLAY.play(getLocation().add(i % 2 == 0 ? -0.4 : -0.55, 0, 0.6 - i * 0.2));
-            }
-            for (int i = 0; i < 5; i++)
-                JagerA2Info.Effects.DISPLAY.play(getLocation().add(0, 0, 0.4 - i * 0.2));
         }
 
         /**
