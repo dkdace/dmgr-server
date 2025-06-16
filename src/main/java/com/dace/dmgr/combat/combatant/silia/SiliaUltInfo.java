@@ -79,12 +79,12 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
 
             for (int j = 0; j < 6; j++) {
                 long index = i * 6 + j;
-                long index1 = Math.min(index, 66);
+                long index1 = Math.min(index, 70);
                 double angle = index1 * 1.7;
-                double forward = -1.4;
+                double forward = -1;
                 float pitch = index1 * 4F;
 
-                if (index1 == 66) {
+                if (index1 == 70) {
                     long subIndex = index - index1;
                     angle -= subIndex * 2.3;
                     forward += subIndex * 0.0025;
@@ -95,7 +95,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
                 location.setPitch(pitch);
 
                 for (int k = 0; k < 3; k++) {
-                    Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, forward * k);
+                    Location loc = LocationUtil.getLocationFromOffset(location, 0, 0, forward - 0.4 * k);
 
                     if (k == 2)
                         USE_TICK_2.play(loc);
