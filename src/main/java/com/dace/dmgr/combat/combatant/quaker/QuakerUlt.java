@@ -119,8 +119,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         private final HashSet<Damageable> targets;
 
         private QuakerUltProjectile(@NonNull HashSet<Damageable> targets) {
-            super(QuakerUlt.this, QuakerUltInfo.VELOCITY,
-                    EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
+            super(QuakerUlt.this, QuakerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
                     Option.builder().size(QuakerUltInfo.SIZE).maxDistance(QuakerUltInfo.DISTANCE).build());
             this.targets = targets;
         }
@@ -146,25 +145,25 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                targets.add(target);
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
+                        target.getStatusEffectModule().apply(stun, QuakerUltInfo.STUN_DURATION);
+                        target.getStatusEffectModule().apply(SLOW, QuakerUltInfo.SLOW_DURATION);
 
-                if (target.getDamageModule().damage(this, QuakerUltInfo.DAMAGE, DamageType.NORMAL, location, false, false)) {
-                    target.getStatusEffectModule().apply(stun, QuakerUltInfo.STUN_DURATION);
-                    target.getStatusEffectModule().apply(SLOW, QuakerUltInfo.SLOW_DURATION);
+                        if (target instanceof Movable) {
+                            Vector dir = LocationUtil.getDirection(combatUser.getLocation(), target.getLocation().add(0, 1, 0))
+                                    .multiply(QuakerUltInfo.KNOCKBACK);
+                            ((Movable) target).getMoveModule().knockback(dir);
+                        }
 
-                    if (target instanceof Movable) {
-                        Vector dir = LocationUtil.getDirection(combatUser.getLocation(), target.getLocation().add(0, 1, 0))
-                                .multiply(QuakerUltInfo.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        if (target.isGoalTarget()) {
+                            combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
+                            bonusScoreModule.addTarget(target, QuakerUltInfo.SLOW_DURATION);
+                        }
                     }
 
-                    if (target.isGoalTarget()) {
-                        combatUser.addScore("적 기절시킴", QuakerUltInfo.DAMAGE_SCORE);
-                        bonusScoreModule.addTarget(target, QuakerUltInfo.SLOW_DURATION);
-                    }
+                    QuakerUltInfo.Effects.HIT_ENTITY.play(location);
                 }
-
-                QuakerUltInfo.Effects.HIT_ENTITY.play(location);
 
                 return !(target instanceof Barrier);
             };

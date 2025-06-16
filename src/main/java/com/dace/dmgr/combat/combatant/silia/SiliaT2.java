@@ -99,8 +99,7 @@ public final class SiliaT2 extends Trait {
         private final HashSet<Damageable> targets;
 
         private SiliaT2MeleeHitscan(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)), SiliaT2Info.DISTANCE,
-                    SiliaT2Info.SIZE);
+            super(combatUser, EntityCondition.enemy(combatUser), SiliaT2Info.DISTANCE, SiliaT2Info.SIZE);
             this.targets = targets;
         }
 
@@ -140,21 +139,21 @@ public final class SiliaT2 extends Trait {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                targets.add(target);
+                if (targets.add(target)) {
+                    if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
+                            SiliaT1Util.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
 
-                if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1Util.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
+                        if (target instanceof Movable) {
+                            Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
+                            ((Movable) target).getMoveModule().knockback(dir);
+                        }
 
-                    if (target instanceof Movable) {
-                        Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
+                            combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 
-                    if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
-                        combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                    SiliaT2Info.Effects.HIT_ENTITY.play(location);
                 }
-
-                SiliaT2Info.Effects.HIT_ENTITY.play(location);
 
                 return true;
             };

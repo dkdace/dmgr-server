@@ -100,8 +100,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         private final boolean isUlt;
 
         private QuakerWeaponMeleeHitscan(@NonNull HashSet<Damageable> targets, boolean isUlt) {
-            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
-                    QuakerWeaponInfo.DISTANCE, QuakerWeaponInfo.SIZE);
+            super(combatUser, EntityCondition.enemy(combatUser), QuakerWeaponInfo.DISTANCE, QuakerWeaponInfo.SIZE);
 
             this.targets = targets;
             this.isUlt = isUlt;
@@ -146,9 +145,7 @@ public final class QuakerWeapon extends AbstractWeapon {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (!isUlt) {
-                    targets.add(target);
-
+                if (!isUlt && targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true)
                             && target instanceof Movable) {
                         Vector dir = VectorUtil.getPitchAxis(combatUser.getLocation())

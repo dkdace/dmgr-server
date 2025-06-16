@@ -82,8 +82,7 @@ public final class No7A1 extends ActiveSkill {
         private final HashMap<Damageable, Timestamp> targets;
 
         private No7A1MeleeHitscan(@NonNull HashMap<Damageable, Timestamp> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity ->
-                    !targets.containsKey(combatEntity) || targets.get(combatEntity).isBefore(Timestamp.now())), No7A1Info.DISTANCE, No7A1Info.SIZE);
+            super(combatUser, EntityCondition.enemy(combatUser), No7A1Info.DISTANCE, No7A1Info.SIZE);
             this.targets = targets;
         }
 
@@ -103,16 +102,20 @@ public final class No7A1 extends ActiveSkill {
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
+                Timestamp damageTimestamp = targets.get(target);
 
-                if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                    combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
+                if (damageTimestamp == null || damageTimestamp.isBefore(Timestamp.now())) {
+                    targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
 
-                    if (target instanceof Movable)
-                        ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
+                    if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
+                        combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
+
+                        if (target instanceof Movable)
+                            ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
+                    }
+
+                    No7A1Info.Effects.HIT_ENTITY.play(location);
                 }
-
-                No7A1Info.Effects.HIT_ENTITY.play(location);
 
                 return false;
             };

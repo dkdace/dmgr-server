@@ -89,8 +89,7 @@ public final class SiliaA1 extends ActiveSkill {
         private final HashSet<Damageable> targets;
 
         private SiliaA1MeleeHitscan(@NonNull HashSet<Damageable> targets) {
-            super(combatUser, EntityCondition.enemy(combatUser).and(combatEntity -> !targets.contains(combatEntity)),
-                    SiliaA1Info.DISTANCE, 0);
+            super(combatUser, EntityCondition.enemy(combatUser), SiliaA1Info.DISTANCE, 0);
             this.targets = targets;
         }
 
@@ -127,12 +126,12 @@ public final class SiliaA1 extends ActiveSkill {
 
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-                targets.add(target);
+                if (targets.add(target)) {
+                    target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
+                            SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
 
-                target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
-                        SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
-
-                SiliaA1Info.Effects.HIT_ENTITY.play(location);
+                    SiliaA1Info.Effects.HIT_ENTITY.play(location);
+                }
 
                 return true;
             }
