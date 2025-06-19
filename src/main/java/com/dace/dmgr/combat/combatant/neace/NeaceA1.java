@@ -88,12 +88,12 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
                 return;
             }
 
-            if (!(combatEntity instanceof Healable) || ((Healable) combatEntity).getDamageModule().isFullHealth()
+            if (!(combatEntity instanceof Healable) || combatEntity.getDamageModule().isFullHealth()
                     || ((NeaceWeapon) combatUser.getActionManager().getWeapon()).isHealing((Healable) combatEntity))
                 return;
 
             double amount = NeaceA1Info.HEAL_PER_SECOND / 20.0;
-            if (((Healable) combatEntity).getDamageModule().heal(combatUser, amount, true))
+            if (((Healable) combatEntity).getHealModule().heal(combatUser, amount, true))
                 heal += amount;
 
             if (heal >= NeaceA1Info.MAX_HEAL)

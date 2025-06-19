@@ -12,7 +12,7 @@ import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Support extends Combatant {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.SPEED);
+    private static final Modifier MODIFIER = new Modifier(RoleTrait1Info.SPEED);
 
     /**
      * 지원 역할군 전투원 정보 인스턴스를 생성한다.
@@ -55,9 +55,9 @@ public abstract class Support extends Combatant {
                             && combatEntity.getLocation().distance(combatUser.getLocation()) >= RoleTrait1Info.DETECT_RADIUS)).isEmpty();
 
             if (isActive)
-                combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+                combatUser.getMoveModule().addModifier(MODIFIER);
             else
-                combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+                combatUser.getMoveModule().removeModifier(MODIFIER);
         }
 
         combatUser.getActionManager().getTrait(RoleTrait2Info.instance).onUse();
@@ -131,7 +131,7 @@ public abstract class Support extends Combatant {
 
         private void onUse() {
             if (lastGiveHealTimestamp.plus(RoleTrait2Info.DURATION).isAfter(Timestamp.now()))
-                combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
+                combatUser.getHealModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
         }
     }
 }

@@ -220,7 +220,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
                         && target instanceof Movable) {
                     Vector dir = getVelocity().normalize().multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
-                    ((Movable) target).getMoveModule().knockback(dir);
+                    ((Movable) target).getKnockbackModule().knockback(dir);
                 }
 
                 return false;
@@ -247,7 +247,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                     if (target instanceof Movable && !InfernoWeaponLProjectile.this.getHitTargets().contains(target)) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        ((Movable) target).getKnockbackModule().knockback(dir);
                     }
                 }
 

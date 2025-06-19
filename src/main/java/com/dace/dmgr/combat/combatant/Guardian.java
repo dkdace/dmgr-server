@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore;
 import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -19,9 +19,9 @@ import java.util.function.LongConsumer;
  */
 public abstract class Guardian extends Combatant {
     /** 넉백 저항 수정자 */
-    private static final AbilityStatus.Modifier KNOCKBACK_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
+    private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
     /** 방어력 수정자 */
-    private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.DEFENSE);
+    private static final Modifier DEFENSE_MODIFIER = new Modifier(RoleTrait1Info.DEFENSE);
 
     /**
      * 수호 역할군 전투원 정보 인스턴스를 생성한다.
@@ -45,15 +45,15 @@ public abstract class Guardian extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
-        combatUser.getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
-        combatUser.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
+        combatUser.getMoveModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+        combatUser.getDamageModule().addModifier(DEFENSE_MODIFIER);
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
         combatUser.addTask(new IntervalTask((LongConsumer) i ->
-                combatUser.getDamageModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION.toTicks(), false),
+                combatUser.getHealModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION.toTicks(), false),
                 1, RoleTrait2Info.DURATION.toTicks()));
     }
 

@@ -30,7 +30,7 @@ public final class NeaceP1 extends AbstractSkill {
         setDuration();
 
         addActionTask(new IntervalTask((LongConsumer) i ->
-                combatUser.getDamageModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20.0, false), 1));
+                combatUser.getHealModule().heal(combatUser, NeaceP1Info.HEAL_PER_SECOND / 20.0, false), 1));
     }
 
     @Override

@@ -112,7 +112,7 @@ public final class MeleeAttackAction extends AbstractAction {
             return (location, target) -> {
                 if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true)
                         && target instanceof Movable)
-                    ((Movable) target).getMoveModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
+                    ((Movable) target).getKnockbackModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
 
                 HIT_ENTITY_EFFECT.play(location);
                 return false;

@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -26,7 +26,7 @@ import java.util.HashSet;
 
 public final class QuakerA3 extends ActiveSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    private static final Modifier MODIFIER = new Modifier(-100);
 
     public QuakerA3(@NonNull CombatUser combatUser) {
         super(combatUser, QuakerA3Info.getInstance(), QuakerA3Info.COOLDOWN, Timespan.MAX, 2);
@@ -48,7 +48,7 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration();
 
         combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
 
         Weapon weapon = combatUser.getActionManager().getWeapon();
@@ -75,7 +75,7 @@ public final class QuakerA3 extends ActiveSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
@@ -151,7 +151,7 @@ public final class QuakerA3 extends ActiveSkill {
                     return false;
 
                 if (i < 3)
-                    target.getMoveModule().knockback(getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
+                    target.getKnockbackModule().knockback(getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
 
                 Location loc = target.getCenterLocation().add(0, 0.1, 0);
                 new QuakerA3Area().emit(loc);
@@ -161,7 +161,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Location hitLoc = loc.clone().add(getVelocity().normalize());
                 if (!LocationUtil.isNonSolid(hitLoc)) {
                     onHitEnemy(hitLoc, (Damageable) target);
-                    target.getMoveModule().knockback(new Vector(), true);
+                    target.getKnockbackModule().knockback(new Vector(), true);
 
                     QuakerA3Info.Effects.HIT_ENTITY_WALL.apply(hitLoc.getBlock()).play(loc);
 

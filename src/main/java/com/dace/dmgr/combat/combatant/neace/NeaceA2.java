@@ -8,16 +8,16 @@ import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
 public final class NeaceA2 extends ChargeableSkill {
     /** 공격력 수정자 */
-    private static final AbilityStatus.Modifier DAMAGE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DAMAGE_INCREMENT);
+    private static final Modifier DAMAGE_MODIFIER = new Modifier(NeaceA2Info.DAMAGE_INCREMENT);
     /** 방어력 수정자 */
-    private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(NeaceA2Info.DEFENSE_INCREMENT);
+    private static final Modifier DEFENSE_MODIFIER = new Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
     public NeaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, NeaceA2Info.getInstance(), NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds(), 1);
@@ -112,9 +112,9 @@ public final class NeaceA2 extends ChargeableSkill {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
+            combatEntity.getDamageModule().addModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(DAMAGE_MODIFIER);
+                ((Attacker) combatEntity).getAttackerModule().addModifier(DAMAGE_MODIFIER);
         }
 
         @Override
@@ -124,9 +124,9 @@ public final class NeaceA2 extends ChargeableSkill {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(DEFENSE_MODIFIER);
+            combatEntity.getDamageModule().removeModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(DAMAGE_MODIFIER);
+                ((Attacker) combatEntity).getAttackerModule().removeModifier(DAMAGE_MODIFIER);
         }
     }
 }

@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class SiliaUlt extends UltimateSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaUltInfo.SPEED);
+    private static final Modifier MODIFIER = new Modifier(SiliaUltInfo.SPEED);
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -54,7 +54,7 @@ public final class SiliaUlt extends UltimateSkill {
             isEnabled = true;
 
             setDuration();
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+            combatUser.getMoveModule().addModifier(MODIFIER);
 
             actionManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
             actionManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
@@ -70,7 +70,7 @@ public final class SiliaUlt extends UltimateSkill {
 
         isEnabled = false;
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
     }
 

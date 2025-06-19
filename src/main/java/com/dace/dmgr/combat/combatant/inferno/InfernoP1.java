@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.interaction.Area;
 import lombok.NonNull;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class InfernoP1 extends AbstractSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(InfernoP1Info.DEFENSE_INCREMENT);
+    private static final Modifier MODIFIER = new Modifier(InfernoP1Info.DEFENSE_INCREMENT);
     /** 활성화 가능 여부 */
     private boolean canActivate = false;
 
@@ -57,13 +57,13 @@ public final class InfernoP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getDamageModule().getDefenseMultiplierStatus().addModifier(MODIFIER);
+        combatUser.getDamageModule().addModifier(MODIFIER);
     }
 
     @Override
     protected void onDurationFinished() {
         super.onDurationFinished();
-        combatUser.getDamageModule().getDefenseMultiplierStatus().removeModifier(MODIFIER);
+        combatUser.getDamageModule().removeModifier(MODIFIER);
     }
 
     @Override

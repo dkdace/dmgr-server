@@ -167,7 +167,7 @@ public final class MagrittaA1 extends ActiveSkill {
 
                     if (target instanceof Movable) {
                         Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MagrittaA1Info.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        ((Movable) target).getKnockbackModule().knockback(dir);
                     }
 
                     MagrittaT1Util.addValue(combatUser, target);

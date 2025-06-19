@@ -15,7 +15,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -31,9 +31,9 @@ import org.jetbrains.annotations.Nullable;
 
 public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>, HasBonusScore {
     /** 이동 속도 수정자 */
-    private static final AbilityStatus.Modifier SPEED_MODIFIER = new AbilityStatus.Modifier(-VellionA2Info.READY_SLOW);
+    private static final Modifier SPEED_MODIFIER = new Modifier(-VellionA2Info.READY_SLOW);
     /** 방어력 수정자 */
-    private static final AbilityStatus.Modifier DEFENSE_MODIFIER = new AbilityStatus.Modifier(-VellionA2Info.DEFENSE_DECREMENT);
+    private static final Modifier DEFENSE_MODIFIER = new Modifier(-VellionA2Info.DEFENSE_DECREMENT);
 
     /** 타겟 모듈 */
     @NonNull
@@ -90,7 +90,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         setDuration();
 
         combatUser.setGlobalCooldown(VellionA2Info.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(SPEED_MODIFIER);
+        combatUser.getMoveModule().addModifier(SPEED_MODIFIER);
 
         VellionA2Info.Effects.USE.play(combatUser.getLocation());
 
@@ -119,7 +119,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     private void onReady(@NonNull Damageable target) {
         isEnabled = true;
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
+        combatUser.getMoveModule().removeModifier(SPEED_MODIFIER);
         target.getStatusEffectModule().apply(VellionA2Mark.instance, Timespan.MAX);
 
         VellionA2Info.Effects.USE_READY.play(combatUser.getLocation());
@@ -161,7 +161,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         }
 
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
+        combatUser.getMoveModule().removeModifier(SPEED_MODIFIER);
     }
 
     @Override
@@ -199,7 +199,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().addModifier(DEFENSE_MODIFIER);
+            combatEntity.getDamageModule().addModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§5§l저주받음!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
         }
@@ -211,7 +211,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getDamageModule().getDefenseMultiplierStatus().removeModifier(DEFENSE_MODIFIER);
+            combatEntity.getDamageModule().removeModifier(DEFENSE_MODIFIER);
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§f저주가 풀림", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
         }

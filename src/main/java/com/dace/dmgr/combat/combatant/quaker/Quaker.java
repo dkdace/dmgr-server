@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public final class Quaker extends Guardian {
     @Getter
     private static final Quaker instance = new Quaker();
     /** 특성 수정자 */
-    private static final AbilityStatus.Modifier TRAIT_MODIFIER = new AbilityStatus.Modifier(QuakerT1Info.STATUS_EFFECT_RESISTANCE);
+    private static final Modifier TRAIT_MODIFIER = new Modifier(QuakerT1Info.STATUS_EFFECT_RESISTANCE);
     /** 발소리 */
     private static final PlayableEffect.Function<Double> FOOTSTEP_SOUND = volumeMultiplier -> PlayableEffect.list(
             SoundEffect.builder(Sound.ENTITY_COW_STEP).volume(0.3 * volumeMultiplier).pitch(0.9).pitchVariance(0.1).build(),
@@ -124,7 +124,7 @@ public final class Quaker extends Guardian {
     @Override
     public void onSet(@NonNull CombatUser combatUser) {
         super.onSet(combatUser);
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(TRAIT_MODIFIER);
+        combatUser.getStatusEffectModule().addModifier(TRAIT_MODIFIER);
     }
 
     @Override

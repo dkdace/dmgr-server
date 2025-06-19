@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.module.statuseffect;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import lombok.NonNull;
@@ -19,7 +19,7 @@ public class Slow implements StatusEffect {
             ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.FALLING_DUST, Material.WOOL, 12).count(3)
                     .horizontalSpread(combatEntity.getWidth() * 0.5).build();
     /** 수정자 */
-    private final AbilityStatus.Modifier modifier;
+    private final Modifier modifier;
 
     /**
      * 둔화 상태 효과 인스턴스를 생성한다.
@@ -27,7 +27,7 @@ public class Slow implements StatusEffect {
      * @param decrement 이동 속도 감소량
      */
     public Slow(double decrement) {
-        this.modifier = new AbilityStatus.Modifier(-decrement);
+        this.modifier = new Modifier(-decrement);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Slow implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof Movable)
-            ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(modifier);
+            ((Movable) combatEntity).getMoveModule().addModifier(modifier);
     }
 
     @Override
@@ -68,6 +68,6 @@ public class Slow implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onEnd(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof Movable)
-            ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(modifier);
+            ((Movable) combatEntity).getMoveModule().removeModifier(modifier);
     }
 }

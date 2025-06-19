@@ -37,18 +37,10 @@ import java.util.function.Predicate;
  *
  * @see Damageable
  */
-public class DamageModule {
-    /** 방어력 배수 기본값 */
-    private static final double DEFAULT_VALUE = 1;
+public final class DamageModule extends CombatEntityModule<Damageable> {
     /** 치명타 배수 기본값 */
     private static final double DEFAULT_CRIT_MULTIPLIER = 2;
 
-    /** 엔티티 인스턴스 */
-    protected final Damageable combatEntity;
-    /** 방어력 배수 값 */
-    @NonNull
-    @Getter
-    private final AbilityStatus defenseMultiplierStatus;
     /** 생명력 홀로그램 표시 여부 */
     private final boolean hasHealthBar;
     /** 보호막 목록 */
@@ -71,11 +63,10 @@ public class DamageModule {
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public DamageModule(@NonNull Damageable combatEntity, int maxHealth, boolean hasHealthBar) {
+        super(combatEntity);
         Validate.isTrue(maxHealth >= 1, "maxHealth >= 1 (%d)", maxHealth);
         Validate.isTrue(combatEntity.getEntity() instanceof LivingEntity, "combatEntity.getEntity()가 LivingEntity를 상속받지 않음");
 
-        this.combatEntity = combatEntity;
-        this.defenseMultiplierStatus = new AbilityStatus(DEFAULT_VALUE);
         this.maxHealth = maxHealth;
         this.hasHealthBar = hasHealthBar;
 
@@ -86,6 +77,11 @@ public class DamageModule {
         combatEntity.addOnRemove(this::clearShields);
         if (hasHealthBar)
             combatEntity.addTask(new DelayTask(this::createHealthBar, 5));
+    }
+
+    @Override
+    protected double getBaseValue() {
+        return 1;
     }
 
     /**
@@ -134,7 +130,7 @@ public class DamageModule {
      *
      * @return 실제 체력×50 (체력 1줄 기준 1000)
      */
-    public final double getHealth() {
+    public double getHealth() {
         return ((LivingEntity) combatEntity.getEntity()).getHealth() * 50.0;
     }
 
@@ -143,7 +139,7 @@ public class DamageModule {
      *
      * @param health 실제 체력×50 (체력 1줄 기준 1000)
      */
-    public final void setHealth(double health) {
+    public void setHealth(double health) {
         ((LivingEntity) combatEntity.getEntity()).setHealth(Math.min(Math.max(0, health), getMaxHealth()) / 50.0);
     }
 
@@ -153,7 +149,7 @@ public class DamageModule {
      * @param maxHealth 실제 체력×50 (체력 1줄 기준 1000). 1 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final void setMaxHealth(int maxHealth) {
+    public void setMaxHealth(int maxHealth) {
         Validate.isTrue(maxHealth >= 1, "maxHealth >= 1", maxHealth);
 
         this.maxHealth = maxHealth;
@@ -168,7 +164,7 @@ public class DamageModule {
      *
      * @return 체력이 최대치이면 {@code true} 반환
      */
-    public final boolean isFullHealth() {
+    public boolean isFullHealth() {
         return getHealth() == getMaxHealth();
     }
 
@@ -177,7 +173,7 @@ public class DamageModule {
      *
      * @return 체력이 50% 이하면 {@code true} 반환
      */
-    public final boolean isHalfHealth() {
+    public boolean isHalfHealth() {
         return getHealth() <= getMaxHealth() / 2.0;
     }
 
@@ -186,7 +182,7 @@ public class DamageModule {
      *
      * @return 체력이 25% 이하면 {@code true} 반환
      */
-    public final boolean isLowHealth() {
+    public boolean isLowHealth() {
         return getHealth() <= getMaxHealth() / 4.0;
     }
 
@@ -197,7 +193,7 @@ public class DamageModule {
      * @return 보호막 인스턴스
      */
     @NonNull
-    public final Shield createShield(int health) {
+    public Shield createShield(int health) {
         return new Shield(health);
     }
 
@@ -207,14 +203,14 @@ public class DamageModule {
      * @return 전체 보호막 체력 (실제 보호막×50 (체력 1줄 기준 1000))
      * @see Shield#getHealth()
      */
-    public final double getTotalShield() {
+    public double getTotalShield() {
         return shields.stream().mapToDouble(Shield::getHealth).sum();
     }
 
     /**
      * 엔티티의 전체 보호막을 초기화한다.
      */
-    public final void clearShields() {
+    public void clearShields() {
         new ArrayList<>(shields).forEach(shield -> shield.setHealth(0));
     }
 
@@ -313,13 +309,13 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location,
-                                double critMultiplier, boolean isUlt) {
+    public boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location,
+                          double critMultiplier, boolean isUlt) {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
         Validate.isTrue(critMultiplier >= 1, "critMultiplier >= 1 (%f)", critMultiplier);
 
-        double damageMultiplier = attacker == null ? 1 : attacker.getAttackModule().getDamageMultiplierStatus().getValue();
-        double defenseMultiplier = defenseMultiplierStatus.getValue();
+        double damageMultiplier = attacker == null ? 1 : attacker.getAttackerModule().getValue();
+        double defenseMultiplier = getValue();
 
         return handleDamage(attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
     }
@@ -336,8 +332,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit,
-                                boolean isUlt) {
+    public boolean damage(@Nullable Attacker attacker, double damage, @NonNull DamageType damageType, @Nullable Location location, boolean isCrit,
+                          boolean isUlt) {
         return damage(attacker, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 
@@ -353,15 +349,15 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
-                                @Nullable Location location, double critMultiplier, boolean isUlt) {
+    public boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
+                          @Nullable Location location, double critMultiplier, boolean isUlt) {
         Validate.isTrue(damage >= 0, "damage >= 0 (%f)", damage);
         Validate.isTrue(critMultiplier >= 1, "critMultiplier >= 1 (%f)", critMultiplier);
 
         CombatEntity attacker = projectile.getShooter();
         if (attacker instanceof Attacker) {
             double damageMultiplier = projectile.getDamageIncrement();
-            double defenseMultiplier = defenseMultiplierStatus.getValue();
+            double defenseMultiplier = getValue();
 
             return handleDamage((Attacker) attacker, damage, damageMultiplier, defenseMultiplier, damageType, location, critMultiplier, isUlt);
         }
@@ -381,8 +377,8 @@ public class DamageModule {
      * @return 피해 여부. 피해를 입었으면 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public final boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
-                                @Nullable Location location, boolean isCrit, boolean isUlt) {
+    public boolean damage(@NonNull Projectile<? extends Damageable> projectile, double damage, @NonNull DamageType damageType,
+                          @Nullable Location location, boolean isCrit, boolean isUlt) {
         return damage(projectile, damage, damageType, location, isCrit ? DEFAULT_CRIT_MULTIPLIER : 1, isUlt);
     }
 

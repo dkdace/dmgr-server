@@ -11,7 +11,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -32,7 +32,7 @@ import java.util.function.IntConsumer;
 
 public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    private static final Modifier MODIFIER = new Modifier(-100);
     /** 둔화 상태 효과 */
     private static final Slow SLOW = new Slow(QuakerA2Info.SLOW);
 
@@ -66,7 +66,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         setDuration();
 
         combatUser.setGlobalCooldown(Timespan.MAX);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), MainHand.RIGHT);
 
         Weapon weapon = combatUser.getActionManager().getWeapon();
@@ -113,7 +113,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         setDuration(Timespan.ZERO);
 
         combatUser.resetGlobalCooldown();
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
 
         combatUser.getActionManager().getWeapon().setVisible(true);
     }

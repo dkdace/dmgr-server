@@ -1,14 +1,13 @@
 package com.dace.dmgr.combat.entity.module;
 
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.EntityUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -23,23 +22,11 @@ import org.bukkit.util.Vector;
  *
  * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  */
-public final class MoveModule {
-    /** 넉백 저항 기본값 */
-    private static final double DEFAULT_VALUE = 1;
-
-    /** 엔티티 인스턴스 */
-    private final Movable combatEntity;
-    /** 이동속도 값 */
-    @NonNull
-    @Getter
-    private final AbilityStatus speedStatus;
-    /** 넉백 저항 값 */
-    @NonNull
-    @Getter
-    private final AbilityStatus resistanceStatus;
-
-    /** 넉백 타임스탬프 */
-    private Timestamp knockbackTimestamp = Timestamp.now();
+@Getter(AccessLevel.PROTECTED)
+@Setter
+public final class MoveModule extends CombatEntityModule<Movable> {
+    /** 이동속도 기본값 */
+    private double baseValue;
 
     /**
      * 이동 모듈 인스턴스를 생성한다.
@@ -49,12 +36,11 @@ public final class MoveModule {
      * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public MoveModule(@NonNull Movable combatEntity, double speed) {
+        super(combatEntity);
         Validate.isTrue(speed >= 0, "speed >= 0 (%f)", speed);
         Validate.isTrue(combatEntity.getEntity() instanceof LivingEntity, "combatEntity.getEntity()가 LivingEntity를 상속받지 않음");
 
-        this.combatEntity = combatEntity;
-        this.speedStatus = new AbilityStatus(speed);
-        this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
+        this.baseValue = speed;
 
         combatEntity.addOnTick(i -> {
             double finalSpeed = Math.max(0, getFinalSpeed());
@@ -83,7 +69,7 @@ public final class MoveModule {
         if (!canMove() || !combatEntity.canMove())
             return 0;
 
-        double speed = speedStatus.getValue();
+        double speed = getValue();
 
         LivingEntity livingEntity = combatEntity.getEntity();
         if (!(livingEntity instanceof Player))
@@ -92,7 +78,7 @@ public final class MoveModule {
         if (((Player) livingEntity).isSprinting()) {
             speed *= 0.88;
             if (!livingEntity.isOnGround())
-                speed *= speed / speedStatus.getBaseValue();
+                speed *= speed / getBaseValue();
         }
 
         return speed;
@@ -125,7 +111,7 @@ public final class MoveModule {
      * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
      */
     public void push(@NonNull Vector velocity, boolean isReset) {
-        if (!(combatEntity instanceof Damageable) || !isKnockbacked()
+        if (!(combatEntity instanceof Damageable) || !combatEntity.getKnockbackModule().isKnockbacked()
                 && !((Damageable) combatEntity).getStatusEffectModule().hasRestriction(CombatRestriction.PUSH))
             combatEntity.getEntity().setVelocity(isReset ? velocity : combatEntity.getEntity().getVelocity().add(velocity));
     }
@@ -137,47 +123,6 @@ public final class MoveModule {
      */
     public void push(@NonNull Vector velocity) {
         push(velocity, false);
-    }
-
-
-    /**
-     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
-     *
-     * <p>또한 잠시동안 이동기({@link MoveModule#push(Vector, boolean)})의 사용을 제한한다.</p>
-     *
-     * @param velocity 속도
-     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
-     * @see MoveModule#push(Vector, boolean)
-     */
-    public void knockback(@NonNull Vector velocity, boolean isReset) {
-        knockbackTimestamp = Timestamp.now().plus(Timespan.ofTicks(3));
-
-        Vector finalVelocity = velocity.clone().multiply(Math.max(0, 2 - resistanceStatus.getValue()));
-        combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));
-
-        if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getCombatantType().getCombatant().onKnockbacked((CombatUser) combatEntity, velocity.length());
-    }
-
-    /**
-     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
-     *
-     * <p>또한 잠시동안 이동기({@link MoveModule#push(Vector)})의 사용을 제한한다.</p>
-     *
-     * @param velocity 속도
-     * @see MoveModule#push(Vector)
-     */
-    public void knockback(@NonNull Vector velocity) {
-        knockback(velocity, false);
-    }
-
-    /**
-     * 엔티티가 넉백 효과를 받은 상태인지 확인한다.
-     *
-     * @return 넉백 효과 상태 여부
-     */
-    public boolean isKnockbacked() {
-        return knockbackTimestamp.isAfter(Timestamp.now());
     }
 
     /**

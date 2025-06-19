@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter(AccessLevel.PACKAGE)
 public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(SiliaA3Info.SPEED);
+    private static final Modifier MODIFIER = new Modifier(SiliaA3Info.SPEED);
     /** 누적 피해 */
     private double damage = 0;
 
@@ -64,7 +64,7 @@ public final class SiliaA3 extends ChargeableSkill {
         }
 
         setDuration();
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         SiliaA3Info.Effects.ON.play(combatUser.getLocation());
 
@@ -91,7 +91,7 @@ public final class SiliaA3 extends ChargeableSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
         damage = 0;
 
         combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);

@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -18,7 +18,7 @@ import java.util.function.LongConsumer;
 
 public final class MagrittaA2 extends ActiveSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(MagrittaA2Info.SPEED);
+    private static final Modifier MODIFIER = new Modifier(MagrittaA2Info.SPEED);
 
     public MagrittaA2(@NonNull CombatUser combatUser) {
         super(combatUser, MagrittaA2Info.getInstance(), MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION, 1);
@@ -45,7 +45,7 @@ public final class MagrittaA2 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), MagrittaA2Info.DURATION);
         combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
                 (int) MagrittaA2Info.DURATION.toTicks(), 2, false, false), true);
@@ -64,7 +64,7 @@ public final class MagrittaA2 extends ActiveSkill {
     protected void onDurationFinished() {
         super.onDurationFinished();
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
 
         MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
         weapon.setVisible(true);

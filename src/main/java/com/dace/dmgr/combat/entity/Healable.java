@@ -12,7 +12,7 @@ public interface Healable extends Damageable {
      * @return 회복 모듈
      */
     @NonNull
-    HealModule getDamageModule();
+    HealModule getHealModule();
 
     /**
      * 엔티티가 치유를 받았을 때 실행될 작업.

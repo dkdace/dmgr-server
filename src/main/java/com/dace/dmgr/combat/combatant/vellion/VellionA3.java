@@ -11,7 +11,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.combat.interaction.Area;
@@ -24,7 +24,7 @@ import org.bukkit.inventory.MainHand;
 
 public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA3Info.READY_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-VellionA3Info.READY_SLOW);
 
     /** 위치 확인 모듈 */
     @NonNull
@@ -90,7 +90,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
         if (!isDurationFinished()) {
             setDuration(Timespan.ZERO);
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+            combatUser.getMoveModule().removeModifier(MODIFIER);
         }
     }
 
@@ -125,7 +125,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
         confirmModule.toggleCheck();
         combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         Location location = confirmModule.getCurrentLocation();
 

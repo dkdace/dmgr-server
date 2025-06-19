@@ -145,7 +145,7 @@ public final class SiliaT2 extends Trait {
 
                         if (target instanceof Movable) {
                             Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
-                            ((Movable) target).getMoveModule().knockback(dir);
+                            ((Movable) target).getKnockbackModule().knockback(dir);
                         }
 
                         if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())

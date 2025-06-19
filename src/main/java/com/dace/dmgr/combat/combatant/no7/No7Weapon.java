@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -21,7 +21,7 @@ import org.bukkit.Location;
 
 public final class No7Weapon extends AbstractWeapon implements FullAuto {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-No7WeaponInfo.SLOW);
+    private static final Modifier MODIFIER = new Modifier(-No7WeaponInfo.SLOW);
 
     /** 연사 모듈 */
     @NonNull
@@ -50,12 +50,12 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
     public void onUse(@NonNull ActionKey actionKey) {
         Bullet.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
 
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         if (slowTimestamp.isBefore(Timestamp.now())) {
             slowTimestamp = Timestamp.now().plus(No7WeaponInfo.SLOW_DURATION);
-            addTask(new IntervalTask(i -> slowTimestamp.isAfter(Timestamp.now()), () ->
-                    combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER), 1));
+            addTask(new IntervalTask(i -> slowTimestamp.isAfter(Timestamp.now()), () -> combatUser.getMoveModule().removeModifier(MODIFIER),
+                    1));
         } else
             slowTimestamp = Timestamp.now().plus(No7WeaponInfo.SLOW_DURATION);
 

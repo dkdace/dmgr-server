@@ -99,7 +99,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
             increasedMaxHealth = newMaxHealth - maxHealth;
 
             combatEntity.getDamageModule().setMaxHealth(newMaxHealth);
-            ((Healable) combatEntity).getDamageModule().heal(combatUser, increasedMaxHealth, true);
+            ((Healable) combatEntity).getHealModule().heal(combatUser, increasedMaxHealth, true);
 
             if (combatEntity instanceof CombatUser)
                 ((CombatUser) combatEntity).getUser().sendTitle("§a§l최대 체력 증가", "", Timespan.ZERO, Timespan.ofTicks(5),

@@ -13,7 +13,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import org.bukkit.Location;
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-JagerWeaponInfo.AIM_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-JagerWeaponInfo.AIM_SLOW);
 
     /** 재장전 모듈 */
     @NonNull
@@ -156,7 +156,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onAimEnable() {
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         JagerWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
     }
@@ -164,7 +164,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onAimDisable() {
         combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
 
         JagerWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }

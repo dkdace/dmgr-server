@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class VellionP1 extends AbstractSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(VellionP1Info.SPEED);
+    private static final Modifier MODIFIER = new Modifier(VellionP1Info.SPEED);
 
     public VellionP1(@NonNull CombatUser combatUser) {
         super(combatUser, VellionP1Info.getInstance(), VellionP1Info.COOLDOWN, VellionP1Info.DURATION);
@@ -49,7 +49,7 @@ public final class VellionP1 extends AbstractSkill {
 
         setDuration();
 
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         Location location = combatUser.getLocation();
 
@@ -90,7 +90,7 @@ public final class VellionP1 extends AbstractSkill {
     protected void onDurationFinished() {
         super.onDurationFinished();
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getEntity().addPotionEffect(
                 new PotionEffect(PotionEffectType.LEVITATION, 40, -10, false, false), true);
 

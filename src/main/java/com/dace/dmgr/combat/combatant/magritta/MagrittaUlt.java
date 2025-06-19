@@ -8,7 +8,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.weapon.Weapon;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MagrittaUltInfo.USE_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-MagrittaUltInfo.USE_SLOW);
 
     /** 보너스 점수 모듈 */
     @NonNull
@@ -52,7 +52,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(MagrittaUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
@@ -82,7 +82,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         super.onDurationFinished();
 
         isEnabled = false;
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     @Override

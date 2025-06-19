@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    private static final Modifier MODIFIER = new Modifier(-100);
     /** 둔화 상태 효과 */
     private static final Slow SLOW = new Slow(VellionUltInfo.SLOW);
 
@@ -64,7 +64,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         combatUser.getActionManager().getSkill(VellionP1Info.getInstance()).cancel();
 
@@ -81,7 +81,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
         isEnabled = false;
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     @Override

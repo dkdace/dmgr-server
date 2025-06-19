@@ -7,43 +7,33 @@ import com.dace.dmgr.combat.entity.Healer;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Particle;
-import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 치유를 받을 수 있는 엔티티의 모듈 클래스.
  *
- * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
- *
  * @see Healable
  */
-@Getter
-public final class HealModule extends DamageModule {
+public final class HealModule extends CombatEntityModule<Healable> {
     /** 회복 입자 효과 */
     private static final PlayableEffect.Function<Double> HEAL_PARTICLE = amount ->
             ParticleEffect.Normal.builder(Particle.HEART).count((int) (amount / 100.0)).horizontalSpread(0.3).verticalSpread(0.1).build();
-    /** 회복량 배수 기본값 */
-    private static final double DEFAULT_VALUE = 1;
-
-    /** 회복량 배수 값 */
-    @NonNull
-    private final AbilityStatus healMultiplierStatus;
 
     /**
      * 회복 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity 대상 엔티티
-     * @param maxHealth    최대 체력. 1 이상의 값
-     * @param hasHealthBar 생명력 홀로그램 표시 여부
-     * @throws IllegalArgumentException 인자값이 유효하지 않거나 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
-    public HealModule(@NonNull Healable combatEntity, int maxHealth, boolean hasHealthBar) {
-        super(combatEntity, maxHealth, hasHealthBar);
-        this.healMultiplierStatus = new AbilityStatus(DEFAULT_VALUE);
+    public HealModule(@NonNull Healable combatEntity) {
+        super(combatEntity);
+    }
+
+    @Override
+    protected double getBaseValue() {
+        return 1;
     }
 
     /**
@@ -57,21 +47,24 @@ public final class HealModule extends DamageModule {
      * @return 치유 여부. 치유를 받았으면 {@code true} 반환
      */
     private boolean handleHeal(@Nullable Healer provider, double amount, double giveHealMultiplier, double takeHealMultiplier, boolean isUlt) {
-        if (combatEntity.getEntity().isDead() || isFullHealth() || combatEntity.getStatusEffectModule().hasRestriction(CombatRestriction.HEALED))
+        DamageModule damageModule = combatEntity.getDamageModule();
+
+        if (combatEntity.getEntity().isDead() || damageModule.isFullHealth()
+                || combatEntity.getStatusEffectModule().hasRestriction(CombatRestriction.HEALED))
             return false;
         if (amount == 0)
             return true;
 
         double finalAmount = Math.max(0, amount * (giveHealMultiplier + takeHealMultiplier - 1));
-        if (getHealth() + finalAmount > getMaxHealth())
-            finalAmount = getMaxHealth() - getHealth();
+        if (damageModule.getHealth() + finalAmount > damageModule.getMaxHealth())
+            finalAmount = damageModule.getMaxHealth() - damageModule.getHealth();
 
-        setHealth(getHealth() + finalAmount);
+        damageModule.setHealth(damageModule.getHealth() + finalAmount);
 
         if (provider != null)
-            provider.onGiveHeal((Healable) combatEntity, finalAmount, isUlt);
+            provider.onGiveHeal(combatEntity, finalAmount, isUlt);
 
-        ((Healable) combatEntity).onTakeHeal(provider, finalAmount);
+        combatEntity.onTakeHeal(provider, finalAmount);
 
         if (finalAmount >= 100 || finalAmount / 100.0 > Math.random())
             HEAL_PARTICLE.apply(finalAmount).play(combatEntity.getLocation().add(0, combatEntity.getHeight() + 0.3, 0));
@@ -91,8 +84,8 @@ public final class HealModule extends DamageModule {
     public boolean heal(@Nullable Healer provider, double amount, boolean isUlt) {
         Validate.isTrue(amount >= 0, "amount >= 0 (%f)", amount);
 
-        double giveHealMultiplier = provider == null ? 1 : provider.getHealerModule().getHealMultiplierStatus().getValue();
-        double takeHealMultiplier = healMultiplierStatus.getValue();
+        double giveHealMultiplier = provider == null ? 1 : provider.getHealerModule().getValue();
+        double takeHealMultiplier = getValue();
 
         return handleHeal(provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
     }
@@ -112,7 +105,7 @@ public final class HealModule extends DamageModule {
         CombatEntity provider = projectile.getShooter();
         if (provider instanceof Healer) {
             double giveHealMultiplier = projectile.getHealIncrement();
-            double takeHealMultiplier = healMultiplierStatus.getValue();
+            double takeHealMultiplier = getValue();
 
             return handleHeal((Healer) provider, amount, giveHealMultiplier, takeHealMultiplier, isUlt);
         }

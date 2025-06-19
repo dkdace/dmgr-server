@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
-import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.entity.module.AttackerModule;
 import lombok.NonNull;
 import org.bukkit.Location;
 
@@ -12,7 +12,7 @@ public interface Attacker extends CombatEntity {
      * @return 공격 모듈
      */
     @NonNull
-    AttackModule getAttackModule();
+    AttackerModule getAttackerModule();
 
     /**
      * 엔티티가 다른 엔티티를 공격했을 때 실행될 작업.

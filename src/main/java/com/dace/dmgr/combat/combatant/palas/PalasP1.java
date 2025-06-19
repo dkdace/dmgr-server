@@ -33,7 +33,7 @@ public final class PalasP1 extends AbstractSkill {
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        target.getDamageModule().heal(combatUser, healAmount, true);
+        target.getHealModule().heal(combatUser, healAmount, true);
     }
 
     @Override

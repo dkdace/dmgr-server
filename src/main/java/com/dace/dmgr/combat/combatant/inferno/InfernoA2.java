@@ -11,7 +11,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
 import com.dace.dmgr.combat.interaction.Area;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-InfernoA2Info.HEAL_DECREMENT);
+    private static final Modifier MODIFIER = new Modifier(-InfernoA2Info.HEAL_DECREMENT);
     /** 보너스 점수 모듈 */
     @NonNull
     @Getter
@@ -96,13 +96,13 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().addModifier(MODIFIER);
+                ((Healable) combatEntity).getHealModule().addModifier(MODIFIER);
         }
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().getHealMultiplierStatus().removeModifier(MODIFIER);
+                ((Healable) combatEntity).getHealModule().removeModifier(MODIFIER);
         }
     }
 

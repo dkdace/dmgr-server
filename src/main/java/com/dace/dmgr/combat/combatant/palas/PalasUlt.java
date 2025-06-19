@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,9 +18,9 @@ import org.bukkit.inventory.MainHand;
 @Getter
 public final class PalasUlt extends UltimateSkill implements Targeted<Healable> {
     /** 공격력 수정자 */
-    private static final AbilityStatus.Modifier DAMAGE_MODIFIER = new AbilityStatus.Modifier(PalasUltInfo.DAMAGE_INCREMENT);
+    private static final Modifier DAMAGE_MODIFIER = new Modifier(PalasUltInfo.DAMAGE_INCREMENT);
     /** 이동 속도 수정자 */
-    private static final AbilityStatus.Modifier SPEED_MODIFIER = new AbilityStatus.Modifier(PalasUltInfo.SPEED_INCREMENT);
+    private static final Modifier SPEED_MODIFIER = new Modifier(PalasUltInfo.SPEED_INCREMENT);
 
     /** 타겟 모듈 */
     @NonNull
@@ -84,9 +84,9 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().addModifier(DAMAGE_MODIFIER);
+                ((Attacker) combatEntity).getAttackerModule().addModifier(DAMAGE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().addModifier(SPEED_MODIFIER);
+                ((Movable) combatEntity).getMoveModule().addModifier(SPEED_MODIFIER);
         }
 
         @Override
@@ -97,9 +97,9 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
             if (combatEntity instanceof Attacker)
-                ((Attacker) combatEntity).getAttackModule().getDamageMultiplierStatus().removeModifier(DAMAGE_MODIFIER);
+                ((Attacker) combatEntity).getAttackerModule().removeModifier(DAMAGE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getSpeedStatus().removeModifier(SPEED_MODIFIER);
+                ((Movable) combatEntity).getMoveModule().removeModifier(SPEED_MODIFIER);
         }
     }
 }

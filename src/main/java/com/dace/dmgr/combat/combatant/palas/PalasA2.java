@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,9 +21,9 @@ import org.bukkit.inventory.MainHand;
 @Getter
 public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     /** 상태 효과 저항 수정자 */
-    private static final AbilityStatus.Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(100);
+    private static final Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new Modifier(100);
     /** 넉백 저항 수정자 */
-    private static final AbilityStatus.Modifier KNOCKBACK_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(100);
+    private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(100);
 
     /** 타겟 모듈 */
     @NonNull
@@ -91,9 +91,9 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onStart(@NonNull Damageable combatEntity) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+            combatEntity.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+                ((Movable) combatEntity).getMoveModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
 
         @Override
@@ -103,9 +103,9 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
         @Override
         public void onEnd(@NonNull Damageable combatEntity) {
-            combatEntity.getStatusEffectModule().getResistanceStatus().removeModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+            combatEntity.getStatusEffectModule().removeModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().getResistanceStatus().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+                ((Movable) combatEntity).getMoveModule().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
     }
 }

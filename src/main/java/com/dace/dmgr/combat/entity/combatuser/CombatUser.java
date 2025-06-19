@@ -88,7 +88,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 공격 모듈 */
     @NonNull
     @Getter
-    private final AttackModule attackModule;
+    private final AttackerModule attackerModule;
     /** 치유 모듈 */
     @NonNull
     @Getter
@@ -96,7 +96,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 피해 모듈 */
     @NonNull
     @Getter
-    private final HealModule damageModule;
+    private final DamageModule damageModule;
+    /** 회복 모듈 */
+    @NonNull
+    @Getter
+    private final HealModule healModule;
     /** 상태 효과 모듈 */
     @NonNull
     @Getter
@@ -105,6 +109,11 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @NonNull
     @Getter
     private final MoveModule moveModule;
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
+
     /** 유저 정보 인스턴스 */
     @NonNull
     @Getter
@@ -211,11 +220,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.killContributorManager = new KillContributorManager(this);
         this.killHelperManager = new KillHelperManager();
 
-        this.attackModule = new AttackModule();
-        this.healerModule = new HealerModule();
-        this.damageModule = new HealModule(this, 1000, true);
+        this.attackerModule = new AttackerModule(this);
+        this.healerModule = new HealerModule(this);
+        this.damageModule = new DamageModule(this, 1000, true);
+        this.healModule = new HealModule(this);
         this.statusEffectModule = new StatusEffectModule(this);
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+        this.knockbackModule = new KnockbackModule(this);
 
         this.combatantType = combatantType;
         this.combatant = combatantType.getCombatant();
@@ -371,7 +382,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (i % 20 == 0) {
             if (coreManager.has(Core.REGENERATION))
-                damageModule.heal((Healer) null, damageModule.getMaxHealth() * Core.REGENERATION.getValue() / 100.0, false);
+                healModule.heal((Healer) null, damageModule.getMaxHealth() * Core.REGENERATION.getValue() / 100.0, false);
 
             if (gameUser != null && !gameUser.isInSpawn())
                 user.getUserData().getCombatantRecord(combatantType).addPlayTime();
@@ -479,7 +490,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
                 addUltGauge(damage);
 
             if (coreManager.has(Core.HEALTH_DRAIN))
-                damageModule.heal(this, damage * Core.HEALTH_DRAIN.getValue() / 100.0, false);
+                healModule.heal(this, damage * Core.HEALTH_DRAIN.getValue() / 100.0, false);
 
             if (gameUser != null && victim instanceof CombatUser)
                 gameUser.addDamage(damage);
@@ -956,7 +967,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         damageModule.setMaxHealth(combatant.getHealth());
         damageModule.setHealth(combatant.getHealth());
-        moveModule.getSpeedStatus().setBaseValue(GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
+        moveModule.setBaseValue(GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
 
         resetHitboxes();
         actionManager = new ActionManager(this);
@@ -987,13 +998,14 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
 
-        statusEffectModule.getResistanceStatus().clearModifiers();
-        attackModule.getDamageMultiplierStatus().clearModifiers();
-        healerModule.getHealMultiplierStatus().clearModifiers();
-        damageModule.getDefenseMultiplierStatus().clearModifiers();
-        damageModule.getHealMultiplierStatus().clearModifiers();
-        moveModule.getSpeedStatus().clearModifiers();
-        moveModule.getResistanceStatus().clearModifiers();
+        statusEffectModule.clearModifiers();
+        attackerModule.clearModifiers();
+        healerModule.clearModifiers();
+        damageModule.clearModifiers();
+        healModule.clearModifiers();
+        moveModule.clearModifiers();
+        knockbackModule.clearModifiers();
+
         coreManager.clear();
         actionManager.remove();
     }

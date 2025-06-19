@@ -19,6 +19,7 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
+import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -150,33 +151,39 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     /**
      * 설랑 클래스.
      */
-    @Getter
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements HasReadyTime, Damageable, Attacker, Movable {
+    public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Movable {
         /** 공격 모듈 */
         @NonNull
-        private final AttackModule attackModule;
+        @Getter
+        private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
+        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
+        @Getter
         private final StatusEffectModule statusEffectModule;
         /** 이동 모듈 */
         @NonNull
+        @Getter
         private final MoveModule moveModule;
-        /** 준비 대기시간 모듈 */
+        /** 넉백 모듈 */
         @NonNull
-        private final ReadyTimeModule readyTimeModule;
+        @Getter
+        private final KnockbackModule knockbackModule;
+        /** 준비 완료 여부 */
+        private boolean isReady = false;
 
         private JagerA1Entity(@NonNull Location spawnLocation) {
             super(EntitySpawnHandler.getDefaultSpawnHandler(Wolf.class), spawnLocation, combatUser.getName() + "의 설랑", combatUser,
                     true, Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
 
-            this.attackModule = new AttackModule();
+            this.attackerModule = new AttackerModule(this);
             this.damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
             this.statusEffectModule = new StatusEffectModule(this);
             this.moveModule = new MoveModule(this, JagerA1Info.SPEED);
-            this.readyTimeModule = new ReadyTimeModule(this, JagerA1Info.SUMMON_DURATION);
+            this.knockbackModule = new KnockbackModule(this);
 
             onInit();
         }
@@ -194,21 +201,20 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
             CombatEffectUtil.ENTITY_SUMMON_SOUND.play(getLocation());
 
             addOnTick(this::onTick);
-        }
+            addTask(new DelayTask(() -> {
+                isReady = true;
 
-        @Override
-        public void onTickBeforeReady(long i) {
-            JagerA1Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-        }
-
-        @Override
-        public void onReady() {
-            entity.setAI(true);
-            JagerA1Info.Effects.SUMMON_READY.play(getLocation());
+                entity.setAI(true);
+                JagerA1Info.Effects.SUMMON_READY.play(getLocation());
+            }, JagerA1Info.SUMMON_DURATION.toTicks()));
         }
 
         private void onTick(long i) {
-            if (!readyTimeModule.isReady() || i % 10 != 0)
+            if (!isReady) {
+                JagerA1Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
+                return;
+            }
+            if (i % 10 != 0)
                 return;
 
             if (entity.getTarget() == null) {

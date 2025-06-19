@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 @Getter
 public final class MetarUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    private static final Modifier MODIFIER = new Modifier(-100);
     /** 보너스 점수 모듈 */
     @NonNull
     private final BonusScoreModule bonusScoreModule;
@@ -45,7 +45,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
         combatUser.getActionManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         addActionTask(new IntervalTask(i -> {
             Location loc = LocationUtil.getLocationFromOffset(combatUser.getEntity().getEyeLocation().subtract(0, 0.4, 0),
@@ -74,7 +74,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     @Override

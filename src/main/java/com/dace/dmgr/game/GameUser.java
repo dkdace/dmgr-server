@@ -174,7 +174,7 @@ public final class GameUser {
                     : "§b§nF키§b를 눌러 전투원을 변경할 수 있습니다.", Timespan.ZERO, Timespan.ofSeconds(0.5), Timespan.ofSeconds(0.5));
 
         if (combatUser != null)
-            combatUser.getDamageModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20.0, false);
+            combatUser.getHealModule().heal((Healer) null, GeneralConfig.getGameConfig().getTeamSpawnHealPerSecond() / 20.0, false);
     }
 
     /**

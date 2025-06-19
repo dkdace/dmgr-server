@@ -58,7 +58,7 @@ public final class MagrittaP1 extends AbstractSkill {
             setDuration();
 
             addActionTask(new IntervalTask(i -> {
-                combatUser.getDamageModule().heal(combatUser, MagrittaP1Info.HEAL_PER_SECOND * 2 / 20.0, false);
+                combatUser.getHealModule().heal(combatUser, MagrittaP1Info.HEAL_PER_SECOND * 2 / 20.0, false);
 
                 return !isDurationFinished();
             }, 2));

@@ -12,7 +12,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -23,7 +23,7 @@ import org.bukkit.Location;
 
 public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-MetarWeaponInfo.SLOW);
+    private static final Modifier MODIFIER = new Modifier(-MetarWeaponInfo.SLOW);
 
     /** 재장전 모듈 */
     @NonNull
@@ -71,12 +71,12 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
                 new MetarWeaponProjectile(isOpposite).shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), MetarWeaponInfo.SPREAD));
 
                 reloadModule.consume(1);
-                combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+                combatUser.getMoveModule().addModifier(MODIFIER);
 
                 if (slowTimestamp.isBefore(Timestamp.now())) {
                     slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
                     addTask(new IntervalTask(i -> slowTimestamp.isAfter(Timestamp.now()), () ->
-                            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER), 1));
+                            combatUser.getMoveModule().removeModifier(MODIFIER), 1));
                 } else
                     slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
 

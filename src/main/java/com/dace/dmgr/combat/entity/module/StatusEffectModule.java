@@ -7,10 +7,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
-import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -19,21 +16,10 @@ import java.util.HashSet;
 /**
  * 엔티티의 상태 효과 모듈 클래스.
  *
- * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
- *
  * @see StatusEffect
  * @see Damageable
  */
-public final class StatusEffectModule {
-    /** 상태 효과 저항 기본값 */
-    private static final double DEFAULT_VALUE = 1;
-
-    /** 엔티티 인스턴스 */
-    private final Damageable combatEntity;
-    /** 해로운 상태 효과에 대한 저항 값 */
-    @NonNull
-    @Getter
-    private final AbilityStatus resistanceStatus;
+public final class StatusEffectModule extends CombatEntityModule<Damageable> {
     /** 적용된 상태 효과 정보 목록 (상태 효과 : 상태 효과 정보) */
     private final HashMap<StatusEffect, StatusEffectInfo> statusEffectInfoMap = new HashMap<>();
 
@@ -41,15 +27,15 @@ public final class StatusEffectModule {
      * 상태 효과 모듈 인스턴스를 생성한다.
      *
      * @param combatEntity 대상 엔티티
-     * @throws IllegalArgumentException 대상 엔티티가 {@link LivingEntity}를 상속받지 않으면 발생
      */
     public StatusEffectModule(@NonNull Damageable combatEntity) {
-        Validate.isTrue(combatEntity.getEntity() instanceof LivingEntity, "combatEntity.getEntity()가 LivingEntity를 상속받지 않음");
-
-        this.combatEntity = combatEntity;
-        this.resistanceStatus = new AbilityStatus(DEFAULT_VALUE);
-
+        super(combatEntity);
         combatEntity.addOnRemove(this::clear);
+    }
+
+    @Override
+    protected double getBaseValue() {
+        return 1;
     }
 
     /**
@@ -78,7 +64,7 @@ public final class StatusEffectModule {
      */
     public void apply(@NonNull StatusEffect statusEffect, @NonNull Timespan duration) {
         if (!statusEffect.isPositive())
-            duration = duration.multiply(Math.max(0, 2 - resistanceStatus.getValue()));
+            duration = duration.multiply(Math.max(0, 2 - getValue()));
         if (duration.isZero())
             return;
 

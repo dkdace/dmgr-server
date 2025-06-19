@@ -23,6 +23,6 @@ public final class OnPlayServerAbilities extends PacketEventListener<WrapperPlay
         if (combatUser == null)
             return;
 
-        packet.setWalkingSpeed((float) (combatUser.getMoveModule().getSpeedStatus().getValue() * 2 * combatUser.getFovValue()));
+        packet.setWalkingSpeed((float) (combatUser.getMoveModule().getValue() * 2 * combatUser.getFovValue()));
     }
 }

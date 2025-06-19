@@ -12,7 +12,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
@@ -33,7 +33,7 @@ import java.util.function.LongConsumer;
 
 public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.ChedUltFireFloor>, HasBonusScore {
     /** 수정자 ID */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedUltInfo.READY_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-ChedUltInfo.READY_SLOW);
 
     /** 소환 엔티티 모듈 */
     @NonNull
@@ -67,7 +67,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         setDuration();
 
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
@@ -97,7 +97,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     private final class ChedUltProjectile extends Projectile<Damageable> {
@@ -160,7 +160,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 if (target.getDamageModule().damage(ChedUltProjectile.this, ChedUltInfo.DISTANT_DAMAGE.getDamage(center.distance(location)),
                         DamageType.NORMAL, null, false, false) && target instanceof Movable) {
                     Vector dir = LocationUtil.getDirection(location, location.clone().add(0, 1, 0)).multiply(ChedUltInfo.KNOCKBACK);
-                    ((Movable) target).getMoveModule().knockback(dir);
+                    ((Movable) target).getKnockbackModule().knockback(dir);
                 }
 
                 return !(target instanceof Barrier);

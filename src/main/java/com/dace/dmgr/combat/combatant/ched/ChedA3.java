@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import java.util.function.LongConsumer;
 @Getter
 public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-ChedA3Info.READY_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-ChedA3Info.READY_SLOW);
     /** 보너스 점수 모듈 */
     @NonNull
     private final BonusScoreModule bonusScoreModule;
@@ -50,7 +50,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         setDuration();
 
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
@@ -80,7 +80,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     private final class ChedA3Projectile extends Projectile<Damageable> {

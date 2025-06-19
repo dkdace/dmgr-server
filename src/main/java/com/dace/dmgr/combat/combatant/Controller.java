@@ -125,7 +125,7 @@ public abstract class Controller extends Combatant {
 
         private void onUse() {
             if (lastDamageTimestamp.plus(RoleTrait2Info.ACTIVATE_DURATION).isBefore(Timestamp.now()))
-                combatUser.getDamageModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
+                combatUser.getHealModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
         }
     }
 }

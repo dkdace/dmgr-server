@@ -227,7 +227,7 @@ public final class JagerA3 extends ActiveSkill {
             if (isDamaged) {
                 if (target instanceof Movable) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK);
-                    ((Movable) target).getMoveModule().knockback(dir);
+                    ((Movable) target).getKnockbackModule().knockback(dir);
                 }
 
                 if (JagerT1Util.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {

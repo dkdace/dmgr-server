@@ -9,7 +9,7 @@ import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 public final class QuakerA1 extends ChargeableSkill implements Summonable<QuakerA1.QuakerA1Entity> {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-QuakerA1Info.USE_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-QuakerA1Info.USE_SLOW);
     /** 소환 엔티티 모듈 */
     @NonNull
     private final EntityModule<QuakerA1Entity> entityModule;
@@ -73,7 +73,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         setDuration();
         combatUser.setGlobalCooldown(QuakerA1Info.GLOBAL_COOLDOWN);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         QuakerA1Info.Effects.ON.play(combatUser.getLocation());
 
@@ -88,7 +88,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
 
         entityModule.removeEntity();
 

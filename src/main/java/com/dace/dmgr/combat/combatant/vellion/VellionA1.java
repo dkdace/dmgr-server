@@ -11,7 +11,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
@@ -32,7 +32,7 @@ import java.util.HashSet;
 
 public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1.VellionA1Entity> {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-VellionA1Info.READY_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-VellionA1Info.READY_SLOW);
 
     /** 소환 엔티티 모듈 */
     @NonNull
@@ -69,7 +69,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
         setDuration();
 
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         VellionA1Info.Effects.USE.play(combatUser.getLocation());
 
@@ -94,7 +94,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
         entityModule.removeEntity();
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     /**
@@ -119,7 +119,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             }
 
             if (combatEntity instanceof Healable)
-                ((Healable) combatEntity).getDamageModule().heal(combatUser, VellionA1Info.HEAL_PER_SECOND / 20.0, true);
+                ((Healable) combatEntity).getHealModule().heal(combatUser, VellionA1Info.HEAL_PER_SECOND / 20.0, true);
         }
 
         @Override

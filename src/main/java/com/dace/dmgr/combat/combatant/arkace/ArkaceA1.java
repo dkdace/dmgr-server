@@ -93,7 +93,7 @@ public final class ArkaceA1 extends ActiveSkill {
                 if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
                     if (target instanceof Movable) {
                         Vector dir = getVelocity().normalize().multiply(ArkaceA1Info.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        ((Movable) target).getKnockbackModule().knockback(dir);
                     }
 
                     if (target.isGoalTarget())
@@ -122,7 +122,7 @@ public final class ArkaceA1 extends ActiveSkill {
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
                         && target instanceof Movable && !ArkaceA1Projectile.this.getHitTargets().contains(target)) {
                     Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK);
-                    ((Movable) target).getMoveModule().knockback(dir);
+                    ((Movable) target).getKnockbackModule().knockback(dir);
                 }
 
                 return !(target instanceof Barrier);

@@ -8,12 +8,14 @@ import com.dace.dmgr.combat.action.skill.Summonable;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.Attacker;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.entity.module.AttackerModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler;
@@ -125,29 +127,29 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
     /**
      * 눈폭풍 발생기 클래스.
      */
-    @Getter
-    public final class JagerUltEntity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
+    public final class JagerUltEntity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
-        private final AttackModule attackModule;
+        @Getter
+        private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
+        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
+        @Getter
         private final StatusEffectModule statusEffectModule;
-        /** 준비 시간 모듈 */
-        @NonNull
-        private final ReadyTimeModule readyTimeModule;
+        /** 준비 완료 여부 */
+        private boolean isReady = false;
 
         private JagerUltEntity(@NonNull Location spawnLocation) {
             super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true,
                     Hitbox.builder(0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build());
 
-            this.attackModule = new AttackModule();
+            this.attackerModule = new AttackerModule(this);
             this.damageModule = new DamageModule(this, JagerUltInfo.HEALTH, true);
             this.statusEffectModule = new StatusEffectModule(this);
-            this.readyTimeModule = new ReadyTimeModule(this, JagerUltInfo.SUMMON_DURATION);
 
             onInit();
         }
@@ -159,26 +161,20 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             JagerUltInfo.Effects.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
-        }
-
-        @Override
-        public void onTickBeforeReady(long i) {
-            if (LocationUtil.isNonSolid(getLocation().add(0, 0.2, 0)))
-                entity.teleport(getLocation().add(0, 0.2, 0));
-
-            JagerUltInfo.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-        }
-
-        @Override
-        public void onReady() {
-            // 미사용
+            addTask(new DelayTask(() -> isReady = true, JagerUltInfo.SUMMON_DURATION.toTicks()));
         }
 
         private void onTick(long i) {
             JagerUltInfo.Effects.DISPLAY.play(getLocation());
 
-            if (!readyTimeModule.isReady())
+            if (!isReady) {
+                if (LocationUtil.isNonSolid(getLocation().add(0, 0.2, 0)))
+                    entity.teleport(getLocation().add(0, 0.2, 0));
+
+                JagerUltInfo.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
+
                 return;
+            }
 
             double minRadius = JagerUltInfo.MIN_RADIUS;
             double maxRadius = JagerUltInfo.MAX_RADIUS;

@@ -59,8 +59,8 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
         this.duration = option.duration;
         this.loopCount = (int) (speed / (20.0 / (1.0 / HITBOX_INTERVAL)));
         this.action = action;
-        this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackModule().getDamageMultiplierStatus().getValue() : 1;
-        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getHealMultiplierStatus().getValue() : 1;
+        this.damageIncrement = (shooter instanceof Attacker) ? ((Attacker) shooter).getAttackerModule().getValue() : 1;
+        this.healIncrement = (shooter instanceof Healer) ? ((Healer) shooter).getHealerModule().getValue() : 1;
     }
 
     /**

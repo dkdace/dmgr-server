@@ -10,7 +10,7 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -27,7 +27,7 @@ import java.util.HashSet;
 
 public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-100);
+    private static final Modifier MODIFIER = new Modifier(-100);
     /** 둔화 상태 효과 */
     private static final Slow SLOW = new Slow(QuakerUltInfo.SLOW);
 
@@ -63,7 +63,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         setDuration();
 
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         QuakerWeapon weapon = (QuakerWeapon) combatUser.getActionManager().getWeapon();
         weapon.cancel();
@@ -82,7 +82,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
@@ -153,7 +153,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
                         if (target instanceof Movable) {
                             Vector dir = LocationUtil.getDirection(combatUser.getLocation(), target.getLocation().add(0, 1, 0))
                                     .multiply(QuakerUltInfo.KNOCKBACK);
-                            ((Movable) target).getMoveModule().knockback(dir);
+                            ((Movable) target).getKnockbackModule().knockback(dir);
                         }
 
                         if (target.isGoalTarget()) {

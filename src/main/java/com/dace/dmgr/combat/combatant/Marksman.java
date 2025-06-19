@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Marksman extends Combatant {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(RoleTrait2Info.SPEED);
+    private static final Modifier MODIFIER = new Modifier(RoleTrait2Info.SPEED);
 
     /**
      * 사격 역할군 전투원 정보 인스턴스를 생성한다.
@@ -43,9 +43,9 @@ public abstract class Marksman extends Combatant {
         super.onTick(combatUser, i);
 
         if (combatUser.getDamageModule().isLowHealth())
-            combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+            combatUser.getMoveModule().addModifier(MODIFIER);
         else
-            combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+            combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     @Override

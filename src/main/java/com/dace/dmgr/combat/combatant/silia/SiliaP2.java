@@ -67,7 +67,7 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.getMoveModule().teleport(LocationUtil.getLocationFromOffset(combatUser.getLocation(), 0, 0, -1 + distance));
 
         addActionTask(new IntervalTask(i -> {
-            if (combatUser.getMoveModule().isKnockbacked() || !canActivate())
+            if (combatUser.getKnockbackModule().isKnockbacked() || !canActivate())
                 return false;
 
             combatUser.getMoveModule().push(new Vector(0, SiliaP2Info.PUSH, 0), true);

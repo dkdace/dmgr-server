@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.combat.entity.Healer;
-import lombok.Getter;
 import lombok.NonNull;
 
 /**
@@ -9,18 +8,16 @@ import lombok.NonNull;
  *
  * @see Healer
  */
-@Getter
-public final class HealerModule {
-    /** 치유량 배수 기본값 */
-    private static final double DEFAULT_VALUE = 1;
-    /** 치유량 배수 값 */
-    @NonNull
-    private final AbilityStatus healMultiplierStatus;
-
+public final class HealerModule extends CombatEntityModule<Healer> {
     /**
      * 치유 모듈 인스턴스를 생성한다.
      */
-    public HealerModule() {
-        this.healMultiplierStatus = new AbilityStatus(DEFAULT_VALUE);
+    public HealerModule(@NonNull Healer combatEntity) {
+        super(combatEntity);
+    }
+
+    @Override
+    protected double getBaseValue() {
+        return 1;
     }
 }

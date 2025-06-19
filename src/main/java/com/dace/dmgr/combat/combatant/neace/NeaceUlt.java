@@ -7,7 +7,7 @@ import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 @Getter(AccessLevel.PACKAGE)
 public final class NeaceUlt extends UltimateSkill {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-NeaceUltInfo.READY_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-NeaceUltInfo.READY_SLOW);
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
@@ -46,7 +46,7 @@ public final class NeaceUlt extends UltimateSkill {
         setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(NeaceUltInfo.READY_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         NeaceUltInfo.Effects.USE.play(combatUser.getLocation());
 
@@ -56,7 +56,7 @@ public final class NeaceUlt extends UltimateSkill {
             isEnabled = true;
 
             setDuration();
-            combatUser.getDamageModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
+            combatUser.getHealModule().heal(combatUser, combatUser.getDamageModule().getMaxHealth(), false);
 
             NeaceUltInfo.Effects.playUseReady(combatUser.getLocation());
 
@@ -83,7 +83,7 @@ public final class NeaceUlt extends UltimateSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
     private final class NeaceUltArea extends Area<Healable> {

@@ -97,7 +97,7 @@ public abstract class CooldownBlock extends FunctionalBlock {
         protected void onUse(@NonNull CombatUser combatUser, @NonNull Location location) {
             super.onUse(combatUser, location);
 
-            combatUser.getDamageModule().heal(combatUser, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
+            combatUser.getHealModule().heal(combatUser, GeneralConfig.getCombatConfig().getHealPackHeal(), false);
             combatUser.getCombatantType().getCombatant().onUseHealPack(combatUser);
 
             USE_SOUND.play(location);

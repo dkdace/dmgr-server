@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -14,7 +14,7 @@ public final class MetarP1 extends AbstractSkill {
     /** 중기갑 */
     private double heavyArmor = MetarP1Info.MAX;
     /** 수정자 */
-    private final AbilityStatus.Modifier modifier = new AbilityStatus.Modifier(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
+    private final Modifier modifier = new Modifier(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
 
     public MetarP1(@NonNull CombatUser combatUser) {
         super(combatUser, MetarP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
@@ -41,7 +41,7 @@ public final class MetarP1 extends AbstractSkill {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getMoveModule().getResistanceStatus().addModifier(modifier);
+        combatUser.getKnockbackModule().addModifier(modifier);
 
         addActionTask(new IntervalTask(i -> !combatUser.getStatusEffectModule().has(Silence.class), this::forceCancel, 1));
     }
@@ -54,7 +54,7 @@ public final class MetarP1 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getMoveModule().getResistanceStatus().removeModifier(modifier);
+        combatUser.getKnockbackModule().removeModifier(modifier);
     }
 
     /**

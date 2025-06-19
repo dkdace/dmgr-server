@@ -9,9 +9,8 @@ import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AttackModule;
+import com.dace.dmgr.combat.entity.module.AttackerModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
-import com.dace.dmgr.combat.entity.module.ReadyTimeModule;
 import com.dace.dmgr.combat.entity.module.StatusEffectModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
@@ -120,29 +119,29 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     /**
      * 곰덫 클래스.
      */
-    @Getter
-    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements HasReadyTime, Damageable, Attacker {
+    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
-        private final AttackModule attackModule;
+        @Getter
+        private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
+        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
+        @Getter
         private final StatusEffectModule statusEffectModule;
-        /** 준비 시간 모듈 */
-        @NonNull
-        private final ReadyTimeModule readyTimeModule;
+        /** 준비 완료 여부 */
+        private boolean isReady = false;
 
         private JagerA2Entity(@NonNull Location spawnLocation) {
             super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 곰덫", combatUser, true,
                     Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build());
 
-            this.attackModule = new AttackModule();
+            this.attackerModule = new AttackerModule(this);
             this.damageModule = new DamageModule(this, JagerA2Info.HEALTH, true);
             this.statusEffectModule = new StatusEffectModule(this);
-            this.readyTimeModule = new ReadyTimeModule(this, JagerA2Info.SUMMON_DURATION);
 
             onInit();
         }
@@ -154,23 +153,19 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
             JagerA2Info.Effects.SUMMON.play(getLocation());
 
             addOnTick(this::onTick);
-        }
-
-        @Override
-        public void onTickBeforeReady(long i) {
-            JagerA2Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-        }
-
-        @Override
-        public void onReady() {
-            JagerA2Info.Effects.SUMMON_READY.play(getLocation());
+            addTask(new DelayTask(() -> {
+                isReady = true;
+                JagerA2Info.Effects.SUMMON_READY.play(getLocation());
+            }, JagerA2Info.SUMMON_DURATION.toTicks()));
         }
 
         private void onTick(long i) {
             JagerA2Info.Effects.playDisplay(getLocation());
 
-            if (!readyTimeModule.isReady())
+            if (!isReady) {
+                JagerA2Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
                 return;
+            }
 
             Damageable target = CombatEntityRegistry.getNearCombatEntity(getLocation().add(0, 0.5, 0), 0.8,
                     EntityCondition.enemy(this).and(Damageable::isCreature));

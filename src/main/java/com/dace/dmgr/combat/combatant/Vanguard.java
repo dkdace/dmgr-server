@@ -6,7 +6,7 @@ import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
 import com.dace.dmgr.combat.action.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -16,9 +16,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Vanguard extends Combatant {
     /** 넉백 저항 수정자 */
-    private static final AbilityStatus.Modifier KNOCKBACK_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
+    private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
     /** 상태 효과 저항 수정자 */
-    private static final AbilityStatus.Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new AbilityStatus.Modifier(RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
+    private static final Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
 
     /**
      * 돌격 역할군 전투원 정보 인스턴스를 생성한다.
@@ -42,8 +42,8 @@ public abstract class Vanguard extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
-        combatUser.getMoveModule().getResistanceStatus().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
-        combatUser.getStatusEffectModule().getResistanceStatus().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+        combatUser.getMoveModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+        combatUser.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
     }
 
     @Override

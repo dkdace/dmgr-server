@@ -105,7 +105,7 @@ public final class SiliaA2 extends ActiveSkill {
                         SiliaT1Util.getCritMultiplier(getVelocity(), target), true)) {
 
                     if (target instanceof Movable)
-                        ((Movable) target).getMoveModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
+                        ((Movable) target).getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
                     Location loc = target.getLocation().add(0, 0.1, 0);
                     loc.setPitch(0);

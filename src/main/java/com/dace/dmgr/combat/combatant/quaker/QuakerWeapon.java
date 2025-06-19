@@ -150,7 +150,7 @@ public final class QuakerWeapon extends AbstractWeapon {
                             && target instanceof Movable) {
                         Vector dir = VectorUtil.getPitchAxis(combatUser.getLocation())
                                 .multiply(isOpposite ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK);
-                        ((Movable) target).getMoveModule().knockback(dir);
+                        ((Movable) target).getKnockbackModule().knockback(dir);
                     }
 
                     QuakerWeaponInfo.Effects.HIT_ENTITY.play(location);

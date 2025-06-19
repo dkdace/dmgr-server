@@ -14,7 +14,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AbilityStatus;
+import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Hitscan;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
@@ -25,7 +25,7 @@ import org.bukkit.Location;
 
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
     /** 수정자 */
-    private static final AbilityStatus.Modifier MODIFIER = new AbilityStatus.Modifier(-PalasWeaponInfo.AIM_SLOW);
+    private static final Modifier MODIFIER = new Modifier(-PalasWeaponInfo.AIM_SLOW);
 
     /** 재장전 모듈 */
     @NonNull
@@ -143,7 +143,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     @Override
     public void onAimEnable() {
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
         PalasWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
     }
@@ -151,7 +151,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     @Override
     public void onAimDisable() {
         combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
-        combatUser.getMoveModule().getSpeedStatus().removeModifier(MODIFIER);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
 
         PalasWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
@@ -259,7 +259,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
                     actionManager.useAction(ActionKey.PERIODIC_1);
 
-                    ((Healable) target).getDamageModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
+                    ((Healable) target).getHealModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 
                     PalasWeaponInfo.Effects.HIT_ENTITY.play(location);
                 }

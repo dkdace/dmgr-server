@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.entity;
 
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.MoveModule;
 import lombok.NonNull;
 
@@ -12,6 +13,12 @@ public interface Movable extends CombatEntity {
      */
     @NonNull
     MoveModule getMoveModule();
+
+    /**
+     * @return 넉백 모듈
+     */
+    @NonNull
+    KnockbackModule getKnockbackModule();
 
     /**
      * 엔티티가 움직일 수 있는지 확인한다.

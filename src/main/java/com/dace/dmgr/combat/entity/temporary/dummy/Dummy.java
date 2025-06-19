@@ -5,10 +5,7 @@ import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.AttackModule;
-import com.dace.dmgr.combat.entity.module.HealModule;
-import com.dace.dmgr.combat.entity.module.MoveModule;
-import com.dace.dmgr.combat.entity.module.StatusEffectModule;
+import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.TemporaryEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.PlayerNPCSpawnHandler;
@@ -31,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 더미(훈련용 봇) 엔티티 클래스.
  */
-public final class Dummy extends TemporaryEntity<Player> implements Attacker, Healable, Movable, HasCritHitbox, CombatEntity {
+public final class Dummy extends TemporaryEntity<Player> implements Attacker, Healable, Movable, HasCritHitbox {
     /** 생성 폭죽 효과 */
     private static final FireworkEffect SPAWN_FIREWORK =
             FireworkEffect.builder(org.bukkit.FireworkEffect.Type.BALL, Color.fromRGB(255, 255, 255))
@@ -57,11 +54,15 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
     /** 공격 모듈 */
     @NonNull
     @Getter
-    private final AttackModule attackModule;
+    private final AttackerModule attackerModule;
     /** 피해 모듈 */
     @NonNull
     @Getter
-    private final HealModule damageModule;
+    private final DamageModule damageModule;
+    /** 회복 모듈 */
+    @NonNull
+    @Getter
+    private final HealModule healModule;
     /** 상태 효과 모듈 */
     @NonNull
     @Getter
@@ -70,6 +71,10 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
     @NonNull
     @Getter
     private final MoveModule moveModule;
+    /** 넉백 모듈 */
+    @NonNull
+    @Getter
+    private final KnockbackModule knockbackModule;
     /** 행동 양식 */
     private final DummyBehavior dummyBehavior;
     /** 적 여부 */
@@ -93,10 +98,12 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
         Validate.isTrue(speedMultiplier >= 0, "speedMultiplier >= 0 (%f)", speedMultiplier);
 
         this.dummyBehavior = dummyBehavior;
-        this.attackModule = new AttackModule();
-        this.damageModule = new HealModule(this, maxHealth, true);
+        this.attackerModule = new AttackerModule(this);
+        this.damageModule = new DamageModule(this, maxHealth, true);
+        this.healModule = new HealModule(this);
         this.statusEffectModule = new StatusEffectModule(this);
         this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed() * speedMultiplier);
+        this.knockbackModule = new KnockbackModule(this);
         this.isEnemy = isEnemy;
 
         onInit();

@@ -95,7 +95,7 @@ public final class InfernoA1 extends ActiveSkill {
             if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true)
                     && target instanceof Movable) {
                 Vector dir = LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)).multiply(InfernoA1Info.KNOCKBACK);
-                ((Movable) target).getMoveModule().knockback(dir);
+                ((Movable) target).getKnockbackModule().knockback(dir);
             }
 
             InfernoA1Info.Effects.HIT_ENTITY.play(location);

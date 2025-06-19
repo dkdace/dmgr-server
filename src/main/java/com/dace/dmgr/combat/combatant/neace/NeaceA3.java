@@ -67,7 +67,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
         Healable target = targetModule.getCurrentTarget();
 
         addActionTask(new IntervalTask(i -> {
-            if (!target.canBeTargeted() || target.isRemoved() || combatUser.getMoveModule().isKnockbacked())
+            if (!target.canBeTargeted() || target.isRemoved() || combatUser.getKnockbackModule().isKnockbacked())
                 return false;
 
             Location loc = combatUser.getLocation().add(0, 1, 0);
