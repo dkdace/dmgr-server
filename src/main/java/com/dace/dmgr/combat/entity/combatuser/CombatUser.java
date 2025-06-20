@@ -2,7 +2,10 @@ package com.dace.dmgr.combat.entity.combatuser;
 
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.dace.dmgr.*;
+import com.dace.dmgr.GeneralConfig;
+import com.dace.dmgr.PlayerSkin;
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.action.Action;
 import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.info.SkillInfo;
@@ -53,7 +56,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
@@ -130,6 +132,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final Team team;
+    /** 선택한 전투원 종류 */
+    @NonNull
+    @Getter
+    private final CombatantType combatantType;
+    /** 선택한 전투원 */
+    private final Combatant combatant;
+    /** 동작 관리 인스턴스 */
+    @NonNull
+    @Getter
+    private final ActionManager actionManager;
     /** 코어 관리 인스턴스 */
     @NonNull
     @Getter
@@ -163,16 +175,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     /** 사망 여부 */
     @Getter
     private boolean isDead;
-    /** 선택한 전투원 종류 */
-    @NonNull
-    @Getter
-    private CombatantType combatantType;
-    /** 선택한 전투원 */
-    private Combatant combatant;
-    /** 동작 관리 인스턴스 */
-    @NonNull
-    @Getter
-    private ActionManager actionManager;
     /** 사망 대사 홀로그램 */
     @Nullable
     private TextHologram deathMentHologram;
@@ -206,50 +208,50 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      *
      * @param combatantType 전투원 종류
      * @param user          대상 플레이어
-     * @param gameUser      대상 게임 유저 인스턴스
      * @throws IllegalStateException 해당 {@code user}의 CombatUser가 이미 존재하면 발생
      */
-    private CombatUser(@NonNull CombatantType combatantType, @NonNull User user, @Nullable GameUser gameUser) {
+    private CombatUser(@NonNull CombatantType combatantType, @NonNull User user) {
         super(user.getPlayer(), user.getPlayer().getName());
 
         this.user = user;
-        this.gameUser = gameUser;
+        this.gameUser = GameUser.fromUser(user);
         this.game = gameUser == null ? null : gameUser.getGame();
         this.team = gameUser == null ? null : gameUser.getTeam();
-        this.coreManager = new CoreManager(this);
+        this.combatantType = combatantType;
+        this.combatant = combatantType.getCombatant();
         this.killContributorManager = new KillContributorManager(this);
         this.killHelperManager = new KillHelperManager();
 
         this.attackerModule = new AttackerModule(this);
         this.healerModule = new HealerModule(this);
-        this.damageModule = new DamageModule(this, 1000, true);
+        this.damageModule = new DamageModule(this, combatant.getHealth(), true);
         this.healModule = new HealModule(this);
         this.statusEffectModule = new StatusEffectModule(this);
-        this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed());
+        this.moveModule = new MoveModule(this, GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
         this.knockbackModule = new KnockbackModule(this);
 
-        this.combatantType = combatantType;
-        this.combatant = combatantType.getCombatant();
+        this.coreManager = new CoreManager(this);
         this.actionManager = new ActionManager(this);
 
-        user.getSidebarManager().clear();
-        user.getGui().set(8, MENU_ITEM);
-
-        setCombatantType(combatantType);
-
-        addOnTick(this::onTick);
-        addOnRemove(this::onRemove);
+        onInit();
     }
 
     /**
-     * 전투 시스템의 플레이어 인스턴스를 생성한다.
+     * 전투 시스템의 플레이어 인스턴스를 생성하여 반환한다.
+     *
+     * <p>해당 {@code user}의 CombatUser가 이미 존재하면 {@link CombatUser#remove()}를 호출한 뒤 생성한다.</p>
      *
      * @param combatantType 전투원 종류
      * @param user          대상 플레이어
-     * @throws IllegalStateException 해당 {@code user}의 CombatUser가 이미 존재하면 발생
+     * @return {@link  CombatUser}
      */
-    public CombatUser(@NonNull CombatantType combatantType, @NonNull User user) {
-        this(combatantType, user, GameUser.fromUser(user));
+    @NonNull
+    public static CombatUser create(@NonNull CombatantType combatantType, @NonNull User user) {
+        CombatUser combatUser = CombatUser.fromUser(user);
+        if (combatUser != null)
+            combatUser.remove();
+
+        return new CombatUser(combatantType, user);
     }
 
     /**
@@ -265,6 +267,22 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             return null;
 
         return (CombatUser) combatEntity;
+    }
+
+    private void onInit() {
+        user.getSidebarManager().clear();
+        user.getGui().set(8, MENU_ITEM);
+
+        reset();
+        resetHitboxes();
+
+        combatant.onSet(this);
+
+        addTask(new IntervalTask((LongConsumer) i ->
+                entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
+                1, 10));
+        addOnTick(this::onTick);
+        addOnRemove(this::onRemove);
     }
 
     /**
@@ -291,8 +309,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (deathMentHologram != null)
             deathMentHologram.remove();
 
-        if (DMGR.getPlugin().isEnabled())
-            PlayerSkin.fromUUID(entity.getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(entity));
+        coreManager.clear();
+        actionManager.remove();
 
         reset();
     }
@@ -955,33 +973,6 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 플레이어의 전투원을 설정하고 무기와 스킬을 초기화한다.
-     *
-     * @param combatantType 전투원
-     */
-    public void setCombatantType(@NonNull CombatantType combatantType) {
-        reset();
-
-        this.combatantType = combatantType;
-        combatant = combatantType.getCombatant();
-
-        damageModule.setMaxHealth(combatant.getHealth());
-        damageModule.setHealth(combatant.getHealth());
-        moveModule.setBaseValue(GeneralConfig.getCombatConfig().getDefaultSpeed() * combatant.getSpeedMultiplier());
-
-        resetHitboxes();
-        actionManager = new ActionManager(this);
-
-        combatant.onSet(this);
-
-        combatant.getPlayerSkin().applySkin(entity);
-
-        addTask(new IntervalTask((LongConsumer) i ->
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, 0, false, false), true),
-                1, 10));
-    }
-
-    /**
      * 플레이어의 모든 상태를 재설정한다.
      */
     private void reset() {
@@ -991,23 +982,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         entity.setGravity(true);
         entity.setGameMode(GameMode.SURVIVAL);
 
-        fovValue = 0;
-        selfHarmDamage = 0;
-        damageModule.clearShields();
-        statusEffectModule.clear();
         setUltGaugePercent(0);
         setLowHealthScreenEffect(false);
-
-        statusEffectModule.clearModifiers();
-        attackerModule.clearModifiers();
-        healerModule.clearModifiers();
-        damageModule.clearModifiers();
-        healModule.clearModifiers();
-        moveModule.clearModifiers();
-        knockbackModule.clearModifiers();
-
-        coreManager.clear();
-        actionManager.remove();
     }
 
     /**

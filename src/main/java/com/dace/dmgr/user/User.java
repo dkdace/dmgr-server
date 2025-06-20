@@ -754,8 +754,12 @@ public final class User {
             sidebarManager.clear();
 
         CombatUser combatUser = CombatUser.fromUser(this);
-        if (combatUser != null)
+        if (combatUser != null) {
             combatUser.remove();
+
+            if (DMGR.getPlugin().isEnabled())
+                PlayerSkin.fromUUID(player.getUniqueId()).onFinish((Consumer<PlayerSkin>) playerSkin -> playerSkin.applySkin(player));
+        }
     }
 
     /**

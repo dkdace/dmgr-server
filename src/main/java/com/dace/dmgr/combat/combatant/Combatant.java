@@ -49,8 +49,6 @@ public abstract class Combatant {
     /** 별명 */
     private final String nickname;
     /** 스킨 */
-    @NonNull
-    @Getter
     private final PlayerSkin playerSkin;
     /** 주 역할군 */
     @NonNull
@@ -318,8 +316,9 @@ public abstract class Combatant {
      *
      * @param combatUser 대상 플레이어
      */
+    @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
-        // 미사용
+        playerSkin.applySkin(combatUser.getEntity());
     }
 
     /**

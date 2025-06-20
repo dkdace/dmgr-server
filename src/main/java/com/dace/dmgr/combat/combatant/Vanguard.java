@@ -42,7 +42,9 @@ public abstract class Vanguard extends Combatant {
     @Override
     @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
-        combatUser.getMoveModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+        super.onSet(combatUser);
+
+        combatUser.getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         combatUser.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
     }
 

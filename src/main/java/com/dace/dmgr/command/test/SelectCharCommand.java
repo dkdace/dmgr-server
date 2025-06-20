@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * 전투원 선택 명령어 클래스.
  *
- * @see CombatUser#setCombatantType(CombatantType)
+ * @see CombatUser#create(CombatantType, User)
  */
 public final class SelectCharCommand extends CommandHandler {
     @Getter
@@ -31,13 +31,8 @@ public final class SelectCharCommand extends CommandHandler {
     protected void onCommandInput(@NonNull Player sender, @NonNull String @NonNull [] args) {
         Player player = Bukkit.getPlayer(args[0]);
         User user = User.fromPlayer(player);
-        CombatUser combatUser = CombatUser.fromUser(user);
-
         CombatantType combatantType = CombatantType.valueOf(args[1].toUpperCase());
 
-        if (combatUser == null)
-            new CombatUser(combatantType, user);
-        else
-            combatUser.setCombatantType(combatantType);
+        CombatUser.create(combatantType, user);
     }
 }

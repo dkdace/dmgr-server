@@ -4,7 +4,6 @@ import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.util.EntityUtil;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -22,13 +21,13 @@ import org.bukkit.util.Vector;
  *
  * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  */
-@Setter
 public final class MoveModule extends CombatEntityModule<Movable> {
     /** 이동속도 기본값 */
-    @Getter(AccessLevel.PROTECTED)
-    private double baseValue;
+    @Getter
+    private final double baseValue;
     /** 점프 강도 */
     @Getter
+    @Setter
     private int jumpStrength = 0;
 
     /**
@@ -84,7 +83,7 @@ public final class MoveModule extends CombatEntityModule<Movable> {
         if (((Player) livingEntity).isSprinting()) {
             speed *= 0.88;
             if (!livingEntity.isOnGround())
-                speed *= speed / getBaseValue();
+                speed *= speed / baseValue;
         }
 
         return speed;

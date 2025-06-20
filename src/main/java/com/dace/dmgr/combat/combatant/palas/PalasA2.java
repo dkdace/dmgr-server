@@ -93,7 +93,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         public void onStart(@NonNull Damageable combatEntity) {
             combatEntity.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+                ((Movable) combatEntity).getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
 
         @Override
@@ -105,7 +105,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
         public void onEnd(@NonNull Damageable combatEntity) {
             combatEntity.getStatusEffectModule().removeModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
             if (combatEntity instanceof Movable)
-                ((Movable) combatEntity).getMoveModule().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+                ((Movable) combatEntity).getKnockbackModule().removeModifier(KNOCKBACK_RESISTANCE_MODIFIER);
         }
     }
 }

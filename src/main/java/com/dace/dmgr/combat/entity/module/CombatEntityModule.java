@@ -62,11 +62,4 @@ public abstract class CombatEntityModule<T extends CombatEntity> {
     public final void removeModifier(@NonNull Modifier modifier) {
         modifiers.remove(modifier);
     }
-
-    /**
-     * 능력치의 모든 수정자를 제거한다.
-     */
-    public final void clearModifiers() {
-        modifiers.clear();
-    }
 }

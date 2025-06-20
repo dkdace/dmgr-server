@@ -86,11 +86,7 @@ public final class SelectChar extends ChestGUI {
                     if (gameUser != null && gameUser.getTeam().checkCombatantDuplication(combatantType))
                         return false;
 
-                    CombatUser combatUser = CombatUser.fromUser(user);
-                    if (combatUser == null)
-                        combatUser = new CombatUser(combatantType, user);
-                    else
-                        combatUser.setCombatantType(combatantType);
+                    CombatUser combatUser = CombatUser.create(combatantType, user);
 
                     player.closeInventory();
 
