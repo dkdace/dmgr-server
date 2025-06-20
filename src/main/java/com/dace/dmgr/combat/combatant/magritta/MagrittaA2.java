@@ -10,8 +10,6 @@ import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.LongConsumer;
@@ -47,8 +45,7 @@ public final class MagrittaA2 extends ActiveSkill {
 
         combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), MagrittaA2Info.DURATION);
-        combatUser.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.JUMP,
-                (int) MagrittaA2Info.DURATION.toTicks(), 2, false, false), true);
+        combatUser.getMoveModule().setJumpStrength(3);
 
         Weapon weapon = combatUser.getActionManager().getWeapon();
         weapon.cancel();
@@ -65,6 +62,7 @@ public final class MagrittaA2 extends ActiveSkill {
         super.onDurationFinished();
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
+        combatUser.getMoveModule().setJumpStrength(0);
 
         MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
         weapon.setVisible(true);

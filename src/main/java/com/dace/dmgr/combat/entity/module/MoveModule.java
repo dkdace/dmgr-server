@@ -22,11 +22,14 @@ import org.bukkit.util.Vector;
  *
  * <p>엔티티가 {@link LivingEntity}을 상속받는 클래스여야 한다.</p>
  */
-@Getter(AccessLevel.PROTECTED)
 @Setter
 public final class MoveModule extends CombatEntityModule<Movable> {
     /** 이동속도 기본값 */
+    @Getter(AccessLevel.PROTECTED)
     private double baseValue;
+    /** 점프 강도 */
+    @Getter
+    private int jumpStrength = 0;
 
     /**
      * 이동 모듈 인스턴스를 생성한다.
@@ -52,7 +55,10 @@ public final class MoveModule extends CombatEntityModule<Movable> {
                 ((Player) livingEntity).setFlySpeed((float) (finalSpeed * 0.35));
 
             if (canJump() && combatEntity.canJump()) {
-                if (livingEntity.hasPotionEffect(PotionEffectType.JUMP) && livingEntity.getPotionEffect(PotionEffectType.JUMP).getAmplifier() < 0)
+                if (jumpStrength > 0)
+                    livingEntity.addPotionEffect(
+                            new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, jumpStrength - 1, false, false), true);
+                else
                     livingEntity.removePotionEffect(PotionEffectType.JUMP);
             } else
                 livingEntity.addPotionEffect(
