@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.action.skill.module.EntityModule;
 import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -258,9 +257,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
-            ActionManager actionManager = combatUser.getActionManager();
-            actionManager.getSkill(JagerP1Info.getInstance()).setTarget(victim);
-            actionManager.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(victim);
 
             if (victim.isGoalTarget())
                 bonusScoreModule.addTarget(victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);

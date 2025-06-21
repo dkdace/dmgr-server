@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -116,9 +115,7 @@ public final class Magritta extends Scuffler {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-
-        if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getActionManager().getSkill(MagrittaP1Info.getInstance()).onTick(i);
     }
 
     @Override

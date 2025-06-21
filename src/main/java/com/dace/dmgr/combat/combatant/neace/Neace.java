@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -114,8 +113,7 @@ public final class Neace extends Support {
 
         new NeaceTarget(combatUser).shot();
 
-        if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getActionManager().getSkill(NeaceP1Info.getInstance()).onTick(i);
     }
 
     @Override

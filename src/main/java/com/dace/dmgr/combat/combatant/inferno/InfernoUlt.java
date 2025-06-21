@@ -1,9 +1,11 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.DamageModule;
@@ -92,5 +94,27 @@ public final class InfernoUlt extends UltimateSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+    }
+
+    /**
+     * 피해를 입었을 때 실행될 작업.
+     *
+     * @param damage   피해량
+     * @param location 맞은 위치
+     */
+    void onDamage(double damage, @Nullable Location location) {
+        if (!isDurationFinished())
+            InfernoUltInfo.Effects.DAMAGE.apply(location, damage).play(CombatEffectUtil.getHitLocation(combatUser, location));
+    }
+
+    /**
+     * 다른 엔티티를 죽였을 때 실행될 작업.
+     *
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
+     */
+    void onKill(@NonNull Damageable victim, double contributionScore) {
+        if (victim.isGoalTarget() && !isDurationFinished())
+            combatUser.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * contributionScore);
     }
 }

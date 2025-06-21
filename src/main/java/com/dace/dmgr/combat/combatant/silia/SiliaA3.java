@@ -8,18 +8,13 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
 public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(SiliaA3Info.SPEED);
     /** 누적 피해 */
-    private double damage = 0;
+    private double damageSum = 0;
 
     public SiliaA3(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaA3Info.getInstance(), SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
@@ -92,10 +87,26 @@ public final class SiliaA3 extends ChargeableSkill {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        damage = 0;
+        damageSum = 0;
 
         combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
 
         SiliaA3Info.Effects.OFF.play(combatUser.getLocation());
+    }
+
+    /**
+     * 피해를 입었을 때 실행될 작업.
+     *
+     * @param damage 피해량
+     */
+    void onDamage(double damage) {
+        if (isDurationFinished())
+            return;
+
+        damageSum += damage;
+        if (damageSum >= combatUser.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO) {
+            cancel();
+            setCooldown(SiliaA3Info.COOLDOWN_FORCE);
+        }
     }
 }

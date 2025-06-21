@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.metar;
 
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -106,11 +105,7 @@ public final class Metar extends Guardian {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-
-        MetarP1 skillp1 = combatUser.getActionManager().getSkill(MetarP1Info.getInstance());
-        skillp1.addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
-
-        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getActionManager().getSkill(MetarP1Info.getInstance()).onTick();
     }
 
     @Override
@@ -120,8 +115,7 @@ public final class Metar extends Guardian {
 
     @Override
     public void onKnockbacked(@NonNull CombatUser victim, double speed) {
-        MetarP1 skillp1 = victim.getActionManager().getSkill(MetarP1Info.getInstance());
-        skillp1.addValue(-speed * MetarP1Info.DECREASE_MULTIPLIER);
+        victim.getActionManager().getSkill(MetarP1Info.getInstance()).onKnockbacked(speed);
     }
 
     @Override

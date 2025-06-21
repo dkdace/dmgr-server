@@ -13,8 +13,6 @@ import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
@@ -23,7 +21,6 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.function.IntConsumer;
 
-@Getter(AccessLevel.PACKAGE)
 public final class SiliaT2 extends Trait {
     /** 일격 사용 가능 여부 */
     private boolean isStrike = false;
@@ -36,8 +33,12 @@ public final class SiliaT2 extends Trait {
      * 일격을 사용한다.
      *
      * @param isOpposite 검기 방향의 반대 방향 여부
+     * @return 사용 성공 여부
      */
-    void useStrike(boolean isOpposite) {
+    boolean useStrike(boolean isOpposite) {
+        if (!isStrike)
+            return false;
+
         ActionManager actionManager = combatUser.getActionManager();
         Weapon weapon = actionManager.getWeapon();
 
@@ -80,6 +81,8 @@ public final class SiliaT2 extends Trait {
 
             weapon.addActionTask(new DelayTask(() -> onIndex.accept(index), delay));
         }
+
+        return true;
     }
 
     /**

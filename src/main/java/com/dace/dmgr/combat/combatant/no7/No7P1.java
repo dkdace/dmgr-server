@@ -50,4 +50,12 @@ public final class No7P1 extends AbstractSkill {
     protected void onCancelled() {
         setCooldown();
     }
+
+    /**
+     * 매 틱마다 실행할 작업.
+     */
+    void onTick() {
+        if (combatUser.getDamageModule().isLowHealth())
+            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
 }

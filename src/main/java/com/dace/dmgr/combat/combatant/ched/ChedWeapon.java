@@ -12,12 +12,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
-import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-@Setter
 public final class ChedWeapon extends AbstractWeapon {
     /** 활 충전량 */
     private double power;
@@ -84,6 +82,16 @@ public final class ChedWeapon extends AbstractWeapon {
      */
     void setCanShoot(boolean canShoot) {
         combatUser.getEntity().getInventory().setItem(ChedWeaponInfo.ARROW_INVENTORY_SLOT, new ItemStack(canShoot ? Material.ARROW : Material.AIR));
+    }
+
+    /**
+     * 무기 발사 전에 실행할 작업.
+     *
+     * @param power 활 충전량
+     */
+    public void beforeShoot(double power) {
+        this.power = power;
+        combatUser.getActionManager().useAction(getDefaultActionKeys()[1]);
     }
 
     private final class ChedWeaponProjectile extends Projectile<Damageable> {

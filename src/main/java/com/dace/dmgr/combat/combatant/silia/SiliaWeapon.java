@@ -35,11 +35,7 @@ public final class SiliaWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         isOpposite = !isOpposite;
 
-        SiliaT2 skillt2 = combatUser.getActionManager().getTrait(SiliaT2Info.getInstance());
-
-        if (skillt2.isStrike())
-            skillt2.useStrike(isOpposite);
-        else {
+        if (!combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
             setCooldown();
             combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(10), MainHand.RIGHT);
 

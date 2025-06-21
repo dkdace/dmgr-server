@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.ActionBarStringUtil;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -83,5 +84,19 @@ public final class SiliaUlt extends UltimateSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getActionManager().getWeapon().setVisible(true);
+    }
+
+    /**
+     * 다른 엔티티를 죽였을 때 실행될 작업.
+     *
+     * @param victim            피격자
+     * @param contributionScore 처치 기여도
+     */
+    void onKill(@NonNull Damageable victim, double contributionScore) {
+        if (!victim.isGoalTarget() || isDurationFinished())
+            return;
+
+        addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
+        combatUser.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * contributionScore);
     }
 }

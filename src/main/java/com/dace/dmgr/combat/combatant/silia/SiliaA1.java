@@ -85,6 +85,16 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.getActionManager().getWeapon().setVisible(true);
     }
 
+    /**
+     * 다른 엔티티를 죽였을 때 실행될 작업.
+     *
+     * @param victim 피격자
+     */
+    void onKill(@NonNull Damageable victim) {
+        if (victim.isGoalTarget() && (!isCooldownFinished() || !isDurationFinished()))
+            setCooldown(Timespan.ZERO);
+    }
+
     private final class SiliaA1MeleeHitscan extends MeleeHitscan<Damageable> {
         private final HashSet<Damageable> targets;
 

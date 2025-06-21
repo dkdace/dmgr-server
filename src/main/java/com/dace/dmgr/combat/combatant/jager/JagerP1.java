@@ -5,11 +5,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.Setter;
 
-@Setter(AccessLevel.PACKAGE)
 public final class JagerP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Damageable target = null;
@@ -37,5 +34,15 @@ public final class JagerP1 extends AbstractSkill {
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    /**
+     * 스킬을 사용한다.
+     *
+     * @param target 사용 대상
+     */
+    void use(@NonNull Damageable target) {
+        this.target = target;
+        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
     }
 }

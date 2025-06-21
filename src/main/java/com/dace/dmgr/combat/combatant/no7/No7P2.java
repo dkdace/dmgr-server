@@ -39,6 +39,16 @@ public final class No7P2 extends AbstractSkill {
         return false;
     }
 
+    /**
+     * 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    void onTick(long i) {
+        if (i % 5 == 0)
+            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
+
     private final class No7P2Area extends Area<Damageable> {
         private No7P2Area() {
             super(combatUser, No7P2Info.RADIUS, EntityCondition.enemy(combatUser));

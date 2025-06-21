@@ -31,4 +31,12 @@ public final class No7T1 extends Trait {
     void addShield(double amount) {
         shield.setHealth(Math.min(No7T1Info.MAX_SHIELD, shield.getHealth() + amount));
     }
+
+    /**
+     * 매 틱마다 실행할 작업.
+     */
+    void onTick() {
+        if (!combatUser.getDamageModule().isLowHealth() || getShield() > No7P1Info.SHIELD)
+            addShield(-No7T1Info.DECREASE_PER_SECOND / 20.0);
+    }
 }

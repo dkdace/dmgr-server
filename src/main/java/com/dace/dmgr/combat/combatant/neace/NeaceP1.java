@@ -42,4 +42,14 @@ public final class NeaceP1 extends AbstractSkill {
     protected void onCancelled() {
         setCooldown();
     }
+
+    /**
+     * 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    void onTick(long i) {
+        if (i % 5 == 0)
+            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
 }

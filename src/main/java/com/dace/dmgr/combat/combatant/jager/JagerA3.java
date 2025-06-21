@@ -11,7 +11,6 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -233,9 +232,7 @@ public final class JagerA3 extends ActiveSkill {
                 if (JagerT1Util.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
-                    ActionManager actionManager = combatUser.getActionManager();
-                    actionManager.getSkill(JagerP1Info.getInstance()).setTarget(target);
-                    actionManager.useAction(ActionKey.PERIODIC_1);
+                    combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(target);
 
                     if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);

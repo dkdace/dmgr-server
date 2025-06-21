@@ -1,7 +1,5 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
-import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -119,9 +117,7 @@ public final class Inferno extends Vanguard {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-
-        if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getActionManager().getSkill(InfernoP1Info.getInstance()).onTick(i);
     }
 
     @Override
@@ -132,19 +128,13 @@ public final class Inferno extends Vanguard {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-
-        if (victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
-            return;
-
-        InfernoUltInfo.Effects.DAMAGE.apply(location, damage).play(CombatEffectUtil.getHitLocation(victim, location));
+        victim.getActionManager().getSkill(InfernoUltInfo.getInstance()).onDamage(damage, location);
     }
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         super.onKill(attacker, victim, contributionScore, isFinalHit);
-
-        if (victim.isGoalTarget() && !attacker.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
-            attacker.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * contributionScore);
+        attacker.getActionManager().getSkill(InfernoUltInfo.getInstance()).onKill(victim, contributionScore);
     }
 
     @Override

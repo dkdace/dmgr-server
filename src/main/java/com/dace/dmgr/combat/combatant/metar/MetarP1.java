@@ -62,8 +62,25 @@ public final class MetarP1 extends AbstractSkill {
      *
      * @param amount 증가량
      */
-    void addValue(double amount) {
+    private void addValue(double amount) {
         heavyArmor = Math.min(MetarP1Info.MAX, Math.max(0, heavyArmor + amount));
         modifier.setIncrement(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
+    }
+
+    /**
+     * 매 틱마다 실행할 작업.
+     */
+    void onTick() {
+        addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
+        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
+
+    /**
+     * 강제로 밀쳐졌을 때 실행될 작업.
+     *
+     * @param speed 속력
+     */
+    void onKnockbacked(double speed) {
+        addValue(-speed * MetarP1Info.DECREASE_MULTIPLIER);
     }
 }

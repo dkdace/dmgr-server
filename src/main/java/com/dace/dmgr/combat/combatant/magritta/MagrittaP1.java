@@ -76,6 +76,16 @@ public final class MagrittaP1 extends AbstractSkill {
         setDuration(Timespan.ZERO);
     }
 
+    /**
+     * 매 틱마다 실행할 작업.
+     *
+     * @param i 인덱스
+     */
+    void onTick(long i) {
+        if (i % 5 == 0)
+            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
+
     private final class MagrittaP1Area extends Area<Damageable> {
         private MagrittaP1Area() {
             super(combatUser, MagrittaP1Info.DETECT_RADIUS, EntityCondition.enemy(combatUser)

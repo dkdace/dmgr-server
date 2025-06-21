@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.no7;
 
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -104,16 +103,9 @@ public final class No7 extends Vanguard {
         super.onTick(combatUser, i);
 
         ActionManager actionManager = combatUser.getActionManager();
-
-        No7T1 skillt1 = actionManager.getTrait(No7T1Info.getInstance());
-        if (!combatUser.getDamageModule().isLowHealth() || skillt1.getShield() > No7P1Info.SHIELD)
-            skillt1.addShield(-No7T1Info.DECREASE_PER_SECOND / 20.0);
-
-        if (combatUser.getDamageModule().isLowHealth())
-            actionManager.useAction(ActionKey.PERIODIC_1);
-
-        if (i % 5 == 0)
-            actionManager.useAction(ActionKey.PERIODIC_2);
+        actionManager.getTrait(No7T1Info.getInstance()).onTick();
+        actionManager.getSkill(No7P1Info.getInstance()).onTick();
+        actionManager.getSkill(No7P2Info.getInstance()).onTick(i);
     }
 
     @Override

@@ -52,4 +52,12 @@ public final class ArkaceP1 extends AbstractSkill {
         combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getActionManager().getWeapon().setDurability(ArkaceWeaponInfo.Resource.DEFAULT);
     }
+
+    /**
+     * 매 틱마다 실행할 작업.
+     */
+    void onTick() {
+        if (combatUser.getEntity().isSprinting())
+            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+    }
 }

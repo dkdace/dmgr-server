@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -118,12 +117,7 @@ public final class Vellion extends Controller {
 
     @Override
     public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (attacker == victim || !victim.isCreature())
-            return;
-
-        ActionManager actionManager = attacker.getActionManager();
-        actionManager.getSkill(VellionP2Info.getInstance()).setDamageAmount(damage);
-        actionManager.useAction(ActionKey.PERIODIC_1);
+        attacker.getActionManager().getSkill(VellionP2Info.getInstance()).onAttack(victim, damage);
     }
 
     @Override

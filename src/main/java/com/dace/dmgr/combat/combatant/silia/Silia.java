@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -125,51 +124,31 @@ public final class Silia extends Scuffler {
 
     @Override
     public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        if (attacker != victim && victim.isGoalTarget() && isCrit)
-            attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
+        SiliaT1Util.onAttack(attacker, victim, isCrit);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-
-        SiliaA3 skill3 = victim.getActionManager().getSkill(SiliaA3Info.getInstance());
-        if (skill3.isDurationFinished())
-            return;
-
-        skill3.setDamage(skill3.getDamage() + damage);
-        if (skill3.getDamage() >= victim.getDamageModule().getMaxHealth() * SiliaA3Info.CANCEL_DAMAGE_RATIO) {
-            skill3.cancel();
-            skill3.setCooldown(SiliaA3Info.COOLDOWN_FORCE);
-        }
+        victim.getActionManager().getSkill(SiliaA3Info.getInstance()).onDamage(damage);
     }
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         super.onKill(attacker, victim, contributionScore, isFinalHit);
 
-        if (!victim.isGoalTarget())
-            return;
-
         if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributionElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
             attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
 
         ActionManager actionManager = attacker.getActionManager();
-
-        SiliaA1 skill1 = actionManager.getSkill(SiliaA1Info.getInstance());
-        if (!skill1.isCooldownFinished() || !skill1.isDurationFinished())
-            skill1.setCooldown(Timespan.ZERO);
-
-        SiliaUlt skillUlt = actionManager.getSkill(SiliaUltInfo.getInstance());
-        if (!skillUlt.isDurationFinished()) {
-            skillUlt.addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
-            attacker.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * contributionScore);
-        }
+        actionManager.getSkill(SiliaA1Info.getInstance()).onKill(victim);
+        actionManager.getSkill(SiliaUltInfo.getInstance()).onKill(victim, contributionScore);
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        return combatUser.getActionManager().getSkill(SiliaP1Info.getInstance()).canUse(ActionKey.SPACE);
+        SiliaP1 skillp1 = combatUser.getActionManager().getSkill(SiliaP1Info.getInstance());
+        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]);
     }
 
     @Override

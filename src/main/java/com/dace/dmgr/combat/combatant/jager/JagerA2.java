@@ -215,10 +215,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         @Override
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
-
-            ActionManager actionManager = combatUser.getActionManager();
-            actionManager.getSkill(JagerP1Info.getInstance()).setTarget(victim);
-            actionManager.useAction(ActionKey.PERIODIC_1);
+            combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(victim);
         }
 
         @Override

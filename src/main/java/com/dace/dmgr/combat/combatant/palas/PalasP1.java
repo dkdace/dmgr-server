@@ -5,11 +5,8 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.Setter;
 
-@Setter(AccessLevel.PACKAGE)
 public final class PalasP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Healable target = null;
@@ -39,5 +36,18 @@ public final class PalasP1 extends AbstractSkill {
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    /**
+     * 스킬을 사용한다.
+     *
+     * @param target     사용 대상
+     * @param healAmount 치유량
+     */
+    void use(@NonNull Healable target, double healAmount) {
+        this.target = target;
+        this.healAmount = healAmount;
+
+        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
     }
 }
