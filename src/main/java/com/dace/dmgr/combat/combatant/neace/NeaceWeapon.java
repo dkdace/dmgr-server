@@ -22,6 +22,8 @@ import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.EnumSet;
+import java.util.Set;
 
 public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     /** 연사 모듈 */
@@ -44,8 +46,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK);
     }
 
     @Override

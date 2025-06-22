@@ -16,7 +16,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Set;
 
 public final class No7A1 extends ActiveSkill {
     public No7A1(@NonNull CombatUser combatUser) {
@@ -25,8 +27,8 @@ public final class No7A1 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override
@@ -35,7 +37,7 @@ public final class No7A1 extends ActiveSkill {
         if (isDurationFinished())
             return null;
 
-        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo(this, "해제");
+        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_1);
     }
 
     @Override

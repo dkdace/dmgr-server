@@ -8,6 +8,9 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class No7P1 extends AbstractSkill {
     public No7P1(@NonNull CombatUser combatUser) {
         super(combatUser, No7P1Info.getInstance(), No7P1Info.COOLDOWN, Timespan.MAX);
@@ -15,8 +18,8 @@ public final class No7P1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -56,6 +59,6 @@ public final class No7P1 extends AbstractSkill {
      */
     void onTick() {
         if (combatUser.getDamageModule().isLowHealth())
-            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 }

@@ -14,6 +14,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class No7A3 extends ActiveSkill {
     public No7A3(@NonNull CombatUser combatUser) {
         super(combatUser, No7A3Info.getInstance(), No7A3Info.COOLDOWN, No7A3Info.DURATION, 2);
@@ -21,8 +24,8 @@ public final class No7A3 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override

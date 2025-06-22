@@ -22,6 +22,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-PalasWeaponInfo.AIM_SLOW);
@@ -46,19 +49,14 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override
     @NonNull
     public String getActionBarString() {
         return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '┃') + (isActionCooldown ? " §a■" : " §c□");
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return (actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey));
     }
 
     @Override

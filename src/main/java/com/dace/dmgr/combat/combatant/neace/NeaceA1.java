@@ -14,6 +14,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     /** 타겟 모듈 */
@@ -27,8 +30,8 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override

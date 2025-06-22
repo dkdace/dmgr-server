@@ -20,6 +20,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
     /** 수정자 */
@@ -47,8 +50,14 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    }
+
+    @Override
+    @NonNull
+    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override
@@ -64,8 +73,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         ActionManager actionManager = combatUser.getActionManager();
-        return (actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
-                && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse(actionKey) && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 

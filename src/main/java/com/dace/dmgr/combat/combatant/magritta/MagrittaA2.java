@@ -12,6 +12,8 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class MagrittaA2 extends ActiveSkill {
@@ -24,8 +26,8 @@ public final class MagrittaA2 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2, ActionKey.RIGHT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2, ActionKey.RIGHT_CLICK);
     }
 
     @Override

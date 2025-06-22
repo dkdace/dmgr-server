@@ -12,6 +12,9 @@ import lombok.NonNull;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
@@ -33,7 +36,8 @@ public abstract class UltimateSkill extends ActiveSkill {
      * @param defaultDuration   기본 지속시간
      * @param cost              필요 충전량
      */
-    protected UltimateSkill(@NonNull CombatUser combatUser, @NonNull UltimateSkillInfo<?> ultimateSkillInfo, @NonNull Timespan defaultDuration, int cost) {
+    protected UltimateSkill(@NonNull CombatUser combatUser, @NonNull UltimateSkillInfo<?> ultimateSkillInfo, @NonNull Timespan defaultDuration,
+                            int cost) {
         super(combatUser, ultimateSkillInfo, Timespan.MAX, defaultDuration, 3);
         this.cost = cost;
     }
@@ -46,8 +50,8 @@ public abstract class UltimateSkill extends ActiveSkill {
 
     @Override
     @NonNull
-    public final ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_4};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_4);
     }
 
     @Override

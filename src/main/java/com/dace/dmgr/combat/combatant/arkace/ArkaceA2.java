@@ -9,6 +9,9 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class ArkaceA2 extends ActiveSkill {
     public ArkaceA2(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceA2Info.getInstance(), ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION, 2);
@@ -16,8 +19,8 @@ public final class ArkaceA2 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override

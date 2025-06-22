@@ -7,6 +7,9 @@ import com.dace.dmgr.util.task.Task;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * 동작(무기, 스킬)의 상태를 관리하는 인터페이스.
  *
@@ -39,7 +42,18 @@ public interface Action {
      * @return 기본 사용 키 목록
      */
     @NonNull
-    ActionKey @NonNull [] getDefaultActionKeys();
+    Set<@NonNull ActionKey> getDefaultActionKeys();
+
+    /**
+     * 쿨타임({@link Action#getCooldown()})을 무시하는 사용 키 목록을 반환한다.
+     *
+     * @return 쿨타임 무시 사용 키 목록
+     * @implSpec {@link Collections#emptySet()}
+     */
+    @NonNull
+    default Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return Collections.emptySet();
+    }
 
     /**
      * 액션바에 동작 상태를 표시하기 위한 문자열을 반환한다.

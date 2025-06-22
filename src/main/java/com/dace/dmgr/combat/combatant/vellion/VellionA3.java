@@ -22,6 +22,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-VellionA3Info.READY_SLOW);
@@ -52,8 +55,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3, ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
     }
 
     @Override

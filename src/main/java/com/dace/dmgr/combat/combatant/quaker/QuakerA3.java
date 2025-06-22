@@ -22,7 +22,9 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
 
 public final class QuakerA3 extends ActiveSkill {
     /** 수정자 */
@@ -34,8 +36,8 @@ public final class QuakerA3 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override

@@ -8,6 +8,9 @@ import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class ArkaceP1 extends AbstractSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(ArkaceP1Info.SPRINT_SPEED);
@@ -18,8 +21,8 @@ public final class ArkaceP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -58,6 +61,6 @@ public final class ArkaceP1 extends AbstractSkill {
      */
     void onTick() {
         if (combatUser.getEntity().isSprinting())
-            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 }

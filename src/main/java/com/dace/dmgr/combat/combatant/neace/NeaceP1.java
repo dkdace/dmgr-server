@@ -7,6 +7,8 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class NeaceP1 extends AbstractSkill {
@@ -16,8 +18,8 @@ public final class NeaceP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -50,6 +52,6 @@ public final class NeaceP1 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 }

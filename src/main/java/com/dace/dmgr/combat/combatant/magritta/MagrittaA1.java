@@ -23,6 +23,9 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class MagrittaA1 extends ActiveSkill {
     /** 화염 상태 효과 */
     private final Burning burning;
@@ -34,8 +37,8 @@ public final class MagrittaA1 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override

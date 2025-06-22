@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -141,7 +142,7 @@ public final class Vellion extends Controller {
         ActionManager actionManager = combatUser.getActionManager();
         VellionP1 skillp1 = actionManager.getSkill(VellionP1Info.getInstance());
 
-        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]) && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return skillp1.canUse(ActionKey.SPACE) && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

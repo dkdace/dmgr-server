@@ -7,6 +7,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class JagerP1 extends AbstractSkill {
     /** 현재 사용 대상 */
     private Damageable target = null;
@@ -17,8 +20,8 @@ public final class JagerP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -43,6 +46,6 @@ public final class JagerP1 extends AbstractSkill {
      */
     void use(@NonNull Damageable target) {
         this.target = target;
-        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 }

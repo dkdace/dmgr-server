@@ -28,7 +28,9 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
 
 public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1.VellionA1Entity> {
     /** 수정자 */
@@ -53,8 +55,8 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1, ActionKey.RIGHT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
     }
 
     @Override

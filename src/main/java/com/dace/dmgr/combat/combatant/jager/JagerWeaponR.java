@@ -17,6 +17,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     /** 주무기 인스턴스 */
     private final JagerWeaponL mainWeapon;
@@ -44,13 +47,14 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return actionKey == ActionKey.DROP || actionKey == ActionKey.RIGHT_CLICK ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
+    @NonNull
+    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override

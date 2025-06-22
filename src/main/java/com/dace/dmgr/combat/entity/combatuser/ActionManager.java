@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 /**
  * 전투 시스템 플레이어의 동작(무기, 스킬)을 관리하는 클래스.
@@ -58,11 +59,12 @@ public final class ActionManager {
         for (ActionKey actionKey : ActionKey.values())
             actionMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
 
-        actionMap.get(ActionKey.SWAP_HAND).add(new MeleeAttackAction(combatUser));
+        Stream.Builder<Action> streamBuilder = Stream.builder();
+
+        streamBuilder.add(new MeleeAttackAction(combatUser));
 
         weapon = combatant.getWeaponInfo().createWeapon(combatUser);
-        for (ActionKey actionKey : weapon.getDefaultActionKeys())
-            actionMap.get(actionKey).add(weapon);
+        streamBuilder.add(weapon);
 
         for (TraitInfo traitInfo : combatant.getTraitInfos()) {
             if (traitInfo instanceof DynamicTraitInfo) {
@@ -75,9 +77,11 @@ public final class ActionManager {
             Skill skill = skillInfo.createSkill(combatUser);
             skillMap.put(skillInfo, skill);
 
-            for (ActionKey actionKey : skill.getDefaultActionKeys())
-                actionMap.get(actionKey).add(skill);
+            streamBuilder.add(skill);
         }
+
+        streamBuilder.build().forEach(action ->
+                action.getDefaultActionKeys().forEach(actionKey -> actionMap.get(actionKey).add(action)));
     }
 
     /**

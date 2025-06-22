@@ -18,6 +18,8 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.LongConsumer;
 
 @Getter
@@ -35,8 +37,8 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override

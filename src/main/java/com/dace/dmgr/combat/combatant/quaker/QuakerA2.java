@@ -27,7 +27,9 @@ import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.IntConsumer;
 
 public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
@@ -52,8 +54,8 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override

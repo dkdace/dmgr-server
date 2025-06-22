@@ -21,6 +21,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-MetarWeaponInfo.SLOW);
@@ -47,8 +50,8 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override

@@ -23,6 +23,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
     @NonNull
@@ -45,19 +48,20 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.LEFT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.LEFT_CLICK, ActionKey.DROP);
+    }
+
+    @Override
+    @NonNull
+    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.DROP);
     }
 
     @Override
     @NonNull
     public String getActionBarString() {
         return reloadModule.getActionBarProgressBar(10, '■');
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey);
     }
 
     @Override

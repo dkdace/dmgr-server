@@ -14,6 +14,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class VellionWeapon extends AbstractWeapon {
     public VellionWeapon(@NonNull CombatUser combatUser) {
         super(combatUser, VellionWeaponInfo.getInstance(), VellionWeaponInfo.COOLDOWN);
@@ -21,8 +24,8 @@ public final class VellionWeapon extends AbstractWeapon {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK);
     }
 
     @Override

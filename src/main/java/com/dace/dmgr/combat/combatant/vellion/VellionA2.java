@@ -29,6 +29,9 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>, HasBonusScore {
     /** 이동 속도 수정자 */
     private static final Modifier SPEED_MODIFIER = new Modifier(-VellionA2Info.READY_SLOW);
@@ -60,8 +63,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override
@@ -70,7 +73,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         if (isDurationFinished() || !isEnabled)
             return null;
 
-        return VellionA2Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "해제");
+        return VellionA2Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_2);
     }
 
     @Override

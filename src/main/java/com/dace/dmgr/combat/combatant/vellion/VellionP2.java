@@ -7,6 +7,9 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class VellionP2 extends AbstractSkill {
     /** 최근 피해량 */
     private double damageAmount;
@@ -17,8 +20,8 @@ public final class VellionP2 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -42,6 +45,6 @@ public final class VellionP2 extends AbstractSkill {
             return;
 
         damageAmount = damage;
-        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 }

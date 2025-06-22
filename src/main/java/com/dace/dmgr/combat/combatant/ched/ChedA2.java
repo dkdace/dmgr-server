@@ -10,6 +10,8 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class ChedA2 extends ActiveSkill {
@@ -19,8 +21,8 @@ public final class ChedA2 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2, ActionKey.SPACE};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2, ActionKey.SPACE);
     }
 
     @Override

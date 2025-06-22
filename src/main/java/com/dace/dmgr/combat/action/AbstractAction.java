@@ -170,7 +170,8 @@ public abstract class AbstractAction implements Action {
     @Override
     @MustBeInvokedByOverriders
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return isCooldownFinished() && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
+        return (getCooldownIgnoreActionKeys().contains(actionKey) || isCooldownFinished())
+                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
     }
 
     @Override

@@ -22,6 +22,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-InfernoA2Info.HEAL_DECREMENT);
@@ -41,8 +44,8 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override

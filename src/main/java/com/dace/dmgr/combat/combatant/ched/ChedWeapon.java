@@ -16,6 +16,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class ChedWeapon extends AbstractWeapon {
     /** 활 충전량 */
     private double power;
@@ -26,8 +29,8 @@ public final class ChedWeapon extends AbstractWeapon {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -91,7 +94,7 @@ public final class ChedWeapon extends AbstractWeapon {
      */
     public void beforeShoot(double power) {
         this.power = power;
-        combatUser.getActionManager().useAction(getDefaultActionKeys()[1]);
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     private final class ChedWeaponProjectile extends Projectile<Damageable> {

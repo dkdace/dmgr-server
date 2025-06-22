@@ -41,25 +41,6 @@ public final class ActionBarStringUtil {
     }
 
     /**
-     * 지정한 스킬의 사용 키 설명을 반환한다.
-     *
-     * <p>Example:</p>
-     *
-     * <pre>[1][우클릭] 사용</pre>
-     * <pre><code>
-     * ActionBarStringUtil.getKeyInfo(skill, "사용");
-     * </code></pre>
-     *
-     * @param skill       스킬
-     * @param description 설명
-     * @return 사용 키 설명
-     */
-    @NonNull
-    public static String getKeyInfo(@NonNull Skill skill, @NonNull String description) {
-        return getKeyInfo(description, skill.getDefaultActionKeys());
-    }
-
-    /**
      * 진행 막대를 반환한다.
      *
      * <p>기본적으로 흰색, 현재 값이 최대 값의 1/2 이하일 경우 노란색, 1/4 이하일 경우 빨간색으로 표시한다.</p>

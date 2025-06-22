@@ -21,6 +21,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class ChedA1 extends StackableSkill {
     /** 화염 상태 효과 */
     private final Burning burning;
@@ -35,8 +38,8 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override
@@ -45,7 +48,7 @@ public final class ChedA1 extends StackableSkill {
         if (isDurationFinished() || !isEnabled())
             return null;
 
-        return ChedA1Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "해제");
+        return ChedA1Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_1);
     }
 
     @Override

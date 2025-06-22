@@ -20,6 +20,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     /** 타겟 모듈 */
@@ -33,8 +36,8 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override
@@ -43,7 +46,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
         if (isDurationFinished())
             return null;
 
-        return NeaceA3Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "해제");
+        return NeaceA3Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_3);
     }
 
     @Override

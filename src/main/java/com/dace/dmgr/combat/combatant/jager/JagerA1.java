@@ -28,6 +28,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class JagerA1 extends ChargeableSkill implements Confirmable, Summonable<JagerA1.JagerA1Entity>, HasBonusScore {
     /** 위치 확인 모듈 */
@@ -55,8 +58,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1, ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1, ActionKey.LEFT_CLICK);
     }
 
     @Override
@@ -64,7 +67,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     public String getActionBarString() {
         String text = ActionBarStringUtil.getProgressBar(this);
         if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo("회수", getDefaultActionKeys()[0]);
+            text += ActionBarStringUtil.getKeyInfo("회수", ActionKey.SLOT_1);
 
         return text;
     }

@@ -10,6 +10,9 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class MetarP1 extends AbstractSkill {
     /** 중기갑 */
     private double heavyArmor = MetarP1Info.MAX;
@@ -23,8 +26,8 @@ public final class MetarP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -72,7 +75,7 @@ public final class MetarP1 extends AbstractSkill {
      */
     void onTick() {
         addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
-        combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     /**

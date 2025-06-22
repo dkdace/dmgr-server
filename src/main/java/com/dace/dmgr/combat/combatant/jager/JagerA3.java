@@ -29,6 +29,9 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class JagerA3 extends ActiveSkill {
     /** 폭발 타임스탬프 */
     private Timestamp explodeTimestamp = Timestamp.now();
@@ -46,8 +49,8 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_3, ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
     }
 
     @Override
@@ -56,7 +59,7 @@ public final class JagerA3 extends ActiveSkill {
         if (isDurationFinished() || !isEnabled)
             return null;
 
-        return JagerA3Info.getInstance() + ActionBarStringUtil.getKeyInfo(this, "투척");
+        return JagerA3Info.getInstance() + ActionBarStringUtil.getKeyInfo("투척", ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
     }
 
     @Override

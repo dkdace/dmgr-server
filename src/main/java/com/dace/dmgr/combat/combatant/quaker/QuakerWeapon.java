@@ -17,7 +17,9 @@ import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.IntConsumer;
 
 public final class QuakerWeapon extends AbstractWeapon {
@@ -30,8 +32,8 @@ public final class QuakerWeapon extends AbstractWeapon {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK);
     }
 
     @Override

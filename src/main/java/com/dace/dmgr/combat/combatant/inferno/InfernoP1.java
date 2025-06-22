@@ -15,6 +15,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class InfernoP1 extends AbstractSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(InfernoP1Info.DEFENSE_INCREMENT);
@@ -27,8 +30,8 @@ public final class InfernoP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -83,7 +86,7 @@ public final class InfernoP1 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
     }
 
     private final class InfernoP1Area extends Area<Damageable> {

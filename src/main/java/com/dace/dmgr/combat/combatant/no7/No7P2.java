@@ -13,6 +13,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class No7P2 extends AbstractSkill {
     public No7P2(@NonNull CombatUser combatUser) {
         super(combatUser, No7P2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
@@ -20,8 +23,8 @@ public final class No7P2 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.PERIODIC_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.PERIODIC_2);
     }
 
     @Override
@@ -46,7 +49,7 @@ public final class No7P2 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(getDefaultActionKeys()[0]);
+            combatUser.getActionManager().useAction(ActionKey.PERIODIC_2);
     }
 
     private final class No7P2Area extends Area<Damageable> {

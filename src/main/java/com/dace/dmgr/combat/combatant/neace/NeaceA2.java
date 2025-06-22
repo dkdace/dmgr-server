@@ -13,6 +13,9 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class NeaceA2 extends ChargeableSkill {
     /** 공격력 수정자 */
     private static final Modifier DAMAGE_MODIFIER = new Modifier(NeaceA2Info.DAMAGE_INCREMENT);
@@ -25,8 +28,8 @@ public final class NeaceA2 extends ChargeableSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override
@@ -34,7 +37,7 @@ public final class NeaceA2 extends ChargeableSkill {
     public String getActionBarString() {
         String text = ActionBarStringUtil.getDurationBar(this, Timespan.ofSeconds(getStateValue()), Timespan.ofSeconds(maxStateValue));
         if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo(this, "해제");
+            text += ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_2);
 
         return text;
     }

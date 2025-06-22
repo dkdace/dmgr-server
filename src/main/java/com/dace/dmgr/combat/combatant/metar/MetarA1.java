@@ -21,6 +21,8 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class MetarA1 extends ActiveSkill {
@@ -33,8 +35,8 @@ public final class MetarA1 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1, ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1, ActionKey.LEFT_CLICK);
     }
 
     @Override

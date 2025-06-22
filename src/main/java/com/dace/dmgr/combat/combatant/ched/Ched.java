@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched;
 
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -124,7 +125,7 @@ public final class Ched extends Marksman {
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         ChedA2 skill2 = combatUser.getActionManager().getSkill(ChedA2Info.getInstance());
-        return skill2.canUse(skill2.getDefaultActionKeys()[1]);
+        return skill2.canUse(ActionKey.SLOT_2);
     }
 
     @Override

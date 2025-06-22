@@ -20,6 +20,9 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class ArkaceA1 extends ActiveSkill {
     public ArkaceA1(@NonNull CombatUser combatUser) {
         super(combatUser, ArkaceA1Info.getInstance(), ArkaceA1Info.COOLDOWN, Timespan.MAX, 1);
@@ -27,8 +30,8 @@ public final class ArkaceA1 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2, ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
     }
 
     @Override

@@ -12,6 +12,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class SiliaWeapon extends AbstractWeapon {
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
@@ -22,8 +25,8 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK);
     }
 
     @Override

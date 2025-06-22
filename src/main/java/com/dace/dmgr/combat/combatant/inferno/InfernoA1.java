@@ -18,6 +18,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class InfernoA1 extends ActiveSkill {
     public InfernoA1(@NonNull CombatUser combatUser) {
         super(combatUser, InfernoA1Info.getInstance(), InfernoA1Info.COOLDOWN, Timespan.MAX, 0);
@@ -25,8 +28,8 @@ public final class InfernoA1 extends ActiveSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override

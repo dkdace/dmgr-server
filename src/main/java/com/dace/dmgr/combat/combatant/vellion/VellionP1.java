@@ -15,6 +15,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class VellionP1 extends AbstractSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(VellionP1Info.SPEED);
@@ -25,8 +28,8 @@ public final class VellionP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SPACE};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SPACE);
     }
 
     @Override
@@ -35,7 +38,7 @@ public final class VellionP1 extends AbstractSkill {
         if (!isCooldownFinished())
             return ActionBarStringUtil.getCooldownBar(this);
         else if (!isDurationFinished())
-            return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo(this, "해제");
+            return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SPACE);
 
         return null;
     }

@@ -10,6 +10,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class SiliaP1 extends AbstractSkill {
     public SiliaP1(@NonNull CombatUser combatUser) {
         super(combatUser, SiliaP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
@@ -17,8 +20,8 @@ public final class SiliaP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SPACE};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SPACE);
     }
 
     @Override

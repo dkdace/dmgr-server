@@ -20,6 +20,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
@@ -39,8 +42,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.RIGHT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
     @Override

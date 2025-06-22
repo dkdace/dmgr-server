@@ -15,6 +15,9 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * 기본 근접 공격 동작 클래스.
  */
@@ -56,8 +59,8 @@ public final class MeleeAttackAction extends AbstractAction {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SWAP_HAND};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SWAP_HAND);
     }
 
     @Override

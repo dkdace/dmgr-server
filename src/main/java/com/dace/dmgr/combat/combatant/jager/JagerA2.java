@@ -27,6 +27,9 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.JagerA2Entity> {
     /** 소환 엔티티 모듈 */
@@ -40,8 +43,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_2};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override

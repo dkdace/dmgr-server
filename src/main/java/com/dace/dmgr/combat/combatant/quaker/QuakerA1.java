@@ -21,6 +21,9 @@ import org.bukkit.Material;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 @Getter
 public final class QuakerA1 extends ChargeableSkill implements Summonable<QuakerA1.QuakerA1Entity> {
     /** 수정자 */
@@ -36,8 +39,8 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.SLOT_1, ActionKey.RIGHT_CLICK};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
     }
 
     @Override
@@ -45,7 +48,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     public String getActionBarString() {
         String text = ActionBarStringUtil.getProgressBar(this);
         if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo(this, "해제");
+            text += ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
 
         return text;
     }

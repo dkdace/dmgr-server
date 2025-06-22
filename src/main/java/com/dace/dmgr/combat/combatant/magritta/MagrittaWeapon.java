@@ -18,7 +18,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Set;
 
 public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     /** 재장전 모듈 */
@@ -33,8 +35,14 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     @NonNull
-    public ActionKey @NonNull [] getDefaultActionKeys() {
-        return new ActionKey[]{ActionKey.LEFT_CLICK, ActionKey.DROP};
+    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.DROP);
+    }
+
+    @Override
+    @NonNull
+    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.DROP);
     }
 
     @Override
@@ -46,8 +54,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         ActionManager actionManager = combatUser.getActionManager();
-        return (actionKey == ActionKey.DROP ? combatUser.isGlobalCooldownFinished() : super.canUse(actionKey))
-                && actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+        return super.canUse(actionKey) && actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
                 && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 

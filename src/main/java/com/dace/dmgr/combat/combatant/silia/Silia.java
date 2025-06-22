@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.action.info.TraitInfo;
@@ -148,7 +149,7 @@ public final class Silia extends Scuffler {
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         SiliaP1 skillp1 = combatUser.getActionManager().getSkill(SiliaP1Info.getInstance());
-        return skillp1.canUse(skillp1.getDefaultActionKeys()[0]);
+        return skillp1.canUse(ActionKey.SPACE);
     }
 
     @Override
