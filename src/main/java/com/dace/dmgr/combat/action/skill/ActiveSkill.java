@@ -52,12 +52,6 @@ public abstract class ActiveSkill extends AbstractSkill {
         addOnRemove(() -> combatUser.getEntity().getInventory().clear(slot));
     }
 
-    @Override
-    @NonNull
-    public ActiveSkillInfo<?> getSkillInfo() {
-        return (ActiveSkillInfo<?>) super.getSkillInfo();
-    }
-
     /**
      * 매 틱마다 실행할 작업.
      */

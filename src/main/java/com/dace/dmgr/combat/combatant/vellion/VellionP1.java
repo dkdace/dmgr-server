@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -34,11 +34,13 @@ public final class VellionP1 extends AbstractSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
+        ActionBarDisplay.Builder builder = ActionBarDisplay.builder(this).title();
+
         if (!isCooldownFinished())
-            return ActionBarStringUtil.getCooldownBar(this);
+            return builder.cooldownBar().build();
         else if (!isDurationFinished())
-            return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SPACE);
+            return builder.durationBar().keyInfo("해제").build();
 
         return null;
     }

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.info.*;
 import com.dace.dmgr.combat.action.weapon.Swappable;
 import com.dace.dmgr.combat.action.weapon.Weapon;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.StringJoiner;
 
 /**
  * 전투원 정보를 관리하는 클래스.
@@ -284,31 +285,31 @@ public abstract class Combatant {
      */
     @NonNull
     public final String getActionBarString(@NonNull CombatUser combatUser) {
-        ArrayList<String> texts = new ArrayList<>();
+        StringJoiner text = new StringJoiner("    ");
 
         ActionManager actionManager = combatUser.getActionManager();
         Weapon weapon = actionManager.getWeapon();
-        String weaponText = weapon.getActionBarString();
-        if (weaponText != null) {
-            texts.add(weaponText);
+        ActionBarDisplay weaponDisplay = weapon.getActionBarDisplay();
+        if (weaponDisplay != null) {
+            text.add(weaponDisplay.toString());
 
             if (weapon instanceof Swappable) {
                 Weapon subweapon = ((Swappable<?>) weapon).getSwapModule().getSubweapon();
-                String subweaponText = subweapon.getActionBarString();
-                if (subweaponText != null)
-                    texts.add(subweaponText);
+                ActionBarDisplay subweaponDisplay = subweapon.getActionBarDisplay();
+                if (subweaponDisplay != null)
+                    text.add(subweaponDisplay.toString());
             }
 
-            texts.add("");
+            text.add("");
         }
 
         for (SkillInfo<?> skillInfo : getSkillInfos()) {
-            String actionBarString = actionManager.getSkill(skillInfo).getActionBarString();
-            if (actionBarString != null)
-                texts.add(actionBarString);
+            ActionBarDisplay actionBarDisplay = actionManager.getSkill(skillInfo).getActionBarDisplay();
+            if (actionBarDisplay != null)
+                text.add(actionBarDisplay.toString());
         }
 
-        return String.join("    ", texts);
+        return text.toString();
     }
 
     /**

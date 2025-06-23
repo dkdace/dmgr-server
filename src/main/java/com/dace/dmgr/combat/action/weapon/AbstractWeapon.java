@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
@@ -23,10 +22,6 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
     /** 아이템 인벤토리 칸 번호 */
     private static final int ITEM_SLOT_INDEX = 4;
 
-    /** 무기 정보 인스턴스 */
-    @NonNull
-    @Getter
-    protected final WeaponInfo<?> weaponInfo;
     /** 무기 아이템 인스턴스 */
     private final ItemStack itemStack;
     /** 무기 아이템 표시 여부 */
@@ -40,9 +35,8 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
      * @param defaultCooldown 기본 쿨타임
      */
     protected AbstractWeapon(@NonNull CombatUser combatUser, @NonNull WeaponInfo<?> weaponInfo, @NonNull Timespan defaultCooldown) {
-        super(combatUser, defaultCooldown);
+        super(combatUser, weaponInfo, defaultCooldown);
 
-        this.weaponInfo = weaponInfo;
         this.itemStack = weaponInfo.getDefinedItem().getItemStack();
 
         combatUser.getEntity().getInventory().setHeldItemSlot(ITEM_SLOT_INDEX);

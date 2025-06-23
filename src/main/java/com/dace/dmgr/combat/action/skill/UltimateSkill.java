@@ -44,13 +44,7 @@ public abstract class UltimateSkill extends ActiveSkill {
 
     @Override
     @NonNull
-    public UltimateSkillInfo<?> getSkillInfo() {
-        return (UltimateSkillInfo<?>) super.getSkillInfo();
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
+    public final Set<@NonNull ActionKey> getDefaultActionKeys() {
         return EnumSet.of(ActionKey.SLOT_4);
     }
 

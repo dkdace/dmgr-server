@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.action;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.action.info.ActionInfo;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatRestriction;
@@ -28,6 +29,10 @@ public abstract class AbstractAction implements Action {
     @NonNull
     @Getter
     protected final CombatUser combatUser;
+    /** 동작 표시 이름 */
+    @NonNull
+    @Getter
+    protected final String displayName;
     /** 기본 쿨타임 */
     @NonNull
     @Getter
@@ -53,10 +58,24 @@ public abstract class AbstractAction implements Action {
      * 동작 인스턴스를 생성한다.
      *
      * @param combatUser      사용자 플레이어
+     * @param actionInfo      동작 정보 인스턴스
+     * @param defaultCooldown 기본 쿨타임
+     */
+    protected AbstractAction(@NonNull CombatUser combatUser, @NonNull ActionInfo actionInfo, @NonNull Timespan defaultCooldown) {
+        this.combatUser = combatUser;
+        this.displayName = actionInfo.toString();
+        this.defaultCooldown = defaultCooldown;
+    }
+
+    /**
+     * 동작 인스턴스를 생성한다.
+     *
+     * @param combatUser      사용자 플레이어
      * @param defaultCooldown 기본 쿨타임
      */
     protected AbstractAction(@NonNull CombatUser combatUser, @NonNull Timespan defaultCooldown) {
         this.combatUser = combatUser;
+        this.displayName = "";
         this.defaultCooldown = defaultCooldown;
     }
 

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Aimable;
@@ -55,8 +56,15 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '┃') + (isActionCooldown ? " §a■" : " §c□");
+    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    }
+
+    @Override
+    @NonNull
+    public ActionBarDisplay getActionBarDisplay() {
+        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL)
+                .suffix(isActionCooldown ? "§a■" : "§c□").build();
     }
 
     @Override

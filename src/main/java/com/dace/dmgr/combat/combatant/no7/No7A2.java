@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Summonable;
@@ -41,11 +41,11 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished())
             return null;
 
-        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
+        return ActionBarDisplay.builder(this).title().durationBar().keyInfo("해제").build();
     }
 
     @Override

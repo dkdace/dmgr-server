@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -53,11 +53,11 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
             return null;
 
-        return MetarA3Info.getInstance() + ActionBarStringUtil.getKeyInfo("격발", ActionKey.SLOT_3);
+        return ActionBarDisplay.builder(this).title().keyInfo("격발").build();
     }
 
     @Override

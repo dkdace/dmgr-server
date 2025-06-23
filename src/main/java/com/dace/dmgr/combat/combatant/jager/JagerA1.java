@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.action.skill.Confirmable;
@@ -64,12 +64,13 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        String text = ActionBarStringUtil.getProgressBar(this);
-        if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo("회수", ActionKey.SLOT_1);
+    public ActionBarDisplay getActionBarDisplay() {
+        ActionBarDisplay.Builder builder = ActionBarDisplay.builder(this).title().progressBar();
 
-        return text;
+        if (isDurationFinished())
+            return builder.build();
+        else
+            return builder.keyInfo("회수", ActionKey.SLOT_1).build();
     }
 
     @Override

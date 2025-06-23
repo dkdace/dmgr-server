@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -48,8 +49,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        return reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '|');
+    public ActionBarDisplay getActionBarDisplay() {
+        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_SYMBOL).build();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.Targeted;
@@ -42,11 +42,11 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished())
             return null;
 
-        return NeaceA3Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_3);
+        return ActionBarDisplay.builder(this).title().keyInfo("해제").build();
     }
 
     @Override

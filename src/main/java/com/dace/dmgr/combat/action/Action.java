@@ -25,6 +25,12 @@ public interface Action {
     CombatUser getCombatUser();
 
     /**
+     * @return 동작 표시 이름
+     */
+    @NonNull
+    String getDisplayName();
+
+    /**
      * 동작 사용 우선순위를 반환한다.
      *
      * <p>같은 사용 키를 가진 동작이 있을 경우 우선순위가 높은 동작이 먼저 사용된다.</p>
@@ -56,13 +62,14 @@ public interface Action {
     }
 
     /**
-     * 액션바에 동작 상태를 표시하기 위한 문자열을 반환한다.
+     * 액션바에 동작 상태를 표시하기 위한 상태 표시 처리기를 반환한다.
      *
-     * @return 동작 상태 표시 문자열. {@code null} 반환 시 표시 대상에서 제외
+     * @return 동작 상태 표시 처리기. {@code null} 반환 시 표시 대상에서 제외
      * @implSpec {@code null}
+     * @see ActionBarDisplay
      */
     @Nullable
-    default String getActionBarString() {
+    default ActionBarDisplay getActionBarDisplay() {
         return null;
     }
 

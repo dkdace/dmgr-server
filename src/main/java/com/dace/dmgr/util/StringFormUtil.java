@@ -19,7 +19,7 @@ public final class StringFormUtil {
     /** 구분선 */
     public static final String BAR = "§7========================================";
     /** 진행 막대의 기본 기호 */
-    private static final char PROGRESS_DEFAULT_SYMBOL = '■';
+    public static final char PROGRESS_DEFAULT_SYMBOL = '■';
 
     /**
      * 진행 막대를 반환한다.

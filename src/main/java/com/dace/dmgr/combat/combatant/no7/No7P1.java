@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -29,8 +29,11 @@ public final class No7P1 extends AbstractSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
-        return isCooldownFinished() ? null : ActionBarStringUtil.getCooldownBar(this);
+    public ActionBarDisplay getActionBarDisplay() {
+        if (isCooldownFinished())
+            return null;
+
+        return ActionBarDisplay.builder(this).title().cooldownBar().build();
     }
 
     @Override

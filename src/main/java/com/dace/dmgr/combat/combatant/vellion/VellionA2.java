@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -69,11 +69,11 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
             return null;
 
-        return VellionA2Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_2);
+        return ActionBarDisplay.builder(this).title().keyInfo("해제").build();
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -26,8 +26,11 @@ public final class InfernoUlt extends UltimateSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
-        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
+    public ActionBarDisplay getActionBarDisplay() {
+        if (isDurationFinished())
+            return null;
+
+        return ActionBarDisplay.builder(this).title().durationBar().build();
     }
 
     @Override

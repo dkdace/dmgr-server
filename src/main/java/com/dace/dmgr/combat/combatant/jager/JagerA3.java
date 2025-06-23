@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.combatant.jager;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.weapon.Weapon;
@@ -55,11 +55,11 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
             return null;
 
-        return JagerA3Info.getInstance() + ActionBarStringUtil.getKeyInfo("투척", ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
+        return ActionBarDisplay.builder(this).title().keyInfo("투척").build();
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -33,11 +33,11 @@ public final class No7A1 extends ActiveSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
+    public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished())
             return null;
 
-        return ActionBarStringUtil.getDurationBar(this) + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_1);
+        return ActionBarDisplay.builder(this).title().durationBar().keyInfo("해제").build();
     }
 
     @Override

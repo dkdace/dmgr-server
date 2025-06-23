@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.action.skill;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.action.Action;
-import com.dace.dmgr.combat.action.info.SkillInfo;
 import lombok.NonNull;
 
 /**
@@ -11,12 +10,6 @@ import lombok.NonNull;
  * @see AbstractSkill
  */
 public interface Skill extends Action {
-    /**
-     * @return 스킬 정보 인스턴스
-     */
-    @NonNull
-    SkillInfo<?> getSkillInfo();
-
     /**
      * 스킬의 기본 지속시간을 반환한다.
      *

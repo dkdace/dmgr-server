@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.AbstractSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -32,8 +32,8 @@ public final class MetarP1 extends AbstractSkill {
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        return ActionBarStringUtil.getProgressBar(skillInfo.toString(), (int) heavyArmor, MetarP1Info.MAX);
+    public ActionBarDisplay getActionBarDisplay() {
+        return ActionBarDisplay.builder(this).title().progressBar((int) heavyArmor, MetarP1Info.MAX).build();
     }
 
     @Override

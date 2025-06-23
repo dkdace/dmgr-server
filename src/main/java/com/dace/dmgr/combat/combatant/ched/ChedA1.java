@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.info.WeaponInfo;
 import com.dace.dmgr.combat.action.skill.StackableSkill;
@@ -44,11 +44,11 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     @Nullable
-    public String getActionBarString() {
-        if (isDurationFinished() || !isEnabled())
+    public ActionBarDisplay getActionBarDisplay() {
+        if (isDurationFinished() || !isEnabled)
             return null;
 
-        return ChedA1Info.getInstance() + ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_1);
+        return ActionBarDisplay.builder(this).title().keyInfo("해제").build();
     }
 
     @Override

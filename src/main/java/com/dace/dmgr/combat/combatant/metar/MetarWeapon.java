@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.FullAuto;
@@ -14,6 +15,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -56,8 +58,8 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        return reloadModule.getActionBarProgressBar(10, '■');
+    public ActionBarDisplay getActionBarDisplay() {
+        return ActionBarDisplay.builder(this).ammoBar(10, StringFormUtil.PROGRESS_DEFAULT_SYMBOL).build();
     }
 
     @Override

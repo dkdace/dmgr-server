@@ -1,8 +1,6 @@
 package com.dace.dmgr.combat.action.weapon.module;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
-import com.dace.dmgr.combat.action.TextIcon;
 import com.dace.dmgr.combat.action.weapon.Reloadable;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -122,19 +120,5 @@ public final class ReloadModule {
 
         if (reloadTask != null)
             reloadTask.stop();
-    }
-
-    /**
-     * 액션바에 무기의 탄약 상태를 표시하기 위한 진행 막대를 반환한다.
-     *
-     * @param length 진행 막대 길이 (글자 수). 1 이상의 값
-     * @param symbol 막대 기호
-     * @return 탄약 표시 진행 막대 문자열
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
-     */
-    @NonNull
-    public String getActionBarProgressBar(int length, char symbol) {
-        Validate.isTrue(length >= 1, "length >= 1 (%d)", length);
-        return ActionBarStringUtil.getProgressBar(TextIcon.CAPACITY.toString(), remainingAmmo, capacity, length, symbol);
     }
 }

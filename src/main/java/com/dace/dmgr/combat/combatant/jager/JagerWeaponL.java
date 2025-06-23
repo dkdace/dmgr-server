@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.jager;
 
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.action.weapon.Aimable;
@@ -62,12 +63,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        String text = reloadModule.getActionBarProgressBar(reloadModule.getCapacity(), '*');
-        if (!swapModule.isSwapped())
-            text = "§a" + text;
-
-        return text;
+    public ActionBarDisplay getActionBarDisplay() {
+        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), '*').build();
     }
 
     @Override

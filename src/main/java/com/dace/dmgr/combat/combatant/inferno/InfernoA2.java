@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ActiveSkill;
 import com.dace.dmgr.combat.action.skill.HasBonusScore;
@@ -50,8 +50,11 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @Nullable
-    public String getActionBarString() {
-        return isDurationFinished() ? null : ActionBarStringUtil.getDurationBar(this);
+    public ActionBarDisplay getActionBarDisplay() {
+        if (isDurationFinished())
+            return null;
+
+        return ActionBarDisplay.builder(this).title().durationBar().build();
     }
 
     @Override

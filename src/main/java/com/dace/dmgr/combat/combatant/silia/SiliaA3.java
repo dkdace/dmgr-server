@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarStringUtil;
+import com.dace.dmgr.combat.action.ActionBarDisplay;
 import com.dace.dmgr.combat.action.ActionKey;
 import com.dace.dmgr.combat.action.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -31,12 +31,14 @@ public final class SiliaA3 extends ChargeableSkill {
 
     @Override
     @NonNull
-    public String getActionBarString() {
-        String text = ActionBarStringUtil.getDurationBar(this, Timespan.ofSeconds(getStateValue()), Timespan.ofSeconds(maxStateValue));
-        if (!isDurationFinished())
-            text += ActionBarStringUtil.getKeyInfo("해제", ActionKey.SLOT_3);
+    public ActionBarDisplay getActionBarDisplay() {
+        ActionBarDisplay.Builder builder = ActionBarDisplay.builder(this).title()
+                .durationBar(Timespan.ofSeconds(getStateValue()), Timespan.ofSeconds(maxStateValue));
 
-        return text;
+        if (isDurationFinished())
+            return builder.build();
+        else
+            return builder.keyInfo("해제").build();
     }
 
     @Override

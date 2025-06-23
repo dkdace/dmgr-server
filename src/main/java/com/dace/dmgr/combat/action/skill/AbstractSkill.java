@@ -17,10 +17,6 @@ import org.jetbrains.annotations.Nullable;
  * {@link Skill}의 기본 구현체, 모든 스킬(패시브 스킬, 액티브 스킬)의 기반 클래스.
  */
 public abstract class AbstractSkill extends AbstractAction implements Skill {
-    /** 스킬 정보 인스턴스 */
-    @NonNull
-    @Getter
-    protected final SkillInfo<?> skillInfo;
     /** 기본 지속시간 */
     @NonNull
     @Getter
@@ -42,9 +38,8 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
      */
     protected AbstractSkill(@NonNull CombatUser combatUser, @NonNull SkillInfo<?> skillInfo, @NonNull Timespan defaultCooldown,
                             @NonNull Timespan defaultDuration) {
-        super(combatUser, defaultCooldown);
+        super(combatUser, skillInfo, defaultCooldown);
 
-        this.skillInfo = skillInfo;
         this.defaultDuration = defaultDuration;
         setCooldown(defaultCooldown);
 
