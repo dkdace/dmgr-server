@@ -105,7 +105,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
                 case 27:
                     return SoundEffect.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.8).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

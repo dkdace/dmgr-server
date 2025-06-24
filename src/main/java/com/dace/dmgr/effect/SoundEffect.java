@@ -12,9 +12,6 @@ import org.bukkit.entity.Player;
  * 효과음 재생 기능을 제공하는 클래스.
  */
 public final class SoundEffect extends PlayableEffect {
-    /** 무음 */
-    public static final SoundEffect NONE = SoundEffect.builder("none").build();
-
     /** 소리 이름 */
     private final String sound;
     /** 음량 */

@@ -14,6 +14,14 @@ import org.bukkit.entity.Player;
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PlayableEffect {
+    /** 효과 없음 */
+    public static final PlayableEffect NONE = new PlayableEffect() {
+        @Override
+        public void play(@NonNull Location location, @NonNull Player player) {
+            // 미사용
+        }
+    };
+
     /**
      * 지정한 효과 목록을 재생하는 효과를 생성하여 반환한다.
      *

@@ -75,7 +75,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
         public static final PlayableEffect.BiFunction<Location, Double> DAMAGE = (location, damage) -> PlayableEffect.list(
                 SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.3 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
 
-                location == null ? SoundEffect.NONE : ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0)
+                location == null ? PlayableEffect.NONE : ParticleEffect.Normal.builder(ParticleEffect.BlockParticleType.BLOCK_DUST, Material.FIRE, 0)
                         .count((int) (damage * 0.04)).speed(0.1).build());
         /** 파괴 */
         public static final PlayableEffect DEATH = PlayableEffect.list(

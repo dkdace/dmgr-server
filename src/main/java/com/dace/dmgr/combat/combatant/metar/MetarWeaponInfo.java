@@ -109,7 +109,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
                 case 57:
                     return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(0.65).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

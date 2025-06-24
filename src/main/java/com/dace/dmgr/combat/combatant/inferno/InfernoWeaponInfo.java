@@ -165,7 +165,7 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
                 case 47:
                     return SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.6).pitch(1.4).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

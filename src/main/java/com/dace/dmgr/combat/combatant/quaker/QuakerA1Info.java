@@ -80,7 +80,7 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
                         SoundEffect.builder(Sound.BLOCK_ANVIL_LAND).volume(0.25 + damage * 0.001).pitch(1.2).pitchVariance(0.1).build(),
                         SoundEffect.builder("random.metalhit").volume(0.3 + damage * 0.001).pitch(0.85).pitchVariance(0.1).build(),
 
-                        location == null ? SoundEffect.NONE : CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
+                        location == null ? PlayableEffect.NONE : CombatEffectUtil.DamageParticle.METAL.apply(combatEntity, location, damage));
         /** 파괴 - 1 */
         public static final PlayableEffect DEATH_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_IRONGOLEM_HURT).volume(2).pitch(0.5).build(),

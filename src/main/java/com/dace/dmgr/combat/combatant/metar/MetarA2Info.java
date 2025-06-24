@@ -65,7 +65,8 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
                 SoundEffect.builder(Sound.BLOCK_LAVA_POP).volume(0.4 + damage * 0.001).pitch(1.5).pitchVariance(0.1).build(),
                 SoundEffect.builder(Sound.ENTITY_IRONGOLEM_ATTACK).volume(0.4 + damage * 0.001).pitch(1.4).pitchVariance(0.1).build(),
 
-                location == null ? SoundEffect.NONE : ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count((int) (damage * 0.04)).speed(0.2).build());
+                location == null ? PlayableEffect.NONE : ParticleEffect.Normal.builder(Particle.CRIT_MAGIC).count((int) (damage * 0.04)).speed(0.2)
+                        .build());
         /** 파괴 - 1 */
         public static final PlayableEffect DEATH_1 = PlayableEffect.list(
                 SoundEffect.builder(Sound.ENTITY_ENDERMEN_TELEPORT).volume(2).pitch(2).build(),

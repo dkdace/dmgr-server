@@ -144,7 +144,7 @@ public final class CombatEffectUtil {
             case CARPET:
                 return SoundEffect.builder(Sound.BLOCK_CLOTH_BREAK).volume(1 * volumeMultiplier).pitch(0.8).pitchVariance(0.1).build();
             default:
-                return SoundEffect.NONE;
+                return PlayableEffect.NONE;
         }
     };
     /** 블록 타격 효과 */

@@ -149,7 +149,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
                 case 37:
                     return SoundEffect.builder(Sound.BLOCK_IRON_DOOR_OPEN).volume(0.6).pitch(1.7).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

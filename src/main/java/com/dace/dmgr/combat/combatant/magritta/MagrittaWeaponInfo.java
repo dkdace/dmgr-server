@@ -111,7 +111,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
                 case 33:
                     return SoundEffect.builder(Sound.ENTITY_WOLF_SHAKE).volume(0.6).pitch(0.9).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

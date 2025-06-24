@@ -105,7 +105,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                 case 5:
                     return SoundEffect.builder(Sound.ENTITY_VILLAGER_NO).volume(0.6).pitch(1.2).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
         /** 재장전 */
@@ -132,7 +132,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
                 case 41:
                     return SoundEffect.builder(Sound.BLOCK_IRON_TRAPDOOR_CLOSE).volume(0.6).pitch(1.2).build();
                 default:
-                    return SoundEffect.NONE;
+                    return PlayableEffect.NONE;
             }
         };
     }

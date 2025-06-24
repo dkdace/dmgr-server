@@ -33,7 +33,7 @@ public final class OnPlayerQuit extends EventListener<PlayerQuitEvent> {
             case 3:
                 return SoundEffect.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, -11 / 12.0)).build();
             default:
-                return SoundEffect.NONE;
+                return PlayableEffect.NONE;
         }
     };
     /** 퇴장 전체 메시지 */

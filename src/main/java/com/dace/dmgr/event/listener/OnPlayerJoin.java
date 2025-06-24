@@ -34,7 +34,7 @@ public final class OnPlayerJoin extends EventListener<PlayerJoinEvent> {
             case 3:
                 return SoundEffect.builder(Sound.BLOCK_NOTE_PLING).volume(1000).pitch(Math.pow(2, 1 / 12.0)).build();
             default:
-                return SoundEffect.NONE;
+                return PlayableEffect.NONE;
         }
     };
     /** 접속 전체 메시지 */
