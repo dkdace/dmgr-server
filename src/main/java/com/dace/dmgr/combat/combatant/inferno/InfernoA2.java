@@ -36,7 +36,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     private final InfernoA2Burning burning;
 
     public InfernoA2(@NonNull CombatUser combatUser, @NonNull InfernoA2Info skillInfo) {
-        super(combatUser, skillInfo, InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION, 1);
+        super(combatUser, skillInfo, InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", InfernoA2Info.ASSIST_SCORE);
         this.burning = new InfernoA2Burning();

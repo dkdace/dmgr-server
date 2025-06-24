@@ -44,7 +44,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     private final BonusScoreModule bonusScoreModule;
 
     public JagerA1(@NonNull CombatUser combatUser, @NonNull JagerA1Info skillInfo) {
-        super(combatUser, skillInfo, JagerA1Info.COOLDOWN, JagerA1Info.HEALTH, 0);
+        super(combatUser, skillInfo, JagerA1Info.COOLDOWN, JagerA1Info.HEALTH);
 
         this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
         this.entityModule = new EntityModule<>(this);

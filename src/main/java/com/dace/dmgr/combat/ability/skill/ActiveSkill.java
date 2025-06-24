@@ -7,7 +7,6 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -33,21 +32,26 @@ public abstract class ActiveSkill extends AbstractSkill {
     /**
      * 액티브 스킬 인스턴스를 생성한다.
      *
+     * <p>{@link ActiveSkill#getDefaultActionKeys()}이 슬롯 키({@link ActionKey#isSlot()})를 하나 포함하도록 구현해야 한다.</p>
+     *
      * @param combatUser      사용자 플레이어
      * @param activeSkillInfo 액티브 스킬 정보 인스턴스
      * @param defaultCooldown 기본 쿨타임
      * @param defaultDuration 기본 지속시간
-     * @param slot            슬롯 번호. 0~4 사이의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @throws IllegalArgumentException {@link ActiveSkill#getDefaultActionKeys()}가 슬롯 키를 포함하지 않으면 발생
      */
     protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
-                          @NonNull Timespan defaultDuration, int slot) {
+                          @NonNull Timespan defaultDuration) {
         super(combatUser, activeSkillInfo, defaultCooldown, defaultDuration);
-        Validate.inclusiveBetween(0, 4, slot, "4 >= slot >= 0 (%d)", slot);
 
         this.originalItemStack = activeSkillInfo.getDefinedItem().getItemStack();
         this.itemStack = originalItemStack.clone();
-        this.slot = slot;
+
+        ActionKey actionKey = getDefaultActionKeys().stream()
+                .filter(ActionKey::isSlot)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("getDefaultActionKeys()가 슬롯 키를 포함하지 않음"));
+        slot = Integer.parseInt(actionKey.toString()) - 1;
 
         addTask(new IntervalTask((LongConsumer) i -> onTick(), 1));
         addOnRemove(() -> combatUser.getEntity().getInventory().clear(slot));

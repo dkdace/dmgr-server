@@ -19,7 +19,7 @@ import java.util.Set;
 
 public final class No7A3 extends ActiveSkill {
     public No7A3(@NonNull CombatUser combatUser, @NonNull No7A3Info skillInfo) {
-        super(combatUser, skillInfo, No7A3Info.COOLDOWN, No7A3Info.DURATION, 2);
+        super(combatUser, skillInfo, No7A3Info.COOLDOWN, No7A3Info.DURATION);
     }
 
     @Override

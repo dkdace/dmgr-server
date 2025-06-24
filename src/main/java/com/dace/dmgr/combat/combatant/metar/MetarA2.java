@@ -32,7 +32,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
     private final MultiEntityModule<MetarA2Entity> multiEntityModule;
 
     public MetarA2(@NonNull CombatUser combatUser, @NonNull MetarA2Info skillInfo) {
-        super(combatUser, skillInfo, MetarA2Info.COOLDOWN, MetarA2Info.STACK_COOLDOWN, Timespan.MAX, MetarA2Info.MAX_STACK, 1);
+        super(combatUser, skillInfo, MetarA2Info.COOLDOWN, MetarA2Info.STACK_COOLDOWN, Timespan.MAX, MetarA2Info.MAX_STACK);
         this.multiEntityModule = new MultiEntityModule<>(this, MetarA2Info.MAX_STACK);
     }
 

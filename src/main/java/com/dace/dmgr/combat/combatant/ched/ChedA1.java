@@ -32,7 +32,7 @@ public final class ChedA1 extends StackableSkill {
     private boolean isEnabled = false;
 
     public ChedA1(@NonNull CombatUser combatUser, @NonNull ChedA1Info skillInfo) {
-        super(combatUser, skillInfo, ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK, 0);
+        super(combatUser, skillInfo, ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK);
         this.burning = new Burning(combatUser, ChedA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 

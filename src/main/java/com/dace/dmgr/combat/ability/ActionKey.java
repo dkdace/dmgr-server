@@ -39,6 +39,23 @@ public enum ActionKey {
     /** 키 이름 */
     private final String name;
 
+    /**
+     * 동작 사용 키가 슬롯 키인지 확인한다.
+     *
+     * @return 슬롯 키 여부
+     */
+    public boolean isSlot() {
+        switch (this) {
+            case SLOT_1:
+            case SLOT_2:
+            case SLOT_3:
+            case SLOT_4:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @Override
     public String toString() {
         return name;

@@ -31,7 +31,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     private final BonusScoreModule bonusScoreModule;
 
     public PalasA3(@NonNull CombatUser combatUser, @NonNull PalasA3Info skillInfo) {
-        super(combatUser, skillInfo, PalasA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, PalasA3Info.COOLDOWN, Timespan.MAX);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA3Info.ASSIST_SCORE);
     }
 

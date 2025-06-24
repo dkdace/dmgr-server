@@ -33,7 +33,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     private final EntityModule<QuakerA1Entity> entityModule;
 
     public QuakerA1(@NonNull CombatUser combatUser, @NonNull QuakerA1Info skillInfo) {
-        super(combatUser, skillInfo, QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH, 0);
+        super(combatUser, skillInfo, QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH);
         this.entityModule = new EntityModule<>(this);
     }
 

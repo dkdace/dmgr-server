@@ -16,7 +16,7 @@ import java.util.function.LongConsumer;
 
 public final class ChedA2 extends ActiveSkill {
     public ChedA2(@NonNull CombatUser combatUser, @NonNull ChedA2Info skillInfo) {
-        super(combatUser, skillInfo, ChedA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, ChedA2Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

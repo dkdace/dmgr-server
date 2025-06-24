@@ -39,7 +39,7 @@ public abstract class UltimateSkill extends ActiveSkill {
      */
     protected UltimateSkill(@NonNull CombatUser combatUser, @NonNull UltimateSkillInfo<?> ultimateSkillInfo, @NonNull Timespan defaultDuration,
                             int cost) {
-        super(combatUser, ultimateSkillInfo, Timespan.MAX, defaultDuration, 3);
+        super(combatUser, ultimateSkillInfo, Timespan.MAX, defaultDuration);
         this.cost = cost;
     }
 

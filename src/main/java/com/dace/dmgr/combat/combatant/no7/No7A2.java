@@ -29,7 +29,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     private final EntityModule<No7A2Entity> entityModule;
 
     public No7A2(@NonNull CombatUser combatUser, @NonNull No7A2Info skillInfo) {
-        super(combatUser, skillInfo, No7A2Info.COOLDOWN, No7A2Info.DURATION, 1);
+        super(combatUser, skillInfo, No7A2Info.COOLDOWN, No7A2Info.DURATION);
         this.entityModule = new EntityModule<>(this);
     }
 

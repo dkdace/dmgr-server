@@ -31,7 +31,7 @@ public final class QuakerA3 extends ActiveSkill {
     private static final Modifier MODIFIER = new Modifier(-100);
 
     public QuakerA3(@NonNull CombatUser combatUser, @NonNull QuakerA3Info skillInfo) {
-        super(combatUser, skillInfo, QuakerA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, QuakerA3Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

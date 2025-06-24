@@ -14,7 +14,7 @@ import java.util.Set;
 
 public final class ArkaceA2 extends ActiveSkill {
     public ArkaceA2(@NonNull CombatUser combatUser, @NonNull ArkaceA2Info skillInfo) {
-        super(combatUser, skillInfo, ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION, 2);
+        super(combatUser, skillInfo, ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION);
     }
 
     @Override

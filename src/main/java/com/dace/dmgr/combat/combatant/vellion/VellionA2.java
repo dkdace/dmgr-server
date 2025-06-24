@@ -53,7 +53,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     private boolean isEnabled = false;
 
     public VellionA2(@NonNull CombatUser combatUser, @NonNull VellionA2Info skillInfo) {
-        super(combatUser, skillInfo, VellionA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, VellionA2Info.COOLDOWN, Timespan.MAX);
 
         this.targetModule = new TargetModule<>(this, VellionA2Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);

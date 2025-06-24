@@ -20,7 +20,7 @@ public final class SiliaA3 extends ChargeableSkill {
     private double damageSum = 0;
 
     public SiliaA3(@NonNull CombatUser combatUser, @NonNull SiliaA3Info skillInfo) {
-        super(combatUser, skillInfo, SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
+        super(combatUser, skillInfo, SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds());
     }
 
     @Override

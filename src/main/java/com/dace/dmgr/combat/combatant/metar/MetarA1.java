@@ -30,7 +30,7 @@ public final class MetarA1 extends ActiveSkill {
     private boolean isOpposite = true;
 
     public MetarA1(@NonNull CombatUser combatUser, @NonNull MetarA1Info skillInfo) {
-        super(combatUser, skillInfo, MetarA1Info.COOLDOWN, Timespan.MAX, 0);
+        super(combatUser, skillInfo, MetarA1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

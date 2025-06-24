@@ -23,7 +23,7 @@ import java.util.Set;
 
 public final class InfernoA1 extends ActiveSkill {
     public InfernoA1(@NonNull CombatUser combatUser, @NonNull InfernoA1Info skillInfo) {
-        super(combatUser, skillInfo, InfernoA1Info.COOLDOWN, Timespan.MAX, 0);
+        super(combatUser, skillInfo, InfernoA1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

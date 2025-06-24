@@ -46,7 +46,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     private final Poison poison;
 
     public VellionA1(@NonNull CombatUser combatUser, @NonNull VellionA1Info skillInfo) {
-        super(combatUser, skillInfo, VellionA1Info.COOLDOWN, Timespan.MAX, 0);
+        super(combatUser, skillInfo, VellionA1Info.COOLDOWN, Timespan.MAX);
 
         this.entityModule = new EntityModule<>(this);
         this.heal = new VellionA1Heal();

@@ -21,7 +21,7 @@ public final class MagrittaA2 extends ActiveSkill {
     private static final Modifier MODIFIER = new Modifier(MagrittaA2Info.SPEED);
 
     public MagrittaA2(@NonNull CombatUser combatUser, @NonNull MagrittaA2Info skillInfo) {
-        super(combatUser, skillInfo, MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION, 1);
+        super(combatUser, skillInfo, MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION);
     }
 
     @Override

@@ -23,7 +23,7 @@ public final class NeaceA2 extends ChargeableSkill {
     private static final Modifier DEFENSE_MODIFIER = new Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
     public NeaceA2(@NonNull CombatUser combatUser, @NonNull NeaceA2Info skillInfo) {
-        super(combatUser, skillInfo, NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds(), 1);
+        super(combatUser, skillInfo, NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds());
     }
 
     @Override

@@ -31,7 +31,7 @@ public final class MagrittaA1 extends ActiveSkill {
     private final Burning burning;
 
     public MagrittaA1(@NonNull CombatUser combatUser, @NonNull MagrittaA1Info skillInfo) {
-        super(combatUser, skillInfo, MagrittaA1Info.COOLDOWN, Timespan.MAX, 0);
+        super(combatUser, skillInfo, MagrittaA1Info.COOLDOWN, Timespan.MAX);
         this.burning = new Burning(combatUser, MagrittaA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 

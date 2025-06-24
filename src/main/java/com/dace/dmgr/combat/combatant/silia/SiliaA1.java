@@ -25,7 +25,7 @@ import java.util.Set;
 
 public final class SiliaA1 extends ActiveSkill {
     public SiliaA1(@NonNull CombatUser combatUser, @NonNull SiliaA1Info skillInfo) {
-        super(combatUser, skillInfo, SiliaA1Info.COOLDOWN, Timespan.MAX, 0);
+        super(combatUser, skillInfo, SiliaA1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

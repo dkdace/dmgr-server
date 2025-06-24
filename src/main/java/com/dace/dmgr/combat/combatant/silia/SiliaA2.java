@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public final class SiliaA2 extends ActiveSkill {
     public SiliaA2(@NonNull CombatUser combatUser, @NonNull SiliaA2Info skillInfo) {
-        super(combatUser, skillInfo, SiliaA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, SiliaA2Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

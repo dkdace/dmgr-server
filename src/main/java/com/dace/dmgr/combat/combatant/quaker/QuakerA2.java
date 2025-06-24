@@ -46,7 +46,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     private final Stun stun;
 
     public QuakerA2(@NonNull CombatUser combatUser, @NonNull QuakerA2Info skillInfo) {
-        super(combatUser, skillInfo, QuakerA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, QuakerA2Info.COOLDOWN, Timespan.MAX);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerA2Info.ASSIST_SCORE);
         this.stun = new Stun(combatUser);

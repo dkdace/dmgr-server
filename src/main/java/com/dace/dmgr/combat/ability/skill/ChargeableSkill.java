@@ -26,12 +26,11 @@ public abstract class ChargeableSkill extends ActiveSkill {
      * @param activeSkillInfo 액티브 스킬 정보 인스턴스
      * @param defaultCooldown 기본 쿨타임
      * @param maxStateValue   상태 변수의 최댓값. 0을 초과하는 값
-     * @param slot            슬롯 번호. 0~4 사이의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected ChargeableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
-                              double maxStateValue, int slot) {
-        super(combatUser, activeSkillInfo, defaultCooldown, Timespan.MAX, slot);
+                              double maxStateValue) {
+        super(combatUser, activeSkillInfo, defaultCooldown, Timespan.MAX);
 
         Validate.isTrue(maxStateValue > 0, "maxStateValue > 0 (%f)", maxStateValue);
         this.maxStateValue = maxStateValue;

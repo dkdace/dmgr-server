@@ -41,7 +41,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     private final Silence silence;
 
     public VellionA3(@NonNull CombatUser combatUser, @NonNull VellionA3Info skillInfo) {
-        super(combatUser, skillInfo, VellionA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, VellionA3Info.COOLDOWN, Timespan.MAX);
 
         this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);

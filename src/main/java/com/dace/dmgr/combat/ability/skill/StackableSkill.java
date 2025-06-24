@@ -40,12 +40,11 @@ public abstract class StackableSkill extends ActiveSkill {
      * @param defaultStackCooldown 기본 스택 충전 쿨타임
      * @param defaultDuration      기본 지속시간
      * @param maxStack             최대 스택 충전량. 1 이상의 값
-     * @param slot                 슬롯 번호. 0~4 사이의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     protected StackableSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
-                             @NonNull Timespan defaultStackCooldown, @NonNull Timespan defaultDuration, int maxStack, int slot) {
-        super(combatUser, activeSkillInfo, defaultCooldown, defaultDuration, slot);
+                             @NonNull Timespan defaultStackCooldown, @NonNull Timespan defaultDuration, int maxStack) {
+        super(combatUser, activeSkillInfo, defaultCooldown, defaultDuration);
         Validate.isTrue(maxStack >= 1, "maxStack >= 1 (%d)", maxStack);
 
         this.defaultStackCooldown = defaultStackCooldown;

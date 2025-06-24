@@ -22,7 +22,7 @@ import java.util.Set;
 
 public final class No7A1 extends ActiveSkill {
     public No7A1(@NonNull CombatUser combatUser, @NonNull No7A1Info skillInfo) {
-        super(combatUser, skillInfo, No7A1Info.COOLDOWN, No7A1Info.DURATION, 0);
+        super(combatUser, skillInfo, No7A1Info.COOLDOWN, No7A1Info.DURATION);
     }
 
     @Override

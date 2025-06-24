@@ -37,7 +37,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     private final EntityModule<JagerA2Entity> entityModule;
 
     public JagerA2(@NonNull CombatUser combatUser, @NonNull JagerA2Info skillInfo) {
-        super(combatUser, skillInfo, JagerA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, JagerA2Info.COOLDOWN, Timespan.MAX);
         this.entityModule = new EntityModule<>(this);
     }
 

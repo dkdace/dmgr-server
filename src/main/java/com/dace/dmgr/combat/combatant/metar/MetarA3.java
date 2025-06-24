@@ -41,7 +41,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     private MetarA3Projectile projectile;
 
     public MetarA3(@NonNull CombatUser combatUser, @NonNull MetarA3Info skillInfo) {
-        super(combatUser, skillInfo, MetarA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, MetarA3Info.COOLDOWN, Timespan.MAX);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", MetarA3Info.ASSIST_SCORE);
     }
 

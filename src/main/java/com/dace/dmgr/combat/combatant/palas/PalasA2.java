@@ -33,7 +33,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     private final TargetModule<Healable> targetModule;
 
     public PalasA2(@NonNull CombatUser combatUser, @NonNull PalasA2Info skillInfo) {
-        super(combatUser, skillInfo, PalasA2Info.COOLDOWN, Timespan.MAX, 1);
+        super(combatUser, skillInfo, PalasA2Info.COOLDOWN, Timespan.MAX);
         this.targetModule = new TargetModule<>(this, PalasA2Info.MAX_DISTANCE);
     }
 

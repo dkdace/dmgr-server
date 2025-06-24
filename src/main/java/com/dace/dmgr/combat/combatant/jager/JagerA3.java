@@ -39,7 +39,7 @@ public final class JagerA3 extends ActiveSkill {
     private boolean isEnabled = false;
 
     public JagerA3(@NonNull CombatUser combatUser, @NonNull JagerA3Info skillInfo) {
-        super(combatUser, skillInfo, JagerA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, JagerA3Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override

@@ -30,7 +30,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     private final TargetModule<Healable> targetModule;
 
     public NeaceA3(@NonNull CombatUser combatUser, @NonNull NeaceA3Info skillInfo) {
-        super(combatUser, skillInfo, NeaceA3Info.COOLDOWN, NeaceA3Info.DURATION, 2);
+        super(combatUser, skillInfo, NeaceA3Info.COOLDOWN, NeaceA3Info.DURATION);
         this.targetModule = new TargetModule<>(this, NeaceA3Info.MAX_DISTANCE);
     }
 

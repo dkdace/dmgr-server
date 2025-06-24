@@ -31,7 +31,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     private final BonusScoreModule bonusScoreModule;
 
     public ChedA3(@NonNull CombatUser combatUser, @NonNull ChedA3Info skillInfo) {
-        super(combatUser, skillInfo, ChedA3Info.COOLDOWN, Timespan.MAX, 2);
+        super(combatUser, skillInfo, ChedA3Info.COOLDOWN, Timespan.MAX);
         this.bonusScoreModule = new BonusScoreModule(this, "탐지 보너스", ChedA3Info.KILL_SCORE);
     }
 
