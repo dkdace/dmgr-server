@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -44,7 +44,7 @@ public final class VellionA3Info extends ActiveSkillInfo<VellionA3> {
 
     private VellionA3Info() {
         super(VellionA3.class, "칠흑의 균열",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("바라보는 곳에 균열을 일으켜 범위의 적을 <:SILENCE:침묵>시키고 <:HEAL_BAN:회복을 차단>합니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())

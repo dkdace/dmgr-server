@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -56,7 +56,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
 
     private ChedUltInfo() {
         super(ChedUlt.class, "피닉스 스트라이크",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("벽을 관통하는 불사조를 날려보내 적과 부딪히면 크게 폭발하여 <:DAMAGE:광역 피해>를 입히고 <3::화염 지대>를 만듭니다. " +
                                 "플레이어가 아닌 적은 통과합니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
@@ -64,7 +64,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, SIZE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build(),
-                        new ActionInfoLore.NamedSection("화염 지대", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("화염 지대", AbilityInfoLore.Section
                                 .builder("지속적인 <:FIRE:화염 피해>를 입히는 지역입니다.")
                                 .addValueInfo(TextIcon.DURATION, Format.TIME, FIRE_FLOOR_DURATION.toSeconds())
                                 .addValueInfo(TextIcon.FIRE, Format.PER_SECOND, FIRE_DAMAGE_PER_SECOND)

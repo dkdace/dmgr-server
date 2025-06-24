@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -49,24 +49,24 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
 
     private JagerA1Info() {
         super(JagerA1.class, "설랑",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("바라보는 곳에 공격을 돕는 늑대인 <3::설랑>을 소환합니다.")
                         .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, SUMMON_MAX_DISTANCE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
-                        new ActionInfoLore.NamedSection("설랑", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("설랑", AbilityInfoLore.Section
                                 .builder("근처의 적을 탐지하면 추적합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (사망 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, ENEMY_DETECT_RADIUS)
                                 .build()),
-                        new ActionInfoLore.NamedSection("설랑: 공격 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("설랑: 공격 시", AbilityInfoLore.Section
                                 .builder("적에게 접근하여 <:DAMAGE:피해>를 입힙니다. " +
                                         "<:SNARE:속박>에 걸린 적에게 <:DAMAGE_INCREASE:치명타>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, 1)
                                 .build()),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("회수", ActionKey.SLOT_1)

@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Confirmable;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Confirmable;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -40,8 +40,8 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     /** 침묵 상태 효과 */
     private final Silence silence;
 
-    public VellionA3(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA3Info.getInstance(), VellionA3Info.COOLDOWN, Timespan.MAX, 2);
+    public VellionA3(@NonNull CombatUser combatUser, @NonNull VellionA3Info skillInfo) {
+        super(combatUser, skillInfo, VellionA3Info.COOLDOWN, Timespan.MAX, 2);
 
         this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);
@@ -62,7 +62,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getActionManager().getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+                && combatUser.getAbilityManager().getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

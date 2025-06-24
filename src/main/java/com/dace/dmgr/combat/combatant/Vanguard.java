@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant;
 
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -74,7 +74,7 @@ public abstract class Vanguard extends Combatant {
 
         private RoleTrait1Info() {
             super("역할: 돌격 - 1",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간과 <:KNOCKBACK:밀쳐내기> 효과가 감소합니다.")
                             .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
                             .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
@@ -90,7 +90,7 @@ public abstract class Vanguard extends Combatant {
 
         private RoleTrait2Info() {
             super("역할: 돌격 - 2",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("적을 처치하면 모든 <:NEGATIVE_EFFECT:해로운 효과>를 제거합니다.")
                             .build()));
         }

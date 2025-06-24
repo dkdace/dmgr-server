@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -40,8 +40,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     /** 화염 상태 효과 */
     private final Burning burning;
 
-    public InfernoWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoWeaponInfo.getInstance(), InfernoWeaponInfo.Fireball.COOLDOWN);
+    public InfernoWeapon(@NonNull CombatUser combatUser, @NonNull InfernoWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, InfernoWeaponInfo.Fireball.COOLDOWN);
 
         this.reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
@@ -56,7 +56,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
         return EnumSet.of(ActionKey.DROP);
     }
 
@@ -77,7 +77,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
 
-                if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
                 InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
@@ -94,7 +94,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponLProjectile().shot();
 
-                if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
                 InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);

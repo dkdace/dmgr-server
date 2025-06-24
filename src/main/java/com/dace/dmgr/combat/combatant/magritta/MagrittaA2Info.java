@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -30,7 +30,7 @@ public final class MagrittaA2Info extends ActiveSkillInfo<MagrittaA2> {
 
     private MagrittaA2Info() {
         super(MagrittaA2.class, "불꽃의 그림자",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("짧은 시간동안 <:WALK_SPEED_INCREASE:이동 속도>가 빨라지며 모든 공격을 받지 않습니다. " +
                                 "사용 후 기본 무기를 재장전합니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())

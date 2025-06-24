@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class VellionP1 extends AbstractSkill {
+public final class VellionP1 extends PassiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(VellionP1Info.SPEED);
 
-    public VellionP1(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionP1Info.getInstance(), VellionP1Info.COOLDOWN, VellionP1Info.DURATION);
+    public VellionP1(@NonNull CombatUser combatUser, @NonNull VellionP1Info skillInfo) {
+        super(combatUser, skillInfo, VellionP1Info.COOLDOWN, VellionP1Info.DURATION);
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -18,8 +18,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class No7A3 extends ActiveSkill {
-    public No7A3(@NonNull CombatUser combatUser) {
-        super(combatUser, No7A3Info.getInstance(), No7A3Info.COOLDOWN, No7A3Info.DURATION, 2);
+    public No7A3(@NonNull CombatUser combatUser, @NonNull No7A3Info skillInfo) {
+        super(combatUser, skillInfo, No7A3Info.COOLDOWN, No7A3Info.DURATION, 2);
     }
 
     @Override
@@ -39,13 +39,13 @@ public final class No7A3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         Location location = combatUser.getLocation();
 
@@ -59,7 +59,7 @@ public final class No7A3 extends ActiveSkill {
             area.emit(loc);
 
             int size = area.getHitTargets().size();
-            combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A3Info.SHIELD * (size + 1.0) / durationTicks);
+            combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).addShield(No7A3Info.SHIELD * (size + 1.0) / durationTicks);
 
             if (size > 0)
                 combatUser.addScore("보호막 획득", (double) (No7A3Info.SHIELD_SCORE * size) / durationTicks);

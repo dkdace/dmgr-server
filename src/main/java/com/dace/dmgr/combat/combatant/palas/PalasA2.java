@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Targeted;
-import com.dace.dmgr.combat.action.skill.module.TargetModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Targeted;
+import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
@@ -32,8 +32,8 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     @NonNull
     private final TargetModule<Healable> targetModule;
 
-    public PalasA2(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA2Info.getInstance(), PalasA2Info.COOLDOWN, Timespan.MAX, 1);
+    public PalasA2(@NonNull CombatUser combatUser, @NonNull PalasA2Info skillInfo) {
+        super(combatUser, skillInfo, PalasA2Info.COOLDOWN, Timespan.MAX, 1);
         this.targetModule = new TargetModule<>(this, PalasA2Info.MAX_DISTANCE);
     }
 
@@ -51,7 +51,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setCooldown();
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasUlt.PalasUltBuff.instance);

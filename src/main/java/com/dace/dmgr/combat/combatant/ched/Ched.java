@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.ched;
 
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -117,14 +117,14 @@ public final class Ched extends Marksman {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return actionManager.getSkill(ChedA3Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(ChedUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return abilityManager.getSkill(ChedA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(ChedUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        ChedA2 skill2 = combatUser.getActionManager().getSkill(ChedA2Info.getInstance());
+        ChedA2 skill2 = combatUser.getAbilityManager().getSkill(ChedA2Info.getInstance());
         return skill2.canUse(ActionKey.SLOT_2);
     }
 

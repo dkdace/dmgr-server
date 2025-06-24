@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.weapon.Aimable;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -49,7 +49,7 @@ public final class PalasWeaponInfo extends WeaponInfo<PalasWeapon> {
 
     private PalasWeaponInfo() {
         super(PalasWeapon.class, Resource.DEFAULT, "RQ-07",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("생체탄을 발사하는 볼트액션 소총입니다. " +
                                 "사격하여 아군을 <:HEAL:치유>하거나 적에게 <:DAMAGE:피해>를 입힙니다. " +
                                 "정조준 시 사거리 제한이 사라집니다.")

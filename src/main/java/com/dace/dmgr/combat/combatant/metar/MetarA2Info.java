@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -39,12 +39,12 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
 
     private MetarA2Info() {
         super(MetarA2.class, "에너지 방벽",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("커다란 <3::에너지 방벽>을 설치하여 공격을 방어합니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME_WITH_MAX_STACK, STACK_COOLDOWN.toSeconds(), MAX_STACK)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build(),
-                        new ActionInfoLore.NamedSection("에너지 방벽", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("에너지 방벽", AbilityInfoLore.Section
                                 .builder("공격을 막는 고정형 방벽입니다.")
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())

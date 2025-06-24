@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -23,8 +23,8 @@ public final class ChedWeapon extends AbstractWeapon {
     /** 활 충전량 */
     private double power;
 
-    public ChedWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedWeaponInfo.getInstance(), ChedWeaponInfo.COOLDOWN);
+    public ChedWeapon(@NonNull CombatUser combatUser, @NonNull ChedWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, ChedWeaponInfo.COOLDOWN);
     }
 
     @Override
@@ -35,7 +35,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -43,8 +43,8 @@ public final class ChedWeapon extends AbstractWeapon {
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                ActionManager actionManager = combatUser.getActionManager();
-                ChedA1 skill1 = actionManager.getSkill(ChedA1Info.getInstance());
+                AbilityManager abilityManager = combatUser.getAbilityManager();
+                ChedA1 skill1 = abilityManager.getSkill(ChedA1Info.getInstance());
 
                 if (skill1.isEnabled()) {
                     setCooldown(ChedA1Info.COOLDOWN);
@@ -55,7 +55,7 @@ public final class ChedWeapon extends AbstractWeapon {
                     setCanShoot(true);
 
                     if (combatUser.getEntity().isHandRaised()) {
-                        Weapon weapon = actionManager.getWeapon();
+                        Weapon weapon = abilityManager.getWeapon();
                         weapon.setVisible(false);
                         weapon.setVisible(true);
                     }
@@ -94,7 +94,7 @@ public final class ChedWeapon extends AbstractWeapon {
      */
     public void beforeShoot(double power) {
         this.power = power;
-        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 
     private final class ChedWeaponProjectile extends Projectile<Damageable> {

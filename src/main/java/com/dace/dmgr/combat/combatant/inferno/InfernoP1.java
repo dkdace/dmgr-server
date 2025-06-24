@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -18,14 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class InfernoP1 extends AbstractSkill {
+public final class InfernoP1 extends PassiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(InfernoP1Info.DEFENSE_INCREMENT);
     /** 활성화 가능 여부 */
     private boolean canActivate = false;
 
-    public InfernoP1(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoP1Info.getInstance(), Timespan.ZERO, InfernoP1Info.DURATION);
+    public InfernoP1(@NonNull CombatUser combatUser, @NonNull InfernoP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, InfernoP1Info.DURATION);
     }
 
     @Override
@@ -89,7 +89,7 @@ public final class InfernoP1 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 
     private final class InfernoP1Area extends Area<Damageable> {

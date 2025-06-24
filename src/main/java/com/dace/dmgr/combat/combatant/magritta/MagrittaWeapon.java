@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -29,8 +29,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @Getter
     private final ReloadModule reloadModule;
 
-    public MagrittaWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaWeaponInfo.getInstance(), MagrittaWeaponInfo.COOLDOWN);
+    public MagrittaWeapon(@NonNull CombatUser combatUser, @NonNull MagrittaWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, MagrittaWeaponInfo.COOLDOWN);
         this.reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
     }
 
@@ -42,7 +42,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
         return EnumSet.of(ActionKey.DROP);
     }
 
@@ -54,9 +54,9 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -196,7 +196,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);
 
                     if (isUlt && target.isGoalTarget())
-                        combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule()
+                        combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule()
                                 .addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 

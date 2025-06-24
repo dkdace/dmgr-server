@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -29,7 +29,7 @@ public final class No7P2Info extends PassiveSkillInfo<No7P2> {
 
     private No7P2Info() {
         super(No7P2.class, "방전",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("<d::충전>으로 얻은 보호막을 가지고 있으면 주위에 전류를 방출하여 <:DAMAGE:광역 피해>를 입힙니다. " +
                                 "보호막이 많을 수록 피해량이 증가합니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_PER_SECOND, MIN_DAMAGE_PER_SECOND, MAX_DAMAGE_PER_SECOND)

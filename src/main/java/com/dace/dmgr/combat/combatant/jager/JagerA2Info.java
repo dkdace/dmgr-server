@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -42,12 +42,12 @@ public final class JagerA2Info extends ActiveSkillInfo<JagerA2> {
 
     private JagerA2Info() {
         super(JagerA2.class, "곰덫",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("눈에 잘 띄지 않는 <3::곰덫>을 던져 설치합니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build(),
-                        new ActionInfoLore.NamedSection("곰덫", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("곰덫", AbilityInfoLore.Section
                                 .builder("밟은 적은 <:DAMAGE:피해>를 입고 <:SNARE:속박>됩니다.")
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)

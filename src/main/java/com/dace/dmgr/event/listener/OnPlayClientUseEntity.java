@@ -4,7 +4,7 @@ import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.dace.dmgr.DMGR;
-import com.dace.dmgr.combat.action.ActionKey;
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.PacketEventListener;
 import com.dace.dmgr.user.User;
@@ -40,7 +40,7 @@ public final class OnPlayClientUseEntity extends PacketEventListener<WrapperPlay
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    combatUser.getActionManager().useAction(ActionKey.LEFT_CLICK);
+                    combatUser.getAbilityManager().useAction(ActionKey.LEFT_CLICK);
                 }
             }.runTask(DMGR.getPlugin());
     }

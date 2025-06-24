@@ -2,12 +2,12 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.Trait;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.Trait;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
@@ -60,14 +60,14 @@ public abstract class Support extends Combatant {
                 combatUser.getMoveModule().removeModifier(MODIFIER);
         }
 
-        combatUser.getActionManager().getTrait(RoleTrait2Info.instance).onUse();
+        combatUser.getAbilityManager().getTrait(RoleTrait2Info.instance).onUse();
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target)
-            provider.getActionManager().getTrait(RoleTrait2Info.instance).lastGiveHealTimestamp = Timestamp.now();
+            provider.getAbilityManager().getTrait(RoleTrait2Info.instance).lastGiveHealTimestamp = Timestamp.now();
     }
 
     @Override
@@ -89,7 +89,7 @@ public abstract class Support extends Combatant {
 
         private RoleTrait1Info() {
             super("역할: 지원 - 1",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("체력이 절반 이하인 아군이 범위 밖에 있을 때 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                             .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
@@ -110,7 +110,7 @@ public abstract class Support extends Combatant {
 
         private RoleTrait2Info() {
             super(RoleTrait2.class, "역할: 지원 - 2",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("아군을 치유하면 일정 시간동안 <:HEAL:회복>합니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
@@ -125,8 +125,8 @@ public abstract class Support extends Combatant {
         /** 마지막 치유 시점 */
         private Timestamp lastGiveHealTimestamp = Timestamp.now();
 
-        public RoleTrait2(@NonNull CombatUser combatUser) {
-            super(combatUser, RoleTrait2Info.instance);
+        public RoleTrait2(@NonNull CombatUser combatUser, @NonNull RoleTrait2Info traitInfo) {
+            super(combatUser, traitInfo);
         }
 
         private void onUse() {

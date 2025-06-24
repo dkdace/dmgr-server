@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.skill.StackableSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.skill.StackableSkill;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -31,8 +31,8 @@ public final class ChedA1 extends StackableSkill {
     @Getter(AccessLevel.PACKAGE)
     private boolean isEnabled = false;
 
-    public ChedA1(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedA1Info.getInstance(), ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK, 0);
+    public ChedA1(@NonNull CombatUser combatUser, @NonNull ChedA1Info skillInfo) {
+        super(combatUser, skillInfo, ChedA1Info.COOLDOWN, ChedA1Info.STACK_COOLDOWN, Timespan.MAX, ChedA1Info.MAX_STACK, 0);
         this.burning = new Burning(combatUser, ChedA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 
@@ -53,7 +53,7 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -67,7 +67,7 @@ public final class ChedA1 extends StackableSkill {
         setDuration();
         combatUser.setGlobalCooldown(ChedA1Info.READY_DURATION);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
 
         ChedA1Info.Effects.USE.play(combatUser.getLocation());
@@ -92,7 +92,7 @@ public final class ChedA1 extends StackableSkill {
 
         setDuration(Timespan.ZERO);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.setGlowing(false);
         weapon.setMaterial(Material.BOW);
         weapon.setDurability(ChedWeaponInfo.Resource.DEFAULT);

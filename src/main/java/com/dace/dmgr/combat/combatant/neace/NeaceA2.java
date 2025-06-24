@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ChargeableSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
@@ -22,8 +22,8 @@ public final class NeaceA2 extends ChargeableSkill {
     /** 방어력 수정자 */
     private static final Modifier DEFENSE_MODIFIER = new Modifier(NeaceA2Info.DEFENSE_INCREMENT);
 
-    public NeaceA2(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA2Info.getInstance(), NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds(), 1);
+    public NeaceA2(@NonNull CombatUser combatUser, @NonNull NeaceA2Info skillInfo) {
+        super(combatUser, skillInfo, NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds(), 1);
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class NeaceA2 extends ChargeableSkill {
         }
 
         setDuration();
-        combatUser.getActionManager().getWeapon().setGlowing(true);
+        combatUser.getAbilityManager().getWeapon().setGlowing(true);
 
         NeaceA2Info.Effects.ON.play(combatUser.getLocation());
 
@@ -87,7 +87,7 @@ public final class NeaceA2 extends ChargeableSkill {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        combatUser.getActionManager().getWeapon().setGlowing(false);
+        combatUser.getAbilityManager().getWeapon().setGlowing(false);
 
         NeaceA2Info.Effects.OFF.play(combatUser.getLocation());
     }

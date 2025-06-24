@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -78,7 +78,7 @@ public abstract class Guardian extends Combatant {
 
         private RoleTrait1Info() {
             super("역할: 수호 - 1",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("받는 <:KNOCKBACK:밀쳐내기> 효과가 감소하며, 기본 <:DEFENSE_INCREASE:방어력>을 보유합니다.")
                             .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
                             .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE)
@@ -99,7 +99,7 @@ public abstract class Guardian extends Combatant {
 
         private RoleTrait2Info() {
             super("역할: 수호 - 2",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("힐 팩을 사용하면 일정 시간동안 추가로 <:HEAL:회복>합니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, HEAL)

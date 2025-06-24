@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -29,8 +29,8 @@ public final class MetarA1 extends ActiveSkill {
     /** 발사 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    public MetarA1(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarA1Info.getInstance(), MetarA1Info.COOLDOWN, Timespan.MAX, 0);
+    public MetarA1(@NonNull CombatUser combatUser, @NonNull MetarA1Info skillInfo) {
+        super(combatUser, skillInfo, MetarA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class MetarA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA1Info.READY_DURATION);
 
         MetarA1Info.Effects.USE.play(combatUser.getLocation());

@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.entity.combatuser;
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;

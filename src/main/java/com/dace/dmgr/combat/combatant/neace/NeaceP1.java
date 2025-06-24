@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -11,9 +11,9 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.LongConsumer;
 
-public final class NeaceP1 extends AbstractSkill {
-    public NeaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceP1Info.getInstance(), NeaceP1Info.ACTIVATE_DURATION, Timespan.MAX);
+public final class NeaceP1 extends PassiveSkill {
+    public NeaceP1(@NonNull CombatUser combatUser, @NonNull NeaceP1Info skillInfo) {
+        super(combatUser, skillInfo, NeaceP1Info.ACTIVATE_DURATION, Timespan.MAX);
     }
 
     @Override
@@ -52,6 +52,6 @@ public final class NeaceP1 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 }

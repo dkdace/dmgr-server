@@ -31,7 +31,7 @@ public class Silence implements StatusEffect {
     public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof CombatUser) {
             ((CombatUser) combatEntity).getUser().sendTitle("§5§l침묵당함!", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
-            ((CombatUser) combatEntity).getActionManager().cancelSkill(attacker);
+            ((CombatUser) combatEntity).getAbilityManager().cancelSkill(attacker);
         }
     }
 

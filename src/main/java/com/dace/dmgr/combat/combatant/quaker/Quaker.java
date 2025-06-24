@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -126,7 +126,7 @@ public final class Quaker extends Guardian {
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        if (!combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished())
+        if (!combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
 
         FOOTSTEP_SOUND.apply(volume).play(combatUser.getLocation());
@@ -139,19 +139,19 @@ public final class Quaker extends Guardian {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return actionManager.getSkill(QuakerA1Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return abilityManager.getSkill(QuakerA1Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return actionManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return abilityManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

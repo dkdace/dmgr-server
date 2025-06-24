@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
 
     private SiliaA3Info() {
         super(SiliaA3.class, "폭풍전야",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("일정 시간동안 <:WALK_SPEED_INCREASE:이동 속도>가 빨라지고 발소리 및 모든 행동의 소음이 감소합니다. " +
                                 "일정량의 피해를 입으면 해제되며, " + ACTIVATE_DURATION.toSeconds() + "초동안 유지하면 다음 기본 공격 시 <d::일격>을 날립니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN_FORCE.toSeconds())
@@ -40,7 +40,7 @@ public final class SiliaA3Info extends ActiveSkillInfo<SiliaA3> {
                         .addValueInfo(TextIcon.DAMAGE, (int) (Silia.getInstance().getHealth() * CANCEL_DAMAGE_RATIO) + " (강제 해제 피해량)")
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
                         .build(),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_3)

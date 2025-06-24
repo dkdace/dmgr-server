@@ -2,15 +2,15 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ChargeableSkill;
-import com.dace.dmgr.combat.action.skill.Confirmable;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.action.skill.module.LocationConfirmModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
+import com.dace.dmgr.combat.ability.skill.Confirmable;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.*;
@@ -43,8 +43,8 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     @NonNull
     private final BonusScoreModule bonusScoreModule;
 
-    public JagerA1(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA1Info.getInstance(), JagerA1Info.COOLDOWN, JagerA1Info.HEALTH, 0);
+    public JagerA1(@NonNull CombatUser combatUser, @NonNull JagerA1Info skillInfo) {
+        super(combatUser, skillInfo, JagerA1Info.COOLDOWN, JagerA1Info.HEALTH, 0);
 
         this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
         this.entityModule = new EntityModule<>(this);
@@ -85,7 +85,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -93,7 +93,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         switch (actionKey) {
             case SLOT_1: {
                 if (isDurationFinished()) {
-                    combatUser.getActionManager().getWeapon().cancel();
+                    combatUser.getAbilityManager().getWeapon().cancel();
                     confirmModule.toggleCheck();
                 } else {
                     setDuration(Timespan.ZERO);
@@ -146,7 +146,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         setDuration();
 
         confirmModule.toggleCheck();
-        combatUser.getActionManager().getWeapon().setCooldown(Timespan.ofTicks(2));
+        combatUser.getAbilityManager().getWeapon().setCooldown(Timespan.ofTicks(2));
 
         entityModule.set(new JagerA1Entity(confirmModule.getCurrentLocation()));
     }
@@ -261,7 +261,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
 
-            combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(victim);
+            combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(victim);
 
             if (victim.isGoalTarget())
                 bonusScoreModule.addTarget(victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);

@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -26,8 +26,8 @@ public final class QuakerWeapon extends AbstractWeapon {
     /** 휘두르는 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    public QuakerWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerWeaponInfo.getInstance(), QuakerWeaponInfo.COOLDOWN);
+    public QuakerWeapon(@NonNull CombatUser combatUser, @NonNull QuakerWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, QuakerWeaponInfo.COOLDOWN);
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

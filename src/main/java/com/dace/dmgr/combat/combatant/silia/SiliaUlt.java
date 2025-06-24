@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -19,8 +19,8 @@ public final class SiliaUlt extends UltimateSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public SiliaUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaUltInfo.getInstance(), SiliaUltInfo.DURATION, SiliaUltInfo.COST);
+    public SiliaUlt(@NonNull CombatUser combatUser, @NonNull SiliaUltInfo skillInfo) {
+        super(combatUser, skillInfo, SiliaUltInfo.DURATION, SiliaUltInfo.COST);
     }
 
     @Override
@@ -44,11 +44,11 @@ public final class SiliaUlt extends UltimateSkill {
         setDuration(Timespan.MAX);
         combatUser.setGlobalCooldown(SiliaUltInfo.READY_DURATION);
 
-        ActionManager actionManager = combatUser.getActionManager();
-        SiliaWeapon weapon = (SiliaWeapon) actionManager.getWeapon();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        SiliaWeapon weapon = (SiliaWeapon) abilityManager.getWeapon();
         weapon.setVisible(false);
 
-        actionManager.getSkill(SiliaA3Info.getInstance()).cancel();
+        abilityManager.getSkill(SiliaA3Info.getInstance()).cancel();
 
         Location loc = combatUser.getLocation();
 
@@ -60,8 +60,8 @@ public final class SiliaUlt extends UltimateSkill {
             setDuration();
             combatUser.getMoveModule().addModifier(MODIFIER);
 
-            actionManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
-            actionManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
+            abilityManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
+            abilityManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
             weapon.setVisible(true);
 
             SiliaUltInfo.Effects.USE_READY.play(combatUser.getLocation());
@@ -75,7 +75,7 @@ public final class SiliaUlt extends UltimateSkill {
         isEnabled = false;
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
+        combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class SiliaUlt extends UltimateSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     /**

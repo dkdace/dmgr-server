@@ -2,13 +2,13 @@ package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.GradualSpreadModule;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.GradualSpreadModule;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -33,8 +33,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @NonNull
     private final GradualSpreadModule fullAutoModule;
 
-    public ArkaceWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceWeaponInfo.getInstance(), Timespan.ZERO);
+    public ArkaceWeapon(@NonNull CombatUser combatUser, @NonNull ArkaceWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, Timespan.ZERO);
 
         this.reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.Spread.INCREMENT,
@@ -67,7 +67,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
                 }
 
                 Location loc = combatUser.getLocation();
-                if (combatUser.getActionManager().getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
+                if (combatUser.getAbilityManager().getSkill(ArkaceUltInfo.getInstance()).isDurationFinished()) {
                     new ArkaceWeaponHitscan(false).shot(VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread()));
 
                     reloadModule.consume(1);
@@ -103,7 +103,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
      * @return 무기 사용 취소 여부
      */
     private boolean cancelP1() {
-        ArkaceP1 skillp1 = combatUser.getActionManager().getSkill(ArkaceP1Info.getInstance());
+        ArkaceP1 skillp1 = combatUser.getAbilityManager().getSkill(ArkaceP1Info.getInstance());
         Timespan skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION.plus(Timespan.ofTicks(2));
 
         if (skillp1.cancel()) {
@@ -171,7 +171,7 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 double damage = ArkaceWeaponInfo.DAMAGE;
                 if (isUlt)
-                    combatUser.getActionManager().getSkill(ArkaceUltInfo.getInstance()).getBonusScoreModule()
+                    combatUser.getAbilityManager().getSkill(ArkaceUltInfo.getInstance()).getBonusScoreModule()
                             .addTarget(target, ArkaceUltInfo.KILL_SCORE_TIME_LIMIT);
                 else
                     damage = ArkaceWeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance());

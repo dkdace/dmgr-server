@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
@@ -44,7 +44,7 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
 
     private MagrittaUltInfo() {
         super(MagrittaUlt.class, "초토화",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("일정 시간동안 기본 무기를 난사하여 강력한 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())

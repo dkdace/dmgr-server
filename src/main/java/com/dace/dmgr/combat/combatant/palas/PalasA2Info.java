@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -36,7 +36,7 @@ public final class PalasA2Info extends ActiveSkillInfo<PalasA2> {
 
     private PalasA2Info() {
         super(PalasA2.class, "생체 나노봇: 알파-X",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("바라보는 아군에게 나노봇을 투여하여 일정 시간동안 모든 <:NEGATIVE_EFFECT:해로운 효과>에 면역시킵니다. " +
                                 "<d::생체 나노봇： 아드레날린> 효과를 덮어씁니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())

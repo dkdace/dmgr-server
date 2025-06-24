@@ -2,10 +2,10 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -33,8 +33,8 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
     /** 이동속도 감소 타임스탬프 */
     private Timestamp slowTimestamp = Timestamp.now();
 
-    public No7Weapon(@NonNull CombatUser combatUser) {
-        super(combatUser, No7WeaponInfo.getInstance(), Timespan.ZERO);
+    public No7Weapon(@NonNull CombatUser combatUser, @NonNull No7WeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, Timespan.ZERO);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, No7WeaponInfo.FIRE_RATE);
     }
 
@@ -46,7 +46,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override

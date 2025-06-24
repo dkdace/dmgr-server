@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.no7;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Vanguard;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -102,10 +102,10 @@ public final class No7 extends Vanguard {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        ActionManager actionManager = combatUser.getActionManager();
-        actionManager.getTrait(No7T1Info.getInstance()).onTick();
-        actionManager.getSkill(No7P1Info.getInstance()).onTick();
-        actionManager.getSkill(No7P2Info.getInstance()).onTick(i);
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        abilityManager.getTrait(No7T1Info.getInstance()).onTick();
+        abilityManager.getSkill(No7P1Info.getInstance()).onTick();
+        abilityManager.getSkill(No7P2Info.getInstance()).onTick(i);
     }
 
     @Override
@@ -115,12 +115,12 @@ public final class No7 extends Vanguard {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return ((No7Weapon) combatUser.getActionManager().getWeapon()).canSprint();
+        return ((No7Weapon) combatUser.getAbilityManager().getWeapon()).canSprint();
     }
 
     @Override

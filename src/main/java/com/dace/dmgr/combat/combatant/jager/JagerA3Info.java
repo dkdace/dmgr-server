@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
@@ -50,7 +50,7 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
 
     private JagerA3Info() {
         super(JagerA3.class, "빙결 수류탄",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("빙결 수류탄의 핀을 뽑습니다. " +
                                 "수류탄은 일정 시간 후 폭발하여 적에게 <:DAMAGE:광역 피해>를 입히고 <5:WALK_SPEED_DECREASE:> <d::빙결>시키며, 적이 최대치의 빙결을 입으면 <:SNARE:속박>됩니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, EXPLODE_DURATION.toSeconds())
@@ -61,7 +61,7 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_3)
                         .build(),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("재사용 시", AbilityInfoLore.Section
                                 .builder("수류탄을 던집니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("투척", ActionKey.SLOT_3)

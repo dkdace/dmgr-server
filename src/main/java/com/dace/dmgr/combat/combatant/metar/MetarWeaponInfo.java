@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -44,7 +44,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
 
     private MetarWeaponInfo() {
         super(MetarWeapon.class, Resource.DEFAULT, "펄스 쌍기관포",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("대용량 탄창이 장착된 에너지 기관포입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
                                 DAMAGE, DAMAGE / 2, DISTANCE / 2, DISTANCE)

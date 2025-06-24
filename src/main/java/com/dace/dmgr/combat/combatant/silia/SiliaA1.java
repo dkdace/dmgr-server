@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class SiliaA1 extends ActiveSkill {
-    public SiliaA1(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA1Info.getInstance(), SiliaA1Info.COOLDOWN, Timespan.MAX, 0);
+    public SiliaA1(@NonNull CombatUser combatUser, @NonNull SiliaA1Info skillInfo) {
+        super(combatUser, skillInfo, SiliaA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class SiliaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -46,7 +46,7 @@ public final class SiliaA1 extends ActiveSkill {
         combatUser.setGlobalCooldown(SiliaA1Info.DURATION);
         combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.setCooldown(Timespan.ZERO);
         weapon.setVisible(false);
 
@@ -84,7 +84,7 @@ public final class SiliaA1 extends ActiveSkill {
         else
             setCooldown(Timespan.ZERO);
 
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     /**

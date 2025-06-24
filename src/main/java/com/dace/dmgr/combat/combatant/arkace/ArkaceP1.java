@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -11,12 +11,12 @@ import lombok.NonNull;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class ArkaceP1 extends AbstractSkill {
+public final class ArkaceP1 extends PassiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(ArkaceP1Info.SPRINT_SPEED);
 
-    public ArkaceP1(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+    public ArkaceP1(@NonNull CombatUser combatUser, @NonNull ArkaceP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -28,7 +28,7 @@ public final class ArkaceP1 extends AbstractSkill {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && isDurationFinished()
-                && !((ArkaceWeapon) combatUser.getActionManager().getWeapon()).getReloadModule().isReloading();
+                && !((ArkaceWeapon) combatUser.getAbilityManager().getWeapon()).getReloadModule().isReloading();
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class ArkaceP1 extends AbstractSkill {
         setDuration();
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getActionManager().getWeapon();
+        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.setDurability(ArkaceWeaponInfo.Resource.SPRINT);
 
         addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting() && !weapon.getReloadModule().isReloading(),
@@ -53,7 +53,7 @@ public final class ArkaceP1 extends AbstractSkill {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        combatUser.getActionManager().getWeapon().setDurability(ArkaceWeaponInfo.Resource.DEFAULT);
+        combatUser.getAbilityManager().getWeapon().setDurability(ArkaceWeaponInfo.Resource.DEFAULT);
     }
 
     /**
@@ -61,6 +61,6 @@ public final class ArkaceP1 extends AbstractSkill {
      */
     void onTick() {
         if (combatUser.getEntity().isSprinting())
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 }

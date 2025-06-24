@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -40,8 +40,8 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     @Nullable
     private MetarA3Projectile projectile;
 
-    public MetarA3(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarA3Info.getInstance(), MetarA3Info.COOLDOWN, Timespan.MAX, 2);
+    public MetarA3(@NonNull CombatUser combatUser, @NonNull MetarA3Info skillInfo) {
+        super(combatUser, skillInfo, MetarA3Info.COOLDOWN, Timespan.MAX, 2);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", MetarA3Info.ASSIST_SCORE);
     }
 
@@ -71,7 +71,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarA3Info.READY_DURATION);
 
         MetarA3Info.Effects.USE.play(combatUser.getLocation());

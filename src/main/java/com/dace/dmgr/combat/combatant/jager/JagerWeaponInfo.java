@@ -2,12 +2,12 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.weapon.Aimable;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.weapon.Aimable;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.effect.ParticleEffect;
@@ -48,21 +48,21 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
 
     private JagerWeaponInfo() {
         super(JagerWeaponL.class, Resource.DEFAULT, "MK.73 ELNR",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("두 개의 탄창을 가진 특수 소총으로, <3::냉각탄> 및 정조준하여 <3::저격탄>을 사격할 수 있습니다.")
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                         .addActionKeyInfo("사격", ActionKey.LEFT_CLICK)
                         .addActionKeyInfo("정조준", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("재장전", ActionKey.DROP)
                         .build(),
-                        new ActionInfoLore.NamedSection("냉각탄", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("냉각탄", AbilityInfoLore.Section
                                 .builder("냉각탄을 사격하여 <:DAMAGE:피해>를 입히고 <5:WALK_SPEED_DECREASE:> <d::빙결>시킵니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.WALK_SPEED_DECREASE, ChatColor.DARK_PURPLE, FREEZE)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                                 .build()),
-                        new ActionInfoLore.NamedSection("저격탄", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("저격탄", AbilityInfoLore.Section
                                 .builder("저격탄을 사격하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
                                         Scope.DAMAGE, Scope.DAMAGE / 2, Scope.DAMAGE_WEAKENING_DISTANCE, Scope.DAMAGE_WEAKENING_DISTANCE * 2)

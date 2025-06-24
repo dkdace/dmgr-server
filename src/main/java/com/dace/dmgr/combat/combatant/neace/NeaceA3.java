@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Targeted;
-import com.dace.dmgr.combat.action.skill.module.TargetModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Targeted;
+import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -29,8 +29,8 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     @NonNull
     private final TargetModule<Healable> targetModule;
 
-    public NeaceA3(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA3Info.getInstance(), NeaceA3Info.COOLDOWN, NeaceA3Info.DURATION, 2);
+    public NeaceA3(@NonNull CombatUser combatUser, @NonNull NeaceA3Info skillInfo) {
+        super(combatUser, skillInfo, NeaceA3Info.COOLDOWN, NeaceA3Info.DURATION, 2);
         this.targetModule = new TargetModule<>(this, NeaceA3Info.MAX_DISTANCE);
     }
 

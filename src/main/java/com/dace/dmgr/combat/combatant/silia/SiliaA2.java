@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -21,21 +21,21 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public final class SiliaA2 extends ActiveSkill {
-    public SiliaA2(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA2Info.getInstance(), SiliaA2Info.COOLDOWN, Timespan.MAX, 1);
+    public SiliaA2(@NonNull CombatUser combatUser, @NonNull SiliaA2Info skillInfo) {
+        super(combatUser, skillInfo, SiliaA2Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
     @NonNull
     public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
+        return EnumSet.of(ActionKey.SLOT_2, ActionKey.RIGHT_CLICK);
     }
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && isDurationFinished() && actionManager.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
-        combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).cancel();
 
         SiliaA2Info.Effects.USE.play(combatUser.getLocation());
 

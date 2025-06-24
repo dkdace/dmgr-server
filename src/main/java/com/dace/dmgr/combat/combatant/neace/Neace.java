@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -113,13 +113,13 @@ public final class Neace extends Support {
 
         new NeaceTarget(combatUser).shot();
 
-        combatUser.getActionManager().getSkill(NeaceP1Info.getInstance()).onTick(i);
+        combatUser.getAbilityManager().getSkill(NeaceP1Info.getInstance()).onTick(i);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getActionManager().getSkill(NeaceP1Info.getInstance()).cancel();
+        victim.getAbilityManager().getSkill(NeaceP1Info.getInstance()).cancel();
     }
 
     @Override
@@ -132,7 +132,7 @@ public final class Neace extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = combatUser.getActionManager().getSkill(NeaceUltInfo.getInstance());
+        NeaceUlt skill4 = combatUser.getAbilityManager().getSkill(NeaceUltInfo.getInstance());
         return skill4.isDurationFinished() || skill4.isEnabled();
     }
 

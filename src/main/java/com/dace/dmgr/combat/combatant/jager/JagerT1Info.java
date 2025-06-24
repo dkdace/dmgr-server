@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -28,7 +28,7 @@ public final class JagerT1Info extends TraitInfo {
 
     private JagerT1Info() {
         super("빙결",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("<5:WALK_SPEED_DECREASE:수치>에 비례하여 <:WALK_SPEED_DECREASE:이동 속도>가 느려지는 상태이상입니다. " +
                                 "수치가 " + NO_SPRINT + "을 넘으면 달리기가 불가능해지며, " + NO_JUMP + "을 넘으면 점프가 불가능해집니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())

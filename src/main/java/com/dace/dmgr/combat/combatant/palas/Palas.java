@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
@@ -134,7 +134,7 @@ public final class Palas extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((PalasWeapon) combatUser.getActionManager().getWeapon()).getAimModule().isAiming();
+        return !((PalasWeapon) combatUser.getAbilityManager().getWeapon()).getAimModule().isAiming();
     }
 
     @Override

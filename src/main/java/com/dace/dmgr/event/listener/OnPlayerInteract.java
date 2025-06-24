@@ -1,8 +1,8 @@
 package com.dace.dmgr.event.listener;
 
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.event.EventListener;
 import com.dace.dmgr.user.User;
@@ -78,15 +78,15 @@ public final class OnPlayerInteract extends EventListener<PlayerInteractEvent> {
                 }
         }
 
-        ActionManager actionManager = combatUser.getActionManager();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
         switch (event.getAction()) {
             case LEFT_CLICK_AIR:
             case LEFT_CLICK_BLOCK:
-                actionManager.useAction(ActionKey.LEFT_CLICK);
+                abilityManager.useAction(ActionKey.LEFT_CLICK);
                 break;
             case RIGHT_CLICK_AIR:
             case RIGHT_CLICK_BLOCK:
-                actionManager.useAction(ActionKey.RIGHT_CLICK);
+                abilityManager.useAction(ActionKey.RIGHT_CLICK);
                 break;
             default:
                 break;

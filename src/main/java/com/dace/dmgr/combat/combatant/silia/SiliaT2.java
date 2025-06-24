@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.Trait;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.Trait;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.util.VectorUtil;
@@ -25,8 +25,8 @@ public final class SiliaT2 extends Trait {
     /** 일격 사용 가능 여부 */
     private boolean isStrike = false;
 
-    public SiliaT2(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaT2Info.getInstance());
+    public SiliaT2(@NonNull CombatUser combatUser, @NonNull SiliaT2Info traitInfo) {
+        super(combatUser, traitInfo);
     }
 
     /**
@@ -39,10 +39,10 @@ public final class SiliaT2 extends Trait {
         if (!isStrike)
             return false;
 
-        ActionManager actionManager = combatUser.getActionManager();
-        Weapon weapon = actionManager.getWeapon();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        Weapon weapon = abilityManager.getWeapon();
 
-        if (!actionManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
+        if (!abilityManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
             weapon.setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
         combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
@@ -93,7 +93,7 @@ public final class SiliaT2 extends Trait {
     void setStrike(boolean isStrike) {
         this.isStrike = isStrike;
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.setGlowing(isStrike);
         weapon.setDurability(isStrike ? SiliaWeaponInfo.Resource.EXTENDED : SiliaWeaponInfo.Resource.DEFAULT);
     }
@@ -151,7 +151,7 @@ public final class SiliaT2 extends Trait {
                             ((Movable) target).getKnockbackModule().knockback(dir);
                         }
 
-                        if (combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
+                        if (combatUser.getAbilityManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 

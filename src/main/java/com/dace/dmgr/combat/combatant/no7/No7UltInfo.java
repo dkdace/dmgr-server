@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -41,7 +41,7 @@ public final class No7UltInfo extends UltimateSkillInfo<No7Ult> {
 
     private No7UltInfo() {
         super(No7Ult.class, "일렉트릭 쇼크",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("강력한 아크 방전을 일으켜 <:DAMAGE:광역 피해>를 입히고 긴 시간동안 <:STUN:기절>시킵니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)

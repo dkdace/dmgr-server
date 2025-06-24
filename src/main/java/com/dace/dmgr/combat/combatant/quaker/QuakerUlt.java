@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -38,8 +38,8 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     /** 기절 상태 효과 */
     private final Stun stun;
 
-    public QuakerUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerUltInfo.getInstance(), Timespan.MAX, QuakerUltInfo.COST);
+    public QuakerUlt(@NonNull CombatUser combatUser, @NonNull QuakerUltInfo skillInfo) {
+        super(combatUser, skillInfo, Timespan.MAX, QuakerUltInfo.COST);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerUltInfo.ASSIST_SCORE);
         this.stun = new Stun(combatUser);
@@ -47,7 +47,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        QuakerA1 skill1 = combatUser.getActionManager().getSkill(QuakerA1Info.getInstance());
+        QuakerA1 skill1 = combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance());
         if (skill1.isDurationFinished()) {
             combatUser.getUser().sendAlertActionBar(skill1.getDisplayName() + " 를 활성화한 상태에서만 사용할 수 있습니다.");
             return false;
@@ -65,7 +65,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        QuakerWeapon weapon = (QuakerWeapon) combatUser.getActionManager().getWeapon();
+        QuakerWeapon weapon = (QuakerWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
         weapon.use(true);
@@ -83,7 +83,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     @Override

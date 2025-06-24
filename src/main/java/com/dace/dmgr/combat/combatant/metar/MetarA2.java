@@ -2,10 +2,10 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.MultiSummonable;
-import com.dace.dmgr.combat.action.skill.StackableSkill;
-import com.dace.dmgr.combat.action.skill.module.MultiEntityModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.MultiSummonable;
+import com.dace.dmgr.combat.ability.skill.StackableSkill;
+import com.dace.dmgr.combat.ability.skill.module.MultiEntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -31,8 +31,8 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
     @NonNull
     private final MultiEntityModule<MetarA2Entity> multiEntityModule;
 
-    public MetarA2(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarA2Info.getInstance(), MetarA2Info.COOLDOWN, MetarA2Info.STACK_COOLDOWN, Timespan.MAX, MetarA2Info.MAX_STACK, 1);
+    public MetarA2(@NonNull CombatUser combatUser, @NonNull MetarA2Info skillInfo) {
+        super(combatUser, skillInfo, MetarA2Info.COOLDOWN, MetarA2Info.STACK_COOLDOWN, Timespan.MAX, MetarA2Info.MAX_STACK, 1);
         this.multiEntityModule = new MultiEntityModule<>(this, MetarA2Info.MAX_STACK);
     }
 

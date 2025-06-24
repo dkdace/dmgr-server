@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -39,8 +39,8 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     @Nullable
     private Healable target = null;
 
-    public NeaceWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceWeaponInfo.getInstance(), NeaceWeaponInfo.COOLDOWN);
+    public NeaceWeapon(@NonNull CombatUser combatUser, @NonNull NeaceWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, NeaceWeaponInfo.COOLDOWN);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
     }
 
@@ -52,7 +52,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(NeaceUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -84,7 +84,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                     blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.Heal.BLOCK_RESET_DELAY);
 
                 String title = MessageFormat.format("{0} : {1}§e{2}",
-                        (combatUser.getActionManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished()
+                        (combatUser.getAbilityManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished()
                                 ? MessageFormat.format("§a{0} §f치유 중", TextIcon.HEAL)
                                 : MessageFormat.format("§b{0} §f강화 중", TextIcon.DAMAGE_INCREASE)),
                         (target instanceof CombatUser ? ((CombatUser) target).getCombatantType().getCombatant().getIcon() + " " : ""),
@@ -108,7 +108,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
      * @param target 치유 대상
      */
     void healTarget(@NonNull Healable target) {
-        NeaceA2 skill2 = combatUser.getActionManager().getSkill(NeaceA2Info.getInstance());
+        NeaceA2 skill2 = combatUser.getAbilityManager().getSkill(NeaceA2Info.getInstance());
         boolean isAmplifying = !skill2.isDurationFinished();
 
         if (isAmplifying)
@@ -126,7 +126,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
      * @return 치유를 받고 있으면 {@code true} 반환
      */
     boolean isHealing(@NonNull Healable target) {
-        return combatUser.getActionManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished() && this.target == target
+        return combatUser.getAbilityManager().getSkill(NeaceA2Info.getInstance()).isDurationFinished() && this.target == target
                 && targetResetTimestamp.isAfter(Timestamp.now());
     }
 

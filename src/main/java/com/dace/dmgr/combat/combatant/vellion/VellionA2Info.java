@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -46,7 +46,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
 
     private VellionA2Info() {
         super(VellionA2.class, "저주 귀속",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("바라보는 적에게 저주를 걸어 <:DEFENSE_DECREASE:방어력>을 감소시키고 해당 적을 제외한 주변에 지속적인 <:DAMAGE:광역 피해>를 입힙니다. " +
                                 "해당 적이 시야에서 " + BLOCK_RESET_DELAY.toSeconds() + "초간 사라지거나 사거리를 벗어나면 저주가 풀립니다.")
                         .addValueInfo(TextIcon.DEFENSE_DECREASE, Format.PERCENT, DEFENSE_DECREMENT)
@@ -55,7 +55,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, RADIUS)
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build(),
-                        new ActionInfoLore.NamedSection("취소/재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("취소/재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_2)

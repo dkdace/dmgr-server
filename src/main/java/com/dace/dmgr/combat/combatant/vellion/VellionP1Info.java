@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -35,14 +35,14 @@ public final class VellionP1Info extends PassiveSkillInfo<VellionP1> {
 
     private VellionP1Info() {
         super(VellionP1.class, "비행",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("공중에서 날아다닐 수 있습니다. " +
                                 "비행 도중 <:WALK_SPEED_INCREASE:이동 속도>가 증가합니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)
                         .addActionKeyInfo("사용", ActionKey.SPACE)
                         .build(),
-                        new ActionInfoLore.NamedSection("지속시간 종료/재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("지속시간 종료/재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SPACE)

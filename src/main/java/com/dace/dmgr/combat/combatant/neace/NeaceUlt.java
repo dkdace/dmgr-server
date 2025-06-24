@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -24,8 +24,8 @@ public final class NeaceUlt extends UltimateSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public NeaceUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceUltInfo.getInstance(), NeaceUltInfo.DURATION, NeaceUltInfo.COST);
+    public NeaceUlt(@NonNull CombatUser combatUser, @NonNull NeaceUltInfo skillInfo) {
+        super(combatUser, skillInfo, NeaceUltInfo.DURATION, NeaceUltInfo.COST);
     }
 
     @Override
@@ -39,7 +39,7 @@ public final class NeaceUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(NeaceA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(NeaceA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -101,7 +101,7 @@ public final class NeaceUlt extends UltimateSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Healable target) {
-            ((NeaceWeapon) combatUser.getActionManager().getWeapon()).healTarget(target);
+            ((NeaceWeapon) combatUser.getAbilityManager().getWeapon()).healTarget(target);
             return true;
         }
     }

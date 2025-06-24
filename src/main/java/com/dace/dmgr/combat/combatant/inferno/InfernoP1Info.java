@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import lombok.Getter;
 
 public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
@@ -20,7 +20,7 @@ public final class InfernoP1Info extends PassiveSkillInfo<InfernoP1> {
 
     private InfernoP1Info() {
         super(InfernoP1.class, "불꽃의 용기",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("근처에 <:FIRE:불>타는 적이 존재하면 <:DEFENSE_INCREASE:방어력>이 증가합니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)

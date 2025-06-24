@@ -2,12 +2,12 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.*;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AttackerModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
@@ -36,8 +36,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     @NonNull
     private final EntityModule<JagerA2Entity> entityModule;
 
-    public JagerA2(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA2Info.getInstance(), JagerA2Info.COOLDOWN, Timespan.MAX, 1);
+    public JagerA2(@NonNull CombatUser combatUser, @NonNull JagerA2Info skillInfo) {
+        super(combatUser, skillInfo, JagerA2Info.COOLDOWN, Timespan.MAX, 1);
         this.entityModule = new EntityModule<>(this);
     }
 
@@ -49,16 +49,16 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && isDurationFinished() && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
         entityModule.removeEntity();
@@ -218,7 +218,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         @Override
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
-            combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(victim);
+            combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(victim);
         }
 
         @Override

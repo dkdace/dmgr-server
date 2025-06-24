@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -31,16 +31,16 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
 
     private ChedP1Info() {
         super(ChedP1.class, "궁사의 날렵함",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("벽을 클릭하여 벽을 오를 수 있습니다. 오르는 도중 <3::매달리기>를 할 수 있습니다.")
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
                         .build(),
-                        new ActionInfoLore.NamedSection("매달리기", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("매달리기", AbilityInfoLore.Section
                                 .builder("벽에 매달려 위치를 고정합니다.")
                                 .addValueInfo(TextIcon.DURATION, Format.TIME, HANG_DURATION.toSeconds())
                                 .addActionKeyInfo("사용", ActionKey.SNEAK)
                                 .build()),
-                        new ActionInfoLore.NamedSection("매달리기: 지속시간 종료/재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("매달리기: 지속시간 종료/재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addActionKeyInfo("해제", ActionKey.SNEAK)
                                 .build())));

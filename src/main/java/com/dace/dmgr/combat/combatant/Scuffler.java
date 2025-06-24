@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Speed;
@@ -67,7 +67,7 @@ public abstract class Scuffler extends Combatant {
 
         private RoleTrait1Info() {
             super("역할: 근접 - 1",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("마지막 공격으로 적을 처치하면 <7:ULTIMATE:궁극기 충전량>을 추가로 얻습니다.")
                             .addValueInfo(TextIcon.ULTIMATE, ULTIMATE_CHARGE)
                             .build()));
@@ -87,7 +87,7 @@ public abstract class Scuffler extends Combatant {
 
         private RoleTrait2Info() {
             super("역할: 근접 - 2",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("적을 처치하면 <:WALK_SPEED_INCREASE:이동 속도>가 빨라집니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.WALK_SPEED_INCREASE, Format.PERCENT, SPEED)

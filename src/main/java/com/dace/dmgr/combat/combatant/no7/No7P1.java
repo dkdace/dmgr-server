@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class No7P1 extends AbstractSkill {
-    public No7P1(@NonNull CombatUser combatUser) {
-        super(combatUser, No7P1Info.getInstance(), No7P1Info.COOLDOWN, Timespan.MAX);
+public final class No7P1 extends PassiveSkill {
+    public No7P1(@NonNull CombatUser combatUser, @NonNull No7P1Info skillInfo) {
+        super(combatUser, skillInfo, No7P1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override
@@ -24,7 +24,7 @@ public final class No7P1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getTrait(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class No7P1 extends AbstractSkill {
         if (!combatUser.getDamageModule().isLowHealth())
             return;
 
-        No7T1 skillt1 = combatUser.getActionManager().getTrait(No7T1Info.getInstance());
+        No7T1 skillt1 = combatUser.getAbilityManager().getTrait(No7T1Info.getInstance());
         skillt1.addShield(No7P1Info.SHIELD - skillt1.getShield());
     }
 
@@ -62,6 +62,6 @@ public final class No7P1 extends AbstractSkill {
      */
     void onTick() {
         if (combatUser.getDamageModule().isLowHealth())
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 }

@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -13,8 +13,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class ArkaceA2 extends ActiveSkill {
-    public ArkaceA2(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceA2Info.getInstance(), ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION, 2);
+    public ArkaceA2(@NonNull CombatUser combatUser, @NonNull ArkaceA2Info skillInfo) {
+        super(combatUser, skillInfo, ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION, 2);
     }
 
     @Override

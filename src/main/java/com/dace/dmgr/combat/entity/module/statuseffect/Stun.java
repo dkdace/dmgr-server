@@ -30,7 +30,7 @@ public class Stun implements StatusEffect {
     @MustBeInvokedByOverriders
     public void onStart(@NonNull Damageable combatEntity) {
         if (combatEntity instanceof CombatUser)
-            ((CombatUser) combatEntity).getActionManager().cancelAction(attacker);
+            ((CombatUser) combatEntity).getAbilityManager().cancelAction(attacker);
     }
 
     @Override

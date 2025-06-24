@@ -33,6 +33,6 @@ public final class OnEntityShootBowEvent extends EventListener<EntityShootBowEve
         event.setCancelled(true);
 
         if (combatUser.getCombatantType() == CombatantType.CHED)
-            ((ChedWeapon) combatUser.getActionManager().getWeapon()).beforeShoot(event.getForce());
+            ((ChedWeapon) combatUser.getAbilityManager().getWeapon()).beforeShoot(event.getForce());
     }
 }

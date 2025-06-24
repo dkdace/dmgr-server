@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -35,8 +35,8 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 화염 상태 효과 */
     private final InfernoA2Burning burning;
 
-    public InfernoA2(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoA2Info.getInstance(), InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION, 1);
+    public InfernoA2(@NonNull CombatUser combatUser, @NonNull InfernoA2Info skillInfo) {
+        super(combatUser, skillInfo, InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION, 1);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", InfernoA2Info.ASSIST_SCORE);
         this.burning = new InfernoA2Burning();

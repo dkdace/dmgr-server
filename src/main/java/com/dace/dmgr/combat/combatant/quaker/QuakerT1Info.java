@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import lombok.Getter;
 
 public final class QuakerT1Info extends TraitInfo {
@@ -14,7 +14,7 @@ public final class QuakerT1Info extends TraitInfo {
 
     private QuakerT1Info() {
         super("불굴",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간이 감소합니다.")
                         .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
                         .build()));

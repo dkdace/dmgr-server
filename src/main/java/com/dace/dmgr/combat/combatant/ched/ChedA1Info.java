@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -41,19 +41,19 @@ public final class ChedA1Info extends ActiveSkillInfo<ChedA1> {
 
     private ChedA1Info() {
         super(ChedA1.class, "불화살",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("충전 없이 <3::불화살>을 속사할 수 있습니다.")
                         .addValueInfo(TextIcon.COOLDOWN, Format.TIME_WITH_MAX_STACK, STACK_COOLDOWN.toSeconds(), MAX_STACK)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
-                        new ActionInfoLore.NamedSection("불화살", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("불화살", AbilityInfoLore.Section
                                 .builder("불화살을 발사하여 <:DAMAGE:피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("발사", ActionKey.RIGHT_CLICK)
                                 .build()),
-                        new ActionInfoLore.NamedSection("불화살: 전탄 사용/재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("불화살: 전탄 사용/재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1)
                                 .build())));

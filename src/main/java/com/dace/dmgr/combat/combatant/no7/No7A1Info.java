@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -46,7 +46,7 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
 
     private No7A1Info() {
         super(No7A1.class, "돌파",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("일정 시간동안 돌진하여 적과 부딪히면 <:DAMAGE:피해>를 입히고 <:KNOCKBACK:밀쳐내며>, <e:HEAL:보호막>을 얻습니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.DAMAGE, DAMAGE)
@@ -54,7 +54,7 @@ public final class No7A1Info extends ActiveSkillInfo<No7A1> {
                         .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, SIZE)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1)
                         .build(),
-                        new ActionInfoLore.NamedSection("지속시간 종료/재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("지속시간 종료/재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1)

@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -24,8 +24,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class ArkaceA1 extends ActiveSkill {
-    public ArkaceA1(@NonNull CombatUser combatUser) {
-        super(combatUser, ArkaceA1Info.getInstance(), ArkaceA1Info.COOLDOWN, Timespan.MAX, 1);
+    public ArkaceA1(@NonNull CombatUser combatUser, @NonNull ArkaceA1Info skillInfo) {
+        super(combatUser, skillInfo, ArkaceA1Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class ArkaceA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(ArkaceA1Info.GLOBAL_COOLDOWN);
 
         addActionTask(new IntervalTask(i -> {

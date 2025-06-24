@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -29,8 +29,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     @NonNull
     private final ReloadModule reloadModule;
 
-    JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponL mainWeapon) {
-        super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
+    JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponInfo weaponInfo, @NonNull JagerWeaponL mainWeapon) {
+        super(combatUser, weaponInfo, JagerWeaponInfo.COOLDOWN);
 
         this.mainWeapon = mainWeapon;
         this.reloadModule = new ReloadModule(this, JagerWeaponInfo.Scope.CAPACITY, Timespan.ZERO);
@@ -50,7 +50,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
         return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 

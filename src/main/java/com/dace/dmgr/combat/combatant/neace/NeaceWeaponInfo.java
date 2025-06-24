@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -34,18 +34,18 @@ public final class NeaceWeaponInfo extends WeaponInfo<NeaceWeapon> {
 
     private NeaceWeaponInfo() {
         super(NeaceWeapon.class, Resource.DEFAULT, "이중성",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("적을 공격하거나 아군을 치유할 수 있는 완드입니다.")
                         .addActionKeyInfo("마법 구체", ActionKey.LEFT_CLICK)
                         .addActionKeyInfo("치유 광선", ActionKey.RIGHT_CLICK)
                         .build(),
-                        new ActionInfoLore.NamedSection("마법 구체", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("마법 구체", AbilityInfoLore.Section
                                 .builder("마법 구체를 발사하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, DAMAGE)
                                 .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME, COOLDOWN.toSeconds())
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build()),
-                        new ActionInfoLore.NamedSection("치유 광선", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("치유 광선", AbilityInfoLore.Section
                                 .builder("바라보는 아군에게 치유 광선을 고정하여 지속적으로 <:HEAL:치유>합니다.")
                                 .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, Heal.HEAL_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, Heal.MAX_DISTANCE)

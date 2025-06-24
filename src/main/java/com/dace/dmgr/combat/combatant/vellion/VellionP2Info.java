@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import lombok.Getter;
 
 public final class VellionP2Info extends PassiveSkillInfo<VellionP2> {
@@ -13,7 +13,7 @@ public final class VellionP2Info extends PassiveSkillInfo<VellionP2> {
 
     private VellionP2Info() {
         super(VellionP2.class, "마력 흡수",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("적에게 피해를 입히면 <:HEAL:회복>합니다.")
                         .addValueInfo(TextIcon.HEAL, "피해량의 {0}%", (int) (100 * HEAL_DAMAGE_RATIO))
                         .build()));

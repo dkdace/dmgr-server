@@ -2,13 +2,13 @@ package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.AimModule;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.Aimable;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.AimModule;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -41,8 +41,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     /** 사용 후 쿨타임 진행 여부 */
     private boolean isActionCooldown = true;
 
-    public PalasWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasWeaponInfo.getInstance(), PalasWeaponInfo.COOLDOWN);
+    public PalasWeapon(@NonNull CombatUser combatUser, @NonNull PalasWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, PalasWeaponInfo.COOLDOWN);
 
         this.reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
         this.aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
@@ -56,7 +56,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
         return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
@@ -257,7 +257,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                    combatUser.getActionManager().getSkill(PalasP1Info.getInstance()).use((Healable) target, PalasWeaponInfo.HEAL);
+                    combatUser.getAbilityManager().getSkill(PalasP1Info.getInstance()).use((Healable) target, PalasWeaponInfo.HEAL);
 
                     ((Healable) target).getHealModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 

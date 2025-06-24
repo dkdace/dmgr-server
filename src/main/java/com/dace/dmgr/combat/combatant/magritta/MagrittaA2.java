@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Invulnerable;
@@ -20,8 +20,8 @@ public final class MagrittaA2 extends ActiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(MagrittaA2Info.SPEED);
 
-    public MagrittaA2(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaA2Info.getInstance(), MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION, 1);
+    public MagrittaA2(@NonNull CombatUser combatUser, @NonNull MagrittaA2Info skillInfo) {
+        super(combatUser, skillInfo, MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION, 1);
     }
 
     @Override
@@ -41,7 +41,7 @@ public final class MagrittaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -52,7 +52,7 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getStatusEffectModule().apply(Invulnerable.getInstance(), MagrittaA2Info.DURATION);
         combatUser.getMoveModule().setJumpStrength(3);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -69,7 +69,7 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getMoveModule().setJumpStrength(0);
 
-        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
+        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.setVisible(true);
         weapon.getReloadModule().resetRemainingAmmo();
 

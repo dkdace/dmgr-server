@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.interaction;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.Action;
+import com.dace.dmgr.combat.ability.Action;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;

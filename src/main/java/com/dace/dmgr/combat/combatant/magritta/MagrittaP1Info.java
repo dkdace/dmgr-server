@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import lombok.Getter;
 
 public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
@@ -20,7 +20,7 @@ public final class MagrittaP1Info extends PassiveSkillInfo<MagrittaP1> {
 
     private MagrittaP1Info() {
         super(MagrittaP1.class, "방화광",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("근처에 <:FIRE:불>타는 적이 존재하면 <:HEAL:회복>합니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                         .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)

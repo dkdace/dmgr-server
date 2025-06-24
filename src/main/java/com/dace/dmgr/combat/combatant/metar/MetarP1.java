@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
@@ -13,14 +13,14 @@ import lombok.NonNull;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class MetarP1 extends AbstractSkill {
+public final class MetarP1 extends PassiveSkill {
     /** 중기갑 */
     private double heavyArmor = MetarP1Info.MAX;
     /** 수정자 */
     private final Modifier modifier = new Modifier(MetarP1Info.KNOCKBACK_RESISTANCE_INCREMENT * heavyArmor);
 
-    public MetarP1(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+    public MetarP1(@NonNull CombatUser combatUser, @NonNull MetarP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
         addOnReset(() -> heavyArmor = MetarP1Info.MAX);
     }
 
@@ -75,7 +75,7 @@ public final class MetarP1 extends AbstractSkill {
      */
     void onTick() {
         addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
-        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 
     /**

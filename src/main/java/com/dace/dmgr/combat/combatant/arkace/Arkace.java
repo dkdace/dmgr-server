@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.arkace;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -112,7 +112,7 @@ public final class Arkace extends Marksman {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getActionManager().getSkill(ArkaceP1Info.getInstance()).onTick();
+        combatUser.getAbilityManager().getSkill(ArkaceP1Info.getInstance()).onTick();
     }
 
     @Override

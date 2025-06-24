@@ -2,12 +2,12 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.Trait;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.DynamicTraitInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.Trait;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -57,14 +57,14 @@ public abstract class Controller extends Combatant {
                             combatUser.setGlowing(targetCombatEntity, Timespan.ofTicks(10));
                     });
 
-        combatUser.getActionManager().getTrait(RoleTrait2Info.instance).onUse();
+        combatUser.getAbilityManager().getTrait(RoleTrait2Info.instance).onUse();
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getActionManager().getTrait(RoleTrait2Info.instance).lastDamageTimestamp = Timestamp.now();
+        victim.getAbilityManager().getTrait(RoleTrait2Info.instance).lastDamageTimestamp = Timestamp.now();
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class Controller extends Combatant {
 
         private RoleTrait1Info() {
             super("역할: 제어 - 1",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("치명상인 아군 근처의 적을 탐지합니다.")
                             .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
                             .build()));
@@ -104,7 +104,7 @@ public abstract class Controller extends Combatant {
 
         private RoleTrait2Info() {
             super(RoleTrait2.class, "역할: 제어 - 2",
-                    new ActionInfoLore(ActionInfoLore.Section
+                    new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("일정 시간동안 피해를 받지 않으면 <:HEAL:회복>합니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, ACTIVATE_DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, Format.PER_SECOND, HEAL_PER_SECOND)
@@ -119,8 +119,8 @@ public abstract class Controller extends Combatant {
         /** 마지막 피격 시점 */
         private Timestamp lastDamageTimestamp = Timestamp.now();
 
-        public RoleTrait2(@NonNull CombatUser combatUser) {
-            super(combatUser, RoleTrait2Info.instance);
+        public RoleTrait2(@NonNull CombatUser combatUser, @NonNull RoleTrait2Info traitInfo) {
+            super(combatUser, traitInfo);
         }
 
         private void onUse() {

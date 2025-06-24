@@ -2,18 +2,18 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.Targeted;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.skill.module.TargetModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.Targeted;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
@@ -52,8 +52,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     @Getter(AccessLevel.PACKAGE)
     private boolean isEnabled = false;
 
-    public VellionA2(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA2Info.getInstance(), VellionA2Info.COOLDOWN, Timespan.MAX, 1);
+    public VellionA2(@NonNull CombatUser combatUser, @NonNull VellionA2Info skillInfo) {
+        super(combatUser, skillInfo, VellionA2Info.COOLDOWN, Timespan.MAX, 1);
 
         this.targetModule = new TargetModule<>(this, VellionA2Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);
@@ -78,9 +78,9 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && !actionManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && !abilityManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override

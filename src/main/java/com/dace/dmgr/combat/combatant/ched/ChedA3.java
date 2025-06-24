@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -30,8 +30,8 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     @NonNull
     private final BonusScoreModule bonusScoreModule;
 
-    public ChedA3(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedA3Info.getInstance(), ChedA3Info.COOLDOWN, Timespan.MAX, 2);
+    public ChedA3(@NonNull CombatUser combatUser, @NonNull ChedA3Info skillInfo) {
+        super(combatUser, skillInfo, ChedA3Info.COOLDOWN, Timespan.MAX, 2);
         this.bonusScoreModule = new BonusScoreModule(this, "탐지 보너스", ChedA3Info.KILL_SCORE);
     }
 
@@ -43,7 +43,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -54,7 +54,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
+        ChedWeapon weapon = (ChedWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 

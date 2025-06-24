@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Poison;
@@ -45,8 +45,8 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     /** 독 상태 효과 */
     private final Poison poison;
 
-    public VellionA1(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionA1Info.getInstance(), VellionA1Info.COOLDOWN, Timespan.MAX, 0);
+    public VellionA1(@NonNull CombatUser combatUser, @NonNull VellionA1Info skillInfo) {
+        super(combatUser, skillInfo, VellionA1Info.COOLDOWN, Timespan.MAX, 0);
 
         this.entityModule = new EntityModule<>(this);
         this.heal = new VellionA1Heal();
@@ -61,9 +61,9 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && isDurationFinished() && !actionManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

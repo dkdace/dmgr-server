@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -19,8 +19,8 @@ public final class SiliaWeapon extends AbstractWeapon {
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    public SiliaWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaWeaponInfo.getInstance(), SiliaWeaponInfo.COOLDOWN);
+    public SiliaWeapon(@NonNull CombatUser combatUser, @NonNull SiliaWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, SiliaWeaponInfo.COOLDOWN);
     }
 
     @Override
@@ -31,14 +31,14 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         isOpposite = !isOpposite;
 
-        if (!combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
+        if (!combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
             setCooldown();
             combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(10), MainHand.RIGHT);
 
@@ -47,7 +47,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             SiliaWeaponInfo.Effects.USE.play(combatUser.getLocation());
         }
 
-        combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).cancel();
     }
 
     @Override

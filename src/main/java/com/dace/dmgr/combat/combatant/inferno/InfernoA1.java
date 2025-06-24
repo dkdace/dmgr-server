@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -22,8 +22,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class InfernoA1 extends ActiveSkill {
-    public InfernoA1(@NonNull CombatUser combatUser) {
-        super(combatUser, InfernoA1Info.getInstance(), InfernoA1Info.COOLDOWN, Timespan.MAX, 0);
+    public InfernoA1(@NonNull CombatUser combatUser, @NonNull InfernoA1Info skillInfo) {
+        super(combatUser, skillInfo, InfernoA1Info.COOLDOWN, Timespan.MAX, 0);
     }
 
     @Override
@@ -41,7 +41,7 @@ public final class InfernoA1 extends ActiveSkill {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(InfernoA1Info.GLOBAL_COOLDOWN);
 
         Location location = combatUser.getLocation();
@@ -77,7 +77,7 @@ public final class InfernoA1 extends ActiveSkill {
 
     @Override
     protected void onCancelled() {
-        if (combatUser.getActionManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+        if (combatUser.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
             setDuration(Timespan.ZERO);
         else
             setCooldown(getDefaultCooldown().minus(InfernoUltInfo.A1_COOLDOWN_DECREMENT));

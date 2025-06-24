@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -30,8 +30,8 @@ public final class QuakerA3 extends ActiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-100);
 
-    public QuakerA3(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA3Info.getInstance(), QuakerA3Info.COOLDOWN, Timespan.MAX, 2);
+    public QuakerA3(@NonNull CombatUser combatUser, @NonNull QuakerA3Info skillInfo) {
+        super(combatUser, skillInfo, QuakerA3Info.COOLDOWN, Timespan.MAX, 2);
     }
 
     @Override
@@ -42,7 +42,7 @@ public final class QuakerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class QuakerA3 extends ActiveSkill {
         combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-7, Timespan.ofTicks(12), MainHand.RIGHT);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -78,7 +78,7 @@ public final class QuakerA3 extends ActiveSkill {
         setDuration(Timespan.ZERO);
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     private final class QuakerA3Projectile extends Projectile<Damageable> {

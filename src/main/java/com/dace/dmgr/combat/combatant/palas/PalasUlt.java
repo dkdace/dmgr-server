@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.Targeted;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.TargetModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.Targeted;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -26,8 +26,8 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
     @NonNull
     private final TargetModule<Healable> targetModule;
 
-    public PalasUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasUltInfo.getInstance(), Timespan.MAX, PalasUltInfo.COST);
+    public PalasUlt(@NonNull CombatUser combatUser, @NonNull PalasUltInfo skillInfo) {
+        super(combatUser, skillInfo, Timespan.MAX, PalasUltInfo.COST);
         this.targetModule = new TargetModule<>(this, PalasUltInfo.MAX_DISTANCE);
     }
 
@@ -41,7 +41,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
         super.onUse(actionKey);
 
         setCooldown();
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         Healable target = targetModule.getCurrentTarget();
         target.getStatusEffectModule().remove(PalasA2.PalasA2Immune.instance);

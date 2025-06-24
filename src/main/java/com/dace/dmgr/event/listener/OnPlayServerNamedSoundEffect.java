@@ -49,7 +49,7 @@ public final class OnPlayServerNamedSoundEffect extends PacketEventListener<Wrap
         if (target != null) {
             CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(target));
             return targetCombatUser != null && targetCombatUser.getCombatantType() == CombatantType.SILIA
-                    && !targetCombatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished()
+                    && !targetCombatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished()
                     && sound.toString().endsWith("_STEP") && soundCategory == EnumWrappers.SoundCategory.PLAYERS;
         }
 

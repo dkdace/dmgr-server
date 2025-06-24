@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -44,18 +44,18 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
 
     private QuakerA1Info() {
         super(QuakerA1.class, "불굴의 방패",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("커다란 <3::방패>를 펼쳐 전방의 공격을 방어합니다. " +
                                 "사용 중에는 <:WALK_SPEED_DECREASE:이동 속도>가 느려집니다.")
                         .addValueInfo(TextIcon.WALK_SPEED_DECREASE, Format.PERCENT, USE_SLOW)
                         .addActionKeyInfo("사용", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)
                         .build(),
-                        new ActionInfoLore.NamedSection("방패", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("방패", AbilityInfoLore.Section
                                 .builder("공격을 막는 방벽입니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME + " (파괴 시)", COOLDOWN_DEATH.toSeconds())
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)
                                 .build()),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_1, ActionKey.RIGHT_CLICK)

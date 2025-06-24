@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.DistantTimespan;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
@@ -43,19 +43,19 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
 
     private InfernoWeaponInfo() {
         super(InfernoWeapon.class, Resource.DEFAULT, "파이어스톰",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("근거리에 화염을 흩뿌리거나 화염탄을 발사할 수 있는 화염방사기입니다.")
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)
                         .addActionKeyInfo("방사", ActionKey.RIGHT_CLICK)
                         .addActionKeyInfo("화염탄", ActionKey.LEFT_CLICK)
                         .build(),
-                        new ActionInfoLore.NamedSection("방사", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("방사", AbilityInfoLore.Section
                                 .builder("근거리에 화염을 방사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.PER_SECOND, DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.FIRE, Format.TIME_WITH_PER_SECOND, FIRE_DURATION.toSeconds(), FIRE_DAMAGE_PER_SECOND)
                                 .addValueInfo(TextIcon.DISTANCE, Format.DISTANCE, DISTANCE)
                                 .build()),
-                        new ActionInfoLore.NamedSection("화염탄", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("화염탄", AbilityInfoLore.Section
                                 .builder("폭발하는 화염 구체를 발사하여 <:DAMAGE:광역 피해>와 <:FIRE:화염 피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE + " (폭발)", Fireball.DAMAGE_EXPLODE, Fireball.DAMAGE_EXPLODE / 2)
                                 .addValueInfo(TextIcon.DAMAGE, Fireball.DAMAGE_DIRECT + " (직격)")

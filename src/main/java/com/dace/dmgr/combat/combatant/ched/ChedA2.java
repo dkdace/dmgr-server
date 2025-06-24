@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class ChedA2 extends ActiveSkill {
-    public ChedA2(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedA2Info.getInstance(), ChedA2Info.COOLDOWN, Timespan.MAX, 1);
+    public ChedA2(@NonNull CombatUser combatUser, @NonNull ChedA2Info skillInfo) {
+        super(combatUser, skillInfo, ChedA2Info.COOLDOWN, Timespan.MAX, 1);
     }
 
     @Override
@@ -27,7 +27,7 @@ public final class ChedA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(ChedP1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance()).isDurationFinished();
     }
 
     @Override

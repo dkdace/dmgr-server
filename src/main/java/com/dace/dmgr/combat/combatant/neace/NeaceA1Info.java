@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -37,7 +37,7 @@ public final class NeaceA1Info extends ActiveSkillInfo<NeaceA1> {
 
     private NeaceA1Info() {
         super(NeaceA1.class, "구원의 표식",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("바라보는 아군에게 표식을 남겨 일정 시간동안 <:HEAL:치유>합니다. " +
                                 "이미 표식이 있는 아군에게 사용할 수 없으며, 치유량이 최대치에 도달하거나 지속 시간이 지나면 사라집니다. " +
                                 "기본 무기로 치유하고 있는 대상은 치유할 수 없습니다.")

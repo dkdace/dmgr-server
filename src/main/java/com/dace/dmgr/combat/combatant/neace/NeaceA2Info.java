@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -38,18 +38,18 @@ public final class NeaceA2Info extends ActiveSkillInfo<NeaceA2> {
 
     private NeaceA2Info() {
         super(NeaceA2.class, "축복",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("일정 시간동안 기본 무기의 치유 대상을 <3::축복>할 수 있습니다. " +
                                 "사용 중에는 기본 무기로 치유할 수 없습니다.")
                         .addValueInfo(TextIcon.DURATION, Format.TIME_WITH_MAX_TIME, MAX_DURATION.toSeconds(), RECOVER_DURATION.toSeconds())
                         .addActionKeyInfo("사용", ActionKey.SLOT_2)
                         .build(),
-                        new ActionInfoLore.NamedSection("축복", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("축복", AbilityInfoLore.Section
                                 .builder("<:DAMAGE_INCREASE:공격력>과 <:DEFENSE_INCREASE:방어력>이 증가합니다.")
                                 .addValueInfo(TextIcon.DAMAGE_INCREASE, Format.PERCENT, DAMAGE_INCREMENT)
                                 .addValueInfo(TextIcon.DEFENSE_INCREASE, Format.PERCENT, DEFENSE_INCREMENT)
                                 .build()),
-                        new ActionInfoLore.NamedSection("재사용 시", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("재사용 시", AbilityInfoLore.Section
                                 .builder("사용을 종료합니다.")
                                 .addValueInfo(TextIcon.COOLDOWN, Format.TIME, COOLDOWN.toSeconds())
                                 .addActionKeyInfo("해제", ActionKey.SLOT_2)

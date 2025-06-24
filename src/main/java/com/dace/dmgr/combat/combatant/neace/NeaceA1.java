@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Targeted;
-import com.dace.dmgr.combat.action.skill.module.TargetModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Targeted;
+import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
@@ -23,8 +23,8 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     @NonNull
     private final TargetModule<Healable> targetModule;
 
-    public NeaceA1(@NonNull CombatUser combatUser) {
-        super(combatUser, NeaceA1Info.getInstance(), NeaceA1Info.COOLDOWN, Timespan.MAX, 0);
+    public NeaceA1(@NonNull CombatUser combatUser, @NonNull NeaceA1Info skillInfo) {
+        super(combatUser, skillInfo, NeaceA1Info.COOLDOWN, Timespan.MAX, 0);
         this.targetModule = new TargetModule<>(this, NeaceA1Info.MAX_DISTANCE);
     }
 
@@ -92,7 +92,7 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
             }
 
             if (!(combatEntity instanceof Healable) || combatEntity.getDamageModule().isFullHealth()
-                    || ((NeaceWeapon) combatUser.getActionManager().getWeapon()).isHealing((Healable) combatEntity))
+                    || ((NeaceWeapon) combatUser.getAbilityManager().getWeapon()).isHealing((Healable) combatEntity))
                 return;
 
             double amount = NeaceA1Info.HEAL_PER_SECOND / 20.0;

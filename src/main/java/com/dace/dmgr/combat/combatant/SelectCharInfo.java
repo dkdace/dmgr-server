@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.PlayerSkin;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfo;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfo;
 import com.dace.dmgr.item.ChestGUI;
 import com.dace.dmgr.item.DefinedItem;
 import com.dace.dmgr.item.GUIItem;
@@ -49,43 +49,43 @@ public final class SelectCharInfo extends ChestGUI {
         set(0, 5, combatant.getWeaponInfo().getDefinedItem());
 
         set(2, 2, SelectCharInfoItem.TRAIT.definedItem);
-        displayActions(2, SelectCharInfoItem.TRAIT, combatant);
+        displayAbilities(2, SelectCharInfoItem.TRAIT, combatant);
         set(3, 2, SelectCharInfoItem.PASSIVE_SKILL.definedItem);
-        displayActions(3, SelectCharInfoItem.PASSIVE_SKILL, combatant);
+        displayAbilities(3, SelectCharInfoItem.PASSIVE_SKILL, combatant);
         set(4, 2, SelectCharInfoItem.ACTIVE_SKILL.definedItem);
-        displayActions(4, SelectCharInfoItem.ACTIVE_SKILL, combatant);
+        displayAbilities(4, SelectCharInfoItem.ACTIVE_SKILL, combatant);
 
         set(5, 8, new GUIItem.Previous(SelectChar::new));
     }
 
     /**
-     * 지정한 동작 종류에 해당하는 모든 동작 정보를 표시한다.
+     * 지정한 능력 종류에 해당하는 모든 능력 정보를 표시한다.
      *
-     * @param row        행 번호
-     * @param actionType 동작 종류
-     * @param combatant  전투원
+     * @param row         행 번호
+     * @param abilityType 능력 종류
+     * @param combatant   전투원
      */
-    private void displayActions(int row, @NonNull SelectCharInfoItem actionType, @NonNull Combatant combatant) {
-        ActionInfo[] actionInfos;
-        switch (actionType) {
+    private void displayAbilities(int row, @NonNull SelectCharInfoItem abilityType, @NonNull Combatant combatant) {
+        AbilityInfo[] abilityInfos;
+        switch (abilityType) {
             case TRAIT:
-                actionInfos = combatant.getTraitInfos();
+                abilityInfos = combatant.getTraitInfos();
                 break;
             case PASSIVE_SKILL:
-                actionInfos = combatant.getPassiveSkillInfos();
+                abilityInfos = combatant.getPassiveSkillInfos();
                 break;
             case ACTIVE_SKILL:
-                actionInfos = combatant.getActiveSkillInfos();
+                abilityInfos = combatant.getActiveSkillInfos();
                 break;
             default:
                 return;
         }
 
         for (int i = 0; i < 4; i++)
-            if (i > actionInfos.length - 1)
+            if (i > abilityInfos.length - 1)
                 remove(row, i + 3);
             else
-                set(row, i + 3, actionInfos[i].getDefinedItem());
+                set(row, i + 3, abilityInfos[i].getDefinedItem());
     }
 
     /**

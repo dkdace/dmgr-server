@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -16,9 +16,9 @@ import org.bukkit.block.Block;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class No7P2 extends AbstractSkill {
-    public No7P2(@NonNull CombatUser combatUser) {
-        super(combatUser, No7P2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+public final class No7P2 extends PassiveSkill {
+    public No7P2(@NonNull CombatUser combatUser, @NonNull No7P2Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -29,7 +29,7 @@ public final class No7P2 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getTrait(No7T1Info.getInstance()).getShield() > 0;
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() > 0;
     }
 
     @Override
@@ -49,7 +49,7 @@ public final class No7P2 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_2);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_2);
     }
 
     private final class No7P2Area extends Area<Damageable> {
@@ -64,7 +64,7 @@ public final class No7P2 extends AbstractSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            double power = combatUser.getActionManager().getTrait(No7T1Info.getInstance()).getShield() / No7T1Info.MAX_SHIELD;
+            double power = combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() / No7T1Info.MAX_SHIELD;
             double damage = (No7P2Info.MIN_DAMAGE_PER_SECOND + power * (No7P2Info.MAX_DAMAGE_PER_SECOND - No7P2Info.MIN_DAMAGE_PER_SECOND)) * 5 / 20.0;
 
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);

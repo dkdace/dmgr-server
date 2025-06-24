@@ -3,10 +3,10 @@ package com.dace.dmgr.combat.combatant.jager;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -38,8 +38,8 @@ public final class JagerA3 extends ActiveSkill {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public JagerA3(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerA3Info.getInstance(), JagerA3Info.COOLDOWN, Timespan.MAX, 2);
+    public JagerA3(@NonNull CombatUser combatUser, @NonNull JagerA3Info skillInfo) {
+        super(combatUser, skillInfo, JagerA3Info.COOLDOWN, Timespan.MAX, 2);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getActionManager().getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && !combatUser.getAbilityManager().getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -79,7 +79,7 @@ public final class JagerA3 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -113,7 +113,7 @@ public final class JagerA3 extends ActiveSkill {
         isEnabled = false;
 
         setDuration(Timespan.ZERO);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -122,7 +122,7 @@ public final class JagerA3 extends ActiveSkill {
     private void onThrow() {
         forceCancel();
 
-        combatUser.getActionManager().getWeapon().setCooldown(Timespan.ofTicks(2));
+        combatUser.getAbilityManager().getWeapon().setCooldown(Timespan.ofTicks(2));
 
         Location loc = combatUser.getArmLocation(MainHand.RIGHT);
         new JagerA3Projectile().shot(loc);
@@ -235,7 +235,7 @@ public final class JagerA3 extends ActiveSkill {
                 if (JagerT1Util.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
-                    combatUser.getActionManager().getSkill(JagerP1Info.getInstance()).use(target);
+                    combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(target);
 
                     if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);

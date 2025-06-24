@@ -6,11 +6,11 @@ import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.Action;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.SkillInfo;
-import com.dace.dmgr.combat.action.info.WeaponInfo;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.Action;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.SkillInfo;
+import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.silia.SiliaA3Info;
@@ -138,10 +138,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private final CombatantType combatantType;
     /** 선택한 전투원 */
     private final Combatant combatant;
-    /** 동작 관리 인스턴스 */
+    /** 능력 관리 인스턴스 */
     @NonNull
     @Getter
-    private final ActionManager actionManager;
+    private final AbilityManager abilityManager;
     /** 코어 관리 인스턴스 */
     @NonNull
     @Getter
@@ -231,7 +231,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.knockbackModule = new KnockbackModule(this);
 
         this.coreManager = new CoreManager(this);
-        this.actionManager = new ActionManager(this);
+        this.abilityManager = new AbilityManager(this);
 
         onInit();
     }
@@ -310,7 +310,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             deathMentHologram.remove();
 
         coreManager.clear();
-        actionManager.remove();
+        abilityManager.remove();
 
         reset();
     }
@@ -419,7 +419,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             footstepDistance += oldLoc.distance(loc);
             if (!entity.isOnGround() || footstepDistance <= 1.6 || combatantType == CombatantType.SILIA
-                    && !actionManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+                    && !abilityManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
                 return;
 
             footstepDistance = 0;
@@ -623,7 +623,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void onKillGoalTarget(@NonNull Damageable victim, double contributionScore) {
         addScore("결정타", FINAL_HIT_SCORE);
 
-        actionManager.handleBonusScoreSkill(victim, contributionScore);
+        abilityManager.handleBonusScoreSkill(victim, contributionScore);
 
         if (killStreakTimeLimitTimestamp.isBefore(Timestamp.now()))
             killStreak = 0;
@@ -635,8 +635,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim instanceof CombatUser) {
             CombatUser combatUserVictim = (CombatUser) victim;
 
-            if (!(combatUserVictim.getActionManager().getSkill(combatUserVictim.combatant.getUltimateSkillInfo()).isDurationFinished()))
-                addScore("궁극기 차단", ActionManager.ULT_BLOCK_SCORE);
+            if (!(combatUserVictim.getAbilityManager().getSkill(combatUserVictim.combatant.getUltimateSkillInfo()).isDurationFinished()))
+                addScore("궁극기 차단", AbilityManager.ULT_BLOCK_SCORE);
 
             sendPlayerKillMent(combatUserVictim);
             combatUserVictim.sendPlayerDeathMent(this);
@@ -661,7 +661,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         int score = victim.killContributorManager.getScore(this);
         addScore(MessageFormat.format("§e{0}§f 처치 도움", victim.getName()), score);
 
-        actionManager.handleBonusScoreSkill(victim, contributionScore);
+        abilityManager.handleBonusScoreSkill(victim, contributionScore);
 
         playKillEffect();
 
@@ -716,7 +716,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         damageModule.setHealth(damageModule.getMaxHealth());
         damageModule.clearShields();
         selfHarmDamage = 0;
-        actionManager.cancelAction(null);
+        abilityManager.cancelAction(null);
 
         if (gameUser != null)
             gameUser.onDeath();
@@ -784,7 +784,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
             isDead = false;
 
             statusEffectModule.clear();
-            actionManager.reset();
+            abilityManager.reset();
             entity.setGameMode(GameMode.SURVIVAL);
 
             if (deathMentHologram != null) {
@@ -864,7 +864,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         int cooldownTicks = (int) Math.min(Integer.MAX_VALUE, cooldown.toTicks());
         entity.setCooldown(SkillInfo.MATERIAL, cooldownTicks);
-        if (cooldown.compareTo(actionManager.getWeapon().getCooldown()) > 0)
+        if (cooldown.compareTo(abilityManager.getWeapon().getCooldown()) > 0)
             entity.setCooldown(WeaponInfo.MATERIAL, cooldownTicks);
     }
 
@@ -936,7 +936,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (value == 1) {
             value = 0.999;
-            UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
+            UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
             if (!skill.isCooldownFinished())
                 skill.setCooldown(Timespan.ZERO);
         }
@@ -952,7 +952,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGaugePercent(double value) {
-        UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
+        UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
         if (skill.isDurationFinished())
             setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
@@ -964,7 +964,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGauge(double value) {
-        UltimateSkill skill = actionManager.getSkill(combatant.getUltimateSkillInfo());
+        UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
         int cost = skill.getCost();
         if (coreManager.has(Core.ULTIMATE))
             cost = (int) (cost * (100 - Core.ULTIMATE.getValue()) / 100.0);

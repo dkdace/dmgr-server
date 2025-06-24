@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -18,8 +18,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public final class VellionWeapon extends AbstractWeapon {
-    public VellionWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionWeaponInfo.getInstance(), VellionWeaponInfo.COOLDOWN);
+    public VellionWeapon(@NonNull CombatUser combatUser, @NonNull VellionWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, VellionWeaponInfo.COOLDOWN);
     }
 
     @Override
@@ -30,9 +30,9 @@ public final class VellionWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && !actionManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && !abilityManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

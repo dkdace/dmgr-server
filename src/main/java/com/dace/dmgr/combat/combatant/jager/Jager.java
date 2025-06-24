@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.jager;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Marksman;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -113,19 +113,19 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return !((JagerWeaponL) combatUser.getActionManager().getWeapon()).getAimModule().isAiming();
+        return !((JagerWeaponL) combatUser.getAbilityManager().getWeapon()).getAimModule().isAiming();
     }
 
     @Override
     public boolean canChargeUlt(@NonNull CombatUser combatUser) {
-        return combatUser.getActionManager().getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
+        return combatUser.getAbilityManager().getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
     }
 
     @Override

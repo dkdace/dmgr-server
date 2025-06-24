@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -29,8 +29,8 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public MagrittaUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaUltInfo.getInstance(), MagrittaUltInfo.DURATION, MagrittaUltInfo.COST);
+    public MagrittaUlt(@NonNull CombatUser combatUser, @NonNull MagrittaUltInfo skillInfo) {
+        super(combatUser, skillInfo, MagrittaUltInfo.DURATION, MagrittaUltInfo.COST);
         this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", MagrittaUltInfo.KILL_SCORE);
     }
 
@@ -45,7 +45,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(MagrittaA2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(MagrittaA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(MagrittaUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getActionManager().getWeapon();
+        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 
@@ -102,7 +102,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
      * 사용 종료 시 실행할 작업.
      */
     private void onEnd() {
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         Timespan weaponCooldown = weapon.getDefaultCooldown().multiply(2);
 
         weapon.setCooldown(weaponCooldown);

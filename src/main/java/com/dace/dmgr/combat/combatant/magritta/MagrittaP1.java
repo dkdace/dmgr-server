@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class MagrittaP1 extends AbstractSkill {
+public final class MagrittaP1 extends PassiveSkill {
     /** 활성화 가능 여부 */
     private boolean canActivate = false;
 
-    public MagrittaP1(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaP1Info.getInstance(), Timespan.ZERO, MagrittaP1Info.DURATION);
+    public MagrittaP1(@NonNull CombatUser combatUser, @NonNull MagrittaP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, MagrittaP1Info.DURATION);
     }
 
     @Override
@@ -89,7 +89,7 @@ public final class MagrittaP1 extends AbstractSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 
     private final class MagrittaP1Area extends Area<Damageable> {

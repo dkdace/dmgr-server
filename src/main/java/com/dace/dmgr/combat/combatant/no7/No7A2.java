@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.combat.interaction.Bullet;
@@ -28,8 +28,8 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     @NonNull
     private final EntityModule<No7A2Entity> entityModule;
 
-    public No7A2(@NonNull CombatUser combatUser) {
-        super(combatUser, No7A2Info.getInstance(), No7A2Info.COOLDOWN, No7A2Info.DURATION, 1);
+    public No7A2(@NonNull CombatUser combatUser, @NonNull No7A2Info skillInfo) {
+        super(combatUser, skillInfo, No7A2Info.COOLDOWN, No7A2Info.DURATION, 1);
         this.entityModule = new EntityModule<>(this);
     }
 
@@ -50,9 +50,9 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && actionManager.getSkill(No7A1Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(No7A3Info.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && abilityManager.getSkill(No7A1Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -65,7 +65,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
         setDuration();
 
         combatUser.setGlobalCooldown(Timespan.ofTicks(1));
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         Location loc = combatUser.getLocation();
         entityModule.set(new No7A2Entity(loc));

@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ChargeableSkill;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -32,8 +32,8 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     @NonNull
     private final EntityModule<QuakerA1Entity> entityModule;
 
-    public QuakerA1(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA1Info.getInstance(), QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH, 0);
+    public QuakerA1(@NonNull CombatUser combatUser, @NonNull QuakerA1Info skillInfo) {
+        super(combatUser, skillInfo, QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH, 0);
         this.entityModule = new EntityModule<>(this);
     }
 
@@ -66,7 +66,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         if (!isDurationFinished()) {
             cancel();

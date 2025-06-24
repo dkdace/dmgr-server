@@ -2,15 +2,15 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.info.*;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.info.*;
+import com.dace.dmgr.combat.ability.weapon.Swappable;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.Healer;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -287,8 +287,8 @@ public abstract class Combatant {
     public final String getActionBarString(@NonNull CombatUser combatUser) {
         StringJoiner text = new StringJoiner("    ");
 
-        ActionManager actionManager = combatUser.getActionManager();
-        Weapon weapon = actionManager.getWeapon();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        Weapon weapon = abilityManager.getWeapon();
         ActionBarDisplay weaponDisplay = weapon.getActionBarDisplay();
         if (weaponDisplay != null) {
             text.add(weaponDisplay.toString());
@@ -304,7 +304,7 @@ public abstract class Combatant {
         }
 
         for (SkillInfo<?> skillInfo : getSkillInfos()) {
-            ActionBarDisplay actionBarDisplay = actionManager.getSkill(skillInfo).getActionBarDisplay();
+            ActionBarDisplay actionBarDisplay = abilityManager.getSkill(skillInfo).getActionBarDisplay();
             if (actionBarDisplay != null)
                 text.add(actionBarDisplay.toString());
         }

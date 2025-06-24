@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ChargeableSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.DelayTask;
@@ -19,8 +19,8 @@ public final class SiliaA3 extends ChargeableSkill {
     /** 누적 피해 */
     private double damageSum = 0;
 
-    public SiliaA3(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaA3Info.getInstance(), SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
+    public SiliaA3(@NonNull CombatUser combatUser, @NonNull SiliaA3Info skillInfo) {
+        super(combatUser, skillInfo, SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds(), 2);
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class SiliaA3 extends ChargeableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class SiliaA3 extends ChargeableSkill {
         }, this::cancel, 1));
 
         addActionTask(new DelayTask(() -> {
-            combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(true);
+            combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).setStrike(true);
             SiliaA3Info.Effects.STRIKE_ACTIVATE.play(combatUser.getEntity());
         }, SiliaA3Info.ACTIVATE_DURATION.toTicks()));
     }
@@ -94,7 +94,7 @@ public final class SiliaA3 extends ChargeableSkill {
         combatUser.getMoveModule().removeModifier(MODIFIER);
         damageSum = 0;
 
-        combatUser.getActionManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
+        combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
 
         SiliaA3Info.Effects.OFF.play(combatUser.getLocation());
     }

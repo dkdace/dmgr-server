@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -30,8 +30,8 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     @NonNull
     private final BonusScoreModule bonusScoreModule;
 
-    public PalasA3(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA3Info.getInstance(), PalasA3Info.COOLDOWN, Timespan.MAX, 2);
+    public PalasA3(@NonNull CombatUser combatUser, @NonNull PalasA3Info skillInfo) {
+        super(combatUser, skillInfo, PalasA3Info.COOLDOWN, Timespan.MAX, 2);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA3Info.ASSIST_SCORE);
     }
 
@@ -50,7 +50,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(PalasA3Info.READY_DURATION);
 
         PalasA3Info.Effects.USE.play(combatUser.getLocation());

@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -115,24 +115,24 @@ public final class Magritta extends Scuffler {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getActionManager().getSkill(MagrittaP1Info.getInstance()).onTick(i);
+        combatUser.getAbilityManager().getSkill(MagrittaP1Info.getInstance()).onTick(i);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getActionManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

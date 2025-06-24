@@ -6,7 +6,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -226,7 +225,7 @@ public final class AsyncTask<T> extends Task {
         private static final SyncExecutor instance = new SyncExecutor();
 
         @Override
-        public void execute(@NotNull Runnable command) {
+        public void execute(@NonNull Runnable command) {
             new BukkitRunnable() {
                 @Override
                 public void run() {

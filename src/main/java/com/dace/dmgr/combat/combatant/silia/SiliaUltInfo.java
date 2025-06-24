@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -38,7 +38,7 @@ public final class SiliaUltInfo extends UltimateSkillInfo<SiliaUlt> {
 
     private SiliaUltInfo() {
         super(SiliaUlt.class, "폭풍의 부름",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("일정 시간동안 <:WALK_SPEED_INCREASE:이동 속도>가 빨라지고 기본 공격 시 <d::일격>을 날립니다. " +
                                 "적 처치 시 <7:DURATION:지속 시간>이 늘어나며, 사용 중에는 <d::진권풍>, <d::폭풍전야>를 사용할 수 없습니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)

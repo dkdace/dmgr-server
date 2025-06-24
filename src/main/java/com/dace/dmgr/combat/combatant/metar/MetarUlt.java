@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -27,8 +27,8 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
     @NonNull
     private final BonusScoreModule bonusScoreModule;
 
-    public MetarUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarUltInfo.getInstance(), Timespan.MAX, MetarUltInfo.COST);
+    public MetarUlt(@NonNull CombatUser combatUser, @NonNull MetarUltInfo skillInfo) {
+        super(combatUser, skillInfo, Timespan.MAX, MetarUltInfo.COST);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", MetarUltInfo.ASSIST_SCORE);
     }
 
@@ -43,7 +43,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MetarUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 

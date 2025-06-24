@@ -2,13 +2,13 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.FullAuto;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.module.FullAutoModule;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.FullAuto;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -43,8 +43,8 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
     /** 발사 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
-    public MetarWeapon(@NonNull CombatUser combatUser) {
-        super(combatUser, MetarWeaponInfo.getInstance(), Timespan.ZERO);
+    public MetarWeapon(@NonNull CombatUser combatUser, @NonNull MetarWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, Timespan.ZERO);
 
         this.reloadModule = new ReloadModule(this, MetarWeaponInfo.CAPACITY, MetarWeaponInfo.RELOAD_DURATION);
         this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, MetarWeaponInfo.FIRE_RATE);

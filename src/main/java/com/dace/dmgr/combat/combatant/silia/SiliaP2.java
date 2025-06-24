@@ -1,9 +1,9 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -16,12 +16,12 @@ import org.bukkit.util.Vector;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class SiliaP2 extends AbstractSkill {
+public final class SiliaP2 extends PassiveSkill {
     /** 벽타기 남은 횟수 */
     private int wallRideCount = SiliaP2Info.USE_COUNT;
 
-    public SiliaP2(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaP2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+    public SiliaP2(@NonNull CombatUser combatUser, @NonNull SiliaP2Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -62,8 +62,8 @@ public final class SiliaP2 extends AbstractSkill {
 
         combatUser.addYawAndPitch(0, 0);
 
-        ActionManager actionManager = combatUser.getActionManager();
-        actionManager.getWeapon().setVisible(false);
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        abilityManager.getWeapon().setVisible(false);
 
         double distance = combatUser.getEntity().getEyeLocation().distance(combatUser.getEntity().getTargetBlock(null, 1).getLocation());
         if (distance < 1)
@@ -78,7 +78,7 @@ public final class SiliaP2 extends AbstractSkill {
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
-            if (actionManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+            if (abilityManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
                 SiliaP2Info.Effects.USE.play(combatUser.getLocation());
             else
                 SiliaP2Info.Effects.USE_A3.play(combatUser.getLocation());
@@ -103,7 +103,7 @@ public final class SiliaP2 extends AbstractSkill {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
 
         addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> wallRideCount = SiliaP2Info.USE_COUNT, 1));
     }

@@ -1,0 +1,240 @@
+package com.dace.dmgr.combat.ability;
+
+import com.dace.dmgr.Timespan;
+import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.ability.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.util.task.IntervalTask;
+import com.dace.dmgr.util.task.Task;
+import com.dace.dmgr.util.task.TaskManager;
+import lombok.Getter;
+import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+
+/**
+ * {@link Action}의 기본 구현체, 모든 동작(무기, 스킬)의 기반 클래스.
+ *
+ * @see AbstractWeapon
+ * @see AbstractSkill
+ */
+public abstract class AbstractAction extends AbstractAbility implements Action {
+    /** 기본 쿨타임 */
+    @NonNull
+    @Getter
+    protected final Timespan defaultCooldown;
+    /** 태스크 관리 인스턴스 */
+    private final TaskManager taskManager = new TaskManager();
+    /** 동작 태스크 관리 인스턴스 */
+    private final TaskManager actionTaskManager = new TaskManager();
+    /** 초기화 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onResets = new ArrayList<>();
+    /** 제거 시 실행할 작업 목록 */
+    private final ArrayList<Runnable> onRemoves = new ArrayList<>();
+
+    /** 틱 작업을 처리하는 태스크 */
+    @Nullable
+    private IntervalTask onTickTask;
+    /** 쿨타임 타임스탬프 */
+    private Timestamp cooldownTimestamp = Timestamp.now();
+    /** 제거 여부 */
+    private boolean isRemoved = false;
+
+    /**
+     * 동작 인스턴스를 생성한다.
+     *
+     * @param combatUser      사용자 플레이어
+     * @param name            이름
+     * @param defaultCooldown 기본 쿨타임
+     */
+    protected AbstractAction(@NonNull CombatUser combatUser, @NonNull String name, @NonNull Timespan defaultCooldown) {
+        super(combatUser, name);
+        this.defaultCooldown = defaultCooldown;
+    }
+
+    /**
+     * 쿨타임({@link Action#getCooldown()})을 무시하는 사용 키 목록을 반환한다.
+     *
+     * @return 쿨타임 무시 사용 키 목록
+     * @implSpec {@link Collections#emptySet()}
+     */
+    @NonNull
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public final void addActionTask(@NonNull Task task) {
+        if (!isRemoved)
+            actionTaskManager.add(task);
+    }
+
+    @Override
+    public final void addTask(@NonNull Task task) {
+        if (!isRemoved)
+            taskManager.add(task);
+    }
+
+    @Override
+    public final void addOnReset(@NonNull Runnable onReset) {
+        if (!isRemoved)
+            onResets.add(onReset);
+    }
+
+    @Override
+    public final void addOnRemove(@NonNull Runnable onRemove) {
+        if (!isRemoved)
+            onRemoves.add(onRemove);
+    }
+
+    @Override
+    @NonNull
+    public final Timespan getCooldown() {
+        return Timestamp.now().until(cooldownTimestamp);
+    }
+
+    @Override
+    public final void setCooldown(@NonNull Timespan cooldown) {
+        if (isCooldownFinished()) {
+            cooldownTimestamp = Timestamp.now().plus(cooldown);
+            onCooldownSet();
+
+            if (!cooldown.isZero())
+                runCooldown();
+
+            return;
+        }
+
+        cooldownTimestamp = Timestamp.now().plus(cooldown);
+        if (cooldown.isZero())
+            stopCooldown();
+    }
+
+    @Override
+    public final void setCooldown() {
+        setCooldown(defaultCooldown);
+    }
+
+    @Override
+    public final void addCooldown(@NonNull Timespan cooldown) {
+        setCooldown(getCooldown().plus(cooldown));
+    }
+
+    /**
+     * 동작의 쿨타임 태스크를 실행한다.
+     */
+    private void runCooldown() {
+        if (onTickTask != null)
+            return;
+
+        onTickTask = new IntervalTask(i -> {
+            if (isCooldownFinished()) {
+                stopCooldown();
+                return false;
+            }
+
+            return true;
+        }, 1);
+
+        addTask(onTickTask);
+    }
+
+    /**
+     * 동작의 쿨타임 태스크를 종료한다.
+     */
+    private void stopCooldown() {
+        if (onTickTask == null)
+            return;
+
+        onTickTask.stop();
+        onTickTask = null;
+        onCooldownFinished();
+    }
+
+    /**
+     * 쿨타임을 설정했을 때 실행할 작업.
+     */
+    protected void onCooldownSet() {
+        // 미사용
+    }
+
+    /**
+     * 쿨타임이 끝났을 때 실행할 작업.
+     */
+    protected void onCooldownFinished() {
+        // 미사용
+    }
+
+    @Override
+    public final boolean isCooldownFinished() {
+        return cooldownTimestamp.isBefore(Timestamp.now());
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    public boolean canUse(@NonNull ActionKey actionKey) {
+        return (getCooldownIgnoreActionKeys().contains(actionKey) || isCooldownFinished())
+                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
+    }
+
+    @Override
+    public final boolean cancel() {
+        if (!isCancellable())
+            return false;
+
+        actionTaskManager.stop();
+        onCancelled();
+
+        return true;
+    }
+
+    /**
+     * 취소 가능 조건 ({@link Action#isCancellable()})을 무시하고 동작 사용을 강제로 취소시킨다.
+     */
+    protected final void forceCancel() {
+        actionTaskManager.stop();
+        onCancelled();
+    }
+
+    /**
+     * 동작 사용이 취소되었을 때 실행할 작업.
+     */
+    protected void onCancelled() {
+        // 미사용
+    }
+
+    @Override
+    public final void reset() {
+        setCooldown(defaultCooldown);
+
+        for (Runnable onReset : onResets) {
+            onReset.run();
+
+            if (isRemoved) {
+                onResets.clear();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public final void remove() {
+        Validate.validState(!isRemoved, "Action이 이미 제거됨");
+
+        reset();
+        onRemoves.forEach(Runnable::run);
+        onRemoves.clear();
+
+        actionTaskManager.stop();
+        taskManager.stop();
+
+        isRemoved = true;
+    }
+}

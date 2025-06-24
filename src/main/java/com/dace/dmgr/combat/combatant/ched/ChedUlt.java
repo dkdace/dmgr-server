@@ -1,12 +1,12 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.Summonable;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.skill.module.EntityModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -46,8 +46,8 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     /** 화염 상태 효과 */
     private final Burning burning;
 
-    public ChedUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedUltInfo.getInstance(), Timespan.MAX, ChedUltInfo.COST);
+    public ChedUlt(@NonNull CombatUser combatUser, @NonNull ChedUltInfo skillInfo) {
+        super(combatUser, skillInfo, Timespan.MAX, ChedUltInfo.COST);
 
         this.entityModule = new EntityModule<>(this);
         this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
@@ -56,7 +56,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getActionManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -69,7 +69,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getActionManager().getWeapon();
+        ChedWeapon weapon = (ChedWeapon) combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 

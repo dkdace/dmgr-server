@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.TextIcon;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.ActionInfoLore.Section.Format;
-import com.dace.dmgr.combat.action.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
+import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -54,12 +54,12 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
 
     private JagerUltInfo() {
         super(JagerUlt.class, "백야의 눈폭풍",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("<3::눈폭풍 발생기>를 던져 긴 시간동안 눈폭풍을 일으킵니다.")
                         .addValueInfo(TextIcon.ULTIMATE, COST)
                         .addActionKeyInfo("사용", ActionKey.SLOT_4)
                         .build(),
-                        new ActionInfoLore.NamedSection("눈폭풍 발생기", ActionInfoLore.Section
+                        new AbilityInfoLore.NamedSection("눈폭풍 발생기", AbilityInfoLore.Section
                                 .builder("일정 시간동안 <:DAMAGE:광역 피해>와 <5:WALK_SPEED_DECREASE:> <d::빙결>을 입히는 눈폭풍을 일으킵니다. " +
                                         "눈폭풍의 범위는 시간에 따라 점차 넓어집니다.")
                                 .addValueInfo(TextIcon.HEALTH, HEALTH)

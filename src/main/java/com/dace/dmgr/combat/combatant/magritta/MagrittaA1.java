@@ -1,13 +1,13 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -30,8 +30,8 @@ public final class MagrittaA1 extends ActiveSkill {
     /** 화염 상태 효과 */
     private final Burning burning;
 
-    public MagrittaA1(@NonNull CombatUser combatUser) {
-        super(combatUser, MagrittaA1Info.getInstance(), MagrittaA1Info.COOLDOWN, Timespan.MAX, 0);
+    public MagrittaA1(@NonNull CombatUser combatUser, @NonNull MagrittaA1Info skillInfo) {
+        super(combatUser, skillInfo, MagrittaA1Info.COOLDOWN, Timespan.MAX, 0);
         this.burning = new Burning(combatUser, MagrittaA1Info.FIRE_DAMAGE_PER_SECOND, true);
     }
 
@@ -43,16 +43,16 @@ public final class MagrittaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && actionManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && actionManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         setDuration();
 
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(MagrittaA1Info.READY_DURATION);
 
         MagrittaA1Info.Effects.USE.play(combatUser.getLocation());

@@ -2,7 +2,7 @@ package com.dace.dmgr.game;
 
 import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.PlayerSkin;
-import com.dace.dmgr.combat.action.TextIcon;
+import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.user.LobbyTabListProfile;
 import com.dace.dmgr.user.TabListProfile;
 import com.keenant.tabbed.util.Skins;

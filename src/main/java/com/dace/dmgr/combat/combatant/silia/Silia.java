@@ -1,15 +1,15 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Scuffler;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -131,7 +131,7 @@ public final class Silia extends Scuffler {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getActionManager().getSkill(SiliaA3Info.getInstance()).onDamage(damage);
+        victim.getAbilityManager().getSkill(SiliaA3Info.getInstance()).onDamage(damage);
     }
 
     @Override
@@ -141,14 +141,14 @@ public final class Silia extends Scuffler {
         if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributionElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
             attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
 
-        ActionManager actionManager = attacker.getActionManager();
-        actionManager.getSkill(SiliaA1Info.getInstance()).onKill(victim);
-        actionManager.getSkill(SiliaUltInfo.getInstance()).onKill(victim, contributionScore);
+        AbilityManager abilityManager = attacker.getAbilityManager();
+        abilityManager.getSkill(SiliaA1Info.getInstance()).onKill(victim);
+        abilityManager.getSkill(SiliaUltInfo.getInstance()).onKill(victim, contributionScore);
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        SiliaP1 skillp1 = combatUser.getActionManager().getSkill(SiliaP1Info.getInstance());
+        SiliaP1 skillp1 = combatUser.getAbilityManager().getSkill(SiliaP1Info.getInstance());
         return skillp1.canUse(ActionKey.SPACE);
     }
 

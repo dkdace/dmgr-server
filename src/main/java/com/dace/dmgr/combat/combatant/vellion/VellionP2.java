@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
@@ -10,12 +10,12 @@ import lombok.NonNull;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class VellionP2 extends AbstractSkill {
+public final class VellionP2 extends PassiveSkill {
     /** 최근 피해량 */
     private double damageAmount;
 
-    public VellionP2(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionP2Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+    public VellionP2(@NonNull CombatUser combatUser, @NonNull VellionP2Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -45,6 +45,6 @@ public final class VellionP2 extends AbstractSkill {
             return;
 
         damageAmount = damage;
-        combatUser.getActionManager().useAction(ActionKey.PERIODIC_1);
+        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
     }
 }

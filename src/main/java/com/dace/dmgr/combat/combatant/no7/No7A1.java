@@ -2,9 +2,9 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 public final class No7A1 extends ActiveSkill {
-    public No7A1(@NonNull CombatUser combatUser) {
-        super(combatUser, No7A1Info.getInstance(), No7A1Info.COOLDOWN, No7A1Info.DURATION, 0);
+    public No7A1(@NonNull CombatUser combatUser, @NonNull No7A1Info skillInfo) {
+        super(combatUser, skillInfo, No7A1Info.COOLDOWN, No7A1Info.DURATION, 0);
     }
 
     @Override
@@ -42,7 +42,7 @@ public final class No7A1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getActionManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class No7A1 extends ActiveSkill {
         }
 
         setDuration();
-        combatUser.getActionManager().getWeapon().cancel();
+        combatUser.getAbilityManager().getWeapon().cancel();
 
         HashMap<Damageable, Timestamp> targets = new HashMap<>();
 
@@ -110,7 +110,7 @@ public final class No7A1 extends ActiveSkill {
                     targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
 
                     if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        combatUser.getActionManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
+                        combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
 
                         if (target instanceof Movable)
                             ((Movable) target).getKnockbackModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));

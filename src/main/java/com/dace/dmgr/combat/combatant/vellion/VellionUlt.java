@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.UltimateSkill;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.UltimateSkill;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -38,8 +38,8 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     /** 활성화 완료 여부 */
     private boolean isEnabled = false;
 
-    public VellionUlt(@NonNull CombatUser combatUser) {
-        super(combatUser, VellionUltInfo.getInstance(), VellionUltInfo.DURATION, VellionUltInfo.COST);
+    public VellionUlt(@NonNull CombatUser combatUser, @NonNull VellionUltInfo skillInfo) {
+        super(combatUser, skillInfo, VellionUltInfo.DURATION, VellionUltInfo.COST);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionUltInfo.ASSIST_SCORE);
         this.stun = new Stun(combatUser);
@@ -57,7 +57,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && isDurationFinished()
-                && !combatUser.getActionManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+                && !combatUser.getAbilityManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -69,7 +69,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        combatUser.getActionManager().getSkill(VellionP1Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getSkill(VellionP1Info.getInstance()).cancel();
 
         VellionUltInfo.Effects.USE.play(combatUser.getLocation());
 

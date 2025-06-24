@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.silia;
 
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.info.ActionInfoLore;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -19,7 +19,7 @@ public final class SiliaP2Info extends PassiveSkillInfo<SiliaP2> {
 
     private SiliaP2Info() {
         super(SiliaP2.class, "상승 기류 - 2",
-                new ActionInfoLore(ActionInfoLore.Section
+                new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("벽을 클릭하여 벽을 오를 수 있습니다.")
                         .addActionKeyInfo("사용", ActionKey.LEFT_CLICK)
                         .build()));

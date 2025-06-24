@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.combatant.no7;
 
-import com.dace.dmgr.combat.action.Trait;
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.DamageModule;
 import lombok.NonNull;
@@ -9,8 +9,8 @@ public final class No7T1 extends Trait {
     /** 보호막 */
     private final DamageModule.Shield shield;
 
-    public No7T1(@NonNull CombatUser combatUser) {
-        super(combatUser, No7T1Info.getInstance());
+    public No7T1(@NonNull CombatUser combatUser, @NonNull No7T1Info traitInfo) {
+        super(combatUser, traitInfo);
         this.shield = combatUser.getDamageModule().createShield(0);
     }
 

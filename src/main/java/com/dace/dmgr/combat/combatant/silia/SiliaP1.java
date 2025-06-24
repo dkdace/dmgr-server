@@ -1,8 +1,8 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -13,9 +13,9 @@ import org.bukkit.util.Vector;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class SiliaP1 extends AbstractSkill {
-    public SiliaP1(@NonNull CombatUser combatUser) {
-        super(combatUser, SiliaP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+public final class SiliaP1 extends PassiveSkill {
+    public SiliaP1(@NonNull CombatUser combatUser, @NonNull SiliaP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -26,7 +26,7 @@ public final class SiliaP1 extends AbstractSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -34,7 +34,7 @@ public final class SiliaP1 extends AbstractSkill {
         setDuration();
 
         Location location = combatUser.getLocation();
-        if (combatUser.getActionManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+        if (combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished())
             SiliaP1Info.Effects.USE.play(location);
         else
             SiliaP1Info.Effects.USE_A3.play(location);

@@ -1,18 +1,18 @@
 package com.dace.dmgr.combat.combatant.jager;
 
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.weapon.AbstractWeapon;
-import com.dace.dmgr.combat.action.weapon.Aimable;
-import com.dace.dmgr.combat.action.weapon.Reloadable;
-import com.dace.dmgr.combat.action.weapon.Swappable;
-import com.dace.dmgr.combat.action.weapon.module.AimModule;
-import com.dace.dmgr.combat.action.weapon.module.ReloadModule;
-import com.dace.dmgr.combat.action.weapon.module.SwapModule;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
+import com.dace.dmgr.combat.ability.weapon.Aimable;
+import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.Swappable;
+import com.dace.dmgr.combat.ability.weapon.module.AimModule;
+import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
+import com.dace.dmgr.combat.ability.weapon.module.SwapModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -39,11 +39,11 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @NonNull
     private final AimModule aimModule;
 
-    public JagerWeaponL(@NonNull CombatUser combatUser) {
-        super(combatUser, JagerWeaponInfo.getInstance(), JagerWeaponInfo.COOLDOWN);
+    public JagerWeaponL(@NonNull CombatUser combatUser, @NonNull JagerWeaponInfo weaponInfo) {
+        super(combatUser, weaponInfo, JagerWeaponInfo.COOLDOWN);
 
         this.reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
-        this.swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, this), JagerWeaponInfo.SWAP_DURATION);
+        this.swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, weaponInfo, this), JagerWeaponInfo.SWAP_DURATION);
         this.aimModule = new AimModule(this, JagerWeaponInfo.Scope.ZOOM_LEVEL);
 
         addOnReset(() -> swapModule.getSubweapon().getReloadModule().resetRemainingAmmo());
@@ -57,7 +57,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
         return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
     }
 
@@ -69,9 +69,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return super.canUse(actionKey) && !actionManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && actionManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return super.canUse(actionKey) && !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override

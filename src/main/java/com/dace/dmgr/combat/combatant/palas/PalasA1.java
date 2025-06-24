@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -29,8 +29,8 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     /** 기절 상태 효과 */
     private final PalasA1Stun stun;
 
-    public PalasA1(@NonNull CombatUser combatUser) {
-        super(combatUser, PalasA1Info.getInstance(), PalasA1Info.COOLDOWN, Timespan.MAX, 0);
+    public PalasA1(@NonNull CombatUser combatUser, @NonNull PalasA1Info skillInfo) {
+        super(combatUser, skillInfo, PalasA1Info.COOLDOWN, Timespan.MAX, 0);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA1Info.ASSIST_SCORE);
         this.stun = new PalasA1Stun();
@@ -52,7 +52,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
         setDuration();
         combatUser.setGlobalCooldown(PalasA1Info.GLOBAL_COOLDOWN);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -76,7 +76,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     @Override

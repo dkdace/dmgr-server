@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.ActiveSkill;
-import com.dace.dmgr.combat.action.skill.HasBonusScore;
-import com.dace.dmgr.combat.action.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.action.weapon.Weapon;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.ActiveSkill;
+import com.dace.dmgr.combat.ability.skill.HasBonusScore;
+import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -45,8 +45,8 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     /** 기절 상태 효과 */
     private final Stun stun;
 
-    public QuakerA2(@NonNull CombatUser combatUser) {
-        super(combatUser, QuakerA2Info.getInstance(), QuakerA2Info.COOLDOWN, Timespan.MAX, 1);
+    public QuakerA2(@NonNull CombatUser combatUser, @NonNull QuakerA2Info skillInfo) {
+        super(combatUser, skillInfo, QuakerA2Info.COOLDOWN, Timespan.MAX, 1);
 
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerA2Info.ASSIST_SCORE);
         this.stun = new Stun(combatUser);
@@ -60,7 +60,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getActionManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         combatUser.getMoveModule().addModifier(MODIFIER);
         combatUser.playMeleeAttackAnimation(-10, Timespan.ofTicks(15), MainHand.RIGHT);
 
-        Weapon weapon = combatUser.getActionManager().getWeapon();
+        Weapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
 
@@ -117,7 +117,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         combatUser.resetGlobalCooldown();
         combatUser.getMoveModule().removeModifier(MODIFIER);
 
-        combatUser.getActionManager().getWeapon().setVisible(true);
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     @Override

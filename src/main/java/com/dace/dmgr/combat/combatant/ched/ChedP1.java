@@ -1,10 +1,10 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.action.ActionBarDisplay;
-import com.dace.dmgr.combat.action.ActionKey;
-import com.dace.dmgr.combat.action.skill.AbstractSkill;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.ability.ActionBarDisplay;
+import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.skill.PassiveSkill;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class ChedP1 extends AbstractSkill {
+public final class ChedP1 extends PassiveSkill {
     /** 벽타기 남은 횟수 */
     private int wallRideCount = ChedP1Info.USE_COUNT;
     /** 매달리기 남은 시간 (tick) */
@@ -29,8 +29,8 @@ public final class ChedP1 extends AbstractSkill {
     @Getter(AccessLevel.PACKAGE)
     private boolean isHanging = false;
 
-    public ChedP1(@NonNull CombatUser combatUser) {
-        super(combatUser, ChedP1Info.getInstance(), Timespan.ZERO, Timespan.MAX);
+    public ChedP1(@NonNull CombatUser combatUser, @NonNull ChedP1Info skillInfo) {
+        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
@@ -90,8 +90,8 @@ public final class ChedP1 extends AbstractSkill {
         setDuration();
         combatUser.addYawAndPitch(0, 0);
 
-        ActionManager actionManager = combatUser.getActionManager();
-        ChedWeapon weapon = (ChedWeapon) actionManager.getWeapon();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        ChedWeapon weapon = (ChedWeapon) abilityManager.getWeapon();
         weapon.setVisible(false);
 
         Location location = combatUser.getEntity().getEyeLocation();
@@ -115,8 +115,8 @@ public final class ChedP1 extends AbstractSkill {
 
             weapon.setCanShoot(false);
 
-            actionManager.getSkill(ChedA3Info.getInstance()).cancel();
-            actionManager.getSkill(ChedUltInfo.getInstance()).cancel();
+            abilityManager.getSkill(ChedA3Info.getInstance()).cancel();
+            abilityManager.getSkill(ChedUltInfo.getInstance()).cancel();
 
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);
@@ -159,7 +159,7 @@ public final class ChedP1 extends AbstractSkill {
             ChedP1Info.Effects.HANG_USE.play(combatUser.getLocation());
             ChedP1Info.Effects.HANG_OFF.play(combatUser.getLocation());
         } else
-            combatUser.getActionManager().getWeapon().setVisible(true);
+            combatUser.getAbilityManager().getWeapon().setVisible(true);
     }
 
     /**
@@ -200,6 +200,6 @@ public final class ChedP1 extends AbstractSkill {
         combatUser.getEntity().setGravity(!isHanging);
 
         if (!isDurationFinished())
-            combatUser.getActionManager().getWeapon().setVisible(isHanging);
+            combatUser.getAbilityManager().getWeapon().setVisible(isHanging);
     }
 }

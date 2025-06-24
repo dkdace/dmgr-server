@@ -1,11 +1,11 @@
 package com.dace.dmgr.combat.combatant.metar;
 
-import com.dace.dmgr.combat.action.info.ActiveSkillInfo;
-import com.dace.dmgr.combat.action.info.PassiveSkillInfo;
-import com.dace.dmgr.combat.action.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Guardian;
-import com.dace.dmgr.combat.entity.combatuser.ActionManager;
+import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -105,7 +105,7 @@ public final class Metar extends Guardian {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getActionManager().getSkill(MetarP1Info.getInstance()).onTick();
+        combatUser.getAbilityManager().getSkill(MetarP1Info.getInstance()).onTick();
     }
 
     @Override
@@ -115,13 +115,13 @@ public final class Metar extends Guardian {
 
     @Override
     public void onKnockbacked(@NonNull CombatUser victim, double speed) {
-        victim.getActionManager().getSkill(MetarP1Info.getInstance()).onKnockbacked(speed);
+        victim.getAbilityManager().getSkill(MetarP1Info.getInstance()).onKnockbacked(speed);
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        ActionManager actionManager = combatUser.getActionManager();
-        return ((MetarWeapon) actionManager.getWeapon()).canSprint() && actionManager.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        return ((MetarWeapon) abilityManager.getWeapon()).canSprint() && abilityManager.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
