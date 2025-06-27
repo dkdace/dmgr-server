@@ -77,7 +77,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
 
-                if (combatUser.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(1);
 
                 InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
@@ -94,7 +94,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
                 new InfernoWeaponLProjectile().shot();
 
-                if (combatUser.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).isDurationFinished())
+                if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished())
                     reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
                 InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);

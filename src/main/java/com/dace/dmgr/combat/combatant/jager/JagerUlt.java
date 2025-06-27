@@ -53,8 +53,8 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -248,7 +248,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(JagerUltEntity.this, JagerUltInfo.DAMAGE_PER_SECOND * 4 / 20.0, DamageType.NORMAL,
                         null, false, false))
-                    JagerT1Util.addValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
+                    JagerT1.addValue(target, JagerUltInfo.FREEZE_PER_SECOND * 4 / 20);
 
                 return true;
             }

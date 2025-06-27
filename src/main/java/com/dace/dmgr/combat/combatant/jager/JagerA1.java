@@ -85,7 +85,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -260,8 +260,7 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
         @Override
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
-
-            combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(victim);
+            combatUser.getAbilityManager().getAbility(JagerP1Info.getInstance()).use(victim);
 
             if (victim.isGoalTarget())
                 bonusScoreModule.addTarget(victim, JagerA1Info.KILL_SCORE_TIME_LIMIT);

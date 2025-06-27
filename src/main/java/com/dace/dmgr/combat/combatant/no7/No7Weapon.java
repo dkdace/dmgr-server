@@ -46,7 +46,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override

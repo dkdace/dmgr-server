@@ -41,7 +41,7 @@ public final class ArkaceUlt extends UltimateSkill implements HasBonusScore {
 
         setDuration();
 
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getAbilityManager().getWeapon();
+        ArkaceWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
     }

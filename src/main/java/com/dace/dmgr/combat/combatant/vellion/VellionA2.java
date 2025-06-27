@@ -79,8 +79,8 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && !abilityManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
+        return super.canUse(actionKey) && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override

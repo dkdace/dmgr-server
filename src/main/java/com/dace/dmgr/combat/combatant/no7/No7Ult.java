@@ -39,8 +39,8 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getSkill(No7A2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(No7A3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(No7A2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override

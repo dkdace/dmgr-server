@@ -16,6 +16,10 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 인페르노 클래스.
  *
@@ -117,7 +121,7 @@ public final class Inferno extends Vanguard {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getAbilityManager().getSkill(InfernoP1Info.getInstance()).onTick(i);
+        combatUser.getAbilityManager().getAbility(InfernoP1Info.getInstance()).onTick(i);
     }
 
     @Override
@@ -128,18 +132,18 @@ public final class Inferno extends Vanguard {
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).onDamage(damage, location);
+        victim.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).onDamage(damage, location);
     }
 
     @Override
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
         super.onKill(attacker, victim, contributionScore, isFinalHit);
-        attacker.getAbilityManager().getSkill(InfernoUltInfo.getInstance()).onKill(victim, contributionScore);
+        attacker.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).onKill(victim, contributionScore);
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getSkill(InfernoA1Info.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getAbility(InfernoA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -150,20 +154,20 @@ public final class Inferno extends Vanguard {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{InfernoP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(InfernoP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{InfernoA1Info.getInstance(), InfernoA2Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(InfernoA1Info.getInstance(), InfernoA2Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

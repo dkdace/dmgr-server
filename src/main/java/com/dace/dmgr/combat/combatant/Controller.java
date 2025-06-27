@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
-import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.CombatEntityRegistry;
@@ -17,6 +16,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 역할군이 '제어'인 전투원의 정보를 관리하는 클래스.
@@ -46,44 +48,34 @@ public abstract class Controller extends Combatant {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        if (i % 5 == 0)
-            CombatEntityRegistry.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
-                            .and(combatEntity -> combatEntity.isGoalTarget() && combatEntity.getDamageModule().isLowHealth()))
-                    .forEach(target -> {
-                        Damageable targetCombatEntity = CombatEntityRegistry.getNearCombatEntity(target.getLocation(), RoleTrait1Info.DETECT_RADIUS,
-                                EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
-
-                        if (targetCombatEntity != null)
-                            combatUser.setGlowing(targetCombatEntity, Timespan.ofTicks(10));
-                    });
-
-        combatUser.getAbilityManager().getTrait(RoleTrait2Info.instance).onUse();
+        combatUser.getAbilityManager().getAbility(RoleTrait1Info.instance).onTick(i);
+        combatUser.getAbilityManager().getAbility(RoleTrait2Info.instance).onTick();
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getAbilityManager().getTrait(RoleTrait2Info.instance).lastDamageTimestamp = Timestamp.now();
+        victim.getAbilityManager().getAbility(RoleTrait2Info.instance).onDamage();
     }
 
     @Override
     @NonNull
-    final TraitInfo @NonNull [] getDefaultTraitInfos() {
-        return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
+    final List<@NonNull TraitInfo<?>> getDefaultTraitInfos() {
+        return Arrays.asList(RoleTrait1Info.instance, RoleTrait2Info.instance);
     }
 
     /**
      * 특성 1번 정보 클래스.
      */
-    private static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo<RoleTrait1> {
         /** 감지 범위 (단위: 블록) */
         private static final int DETECT_RADIUS = 10;
 
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 제어 - 1",
+            super(RoleTrait1.class, "역할: 제어 - 1",
                     new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("치명상인 아군 근처의 적을 탐지합니다.")
                             .addValueInfo(TextIcon.RADIUS, Format.DISTANCE, DETECT_RADIUS)
@@ -92,9 +84,31 @@ public abstract class Controller extends Combatant {
     }
 
     /**
+     * 특성 1번 클래스.
+     */
+    private static final class RoleTrait1 extends Trait {
+        public RoleTrait1(@NonNull CombatUser combatUser, @NonNull RoleTrait1Info traitInfo) {
+            super(combatUser, traitInfo);
+        }
+
+        private void onTick(long i) {
+            if (i % 5 == 0)
+                CombatEntityRegistry.getCombatEntities(combatUser.getLocation().getWorld(), EntityCondition.team(combatUser).exclude(combatUser)
+                                .and(combatEntity -> combatEntity.isGoalTarget() && combatEntity.getDamageModule().isLowHealth()))
+                        .forEach(target -> {
+                            Damageable targetCombatEntity = CombatEntityRegistry.getNearCombatEntity(target.getLocation(),
+                                    RoleTrait1Info.DETECT_RADIUS, EntityCondition.enemy(combatUser).and(Damageable::isGoalTarget));
+
+                            if (targetCombatEntity != null)
+                                combatUser.setGlowing(targetCombatEntity, Timespan.ofTicks(10));
+                        });
+        }
+    }
+
+    /**
      * 특성 2번 정보 클래스.
      */
-    private static final class RoleTrait2Info extends DynamicTraitInfo<RoleTrait2> {
+    private static final class RoleTrait2Info extends TraitInfo<RoleTrait2> {
         /** 초당 치유량 */
         private static final int HEAL_PER_SECOND = 40;
         /** 활성화 시간 */
@@ -123,9 +137,13 @@ public abstract class Controller extends Combatant {
             super(combatUser, traitInfo);
         }
 
-        private void onUse() {
+        private void onTick() {
             if (lastDamageTimestamp.plus(RoleTrait2Info.ACTIVATE_DURATION).isBefore(Timestamp.now()))
                 combatUser.getHealModule().heal(combatUser, RoleTrait2Info.HEAL_PER_SECOND / 20.0, false);
+        }
+
+        private void onDamage() {
+            lastDamageTimestamp = Timestamp.now();
         }
     }
 }

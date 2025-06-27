@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
@@ -12,17 +13,14 @@ import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.LongConsumer;
 
 /**
  * 역할군이 '수호'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Guardian extends Combatant {
-    /** 넉백 저항 수정자 */
-    private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
-    /** 방어력 수정자 */
-    private static final Modifier DEFENSE_MODIFIER = new Modifier(RoleTrait1Info.DEFENSE);
-
     /**
      * 수호 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -46,29 +44,25 @@ public abstract class Guardian extends Combatant {
     @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
         super.onSet(combatUser);
-
-        combatUser.getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
-        combatUser.getDamageModule().addModifier(DEFENSE_MODIFIER);
+        combatUser.getAbilityManager().getAbility(RoleTrait1Info.instance).onSet();
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onUseHealPack(@NonNull CombatUser combatUser) {
-        combatUser.addTask(new IntervalTask((LongConsumer) i ->
-                combatUser.getHealModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION.toTicks(), false),
-                1, RoleTrait2Info.DURATION.toTicks()));
+        combatUser.getAbilityManager().getAbility(RoleTrait2Info.instance).onUseHealPack();
     }
 
     @Override
     @NonNull
-    final TraitInfo @NonNull [] getDefaultTraitInfos() {
-        return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
+    final List<@NonNull TraitInfo<?>> getDefaultTraitInfos() {
+        return Arrays.asList(RoleTrait1Info.instance, RoleTrait2Info.instance);
     }
 
     /**
      * 특성 1번 정보 클래스.
      */
-    private static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo<RoleTrait1> {
         /** 넉백 저항 */
         private static final int KNOCKBACK_RESISTANCE = 25;
         /** 방어력 */
@@ -77,7 +71,7 @@ public abstract class Guardian extends Combatant {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 수호 - 1",
+            super(RoleTrait1.class, "역할: 수호 - 1",
                     new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("받는 <:KNOCKBACK:밀쳐내기> 효과가 감소하며, 기본 <:DEFENSE_INCREASE:방어력>을 보유합니다.")
                             .addValueInfo(TextIcon.KNOCKBACK, Format.PERCENT, KNOCKBACK_RESISTANCE)
@@ -87,9 +81,28 @@ public abstract class Guardian extends Combatant {
     }
 
     /**
+     * 특성 1번 클래스.
+     */
+    private static final class RoleTrait1 extends Trait {
+        /** 넉백 저항 수정자 */
+        private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
+        /** 방어력 수정자 */
+        private static final Modifier DEFENSE_MODIFIER = new Modifier(RoleTrait1Info.DEFENSE);
+
+        public RoleTrait1(@NonNull CombatUser combatUser, @NonNull RoleTrait1Info traitInfo) {
+            super(combatUser, traitInfo);
+        }
+
+        private void onSet() {
+            combatUser.getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+            combatUser.getDamageModule().addModifier(DEFENSE_MODIFIER);
+        }
+    }
+
+    /**
      * 특성 2번 정보 클래스.
      */
-    private static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo<RoleTrait2> {
         /** 치유량 */
         private static final int HEAL = 300;
         /** 지속시간 */
@@ -98,12 +111,27 @@ public abstract class Guardian extends Combatant {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 수호 - 2",
+            super(RoleTrait2.class, "역할: 수호 - 2",
                     new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("힐 팩을 사용하면 일정 시간동안 추가로 <:HEAL:회복>합니다.")
                             .addValueInfo(TextIcon.DURATION, Format.TIME, DURATION.toSeconds())
                             .addValueInfo(TextIcon.HEAL, HEAL)
                             .build()));
+        }
+    }
+
+    /**
+     * 특성 2번 클래스.
+     */
+    private static final class RoleTrait2 extends Trait {
+        public RoleTrait2(@NonNull CombatUser combatUser, @NonNull RoleTrait2Info traitInfo) {
+            super(combatUser, traitInfo);
+        }
+
+        private void onUseHealPack() {
+            combatUser.addTask(new IntervalTask((LongConsumer) i ->
+                    combatUser.getHealModule().heal(combatUser, (double) RoleTrait2Info.HEAL / RoleTrait2Info.DURATION.toTicks(), false),
+                    1, RoleTrait2Info.DURATION.toTicks()));
         }
     }
 }

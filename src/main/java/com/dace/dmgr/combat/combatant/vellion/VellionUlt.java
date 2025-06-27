@@ -57,7 +57,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && isDurationFinished()
-                && !combatUser.getAbilityManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+                && !combatUser.getAbilityManager().getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -69,7 +69,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        combatUser.getAbilityManager().getSkill(VellionP1Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getAbility(VellionP1Info.getInstance()).cancel();
 
         VellionUltInfo.Effects.USE.play(combatUser.getLocation());
 

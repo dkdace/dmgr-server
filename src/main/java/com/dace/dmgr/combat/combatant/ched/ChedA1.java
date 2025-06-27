@@ -53,7 +53,7 @@ public final class ChedA1 extends StackableSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 

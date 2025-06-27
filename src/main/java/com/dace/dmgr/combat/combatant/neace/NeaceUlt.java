@@ -39,7 +39,8 @@ public final class NeaceUlt extends UltimateSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(NeaceA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getAbilityManager().getAbility(NeaceA3Info.getInstance()).isDurationFinished();
     }
 
     @Override

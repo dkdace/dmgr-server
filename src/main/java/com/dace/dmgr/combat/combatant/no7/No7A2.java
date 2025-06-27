@@ -51,8 +51,8 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getSkill(No7A1Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(No7A3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && abilityManager.getAbility(No7A1Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override

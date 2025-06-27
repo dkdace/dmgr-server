@@ -91,7 +91,7 @@ public final class ChedP1 extends PassiveSkill {
         combatUser.addYawAndPitch(0, 0);
 
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        ChedWeapon weapon = (ChedWeapon) abilityManager.getWeapon();
+        ChedWeapon weapon = abilityManager.getWeapon();
         weapon.setVisible(false);
 
         Location location = combatUser.getEntity().getEyeLocation();
@@ -115,8 +115,8 @@ public final class ChedP1 extends PassiveSkill {
 
             weapon.setCanShoot(false);
 
-            abilityManager.getSkill(ChedA3Info.getInstance()).cancel();
-            abilityManager.getSkill(ChedUltInfo.getInstance()).cancel();
+            abilityManager.getAbility(ChedA3Info.getInstance()).cancel();
+            abilityManager.getAbility(ChedUltInfo.getInstance()).cancel();
 
             combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
             combatUser.getEntity().setFallDistance(0);

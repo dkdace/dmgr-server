@@ -10,6 +10,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 인페르노 클래스.
  *
@@ -115,24 +119,24 @@ public final class Magritta extends Scuffler {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getAbilityManager().getSkill(MagrittaP1Info.getInstance()).onTick(i);
+        combatUser.getAbilityManager().getAbility(MagrittaP1Info.getInstance()).onTick(i);
     }
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -143,20 +147,20 @@ public final class Magritta extends Scuffler {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[]{MagrittaT1Info.getInstance()};
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.singletonList(MagrittaT1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{MagrittaP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(MagrittaP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{MagrittaA1Info.getInstance(), MagrittaA2Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(MagrittaA1Info.getInstance(), MagrittaA2Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

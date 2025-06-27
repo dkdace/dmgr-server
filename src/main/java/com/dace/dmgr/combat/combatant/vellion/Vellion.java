@@ -14,6 +14,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 벨리온 클래스.
  *
@@ -118,7 +122,7 @@ public final class Vellion extends Controller {
 
     @Override
     public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        attacker.getAbilityManager().getSkill(VellionP2Info.getInstance()).onAttack(victim, damage);
+        attacker.getAbilityManager().getAbility(VellionP2Info.getInstance()).onAttack(victim, damage);
     }
 
     @Override
@@ -129,7 +133,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return !combatUser.getAbilityManager().getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking();
+        return !combatUser.getAbilityManager().getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -140,19 +144,18 @@ public final class Vellion extends Controller {
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        VellionP1 skillp1 = abilityManager.getSkill(VellionP1Info.getInstance());
-
-        return skillp1.canUse(ActionKey.SPACE) && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(VellionP1Info.getInstance()).canUse(ActionKey.SPACE)
+                && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        VellionA2 skill2 = abilityManager.getSkill(VellionA2Info.getInstance());
+        VellionA2 skill2 = abilityManager.getAbility(VellionA2Info.getInstance());
 
-        return abilityManager.getSkill(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled())
-                && abilityManager.getSkill(VellionA3Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(VellionA1Info.getInstance()).isDurationFinished() && (skill2.isDurationFinished() || skill2.isEnabled())
+                && abilityManager.getAbility(VellionA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -163,20 +166,20 @@ public final class Vellion extends Controller {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{VellionP1Info.getInstance(), VellionP2Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Arrays.asList(VellionP1Info.getInstance(), VellionP2Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{VellionA1Info.getInstance(), VellionA2Info.getInstance(), VellionA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(VellionA1Info.getInstance(), VellionA2Info.getInstance(), VellionA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

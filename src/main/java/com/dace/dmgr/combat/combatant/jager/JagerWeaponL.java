@@ -70,8 +70,8 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -205,7 +205,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, JagerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true))
-                    JagerT1Util.addValue(target, JagerWeaponInfo.FREEZE);
+                    JagerT1.addValue(target, JagerWeaponInfo.FREEZE);
 
                 return false;
             };

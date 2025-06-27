@@ -1,10 +1,7 @@
 package com.dace.dmgr.combat.ability.info;
 
-import com.dace.dmgr.ConsoleLogger;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
-import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.item.ItemBuilder;
-import com.dace.dmgr.util.ReflectionUtil;
 import lombok.NonNull;
 import org.bukkit.Material;
 
@@ -13,13 +10,11 @@ import org.bukkit.Material;
  *
  * @param <T> {@link Weapon}을 상속받는 무기
  */
-public abstract class WeaponInfo<T extends Weapon> extends AbilityInfo {
+public abstract class WeaponInfo<T extends Weapon> extends AbilityInfo<T> {
     /** 무기 아이템 타입 */
     public static final Material MATERIAL = Material.DIAMOND_HOE;
     /** 무기 이름의 접두사 */
     private static final String PREFIX = "§7§l[기본무기] §f";
-    /** 무기 클래스 */
-    private final Class<T> weaponClass;
 
     /**
      * 무기 정보 인스턴스를 생성한다.
@@ -32,11 +27,10 @@ public abstract class WeaponInfo<T extends Weapon> extends AbilityInfo {
      */
     protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, @NonNull Material material, short resource, @NonNull String name,
                          @NonNull AbilityInfoLore abilityInfoLore) {
-        super(name, new ItemBuilder(material)
+        super(weaponClass, name, new ItemBuilder(material)
                 .setName(PREFIX + name)
                 .setDamage(resource)
                 .build(), abilityInfoLore);
-        this.weaponClass = weaponClass;
     }
 
     /**
@@ -49,35 +43,5 @@ public abstract class WeaponInfo<T extends Weapon> extends AbilityInfo {
      */
     protected WeaponInfo(@NonNull Class<@NonNull T> weaponClass, short resource, @NonNull String name, @NonNull AbilityInfoLore abilityInfoLore) {
         this(weaponClass, MATERIAL, resource, name, abilityInfoLore);
-    }
-
-    /**
-     * 무기 인스턴스를 생성하여 반환한다.
-     *
-     * <p>무기 클래스는 다음과 같이 {@link CombatUser}와 {@link WeaponInfo}를 인자로 받는 생성자를 가지는 형태로 구현해야 한다.</p>
-     *
-     * <p>Example:</p>
-     *
-     * <pre><code>
-     * public final class TestWeapon extends AbstractWeapon {
-     *     public TestWeapon(CombatUser combatUser, TestWeaponInfo weaponInfo) {
-     *         super(combatUser, weaponInfo, TestWeaponInfo.COOLDOWN);
-     *     }
-     * }
-     * </code></pre>
-     *
-     * @param combatUser 사용자 플레이어
-     * @return 무기 인스턴스
-     * @throws UnsupportedOperationException 해당 무기를 생성할 수 없으면 발생
-     */
-    @NonNull
-    public final T createWeapon(@NonNull CombatUser combatUser) {
-        try {
-            return ReflectionUtil.getConstructor(weaponClass, CombatUser.class, getClass()).newInstance(combatUser, this);
-        } catch (Exception ex) {
-            ConsoleLogger.severe("무기 인스턴스 생성 실패", ex);
-        }
-
-        throw new UnsupportedOperationException();
     }
 }

@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
-import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -15,7 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 
-public final class SiliaT2Info extends DynamicTraitInfo<SiliaT2> {
+public final class SiliaT2Info extends TraitInfo<SiliaT2> {
     /** 전역 쿨타임 */
     public static final Timespan GLOBAL_COOLDOWN = Timespan.ofSeconds(0.3);
     /** 피해량 */

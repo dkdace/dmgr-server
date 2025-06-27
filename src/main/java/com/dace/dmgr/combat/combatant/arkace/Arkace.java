@@ -9,6 +9,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 아케이스 클래스.
  *
@@ -112,7 +116,7 @@ public final class Arkace extends Marksman {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getAbilityManager().getSkill(ArkaceP1Info.getInstance()).onTick();
+        combatUser.getAbilityManager().getAbility(ArkaceP1Info.getInstance()).onTick();
     }
 
     @Override
@@ -123,20 +127,20 @@ public final class Arkace extends Marksman {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{ArkaceP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(ArkaceP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{ArkaceA1Info.getInstance(), ArkaceA2Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(ArkaceA1Info.getInstance(), ArkaceA2Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

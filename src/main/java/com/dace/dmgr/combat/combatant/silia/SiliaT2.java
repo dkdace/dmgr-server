@@ -42,7 +42,7 @@ public final class SiliaT2 extends Trait {
         AbilityManager abilityManager = combatUser.getAbilityManager();
         Weapon weapon = abilityManager.getWeapon();
 
-        if (!abilityManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished())
+        if (!abilityManager.getAbility(SiliaUltInfo.getInstance()).isDurationFinished())
             weapon.setCooldown(SiliaUltInfo.STRIKE_COOLDOWN);
 
         combatUser.setGlobalCooldown(SiliaT2Info.GLOBAL_COOLDOWN);
@@ -144,14 +144,14 @@ public final class SiliaT2 extends Trait {
             return (location, target) -> {
                 if (targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
-                            SiliaT1Util.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
+                            SiliaT1.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
 
                         if (target instanceof Movable) {
                             Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
                             ((Movable) target).getKnockbackModule().knockback(dir);
                         }
 
-                        if (combatUser.getAbilityManager().getSkill(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
+                        if (combatUser.getAbilityManager().getAbility(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
                             combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
                     }
 

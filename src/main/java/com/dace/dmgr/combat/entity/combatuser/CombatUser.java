@@ -419,7 +419,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
             footstepDistance += oldLoc.distance(loc);
             if (!entity.isOnGround() || footstepDistance <= 1.6 || combatantType == CombatantType.SILIA
-                    && !abilityManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+                    && !abilityManager.getAbility(SiliaA3Info.getInstance()).isDurationFinished())
                 return;
 
             footstepDistance = 0;
@@ -635,7 +635,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         if (victim instanceof CombatUser) {
             CombatUser combatUserVictim = (CombatUser) victim;
 
-            if (!(combatUserVictim.getAbilityManager().getSkill(combatUserVictim.combatant.getUltimateSkillInfo()).isDurationFinished()))
+            if (!(combatUserVictim.getAbilityManager().getUltimateSkill().isDurationFinished()))
                 addScore("궁극기 차단", AbilityManager.ULT_BLOCK_SCORE);
 
             sendPlayerKillMent(combatUserVictim);
@@ -936,7 +936,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         if (value == 1) {
             value = 0.999;
-            UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
+            UltimateSkill skill = abilityManager.getUltimateSkill();
             if (!skill.isCooldownFinished())
                 skill.setCooldown(Timespan.ZERO);
         }
@@ -952,8 +952,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGaugePercent(double value) {
-        UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
-        if (skill.isDurationFinished())
+        if (abilityManager.getUltimateSkill().isDurationFinished())
             setUltGaugePercent(Math.min(getUltGaugePercent() + value, 1));
     }
 
@@ -964,8 +963,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
     public void addUltGauge(double value) {
-        UltimateSkill skill = abilityManager.getSkill(combatant.getUltimateSkillInfo());
-        int cost = skill.getCost();
+        int cost = abilityManager.getUltimateSkill().getCost();
         if (coreManager.has(Core.ULTIMATE))
             cost = (int) (cost * (100 - Core.ULTIMATE.getValue()) / 100.0);
 

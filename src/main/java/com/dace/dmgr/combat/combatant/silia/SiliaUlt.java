@@ -45,10 +45,10 @@ public final class SiliaUlt extends UltimateSkill {
         combatUser.setGlobalCooldown(SiliaUltInfo.READY_DURATION);
 
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        SiliaWeapon weapon = (SiliaWeapon) abilityManager.getWeapon();
+        SiliaWeapon weapon = abilityManager.getWeapon();
         weapon.setVisible(false);
 
-        abilityManager.getSkill(SiliaA3Info.getInstance()).cancel();
+        abilityManager.getAbility(SiliaA3Info.getInstance()).cancel();
 
         Location loc = combatUser.getLocation();
 
@@ -60,8 +60,8 @@ public final class SiliaUlt extends UltimateSkill {
             setDuration();
             combatUser.getMoveModule().addModifier(MODIFIER);
 
-            abilityManager.getSkill(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
-            abilityManager.getTrait(SiliaT2Info.getInstance()).setStrike(true);
+            abilityManager.getAbility(SiliaA1Info.getInstance()).setCooldown(Timespan.ZERO);
+            abilityManager.getAbility(SiliaT2Info.getInstance()).setStrike(true);
             weapon.setVisible(true);
 
             SiliaUltInfo.Effects.USE_READY.play(combatUser.getLocation());
@@ -75,7 +75,7 @@ public final class SiliaUlt extends UltimateSkill {
         isEnabled = false;
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
-        combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).setStrike(false);
+        combatUser.getAbilityManager().getAbility(SiliaT2Info.getInstance()).setStrike(false);
     }
 
     @Override

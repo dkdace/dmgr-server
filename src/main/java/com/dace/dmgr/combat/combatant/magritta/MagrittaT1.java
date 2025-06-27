@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
 import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -10,13 +11,15 @@ import com.dace.dmgr.util.location.LocationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 
-@UtilityClass
-public final class MagrittaT1Util {
+public final class MagrittaT1 extends Trait {
+    public MagrittaT1(@NonNull CombatUser combatUser, @NonNull MagrittaT1Info traitInfo) {
+        super(combatUser, traitInfo);
+    }
+
     /**
      * 피격자의 파쇄 수치를 증가시킨다.
      *

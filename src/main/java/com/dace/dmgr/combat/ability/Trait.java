@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.ability;
 
-import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -12,11 +12,11 @@ public abstract class Trait extends AbstractAbility {
     /**
      * 특성 인스턴스를 생성한다.
      *
-     * @param combatUser       사용자 플레이어
-     * @param dynamicTraitInfo 동적 특성 정보 인스턴스
+     * @param combatUser 사용자 플레이어
+     * @param traitInfo  특성 정보 인스턴스
      */
-    protected Trait(@NonNull CombatUser combatUser, @NonNull DynamicTraitInfo<?> dynamicTraitInfo) {
-        super(combatUser, dynamicTraitInfo.getName());
+    protected Trait(@NonNull CombatUser combatUser, @NonNull TraitInfo<?> traitInfo) {
+        super(combatUser, traitInfo.getName());
     }
 
     @Override

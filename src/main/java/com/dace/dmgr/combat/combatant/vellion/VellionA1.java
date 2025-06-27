@@ -62,8 +62,8 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getSkill(VellionA3Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

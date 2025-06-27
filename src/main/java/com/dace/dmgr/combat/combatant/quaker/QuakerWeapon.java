@@ -38,7 +38,7 @@ public final class QuakerWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override

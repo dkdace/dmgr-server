@@ -44,8 +44,8 @@ public final class MagrittaA1 extends ActiveSkill {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -173,7 +173,7 @@ public final class MagrittaA1 extends ActiveSkill {
                         ((Movable) target).getKnockbackModule().knockback(dir);
                     }
 
-                    MagrittaT1Util.addValue(combatUser, target);
+                    MagrittaT1.addValue(combatUser, target);
                 }
 
                 return !(target instanceof Barrier);

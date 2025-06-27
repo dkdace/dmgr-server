@@ -42,7 +42,7 @@ public final class No7A1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -110,7 +110,7 @@ public final class No7A1 extends ActiveSkill {
                     targets.put(target, Timestamp.now().plus(No7A1Info.DAMAGE_COOLDOWN));
 
                     if (target.getDamageModule().damage(combatUser, No7A1Info.DAMAGE, DamageType.NORMAL, location, false, true)) {
-                        combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
+                        combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
 
                         if (target instanceof Movable)
                             ((Movable) target).getKnockbackModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));

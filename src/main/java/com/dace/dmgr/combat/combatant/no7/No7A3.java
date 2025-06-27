@@ -39,7 +39,7 @@ public final class No7A3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class No7A3 extends ActiveSkill {
             area.emit(loc);
 
             int size = area.getHitTargets().size();
-            combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).addShield(No7A3Info.SHIELD * (size + 1.0) / durationTicks);
+            combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).addShield(No7A3Info.SHIELD * (size + 1.0) / durationTicks);
 
             if (size > 0)
                 combatUser.addScore("보호막 획득", (double) (No7A3Info.SHIELD_SCORE * size) / durationTicks);

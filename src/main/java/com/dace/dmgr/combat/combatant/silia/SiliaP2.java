@@ -78,7 +78,7 @@ public final class SiliaP2 extends PassiveSkill {
             combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
                     Timespan.ofTicks(10), Timespan.ofTicks(5));
 
-            if (abilityManager.getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+            if (abilityManager.getAbility(SiliaA3Info.getInstance()).isDurationFinished())
                 SiliaP2Info.Effects.USE.play(combatUser.getLocation());
             else
                 SiliaP2Info.Effects.USE_A3.play(combatUser.getLocation());

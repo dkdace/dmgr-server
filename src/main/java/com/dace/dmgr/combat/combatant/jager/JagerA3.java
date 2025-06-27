@@ -64,7 +64,7 @@ public final class JagerA3 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getAbilityManager().getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+        return super.canUse(actionKey) && !combatUser.getAbilityManager().getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
@@ -232,10 +232,10 @@ public final class JagerA3 extends ActiveSkill {
                     ((Movable) target).getKnockbackModule().knockback(dir);
                 }
 
-                if (JagerT1Util.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
+                if (JagerT1.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);
 
-                    combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(target);
+                    combatUser.getAbilityManager().getAbility(JagerP1Info.getInstance()).use(target);
 
                     if (target != combatUser && target.isGoalTarget())
                         combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);

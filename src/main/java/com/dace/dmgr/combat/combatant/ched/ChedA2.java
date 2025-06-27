@@ -27,7 +27,7 @@ public final class ChedA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance()).isDurationFinished();
     }
 
     @Override

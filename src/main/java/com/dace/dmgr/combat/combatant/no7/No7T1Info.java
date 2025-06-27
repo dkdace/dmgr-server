@@ -2,11 +2,11 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
-import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
+import com.dace.dmgr.combat.ability.info.TraitInfo;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 
-public final class No7T1Info extends DynamicTraitInfo<No7T1> {
+public final class No7T1Info extends TraitInfo<No7T1> {
     /** 최대 보호막 */
     public static final int MAX_SHIELD = 2000;
     /** 초당 감소량 (단위: 블록) */

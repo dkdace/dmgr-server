@@ -16,6 +16,9 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 전투원 - 실리아 클래스.
  *
@@ -125,13 +128,13 @@ public final class Silia extends Scuffler {
 
     @Override
     public void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, double damage, boolean isCrit) {
-        SiliaT1Util.onAttack(attacker, victim, isCrit);
+        attacker.getAbilityManager().getAbility(SiliaT1Info.getInstance()).onAttack(victim, isCrit);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getAbilityManager().getSkill(SiliaA3Info.getInstance()).onDamage(damage);
+        victim.getAbilityManager().getAbility(SiliaA3Info.getInstance()).onDamage(damage);
     }
 
     @Override
@@ -142,13 +145,13 @@ public final class Silia extends Scuffler {
             attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
 
         AbilityManager abilityManager = attacker.getAbilityManager();
-        abilityManager.getSkill(SiliaA1Info.getInstance()).onKill(victim);
-        abilityManager.getSkill(SiliaUltInfo.getInstance()).onKill(victim, contributionScore);
+        abilityManager.getAbility(SiliaA1Info.getInstance()).onKill(victim);
+        abilityManager.getAbility(SiliaUltInfo.getInstance()).onKill(victim, contributionScore);
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        SiliaP1 skillp1 = combatUser.getAbilityManager().getSkill(SiliaP1Info.getInstance());
+        SiliaP1 skillp1 = combatUser.getAbilityManager().getAbility(SiliaP1Info.getInstance());
         return skillp1.canUse(ActionKey.SPACE);
     }
 
@@ -160,20 +163,20 @@ public final class Silia extends Scuffler {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[]{SiliaT1Info.getInstance(), SiliaT2Info.getInstance()};
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Arrays.asList(SiliaT1Info.getInstance(), SiliaT2Info.getInstance());
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{SiliaP1Info.getInstance(), SiliaP2Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Arrays.asList(SiliaP1Info.getInstance(), SiliaP2Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{SiliaA1Info.getInstance(), SiliaA2Info.getInstance(), SiliaA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(SiliaA1Info.getInstance(), SiliaA2Info.getInstance(), SiliaA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

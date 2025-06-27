@@ -14,6 +14,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Sound;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - No.7 클래스.
  *
@@ -103,9 +107,9 @@ public final class No7 extends Vanguard {
         super.onTick(combatUser, i);
 
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        abilityManager.getTrait(No7T1Info.getInstance()).onTick();
-        abilityManager.getSkill(No7P1Info.getInstance()).onTick();
-        abilityManager.getSkill(No7P2Info.getInstance()).onTick(i);
+        abilityManager.getAbility(No7T1Info.getInstance()).onTick();
+        abilityManager.getAbility(No7P1Info.getInstance()).onTick();
+        abilityManager.getAbility(No7P2Info.getInstance()).onTick(i);
     }
 
     @Override
@@ -115,7 +119,7 @@ public final class No7 extends Vanguard {
 
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getSkill(No7A2Info.getInstance()).isDurationFinished();
+        return combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -136,20 +140,20 @@ public final class No7 extends Vanguard {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[]{No7T1Info.getInstance()};
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.singletonList(No7T1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{No7P1Info.getInstance(), No7P2Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Arrays.asList(No7P1Info.getInstance(), No7P2Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{No7A1Info.getInstance(), No7A2Info.getInstance(), No7A3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(No7A1Info.getInstance(), No7A2Info.getInstance(), No7A3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

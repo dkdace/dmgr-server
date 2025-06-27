@@ -62,7 +62,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getSkill(VellionUltInfo.getInstance()).isDurationFinished();
+                && combatUser.getAbilityManager().getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override

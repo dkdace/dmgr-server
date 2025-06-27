@@ -1,12 +1,10 @@
 package com.dace.dmgr.combat.entity.combatuser;
 
+import com.dace.dmgr.combat.ability.Ability;
 import com.dace.dmgr.combat.ability.Action;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.MeleeAttackAction;
-import com.dace.dmgr.combat.ability.Trait;
-import com.dace.dmgr.combat.ability.info.DynamicTraitInfo;
-import com.dace.dmgr.combat.ability.info.SkillInfo;
-import com.dace.dmgr.combat.ability.info.TraitInfo;
+import com.dace.dmgr.combat.ability.info.AbilityInfo;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.Skill;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
@@ -16,16 +14,11 @@ import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.combatant.Combatant;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.TreeSet;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * 전투 시스템 플레이어의 능력(무기, 스킬, 특성)을 관리하는 클래스.
@@ -34,18 +27,12 @@ public final class AbilityManager {
     /** 궁극기 차단 점수 */
     static final int ULT_BLOCK_SCORE = 50;
 
+    /** 능력 정보별 능력 목록 (능력 정보 : 능력) */
+    private final HashMap<AbilityInfo<?>, Ability> abilityMap = new HashMap<>();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작 목록) */
-    private final EnumMap<ActionKey, TreeSet<Action>> actionMap = new EnumMap<>(ActionKey.class);
-    /** 동적 특성 목록 (동적 특성 정보 : 특성) */
-    private final HashMap<DynamicTraitInfo<?>, Trait> dynamicTraitMap = new HashMap<>();
-    /** 스킬 목록 (스킬 정보 : 스킬) */
-    private final HashMap<SkillInfo<?>, Skill> skillMap = new HashMap<>();
+    private final EnumMap<ActionKey, TreeSet<Action>> actionsMap = new EnumMap<>(ActionKey.class);
     /** 플레이어 인스턴스 */
     private final CombatUser combatUser;
-    /** 무기 인스턴스 */
-    @NonNull
-    @Getter
-    private final Weapon weapon;
 
     /**
      * 능력 관리 인스턴스를 생성하고, 플레이어의 능력 설정을 초기화한다.
@@ -57,59 +44,58 @@ public final class AbilityManager {
         Combatant combatant = combatUser.getCombatantType().getCombatant();
 
         for (ActionKey actionKey : ActionKey.values())
-            actionMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
+            actionsMap.put(actionKey, new TreeSet<>(Comparator.comparing(Action::getPriority).reversed()));
 
-        Stream.Builder<Action> streamBuilder = Stream.builder();
+        HashSet<Ability> abilities = new HashSet<>();
+        abilities.add(new MeleeAttackAction(combatUser));
 
-        streamBuilder.add(new MeleeAttackAction(combatUser));
+        combatant.getAbilityInfos().forEach(abilityInfo -> {
+            Ability ability = abilityInfo.create(combatUser);
 
-        weapon = combatant.getWeaponInfo().createWeapon(combatUser);
-        streamBuilder.add(weapon);
+            abilityMap.put(abilityInfo, ability);
+            abilities.add(ability);
+        });
 
-        for (TraitInfo traitInfo : combatant.getTraitInfos()) {
-            if (traitInfo instanceof DynamicTraitInfo) {
-                Trait trait = ((DynamicTraitInfo<?>) traitInfo).createTrait(combatUser);
-                dynamicTraitMap.put((DynamicTraitInfo<?>) traitInfo, trait);
-            }
-        }
-
-        for (SkillInfo<?> skillInfo : combatant.getSkillInfos()) {
-            Skill skill = skillInfo.createSkill(combatUser);
-            skillMap.put(skillInfo, skill);
-
-            streamBuilder.add(skill);
-        }
-
-        streamBuilder.build().forEach(action ->
-                action.getDefaultActionKeys().forEach(actionKey -> actionMap.get(actionKey).add(action)));
+        abilities.forEach(ability -> {
+            if (ability instanceof Action)
+                ((Action) ability).getDefaultActionKeys().forEach(actionKey -> actionsMap.get(actionKey).add((Action) ability));
+        });
     }
 
     /**
-     * 지정한 동적 특성 정보에 해당하는 특성을 반환한다.
+     * 무기를 반환한다.
      *
-     * @param dynamicTraitInfo 동적 특성 정보
-     * @param <T>              {@link Trait}을 상속받는 스킬
-     * @return 특성 인스턴스
-     * @throws NullPointerException 해당하는 특성이 존재하지 않으면 발생
+     * @return 무기 인스턴스
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public <T extends Trait> T getTrait(@NonNull DynamicTraitInfo<T> dynamicTraitInfo) {
-        return Validate.notNull((T) dynamicTraitMap.get(dynamicTraitInfo), "일치하는 특성이 존재하지 않음");
+    public <T extends Weapon> T getWeapon() {
+        return (T) abilityMap.get(combatUser.getCombatantType().getCombatant().getWeaponInfo());
     }
 
     /**
-     * 지정한 스킬 정보에 해당하는 스킬을 반환한다.
+     * 지정한 능력 정보에 해당하는 능력을 반환한다.
      *
-     * @param skillInfo 스킬 정보
-     * @param <T>       {@link Skill}을 상속받는 스킬
+     * @param abilityInfo 능력 정보
+     * @param <T>         {@link Ability}을 상속받는 능력
      * @return 스킬 인스턴스
-     * @throws NullPointerException 해당하는 스킬이 존재하지 않으면 발생
+     * @throws NullPointerException 해당하는 능력이 존재하지 않으면 발생
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public <T extends Skill> T getSkill(@NonNull SkillInfo<T> skillInfo) {
-        return Validate.notNull((T) skillMap.get(skillInfo), "일치하는 스킬이 존재하지 않음");
+    public <T extends Ability> T getAbility(@NonNull AbilityInfo<T> abilityInfo) {
+        return Validate.notNull((T) abilityMap.get(abilityInfo), "일치하는 능력이 존재하지 않음");
+    }
+
+    /**
+     * 궁극기 스킬을 반환한다.
+     *
+     * @return 궁극기 인스턴스
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public <T extends UltimateSkill> T getUltimateSkill() {
+        return (T) abilityMap.get(combatUser.getCombatantType().getCombatant().getUltimateSkillInfo());
     }
 
     /**
@@ -118,7 +104,7 @@ public final class AbilityManager {
      * @param actionKey 동작 사용 키
      */
     public void useAction(@NonNull ActionKey actionKey) {
-        actionMap.get(actionKey).forEach(action -> {
+        actionsMap.get(actionKey).forEach(action -> {
             if (combatUser.isDead() || action == null || combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION))
                 return;
 
@@ -127,7 +113,7 @@ public final class AbilityManager {
                 return;
             }
 
-            Weapon realWeapon = weapon;
+            Weapon realWeapon = getWeapon();
             if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().isSwapped())
                 realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
 
@@ -168,7 +154,7 @@ public final class AbilityManager {
      * @param attacker 공격자
      */
     public void cancelAction(@Nullable CombatUser attacker) {
-        weapon.cancel();
+        getWeapon().cancel();
         cancelSkill(attacker);
     }
 
@@ -178,7 +164,8 @@ public final class AbilityManager {
      * @param attacker 공격자
      */
     public void cancelSkill(@Nullable CombatUser attacker) {
-        skillMap.values().forEach(skill -> {
+        combatUser.getCombatantType().getCombatant().getSkillInfos().forEach(skillInfo -> {
+            Skill skill = getAbility(skillInfo);
             if (!skill.cancel())
                 return;
 
@@ -194,26 +181,30 @@ public final class AbilityManager {
      * @param contributionScore 처치 기여도
      */
     void handleBonusScoreSkill(@NonNull Damageable victim, double contributionScore) {
-        for (SkillInfo<?> skillInfo : combatUser.getCombatantType().getCombatant().getSkillInfos()) {
-            Skill skill = getSkill(skillInfo);
+        combatUser.getCombatantType().getCombatant().getSkillInfos().forEach(skillInfo -> {
+            Skill skill = getAbility(skillInfo);
             if (skill instanceof HasBonusScore)
                 ((HasBonusScore) skill).getBonusScoreModule().onKill(victim, contributionScore);
-        }
+        });
     }
 
     /**
      * 무기와 모든 스킬의 {@link Action#reset()}을 호출한다.
      */
     void reset() {
-        weapon.reset();
-        skillMap.values().forEach(Skill::reset);
+        abilityMap.values().forEach(ability -> {
+            if (ability instanceof Action)
+                ((Action) ability).reset();
+        });
     }
 
     /**
      * 무기와 모든 스킬의 {@link Action#remove()}을 호출한다.
      */
     void remove() {
-        weapon.remove();
-        skillMap.values().forEach(Skill::remove);
+        abilityMap.values().forEach(ability -> {
+            if (ability instanceof Action)
+                ((Action) ability).remove();
+        });
     }
 }

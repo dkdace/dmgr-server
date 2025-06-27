@@ -12,6 +12,8 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 /**
  * 전투원 선택 정보 GUI 클래스.
  */
@@ -66,7 +68,7 @@ public final class SelectCharInfo extends ChestGUI {
      * @param combatant   전투원
      */
     private void displayAbilities(int row, @NonNull SelectCharInfoItem abilityType, @NonNull Combatant combatant) {
-        AbilityInfo[] abilityInfos;
+        List<? extends AbilityInfo<?>> abilityInfos;
         switch (abilityType) {
             case TRAIT:
                 abilityInfos = combatant.getTraitInfos();
@@ -82,10 +84,10 @@ public final class SelectCharInfo extends ChestGUI {
         }
 
         for (int i = 0; i < 4; i++)
-            if (i > abilityInfos.length - 1)
+            if (i > abilityInfos.size() - 1)
                 remove(row, i + 3);
             else
-                set(row, i + 3, abilityInfos[i].getDefinedItem());
+                set(row, i + 3, abilityInfos.get(i).getDefinedItem());
     }
 
     /**

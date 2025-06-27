@@ -13,6 +13,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Sound;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 퀘이커 클래스.
  *
@@ -121,12 +125,12 @@ public final class Quaker extends Guardian {
     @Override
     public void onSet(@NonNull CombatUser combatUser) {
         super.onSet(combatUser);
-        QuakerT1Util.onSet(combatUser);
+        combatUser.getAbilityManager().getAbility(QuakerT1Info.getInstance()).onSet();
     }
 
     @Override
     public void onFootstep(@NonNull CombatUser combatUser, double volume) {
-        if (!combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance()).isDurationFinished())
+        if (!combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished())
             volume = 1.4;
 
         FOOTSTEP_SOUND.apply(volume).play(combatUser.getLocation());
@@ -140,18 +144,18 @@ public final class Quaker extends Guardian {
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return abilityManager.getSkill(QuakerA1Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(QuakerA1Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(QuakerA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(QuakerA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canJump(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return abilityManager.getSkill(QuakerA2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(QuakerA3Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(QuakerUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(QuakerA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(QuakerA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(QuakerUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -162,20 +166,20 @@ public final class Quaker extends Guardian {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[]{QuakerT1Info.getInstance()};
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.singletonList(QuakerT1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[0];
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{QuakerA1Info.getInstance(), QuakerA2Info.getInstance(), QuakerA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(QuakerA1Info.getInstance(), QuakerA2Info.getInstance(), QuakerA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

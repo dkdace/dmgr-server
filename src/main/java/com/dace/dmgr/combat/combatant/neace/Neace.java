@@ -16,6 +16,10 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 니스 클래스.
  *
@@ -113,13 +117,13 @@ public final class Neace extends Support {
 
         new NeaceTarget(combatUser).shot();
 
-        combatUser.getAbilityManager().getSkill(NeaceP1Info.getInstance()).onTick(i);
+        combatUser.getAbilityManager().getAbility(NeaceP1Info.getInstance()).onTick(i);
     }
 
     @Override
     public void onDamage(@NonNull CombatUser victim, @Nullable Attacker attacker, double damage, @Nullable Location location, boolean isCrit) {
         super.onDamage(victim, attacker, damage, location, isCrit);
-        victim.getAbilityManager().getSkill(NeaceP1Info.getInstance()).cancel();
+        victim.getAbilityManager().getAbility(NeaceP1Info.getInstance()).cancel();
     }
 
     @Override
@@ -132,7 +136,7 @@ public final class Neace extends Support {
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
-        NeaceUlt skill4 = combatUser.getAbilityManager().getSkill(NeaceUltInfo.getInstance());
+        NeaceUlt skill4 = combatUser.getAbilityManager().getAbility(NeaceUltInfo.getInstance());
         return skill4.isDurationFinished() || skill4.isEnabled();
     }
 
@@ -149,20 +153,20 @@ public final class Neace extends Support {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{NeaceP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(NeaceP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{NeaceA1Info.getInstance(), NeaceA2Info.getInstance(), NeaceA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(NeaceA1Info.getInstance(), NeaceA2Info.getInstance(), NeaceA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

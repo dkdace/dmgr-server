@@ -1,16 +1,20 @@
 package com.dace.dmgr.combat.combatant.jager;
 
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-@UtilityClass
-public final class JagerT1Util {
+public final class JagerT1 extends Trait {
+    public JagerT1(@NonNull CombatUser combatUser, @NonNull JagerT1Info traitInfo) {
+        super(combatUser, traitInfo);
+    }
+
     /**
      * 피격자의 빙결 수치를 증가시킨다.
      *

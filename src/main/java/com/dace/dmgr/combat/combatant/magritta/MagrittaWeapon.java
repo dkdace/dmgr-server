@@ -55,8 +55,8 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getSkill(MagrittaA2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -135,7 +135,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
         targets.forEach((target, hits) -> {
             if (hits >= MagrittaWeaponInfo.PELLET_AMOUNT / 2)
-                MagrittaT1Util.addValue(combatUser, target);
+                MagrittaT1.addValue(combatUser, target);
         });
     }
 
@@ -187,7 +187,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 double damage = MagrittaWeaponInfo.DISTANT_DAMAGE.getDamage(getTravelDistance());
-                MagrittaT1Util.ValueEffect valueEffect = target.getStatusEffectModule().get(MagrittaT1Util.ValueEffect.class);
+                MagrittaT1.ValueEffect valueEffect = target.getStatusEffectModule().get(MagrittaT1.ValueEffect.class);
 
                 if (valueEffect != null)
                     damage = damage * (100 + MagrittaT1Info.DAMAGE_INCREMENT * valueEffect.getValue()) / 100.0;
@@ -196,7 +196,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                     targets.put(target, targets.getOrDefault(target, 0) + 1);
 
                     if (isUlt && target.isGoalTarget())
-                        combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).getBonusScoreModule()
+                        combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).getBonusScoreModule()
                                 .addTarget(target, MagrittaUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 

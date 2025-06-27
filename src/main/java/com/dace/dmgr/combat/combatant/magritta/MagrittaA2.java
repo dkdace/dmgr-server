@@ -41,7 +41,8 @@ public final class MagrittaA2 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(MagrittaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -69,7 +70,7 @@ public final class MagrittaA2 extends ActiveSkill {
         combatUser.getMoveModule().removeModifier(MODIFIER);
         combatUser.getMoveModule().setJumpStrength(0);
 
-        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getAbilityManager().getWeapon();
+        MagrittaWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.setVisible(true);
         weapon.getReloadModule().resetRemainingAmmo();
 

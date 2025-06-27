@@ -257,7 +257,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target instanceof Healable && !target.isEnemy(combatUser)) {
-                    combatUser.getAbilityManager().getSkill(PalasP1Info.getInstance()).use((Healable) target, PalasWeaponInfo.HEAL);
+                    combatUser.getAbilityManager().getAbility(PalasP1Info.getInstance()).use((Healable) target, PalasWeaponInfo.HEAL);
 
                     ((Healable) target).getHealModule().heal(combatUser, PalasWeaponInfo.HEAL, true);
 

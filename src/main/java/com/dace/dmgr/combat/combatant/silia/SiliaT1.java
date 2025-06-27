@@ -1,14 +1,17 @@
 package com.dace.dmgr.combat.combatant.silia;
 
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-@UtilityClass
-public final class SiliaT1Util {
+public final class SiliaT1 extends Trait {
+    public SiliaT1(@NonNull CombatUser combatUser, @NonNull SiliaT1Info traitInfo) {
+        super(combatUser, traitInfo);
+    }
+
     /**
      * 공격의 백어택(치명타) 여부를 확인하여 치명타 배수를 반환한다.
      *
@@ -31,12 +34,11 @@ public final class SiliaT1Util {
     /**
      * 다른 엔티티를 공격했을 때 실행할 작업.
      *
-     * @param attacker 공격자
-     * @param victim   피격자
-     * @param isCrit   치명타 여부
+     * @param victim 피격자
+     * @param isCrit 치명타 여부
      */
-    static void onAttack(@NonNull CombatUser attacker, @NonNull Damageable victim, boolean isCrit) {
-        if (attacker != victim && victim.isGoalTarget() && isCrit)
-            attacker.addScore("백어택", SiliaT1Info.CRIT_SCORE);
+    void onAttack(@NonNull Damageable victim, boolean isCrit) {
+        if (combatUser != victim && victim.isGoalTarget() && isCrit)
+            combatUser.addScore("백어택", SiliaT1Info.CRIT_SCORE);
     }
 }

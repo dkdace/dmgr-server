@@ -31,14 +31,14 @@ public final class SiliaWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         isOpposite = !isOpposite;
 
-        if (!combatUser.getAbilityManager().getTrait(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
+        if (!combatUser.getAbilityManager().getAbility(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
             setCooldown();
             combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(10), MainHand.RIGHT);
 
@@ -47,7 +47,7 @@ public final class SiliaWeapon extends AbstractWeapon {
             SiliaWeaponInfo.Effects.USE.play(combatUser.getLocation());
         }
 
-        combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getAbility(SiliaA3Info.getInstance()).cancel();
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class SiliaWeapon extends AbstractWeapon {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 target.getDamageModule().damage(this, SiliaWeaponInfo.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1Util.getCritMultiplier(getVelocity(), target), true);
+                        SiliaT1.getCritMultiplier(getVelocity(), target), true);
 
                 SiliaWeaponInfo.Effects.HIT_ENTITY.play(location);
 

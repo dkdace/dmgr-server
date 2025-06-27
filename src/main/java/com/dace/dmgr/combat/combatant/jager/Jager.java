@@ -10,6 +10,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 예거 클래스.
  *
@@ -114,8 +118,8 @@ public final class Jager extends Marksman {
     @Override
     public boolean canUseMeleeAttack(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -125,7 +129,7 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean canChargeUlt(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getSkill(JagerUltInfo.getInstance()).getEntityModule().get() == null;
+        return combatUser.getAbilityManager().getAbility(JagerUltInfo.getInstance()).getEntityModule().get() == null;
     }
 
     @Override
@@ -136,20 +140,20 @@ public final class Jager extends Marksman {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[]{JagerT1Info.getInstance()};
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.singletonList(JagerT1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{JagerP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(JagerP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{JagerA1Info.getInstance(), JagerA2Info.getInstance(), JagerA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(JagerA1Info.getInstance(), JagerA2Info.getInstance(), JagerA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

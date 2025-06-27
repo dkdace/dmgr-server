@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.ability.Ability;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.info.*;
 import com.dace.dmgr.combat.ability.weapon.Swappable;
@@ -19,7 +20,6 @@ import com.dace.dmgr.item.ItemBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +30,8 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 /**
@@ -288,26 +290,26 @@ public abstract class Combatant {
         StringJoiner text = new StringJoiner("    ");
 
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        Weapon weapon = abilityManager.getWeapon();
-        ActionBarDisplay weaponDisplay = weapon.getActionBarDisplay();
-        if (weaponDisplay != null) {
-            text.add(weaponDisplay.toString());
 
-            if (weapon instanceof Swappable) {
-                Weapon subweapon = ((Swappable<?>) weapon).getSwapModule().getSubweapon();
-                ActionBarDisplay subweaponDisplay = subweapon.getActionBarDisplay();
-                if (subweaponDisplay != null)
-                    text.add(subweaponDisplay.toString());
+        getAbilityInfos().forEach(abilityInfo -> {
+            Ability ability = abilityManager.getAbility(abilityInfo);
+            ActionBarDisplay actionBarDisplay = ability.getActionBarDisplay();
+            if (actionBarDisplay == null)
+                return;
+
+            text.add(actionBarDisplay.toString());
+
+            if (ability instanceof Weapon) {
+                if (ability instanceof Swappable) {
+                    ActionBarDisplay subweaponActionBarDisplay = ((Swappable<?>) ability).getSwapModule().getSubweapon().getActionBarDisplay();
+
+                    if (subweaponActionBarDisplay != null)
+                        text.add(subweaponActionBarDisplay.toString());
+                }
+
+                text.add("");
             }
-
-            text.add("");
-        }
-
-        for (SkillInfo<?> skillInfo : getSkillInfos()) {
-            ActionBarDisplay actionBarDisplay = abilityManager.getSkill(skillInfo).getActionBarDisplay();
-            if (actionBarDisplay != null)
-                text.add(actionBarDisplay.toString());
-        }
+        });
 
         return text.toString();
     }
@@ -494,6 +496,21 @@ public abstract class Combatant {
     }
 
     /**
+     * 전투원의 모든 능력 목록을 반환한다.
+     *
+     * @return 모든 능력 목록
+     */
+    @NonNull
+    public final List<@NonNull AbilityInfo<?>> getAbilityInfos() {
+        ArrayList<AbilityInfo<?>> list = new ArrayList<>();
+        list.add(getWeaponInfo());
+        list.addAll(getTraitInfos());
+        list.addAll(getSkillInfos());
+
+        return list;
+    }
+
+    /**
      * 전투원의 무기 정보를 반환한다.
      *
      * @return 무기 정보
@@ -504,11 +521,14 @@ public abstract class Combatant {
     /**
      * 전투원의 특성 목록을 반환한다.
      *
-     * @return 특성 목록. 길이가 0~4 사이인 배열
+     * @return 특성 목록
      */
     @NonNull
-    public final TraitInfo @NonNull [] getTraitInfos() {
-        return ArrayUtils.addAll(getDefaultTraitInfos(), getCombatantTraitInfos());
+    public final List<@NonNull TraitInfo<?>> getTraitInfos() {
+        ArrayList<TraitInfo<?>> list = new ArrayList<>(getDefaultTraitInfos());
+        list.addAll(getCombatantTraitInfos());
+
+        return list;
     }
 
     /**
@@ -517,7 +537,7 @@ public abstract class Combatant {
      * @return 특성 목록
      */
     @NonNull
-    abstract TraitInfo @NonNull [] getDefaultTraitInfos();
+    abstract List<@NonNull TraitInfo<?>> getDefaultTraitInfos();
 
     /**
      * 전투원의 개별 특성 목록을 반환한다.
@@ -525,33 +545,36 @@ public abstract class Combatant {
      * @return 특성 목록
      */
     @NonNull
-    protected abstract TraitInfo @NonNull [] getCombatantTraitInfos();
+    protected abstract List<@NonNull TraitInfo<?>> getCombatantTraitInfos();
 
     /**
      * 전투원의 모든 스킬 목록을 반환한다.
      *
-     * @return 모든 스킬 목록. 길이가 0~8인 배열
+     * @return 모든 스킬 목록
      */
     @NonNull
-    public final SkillInfo<?> @NonNull [] getSkillInfos() {
-        return ArrayUtils.addAll(ArrayUtils.addAll(new SkillInfo[0], getPassiveSkillInfos()), getActiveSkillInfos());
+    public final List<@NonNull SkillInfo<?>> getSkillInfos() {
+        ArrayList<SkillInfo<?>> list = new ArrayList<>(getPassiveSkillInfos());
+        list.addAll(getActiveSkillInfos());
+
+        return list;
     }
 
     /**
      * 전투원의 패시브 스킬 정보 목록을 반환한다.
      *
-     * @return 패시브 스킬 정보 목록. 길이가 0~4 사이인 배열
+     * @return 패시브 스킬 정보 목록
      */
     @NonNull
-    public abstract PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos();
+    public abstract List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos();
 
     /**
      * 전투원의 액티브 스킬 정보 목록을 반환한다.
      *
-     * @return 액티브 스킬 정보 목록. 길이가 0~4 사이인 배열
+     * @return 액티브 스킬 정보 목록
      */
     @NonNull
-    public abstract ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos();
+    public abstract List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos();
 
     /**
      * 전투원의 궁극기 정보를 반환한다.

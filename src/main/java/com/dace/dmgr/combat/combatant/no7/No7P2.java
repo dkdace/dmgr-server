@@ -29,7 +29,7 @@ public final class No7P2 extends PassiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() > 0;
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() > 0;
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class No7P2 extends PassiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            double power = combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() / No7T1Info.MAX_SHIELD;
+            double power = combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() / No7T1Info.MAX_SHIELD;
             double damage = (No7P2Info.MIN_DAMAGE_PER_SECOND + power * (No7P2Info.MAX_DAMAGE_PER_SECOND - No7P2Info.MIN_DAMAGE_PER_SECOND)) * 5 / 20.0;
 
             target.getDamageModule().damage(combatUser, damage, DamageType.NORMAL, null, false, true);

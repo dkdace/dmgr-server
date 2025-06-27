@@ -36,7 +36,8 @@ public final class SiliaA1 extends ActiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -140,7 +141,7 @@ public final class SiliaA1 extends ActiveSkill {
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (targets.add(target)) {
                     target.getDamageModule().damage(combatUser, SiliaA1Info.DAMAGE, DamageType.NORMAL, null,
-                            SiliaT1Util.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
+                            SiliaT1.getCritMultiplier(LocationUtil.getDirection(center, location), target), true);
 
                     SiliaA1Info.Effects.HIT_ENTITY.play(location);
                 }

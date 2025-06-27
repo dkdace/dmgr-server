@@ -50,8 +50,8 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getSkill(JagerA1Info.getInstance()).getConfirmModule().isChecking()
-                && abilityManager.getSkill(JagerA3Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+                && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -218,7 +218,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         @Override
         public void onAttack(@NonNull Damageable victim, double damage, boolean isCrit, boolean isUlt) {
             owner.onAttack(victim, damage, isCrit, isUlt);
-            combatUser.getAbilityManager().getSkill(JagerP1Info.getInstance()).use(victim);
+            combatUser.getAbilityManager().getAbility(JagerP1Info.getInstance()).use(victim);
         }
 
         @Override

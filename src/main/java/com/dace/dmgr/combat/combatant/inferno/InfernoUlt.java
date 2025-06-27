@@ -36,8 +36,8 @@ public final class InfernoUlt extends UltimateSkill {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getSkill(InfernoA1Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(InfernoA2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(InfernoA1Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(InfernoA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -47,9 +47,9 @@ public final class InfernoUlt extends UltimateSkill {
         setDuration();
 
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        abilityManager.getSkill(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
+        abilityManager.getAbility(InfernoA1Info.getInstance()).setCooldown(Timespan.ZERO);
 
-        InfernoWeapon weapon = (InfernoWeapon) abilityManager.getWeapon();
+        InfernoWeapon weapon = abilityManager.getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 

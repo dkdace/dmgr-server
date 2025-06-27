@@ -36,7 +36,7 @@ public final class ArkaceP1 extends PassiveSkill {
         setDuration();
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ArkaceWeapon weapon = (ArkaceWeapon) combatUser.getAbilityManager().getWeapon();
+        ArkaceWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.setDurability(ArkaceWeaponInfo.Resource.SPRINT);
 
         addActionTask(new IntervalTask(i -> combatUser.getEntity().isSprinting() && !weapon.getReloadModule().isReloading(),

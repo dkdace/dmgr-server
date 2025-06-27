@@ -34,8 +34,8 @@ public final class SiliaA2 extends ActiveSkill {
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getSkill(SiliaP2Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(SiliaUltInfo.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(SiliaP2Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class SiliaA2 extends ActiveSkill {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
-        combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).cancel();
+        combatUser.getAbilityManager().getAbility(SiliaA3Info.getInstance()).cancel();
 
         SiliaA2Info.Effects.USE.play(combatUser.getLocation());
 
@@ -104,7 +104,7 @@ public final class SiliaA2 extends ActiveSkill {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, SiliaA2Info.DAMAGE, DamageType.NORMAL, location,
-                        SiliaT1Util.getCritMultiplier(getVelocity(), target), true)) {
+                        SiliaT1.getCritMultiplier(getVelocity(), target), true)) {
 
                     if (target instanceof Movable)
                         ((Movable) target).getKnockbackModule().knockback(new Vector(0, SiliaA2Info.PUSH, 0), true);

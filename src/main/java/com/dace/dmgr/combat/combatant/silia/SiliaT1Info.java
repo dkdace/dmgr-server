@@ -5,7 +5,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
 import lombok.Getter;
 
-public final class SiliaT1Info extends TraitInfo {
+public final class SiliaT1Info extends TraitInfo<SiliaT1> {
     /** 치명타 배수 */
     public static final int CRIT_MULTIPLIER = 2;
 
@@ -16,7 +16,7 @@ public final class SiliaT1Info extends TraitInfo {
     private static final SiliaT1Info instance = new SiliaT1Info();
 
     private SiliaT1Info() {
-        super("백어택",
+        super(SiliaT1.class, "백어택",
                 new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("적의 뒤를 공격하면 <:DAMAGE_INCREASE:치명타>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE_INCREASE, "×" + CRIT_MULTIPLIER)

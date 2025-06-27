@@ -11,6 +11,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - 체드 클래스.
  *
@@ -118,14 +122,13 @@ public final class Ched extends Marksman {
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return abilityManager.getSkill(ChedA3Info.getInstance()).isDurationFinished()
-                && abilityManager.getSkill(ChedUltInfo.getInstance()).isDurationFinished();
+        return abilityManager.getAbility(ChedA3Info.getInstance()).isDurationFinished()
+                && abilityManager.getAbility(ChedUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        ChedA2 skill2 = combatUser.getAbilityManager().getSkill(ChedA2Info.getInstance());
-        return skill2.canUse(ActionKey.SLOT_2);
+        return combatUser.getAbilityManager().getAbility(ChedA2Info.getInstance()).canUse(ActionKey.SLOT_2);
     }
 
     @Override
@@ -141,20 +144,20 @@ public final class Ched extends Marksman {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{ChedP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(ChedP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{ChedA1Info.getInstance(), ChedA2Info.getInstance(), ChedA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(ChedA1Info.getInstance(), ChedA2Info.getInstance(), ChedA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

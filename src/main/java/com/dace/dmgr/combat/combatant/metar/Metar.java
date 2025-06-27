@@ -13,6 +13,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Sound;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 전투원 - METAR 클래스.
  *
@@ -105,7 +109,7 @@ public final class Metar extends Guardian {
     @Override
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
-        combatUser.getAbilityManager().getSkill(MetarP1Info.getInstance()).onTick();
+        combatUser.getAbilityManager().getAbility(MetarP1Info.getInstance()).onTick();
     }
 
     @Override
@@ -115,13 +119,13 @@ public final class Metar extends Guardian {
 
     @Override
     public void onKnockbacked(@NonNull CombatUser victim, double speed) {
-        victim.getAbilityManager().getSkill(MetarP1Info.getInstance()).onKnockbacked(speed);
+        victim.getAbilityManager().getAbility(MetarP1Info.getInstance()).onKnockbacked(speed);
     }
 
     @Override
     public boolean canSprint(@NonNull CombatUser combatUser) {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return ((MetarWeapon) abilityManager.getWeapon()).canSprint() && abilityManager.getSkill(MetarUltInfo.getInstance()).isDurationFinished();
+        return ((MetarWeapon) abilityManager.getWeapon()).canSprint() && abilityManager.getAbility(MetarUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -137,20 +141,20 @@ public final class Metar extends Guardian {
 
     @Override
     @NonNull
-    protected TraitInfo @NonNull [] getCombatantTraitInfos() {
-        return new TraitInfo[0];
+    protected List<@NonNull TraitInfo<?>> getCombatantTraitInfos() {
+        return Collections.emptyList();
     }
 
     @Override
     @NonNull
-    public PassiveSkillInfo<?> @NonNull [] getPassiveSkillInfos() {
-        return new PassiveSkillInfo[]{MetarP1Info.getInstance()};
+    public List<@NonNull PassiveSkillInfo<?>> getPassiveSkillInfos() {
+        return Collections.singletonList(MetarP1Info.getInstance());
     }
 
     @Override
     @NonNull
-    public ActiveSkillInfo<?> @NonNull [] getActiveSkillInfos() {
-        return new ActiveSkillInfo[]{MetarA1Info.getInstance(), MetarA2Info.getInstance(), MetarA3Info.getInstance(), getUltimateSkillInfo()};
+    public List<@NonNull ActiveSkillInfo<?>> getActiveSkillInfos() {
+        return Arrays.asList(MetarA1Info.getInstance(), MetarA2Info.getInstance(), MetarA3Info.getInstance(), getUltimateSkillInfo());
     }
 
     @Override

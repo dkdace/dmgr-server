@@ -35,7 +35,7 @@ public final class ChedWeapon extends AbstractWeapon {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -44,7 +44,7 @@ public final class ChedWeapon extends AbstractWeapon {
         switch (actionKey) {
             case RIGHT_CLICK: {
                 AbilityManager abilityManager = combatUser.getAbilityManager();
-                ChedA1 skill1 = abilityManager.getSkill(ChedA1Info.getInstance());
+                ChedA1 skill1 = abilityManager.getAbility(ChedA1Info.getInstance());
 
                 if (skill1.isEnabled()) {
                     setCooldown(ChedA1Info.COOLDOWN);

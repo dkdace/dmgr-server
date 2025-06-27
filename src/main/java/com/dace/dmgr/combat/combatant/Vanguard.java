@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.combatant;
 
 import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.Trait;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
@@ -11,15 +12,13 @@ import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 역할군이 '돌격'인 전투원의 정보를 관리하는 클래스.
  */
 public abstract class Vanguard extends Combatant {
-    /** 넉백 저항 수정자 */
-    private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
-    /** 상태 효과 저항 수정자 */
-    private static final Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
-
     /**
      * 돌격 역할군 전투원 정보 인스턴스를 생성한다.
      *
@@ -43,28 +42,25 @@ public abstract class Vanguard extends Combatant {
     @MustBeInvokedByOverriders
     public void onSet(@NonNull CombatUser combatUser) {
         super.onSet(combatUser);
-
-        combatUser.getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
-        combatUser.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+        combatUser.getAbilityManager().getAbility(RoleTrait1Info.instance).onSet();
     }
 
     @Override
     @MustBeInvokedByOverriders
     public void onKill(@NonNull CombatUser attacker, @NonNull Damageable victim, double contributionScore, boolean isFinalHit) {
-        if (victim.isGoalTarget())
-            attacker.getStatusEffectModule().clear(false);
+        attacker.getAbilityManager().getAbility(RoleTrait2Info.instance).onKill(victim);
     }
 
     @Override
     @NonNull
-    final TraitInfo @NonNull [] getDefaultTraitInfos() {
-        return new TraitInfo[]{RoleTrait1Info.instance, RoleTrait2Info.instance};
+    final List<@NonNull TraitInfo<?>> getDefaultTraitInfos() {
+        return Arrays.asList(RoleTrait1Info.instance, RoleTrait2Info.instance);
     }
 
     /**
      * 특성 1번 정보 클래스.
      */
-    private static final class RoleTrait1Info extends TraitInfo {
+    private static final class RoleTrait1Info extends TraitInfo<RoleTrait1> {
         /** 상태 효과 저항 */
         private static final int STATUS_EFFECT_RESISTANCE = 15;
         /** 넉백 저항 */
@@ -73,7 +69,7 @@ public abstract class Vanguard extends Combatant {
         private static final RoleTrait1Info instance = new RoleTrait1Info();
 
         private RoleTrait1Info() {
-            super("역할: 돌격 - 1",
+            super(RoleTrait1.class, "역할: 돌격 - 1",
                     new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("받는 모든 <:NEGATIVE_EFFECT:해로운 효과>의 시간과 <:KNOCKBACK:밀쳐내기> 효과가 감소합니다.")
                             .addValueInfo(TextIcon.NEGATIVE_EFFECT, Format.PERCENT, STATUS_EFFECT_RESISTANCE)
@@ -83,16 +79,49 @@ public abstract class Vanguard extends Combatant {
     }
 
     /**
+     * 특성 1번 클래스.
+     */
+    private static final class RoleTrait1 extends Trait {
+        /** 넉백 저항 수정자 */
+        private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.KNOCKBACK_RESISTANCE);
+        /** 상태 효과 저항 수정자 */
+        private static final Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new Modifier(RoleTrait1Info.STATUS_EFFECT_RESISTANCE);
+
+        public RoleTrait1(@NonNull CombatUser combatUser, @NonNull RoleTrait1Info traitInfo) {
+            super(combatUser, traitInfo);
+        }
+
+        private void onSet() {
+            combatUser.getKnockbackModule().addModifier(KNOCKBACK_RESISTANCE_MODIFIER);
+            combatUser.getStatusEffectModule().addModifier(STATUS_EFFECT_RESISTANCE_MODIFIER);
+        }
+    }
+
+    /**
      * 특성 2번 정보 클래스.
      */
-    private static final class RoleTrait2Info extends TraitInfo {
+    private static final class RoleTrait2Info extends TraitInfo<RoleTrait2> {
         private static final RoleTrait2Info instance = new RoleTrait2Info();
 
         private RoleTrait2Info() {
-            super("역할: 돌격 - 2",
+            super(RoleTrait2.class, "역할: 돌격 - 2",
                     new AbilityInfoLore(AbilityInfoLore.Section
                             .builder("적을 처치하면 모든 <:NEGATIVE_EFFECT:해로운 효과>를 제거합니다.")
                             .build()));
+        }
+    }
+
+    /**
+     * 특성 2번 클래스.
+     */
+    private static final class RoleTrait2 extends Trait {
+        public RoleTrait2(@NonNull CombatUser combatUser, @NonNull RoleTrait2Info traitInfo) {
+            super(combatUser, traitInfo);
+        }
+
+        private void onKill(@NonNull Damageable victim) {
+            if (victim.isGoalTarget())
+                combatUser.getStatusEffectModule().clear(false);
         }
     }
 }

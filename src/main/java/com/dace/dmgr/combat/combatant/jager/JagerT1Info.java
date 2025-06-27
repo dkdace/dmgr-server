@@ -13,7 +13,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-public final class JagerT1Info extends TraitInfo {
+public final class JagerT1Info extends TraitInfo<JagerT1> {
     /** 지속시간 */
     public static final Timespan DURATION = Timespan.ofSeconds(2);
     /** 달리기 불가능 수치 */
@@ -27,7 +27,7 @@ public final class JagerT1Info extends TraitInfo {
     private static final JagerT1Info instance = new JagerT1Info();
 
     private JagerT1Info() {
-        super("빙결",
+        super(JagerT1.class, "빙결",
                 new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("<5:WALK_SPEED_DECREASE:수치>에 비례하여 <:WALK_SPEED_DECREASE:이동 속도>가 느려지는 상태이상입니다. " +
                                 "수치가 " + NO_SPRINT + "을 넘으면 달리기가 불가능해지며, " + NO_JUMP + "을 넘으면 점프가 불가능해집니다.")

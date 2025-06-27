@@ -43,7 +43,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
         return super.canUse(actionKey) && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -54,7 +54,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getAbilityManager().getWeapon();
+        ChedWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 

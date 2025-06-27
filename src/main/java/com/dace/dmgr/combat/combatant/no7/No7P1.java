@@ -24,7 +24,7 @@ public final class No7P1 extends PassiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getTrait(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
+        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class No7P1 extends PassiveSkill {
         if (!combatUser.getDamageModule().isLowHealth())
             return;
 
-        No7T1 skillt1 = combatUser.getAbilityManager().getTrait(No7T1Info.getInstance());
+        No7T1 skillt1 = combatUser.getAbilityManager().getAbility(No7T1Info.getInstance());
         skillt1.addShield(No7P1Info.SHIELD - skillt1.getShield());
     }
 

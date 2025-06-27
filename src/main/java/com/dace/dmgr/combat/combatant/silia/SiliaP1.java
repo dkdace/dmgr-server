@@ -26,7 +26,8 @@ public final class SiliaP1 extends PassiveSkill {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(SiliaP2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -34,7 +35,7 @@ public final class SiliaP1 extends PassiveSkill {
         setDuration();
 
         Location location = combatUser.getLocation();
-        if (combatUser.getAbilityManager().getSkill(SiliaA3Info.getInstance()).isDurationFinished())
+        if (combatUser.getAbilityManager().getAbility(SiliaA3Info.getInstance()).isDurationFinished())
             SiliaP1Info.Effects.USE.play(location);
         else
             SiliaP1Info.Effects.USE_A3.play(location);

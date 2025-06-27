@@ -47,7 +47,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        QuakerA1 skill1 = combatUser.getAbilityManager().getSkill(QuakerA1Info.getInstance());
+        QuakerA1 skill1 = combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance());
         if (skill1.isDurationFinished()) {
             combatUser.getUser().sendAlertActionBar(skill1.getDisplayName() + " 를 활성화한 상태에서만 사용할 수 있습니다.");
             return false;
@@ -65,7 +65,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        QuakerWeapon weapon = (QuakerWeapon) combatUser.getAbilityManager().getWeapon();
+        QuakerWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setVisible(false);
         weapon.use(true);

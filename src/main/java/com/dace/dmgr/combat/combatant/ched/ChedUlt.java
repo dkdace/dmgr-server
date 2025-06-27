@@ -56,7 +56,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        ChedP1 skillp1 = combatUser.getAbilityManager().getSkill(ChedP1Info.getInstance());
+        ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
         return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
@@ -69,7 +69,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        ChedWeapon weapon = (ChedWeapon) combatUser.getAbilityManager().getWeapon();
+        ChedWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.setCanShoot(false);
 

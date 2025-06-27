@@ -45,7 +45,8 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getSkill(MagrittaA2Info.getInstance()).isDurationFinished();
+        return super.canUse(actionKey) && isDurationFinished()
+                && combatUser.getAbilityManager().getAbility(MagrittaA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
@@ -57,7 +58,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
         combatUser.setGlobalCooldown(MagrittaUltInfo.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
-        MagrittaWeapon weapon = (MagrittaWeapon) combatUser.getAbilityManager().getWeapon();
+        MagrittaWeapon weapon = combatUser.getAbilityManager().getWeapon();
         weapon.cancel();
         weapon.getReloadModule().resetRemainingAmmo();
 
