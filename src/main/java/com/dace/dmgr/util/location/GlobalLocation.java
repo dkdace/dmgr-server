@@ -1,6 +1,7 @@
 package com.dace.dmgr.util.location;
 
 import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.SerializerUtil;
 import lombok.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +21,10 @@ import java.util.Map;
 public final class GlobalLocation {
     /** 모든 값이 0인 전역 위치 */
     public static final GlobalLocation ZERO = new GlobalLocation(0, 0, 0, 0, 0);
+
+    static {
+        SerializerUtil.addDefaultSerializer(GlobalLocation.class, new GlobalLocationSerializer());
+    }
 
     /** X 좌표 */
     private final double x;
@@ -57,11 +62,8 @@ public final class GlobalLocation {
     /**
      * {@link GlobalLocation}의 직렬화 처리기 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class GlobalLocationSerializer implements Serializer<GlobalLocation, Map<String, Number>> {
-        @Getter
-        private static final GlobalLocationSerializer instance = new GlobalLocationSerializer();
-
+    @NoArgsConstructor
+    private static final class GlobalLocationSerializer implements Serializer<GlobalLocation, Map<String, Number>> {
         @Override
         @NonNull
         public Map<String, Number> serialize(@NonNull GlobalLocation value) {

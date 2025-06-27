@@ -14,6 +14,9 @@ import com.dace.dmgr.user.User;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.ReflectionUtil;
+import com.dace.dmgr.util.location.BlockRegion;
+import com.dace.dmgr.util.location.CuboidRegion;
+import com.dace.dmgr.util.location.GlobalLocation;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +41,11 @@ public class DMGR extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            ReflectionUtil.loadClass(Timespan.class);
+            ReflectionUtil.loadClass(GlobalLocation.class);
+            ReflectionUtil.loadClass(CuboidRegion.class);
+            ReflectionUtil.loadClass(BlockRegion.class);
+
             ReflectionUtil.loadClass(GeneralConfig.class);
             ReflectionUtil.loadClass(LobbyTabListProfile.class);
             ReflectionUtil.loadClass(GameTabListProfile.class);

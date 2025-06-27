@@ -1,10 +1,5 @@
 package com.dace.dmgr.yaml;
 
-import com.dace.dmgr.Timespan;
-import com.dace.dmgr.user.UserData;
-import com.dace.dmgr.util.location.BlockRegion;
-import com.dace.dmgr.util.location.CuboidRegion;
-import com.dace.dmgr.util.location.GlobalLocation;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -33,11 +28,18 @@ public final class SerializerUtil {
         SERIALIZER_MAP.put(Float.class, new NumberSerializer<>(Number::floatValue));
         SERIALIZER_MAP.put(Double.class, new NumberSerializer<>(Number::doubleValue));
         SERIALIZER_MAP.put(String.class, new DefaultSerializer<>());
-        SERIALIZER_MAP.put(Timespan.class, Timespan.TimespanSerializer.getInstance());
-        SERIALIZER_MAP.put(GlobalLocation.class, GlobalLocation.GlobalLocationSerializer.getInstance());
-        SERIALIZER_MAP.put(UserData.class, UserData.UserDataSerializer.getInstance());
-        SERIALIZER_MAP.put(CuboidRegion.class, CuboidRegion.CuboidRegionSerializer.getInstance());
-        SERIALIZER_MAP.put(BlockRegion.class, BlockRegion.BlockRegionSerializer.getInstance());
+    }
+
+    /**
+     * 지정한 타입에 대한 기본 직렬화 처리기를 등록한다.
+     *
+     * @param rawType    원시 타입 (클래스)
+     * @param serializer 직렬화 처리기
+     * @param <T>        역직렬화된 데이터 타입
+     * @param <R>        Yaml 파일에 저장할 직렬화된 데이터 타입
+     */
+    public static <T, R> void addDefaultSerializer(@NonNull Class<T> rawType, @NonNull Serializer<T, R> serializer) {
+        SERIALIZER_MAP.put(rawType, serializer);
     }
 
     @NonNull

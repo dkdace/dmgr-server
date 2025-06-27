@@ -1,8 +1,9 @@
 package com.dace.dmgr.util.location;
 
 import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.SerializerUtil;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,10 @@ import java.util.Map;
 public final class CuboidRegion implements Region {
     /** 기본값 */
     public static final CuboidRegion DEFAULT = new CuboidRegion(GlobalLocation.ZERO, GlobalLocation.ZERO);
+
+    static {
+        SerializerUtil.addDefaultSerializer(CuboidRegion.class, new CuboidRegionSerializer());
+    }
 
     /** 첫 번째 위치 */
     @NonNull
@@ -38,11 +43,10 @@ public final class CuboidRegion implements Region {
     /**
      * {@link CuboidRegion}의 직렬화 처리기 클래스.
      */
-    public static final class CuboidRegionSerializer implements Serializer<CuboidRegion, List<Map<String, Number>>> {
+    @NoArgsConstructor
+    private static final class CuboidRegionSerializer implements Serializer<CuboidRegion, List<Map<String, Number>>> {
         /** GlobalLocation 직렬화 처리기 */
-        private static final GlobalLocation.GlobalLocationSerializer SERIALIZER = GlobalLocation.GlobalLocationSerializer.getInstance();
-        @Getter
-        private static final CuboidRegionSerializer instance = new CuboidRegionSerializer();
+        private static final Serializer<GlobalLocation, Map<String, Number>> SERIALIZER = SerializerUtil.getDefaultSerializer(GlobalLocation.class);
 
         @Override
         @NonNull

@@ -1,6 +1,7 @@
 package com.dace.dmgr;
 
 import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.SerializerUtil;
 import lombok.*;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.util.NumberConversions;
@@ -29,6 +30,10 @@ public final class Timespan implements Comparable<Timespan> {
     private static final int TICKS_IN_HOUR = TICKS_IN_MINUTE * 60;
     /** 틱으로 나타낸 1일 */
     private static final int TICKS_IN_DAY = TICKS_IN_HOUR * 24;
+
+    static {
+        SerializerUtil.addDefaultSerializer(Timespan.class, new TimespanSerializer());
+    }
 
     /** 시간 (틱) */
     private final long ticks;
@@ -272,11 +277,8 @@ public final class Timespan implements Comparable<Timespan> {
     /**
      * {@link Timespan}의 직렬화 처리기 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class TimespanSerializer implements Serializer<Timespan, Map<String, Number>> {
-        @Getter
-        private static final TimespanSerializer instance = new TimespanSerializer();
-
+    @NoArgsConstructor
+    private static final class TimespanSerializer implements Serializer<Timespan, Map<String, Number>> {
         @Override
         @NonNull
         public Map<String, Number> serialize(@NonNull Timespan value) {

@@ -11,9 +11,9 @@ import com.dace.dmgr.util.task.AsyncTask;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.Initializable;
 import com.dace.dmgr.yaml.Serializer;
+import com.dace.dmgr.yaml.SerializerUtil;
 import com.dace.dmgr.yaml.TypeToken;
 import com.dace.dmgr.yaml.YamlFile;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -63,6 +63,8 @@ public final class UserData implements Initializable<Void> {
     private static final SoundEffect TIER_DOWN_SOUND = SoundEffect.builder(Sound.ENTITY_BLAZE_DEATH).volume(1000).pitch(0.5).build();
 
     static {
+        SerializerUtil.addDefaultSerializer(UserData.class, UserDataSerializer.instance);
+
         try (Stream<Path> userDataPaths = Files.list(DMGR.getPlugin().getDataFolder().toPath().resolve(DIRECTORY_NAME))) {
             userDataPaths.map(path -> UserDataSerializer.instance.deserialize(FilenameUtils.removeExtension(path.getFileName().toString())))
                     .forEach(userData -> {
@@ -682,9 +684,8 @@ public final class UserData implements Initializable<Void> {
     /**
      * {@link UserData}의 직렬화 처리기 클래스.
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class UserDataSerializer implements Serializer<UserData, String> {
-        @Getter
+    @NoArgsConstructor
+    private static final class UserDataSerializer implements Serializer<UserData, String> {
         private static final UserDataSerializer instance = new UserDataSerializer();
 
         @Override

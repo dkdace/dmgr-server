@@ -2,7 +2,7 @@ package com.dace.dmgr.util.location;
 
 import com.dace.dmgr.yaml.Serializer;
 import com.dace.dmgr.yaml.SerializerUtil;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Location;
@@ -19,6 +19,10 @@ import java.util.Map;
 public final class BlockRegion implements Region {
     /** 기본값 */
     public static final BlockRegion DEFAULT = new BlockRegion(Material.STONE, 0);
+
+    static {
+        SerializerUtil.addDefaultSerializer(BlockRegion.class, new BlockRegionSerializer());
+    }
 
     /** 확인할 블록의 종류 */
     private final Material material;
@@ -49,11 +53,10 @@ public final class BlockRegion implements Region {
     /**
      * {@link BlockRegion}의 직렬화 처리기 클래스.
      */
-    public static final class BlockRegionSerializer implements Serializer<BlockRegion, Map<String, Object>> {
+    @NoArgsConstructor
+    private static final class BlockRegionSerializer implements Serializer<BlockRegion, Map<String, Object>> {
         /** Material 직렬화 처리기 */
         private static final Serializer<Material, Object> SERIALIZER = SerializerUtil.getDefaultSerializer(Material.class);
-        @Getter
-        private static final BlockRegionSerializer instance = new BlockRegionSerializer();
 
         @Override
         @NonNull
