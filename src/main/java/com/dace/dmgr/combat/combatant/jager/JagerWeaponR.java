@@ -33,13 +33,13 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
         super(combatUser, weaponInfo, JagerWeaponInfo.COOLDOWN);
 
         this.mainWeapon = mainWeapon;
-        this.reloadModule = new ReloadModule(this, JagerWeaponInfo.Scope.CAPACITY, Timespan.ZERO);
+        this.reloadModule = new ReloadModule(this);
     }
 
     @Override
     @NonNull
     public ActionBarDisplay getActionBarDisplay() {
-        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL).build();
+        return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL).build();
     }
 
     @Override
@@ -58,16 +58,12 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!reloadModule.consume(1))
                     return;
-                }
 
                 setCooldown();
 
                 new JagerWeaponRHitscan().shot();
-
-                reloadModule.consume(1);
 
                 JagerWeaponInfo.Scope.RECOIL.send(combatUser);
 
@@ -93,10 +89,18 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     protected void onCancelled() {
-        mainWeapon.getAimModule().cancel();
-        mainWeapon.getReloadModule().cancel();
-        mainWeapon.getSwapModule().cancel();
-        mainWeapon.getSwapModule().swap();
+        mainWeapon.cancel();
+    }
+
+    @Override
+    public int getCapacity() {
+        return JagerWeaponInfo.Scope.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return Timespan.ZERO;
     }
 
     @Override
@@ -106,10 +110,7 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
+        mainWeapon.cancel();
         addActionTask(new DelayTask(() -> mainWeapon.getReloadModule().reload(), getDefaultCooldown().toTicks()));
     }
 

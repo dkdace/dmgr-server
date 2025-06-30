@@ -3,8 +3,7 @@ package com.dace.dmgr.combat.combatant.vellion;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
-import com.dace.dmgr.combat.ability.skill.Summonable;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -20,7 +19,6 @@ import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -32,14 +30,12 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1.VellionA1Entity> {
+public final class VellionA1 extends ActiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-VellionA1Info.READY_SLOW);
 
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    @Getter
-    private final EntityModule<VellionA1Entity> entityModule;
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<VellionA1Entity> summonModule;
     /** 회복 상태 효과 */
     private final VellionA1Heal heal;
     /** 독 상태 효과 */
@@ -48,7 +44,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     public VellionA1(@NonNull CombatUser combatUser, @NonNull VellionA1Info skillInfo) {
         super(combatUser, skillInfo, VellionA1Info.COOLDOWN, Timespan.MAX);
 
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
         this.heal = new VellionA1Heal();
         this.poison = new Poison(combatUser, VellionA1Info.POISON_DAMAGE_PER_SECOND, true);
     }
@@ -79,7 +75,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
             cancel();
 
             Location loc = combatUser.getArmLocation(MainHand.RIGHT);
-            entityModule.set(new VellionA1Entity(loc));
+            summonModule.set(new VellionA1Entity(loc));
 
             VellionA1Info.Effects.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION.toTicks()));
@@ -94,7 +90,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
 
-        entityModule.removeEntity();
+        summonModule.removeEntity();
 
         combatUser.getMoveModule().removeModifier(MODIFIER);
     }
@@ -133,7 +129,7 @@ public final class VellionA1 extends ActiveSkill implements Summonable<VellionA1
     /**
      * 마력 응집체 클래스.
      */
-    public final class VellionA1Entity extends SummonEntity<ArmorStand> {
+    private final class VellionA1Entity extends SummonEntity<ArmorStand> {
         /** 피격자 목록 */
         private final HashSet<Damageable> targets = new HashSet<>();
         /** 회수 시간 */

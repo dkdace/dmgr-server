@@ -16,6 +16,15 @@ public interface Aimable extends Weapon {
     AimModule getAimModule();
 
     /**
+     * 조준 시 확대 레벨을 반환한다.
+     *
+     * @return 확대 레벨
+     * @see ZoomLevel
+     */
+    @NonNull
+    ZoomLevel getZoomLevel();
+
+    /**
      * 정조준 활성화 시 실행할 작업.
      */
     void onAimEnable();

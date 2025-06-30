@@ -301,7 +301,7 @@ public abstract class Combatant {
 
             if (ability instanceof Weapon) {
                 if (ability instanceof Swappable) {
-                    ActionBarDisplay subweaponActionBarDisplay = ((Swappable<?>) ability).getSwapModule().getSubweapon().getActionBarDisplay();
+                    ActionBarDisplay subweaponActionBarDisplay = ((Swappable<?>) ability).getSubweapon().getActionBarDisplay();
 
                     if (subweaponActionBarDisplay != null)
                         text.add(subweaponActionBarDisplay.toString());

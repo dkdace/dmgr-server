@@ -44,8 +44,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     public PalasWeapon(@NonNull CombatUser combatUser, @NonNull PalasWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, PalasWeaponInfo.COOLDOWN);
 
-        this.reloadModule = new ReloadModule(this, PalasWeaponInfo.CAPACITY, PalasWeaponInfo.RELOAD_DURATION);
-        this.aimModule = new AimModule(this, PalasWeaponInfo.ZOOM_LEVEL);
+        this.reloadModule = new ReloadModule(this);
+        this.aimModule = new AimModule(this);
     }
 
     @Override
@@ -63,7 +63,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     @Override
     @NonNull
     public ActionBarDisplay getActionBarDisplay() {
-        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL)
+        return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL)
                 .suffix(isActionCooldown ? "§a■" : "§c□").build();
     }
 
@@ -71,10 +71,8 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!reloadModule.consume(0))
                     return;
-                }
                 if (!isActionCooldown) {
                     action();
                     break;
@@ -107,7 +105,7 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -119,46 +117,6 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
     protected void onCancelled() {
         reloadModule.cancel();
         aimModule.cancel();
-    }
-
-    @Override
-    public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity();
-    }
-
-    @Override
-    public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
-        reloadModule.reload();
-    }
-
-    @Override
-    public void onReloadTick(long i) {
-        PalasWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
-    }
-
-    @Override
-    public void onReloadFinished() {
-        // 미사용
-    }
-
-    @Override
-    public void onAimEnable() {
-        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
-        combatUser.getMoveModule().addModifier(MODIFIER);
-
-        PalasWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
-    }
-
-    @Override
-    public void onAimDisable() {
-        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
-        combatUser.getMoveModule().removeModifier(MODIFIER);
-
-        PalasWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
 
     /**
@@ -193,6 +151,54 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
             isActionCooldown = true;
             reloadModule.consume(1);
         }, 1, PalasWeaponInfo.ACTION_COOLDOWN.toTicks()));
+    }
+
+    @Override
+    public int getCapacity() {
+        return PalasWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return PalasWeaponInfo.RELOAD_DURATION;
+    }
+
+    @Override
+    public void onAmmoEmpty() {
+        reloadModule.reload();
+    }
+
+    @Override
+    public void onReloadTick(long i) {
+        PalasWeaponInfo.Effects.RELOAD.apply(i).play(combatUser.getLocation());
+    }
+
+    @Override
+    public void onReloadFinished() {
+        // 미사용
+    }
+
+    @Override
+    @NonNull
+    public ZoomLevel getZoomLevel() {
+        return PalasWeaponInfo.ZOOM_LEVEL;
+    }
+
+    @Override
+    public void onAimEnable() {
+        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
+        combatUser.getMoveModule().addModifier(MODIFIER);
+
+        PalasWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
+    }
+
+    @Override
+    public void onAimDisable() {
+        combatUser.setGlobalCooldown(PalasWeaponInfo.AIM_DURATION);
+        combatUser.getMoveModule().removeModifier(MODIFIER);
+
+        PalasWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
 
     private final class PalasWeaponHitscan extends Hitscan<Damageable> {

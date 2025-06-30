@@ -41,7 +41,7 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
 
     public NeaceWeapon(@NonNull CombatUser combatUser, @NonNull NeaceWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, NeaceWeaponInfo.COOLDOWN);
-        this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
+        this.fullAutoModule = new FullAutoModule(this);
     }
 
     @Override
@@ -94,7 +94,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
                 NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
 
                 healTarget(target);
-
                 break;
             }
             default:
@@ -128,6 +127,18 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     boolean isHealing(@NonNull Healable target) {
         return combatUser.getAbilityManager().getAbility(NeaceA2Info.getInstance()).isDurationFinished() && this.target == target
                 && targetResetTimestamp.isAfter(Timestamp.now());
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getFullAutoKey() {
+        return ActionKey.RIGHT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public FireRate getFireRate() {
+        return FireRate.RPM_1200;
     }
 
     private final class NeaceWeaponRTarget extends Target<Healable> {

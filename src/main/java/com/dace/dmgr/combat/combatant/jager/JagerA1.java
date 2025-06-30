@@ -7,10 +7,9 @@ import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
 import com.dace.dmgr.combat.ability.skill.Confirmable;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
-import com.dace.dmgr.combat.ability.skill.Summonable;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
 import com.dace.dmgr.combat.ability.skill.module.LocationConfirmModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.*;
@@ -31,23 +30,23 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Getter
-public final class JagerA1 extends ChargeableSkill implements Confirmable, Summonable<JagerA1.JagerA1Entity>, HasBonusScore {
+public final class JagerA1 extends ChargeableSkill implements Confirmable, HasBonusScore {
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<JagerA1Entity> summonModule;
     /** 위치 확인 모듈 */
     @NonNull
+    @Getter
     private final LocationConfirmModule confirmModule;
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final EntityModule<JagerA1Entity> entityModule;
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
 
     public JagerA1(@NonNull CombatUser combatUser, @NonNull JagerA1Info skillInfo) {
         super(combatUser, skillInfo, JagerA1Info.COOLDOWN, JagerA1Info.HEALTH);
 
-        this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_1, JagerA1Info.SUMMON_MAX_DISTANCE);
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
+        this.confirmModule = new LocationConfirmModule(this, JagerA1Info.SUMMON_MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "설랑 보너스", JagerA1Info.KILL_SCORE);
     }
 
@@ -97,18 +96,26 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
                     confirmModule.toggleCheck();
                 } else {
                     setDuration(Timespan.ZERO);
-                    entityModule.removeEntity();
+                    summonModule.removeEntity();
                 }
 
                 break;
             }
             case LEFT_CLICK: {
-                onUse();
+                confirmModule.accept();
                 break;
             }
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onAccept() {
+        setDuration();
+        combatUser.getAbilityManager().getWeapon().setCooldown(Timespan.ofTicks(2));
+
+        summonModule.set(new JagerA1Entity(confirmModule.getCurrentLocation()));
     }
 
     @Override
@@ -122,33 +129,15 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, Summo
     }
 
     @Override
-    public void onCheckEnable() {
-        // 미사용
+    @NonNull
+    public ActionKey getAcceptKey() {
+        return ActionKey.LEFT_CLICK;
     }
 
     @Override
-    public void onCheckTick(long i) {
-        // 미사용
-    }
-
-    @Override
-    public void onCheckDisable() {
-        // 미사용
-    }
-
-    /**
-     * 사용 시 실행할 작업.
-     */
-    private void onUse() {
-        if (!confirmModule.isValid())
-            return;
-
-        setDuration();
-
-        confirmModule.toggleCheck();
-        combatUser.getAbilityManager().getWeapon().setCooldown(Timespan.ofTicks(2));
-
-        entityModule.set(new JagerA1Entity(confirmModule.getCurrentLocation()));
+    @NonNull
+    public ActionKey getCancelKey() {
+        return ActionKey.SLOT_1;
     }
 
     /**

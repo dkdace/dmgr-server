@@ -4,15 +4,13 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
-import com.dace.dmgr.combat.ability.skill.Summonable;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.BulletBarrier;
 import com.dace.dmgr.combat.interaction.Bullet;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
@@ -22,15 +20,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.LongConsumer;
 
-@Getter
-public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2Entity> {
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final EntityModule<No7A2Entity> entityModule;
+public final class No7A2 extends ActiveSkill {
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<No7A2Entity> summonModule;
 
     public No7A2(@NonNull CombatUser combatUser, @NonNull No7A2Info skillInfo) {
         super(combatUser, skillInfo, No7A2Info.COOLDOWN, No7A2Info.DURATION);
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
     }
 
     @Override
@@ -68,7 +64,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
         combatUser.getAbilityManager().getWeapon().cancel();
 
         Location loc = combatUser.getLocation();
-        entityModule.set(new No7A2Entity(loc));
+        summonModule.set(new No7A2Entity(loc));
 
         No7A2Info.Effects.ON.play(loc);
 
@@ -80,7 +76,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     protected void onDurationFinished() {
         super.onDurationFinished();
 
-        entityModule.removeEntity();
+        summonModule.removeEntity();
         No7A2Info.Effects.OFF.play(combatUser.getLocation());
     }
 
@@ -97,7 +93,7 @@ public final class No7A2 extends ActiveSkill implements Summonable<No7A2.No7A2En
     /**
      * 능동방어 자기장 클래스.
      */
-    public final class No7A2Entity extends BulletBarrier {
+    private final class No7A2Entity extends BulletBarrier {
         private final HashSet<Class<?>> bulletClasses = new HashSet<>();
 
         private No7A2Entity(@NonNull Location spawnLocation) {

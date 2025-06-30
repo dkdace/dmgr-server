@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.ability.weapon;
 
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,23 @@ public interface FullAuto extends Weapon {
      */
     @NonNull
     FullAutoModule getFullAutoModule();
+
+    /**
+     * 연사 기능을 적용할 동작 사용 키를 반환한다.
+     *
+     * @return 연사 동작 사용 키
+     */
+    @NonNull
+    ActionKey getFullAutoKey();
+
+    /**
+     * 연사속도를 반환한다.
+     *
+     * @return 연사속도
+     * @see FireRate
+     */
+    @NonNull
+    FireRate getFireRate();
 
     /**
      * 지정할 수 있는 연사속도의 목록.

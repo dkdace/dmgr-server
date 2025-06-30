@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.jager;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
@@ -35,6 +36,9 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     /** 2중 무기 모듈 */
     @NonNull
     private final SwapModule<JagerWeaponR> swapModule;
+    /** 보조무기 */
+    @NonNull
+    private final JagerWeaponR subweapon;
     /** 정조준 모듈 */
     @NonNull
     private final AimModule aimModule;
@@ -42,11 +46,12 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public JagerWeaponL(@NonNull CombatUser combatUser, @NonNull JagerWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, JagerWeaponInfo.COOLDOWN);
 
-        this.reloadModule = new ReloadModule(this, JagerWeaponInfo.CAPACITY, JagerWeaponInfo.RELOAD_DURATION);
-        this.swapModule = new SwapModule<>(this, new JagerWeaponR(combatUser, weaponInfo, this), JagerWeaponInfo.SWAP_DURATION);
-        this.aimModule = new AimModule(this, JagerWeaponInfo.Scope.ZOOM_LEVEL);
+        this.reloadModule = new ReloadModule(this);
+        this.swapModule = new SwapModule<>(this);
+        this.subweapon = new JagerWeaponR(combatUser, weaponInfo, this);
+        this.aimModule = new AimModule(this);
 
-        addOnReset(() -> swapModule.getSubweapon().getReloadModule().resetRemainingAmmo());
+        addOnReset(() -> subweapon.getReloadModule().resetRemainingAmmo());
     }
 
     @Override
@@ -64,7 +69,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     @NonNull
     public ActionBarDisplay getActionBarDisplay() {
-        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), '*').build();
+        return ActionBarDisplay.builder(this).ammoBar(getCapacity(), '*').build();
     }
 
     @Override
@@ -78,16 +83,12 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!reloadModule.consume(1))
                     return;
-                }
 
                 setCooldown();
 
                 new JagerWeaponLProjectile().shot();
-
-                reloadModule.consume(1);
 
                 JagerWeaponInfo.RECOIL.send(combatUser);
                 JagerWeaponInfo.Effects.USE.play(combatUser.getLocation());
@@ -103,7 +104,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -113,28 +114,32 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     protected void onCancelled() {
-        if (swapModule.isSwapped()) {
-            swapModule.getSubweapon().cancel();
-            return;
-        }
-
         reloadModule.cancel();
         swapModule.cancel();
         aimModule.cancel();
+
+        if (swapModule.isSwapped())
+            swapModule.swap();
+    }
+
+    @Override
+    public int getCapacity() {
+        return JagerWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return JagerWeaponInfo.RELOAD_DURATION;
     }
 
     @Override
     public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity()
-                || swapModule.getSubweapon().getReloadModule().getRemainingAmmo() < swapModule.getSubweapon().getReloadModule().getCapacity();
+        return Reloadable.super.canReload() || subweapon.getReloadModule().getRemainingAmmo() < subweapon.getCapacity();
     }
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
         reloadModule.reload();
     }
 
@@ -145,7 +150,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onReloadFinished() {
-        swapModule.getSubweapon().getReloadModule().resetRemainingAmmo();
+        subweapon.getReloadModule().resetRemainingAmmo();
+    }
+
+    @Override
+    @NonNull
+    public Timespan getSwapDuration() {
+        return JagerWeaponInfo.SWAP_DURATION;
     }
 
     @Override
@@ -156,6 +167,12 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onSwapFinished(boolean isSwapped) {
         // 미사용
+    }
+
+    @Override
+    @NonNull
+    public ZoomLevel getZoomLevel() {
+        return JagerWeaponInfo.Scope.ZOOM_LEVEL;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
+import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
 import com.dace.dmgr.combat.ability.weapon.module.GradualSpreadModule;
 import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -24,21 +25,25 @@ import org.bukkit.Location;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Getter
 public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, FullAuto {
     /** 재장전 모듈 */
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
     /** 연사 모듈 */
     @NonNull
-    private final GradualSpreadModule fullAutoModule;
+    @Getter
+    private final FullAutoModule fullAutoModule;
+    /** 점진적 탄퍼짐 모듈 */
+    private final GradualSpreadModule gradualSpreadModule;
 
     public ArkaceWeapon(@NonNull CombatUser combatUser, @NonNull ArkaceWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, Timespan.ZERO);
 
-        this.reloadModule = new ReloadModule(this, ArkaceWeaponInfo.CAPACITY, ArkaceWeaponInfo.RELOAD_DURATION);
-        this.fullAutoModule = new GradualSpreadModule(this, ActionKey.RIGHT_CLICK, ArkaceWeaponInfo.FIRE_RATE, ArkaceWeaponInfo.Spread.INCREMENT,
-                ArkaceWeaponInfo.Spread.START, ArkaceWeaponInfo.Spread.MAX);
+        this.reloadModule = new ReloadModule(this);
+        this.fullAutoModule = new FullAutoModule(this);
+        this.gradualSpreadModule = new GradualSpreadModule(ArkaceWeaponInfo.Spread.INCREMENT, ArkaceWeaponInfo.Spread.START,
+                ArkaceWeaponInfo.Spread.MAX);
     }
 
     @Override
@@ -49,42 +54,46 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
 
     @Override
     @NonNull
+    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
+        return EnumSet.of(ActionKey.DROP);
+    }
+
+    @Override
+    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
-        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_SYMBOL).build();
+        return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_SYMBOL).build();
     }
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
-                    return;
-                }
                 if (cancelP1()) {
                     setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
                     return;
                 }
 
-                Location loc = combatUser.getLocation();
-                if (combatUser.getAbilityManager().getAbility(ArkaceUltInfo.getInstance()).isDurationFinished()) {
-                    new ArkaceWeaponHitscan(false).shot(VectorUtil.getSpreadedVector(loc.getDirection(), fullAutoModule.increaseSpread()));
+                boolean isUlt = !combatUser.getAbilityManager().getAbility(ArkaceUltInfo.getInstance()).isDurationFinished();
+                if (!isUlt && !reloadModule.consume(1))
+                    return;
 
-                    reloadModule.consume(1);
+                Location loc = combatUser.getLocation();
+                if (isUlt) {
+                    new ArkaceWeaponHitscan(true).shot();
+                    ArkaceUltInfo.Effects.SHOOT.play(loc);
+                } else {
+                    new ArkaceWeaponHitscan(false).shot(VectorUtil.getSpreadedVector(loc.getDirection(), gradualSpreadModule.increaseSpread()));
 
                     ArkaceWeaponInfo.RECOIL.send(combatUser);
                     ArkaceWeaponInfo.Effects.USE.play(loc);
 
                     addTask(new DelayTask(() -> ArkaceWeaponInfo.Effects.SHELL_DROP.play(loc), 8));
-                } else {
-                    new ArkaceWeaponHitscan(true).shot();
-                    ArkaceUltInfo.Effects.SHOOT.play(loc);
                 }
 
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -116,16 +125,18 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     }
 
     @Override
-    public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity();
+    public int getCapacity() {
+        return ArkaceWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return ArkaceWeaponInfo.RELOAD_DURATION;
     }
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
         reloadModule.reload();
     }
 
@@ -137,6 +148,18 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @Override
     public void onReloadFinished() {
         // 미사용
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getFullAutoKey() {
+        return ActionKey.RIGHT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public FireRate getFireRate() {
+        return ArkaceWeaponInfo.FIRE_RATE;
     }
 
     private final class ArkaceWeaponHitscan extends Hitscan<Damageable> {

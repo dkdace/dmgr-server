@@ -43,7 +43,7 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     public VellionA3(@NonNull CombatUser combatUser, @NonNull VellionA3Info skillInfo) {
         super(combatUser, skillInfo, VellionA3Info.COOLDOWN, Timespan.MAX);
 
-        this.confirmModule = new LocationConfirmModule(this, ActionKey.LEFT_CLICK, ActionKey.SLOT_3, VellionA3Info.MAX_DISTANCE);
+        this.confirmModule = new LocationConfirmModule(this, VellionA3Info.MAX_DISTANCE);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);
         this.silence = new Silence(combatUser);
     }
@@ -70,11 +70,10 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
         switch (actionKey) {
             case SLOT_3: {
                 confirmModule.toggleCheck();
-
                 break;
             }
             case LEFT_CLICK: {
-                onUse();
+                confirmModule.accept();
                 break;
             }
             default:
@@ -83,50 +82,9 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     }
 
     @Override
-    public boolean isCancellable() {
-        return confirmModule.isChecking() || !isDurationFinished();
-    }
-
-    @Override
-    protected void onCancelled() {
-        confirmModule.cancel();
-
-        if (!isDurationFinished()) {
-            setDuration(Timespan.ZERO);
-            combatUser.getMoveModule().removeModifier(MODIFIER);
-        }
-    }
-
-    @Override
-    public void onCheckEnable() {
-        // 미사용
-    }
-
-    @Override
-    public void onCheckTick(long i) {
-        // 미사용
-    }
-
-    @Override
-    public void onCheckDisable() {
-        // 미사용
-    }
-
-    @Override
-    public boolean isAssistMode() {
-        return true;
-    }
-
-    /**
-     * 사용 시 실행할 작업.
-     */
-    private void onUse() {
-        if (!confirmModule.isValid())
-            return;
-
+    public void onAccept() {
         setDuration();
 
-        confirmModule.toggleCheck();
         combatUser.setGlobalCooldown(VellionA3Info.READY_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
 
@@ -148,6 +106,38 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
                 VellionA3Info.Effects.playTick(i, loc);
             }, 1, VellionA3Info.DURATION.toTicks()));
         }, 1, VellionA3Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return confirmModule.isChecking() || !isDurationFinished();
+    }
+
+    @Override
+    protected void onCancelled() {
+        confirmModule.cancel();
+
+        if (!isDurationFinished()) {
+            setDuration(Timespan.ZERO);
+            combatUser.getMoveModule().removeModifier(MODIFIER);
+        }
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getAcceptKey() {
+        return ActionKey.LEFT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getCancelKey() {
+        return ActionKey.SLOT_3;
+    }
+
+    @Override
+    public boolean isAssistMode() {
+        return true;
     }
 
     private final class VellionA3Area extends Area<Damageable> {

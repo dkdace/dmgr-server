@@ -4,8 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
-import com.dace.dmgr.combat.ability.skill.Summonable;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -30,15 +29,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Getter
-public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.JagerA2Entity> {
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final EntityModule<JagerA2Entity> entityModule;
+public final class JagerA2 extends ActiveSkill {
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<JagerA2Entity> summonModule;
 
     public JagerA2(@NonNull CombatUser combatUser, @NonNull JagerA2Info skillInfo) {
         super(combatUser, skillInfo, JagerA2Info.COOLDOWN, Timespan.MAX);
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
     }
 
     @Override
@@ -61,7 +58,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerA2Info.READY_DURATION);
 
-        entityModule.removeEntity();
+        summonModule.removeEntity();
 
         JagerA2Info.Effects.USE.play(combatUser.getLocation());
 
@@ -95,7 +92,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
         @Override
         protected void onDestroy(@NonNull Location location, boolean isForce) {
             if (!isForce)
-                entityModule.set(new JagerA2Entity(location));
+                summonModule.set(new JagerA2Entity(location));
         }
 
         @Override
@@ -122,7 +119,7 @@ public final class JagerA2 extends ActiveSkill implements Summonable<JagerA2.Jag
     /**
      * 곰덫 클래스.
      */
-    public final class JagerA2Entity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
+    private final class JagerA2Entity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
         @Getter

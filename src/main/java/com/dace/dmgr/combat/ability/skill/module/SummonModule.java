@@ -1,26 +1,26 @@
 package com.dace.dmgr.combat.ability.skill.module;
 
-import com.dace.dmgr.combat.ability.skill.Summonable;
+import com.dace.dmgr.combat.ability.skill.Skill;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 스킬의 소환 엔티티 모듈 클래스.
+ * 소환 가능한 엔티티({@link SummonEntity})를 소환할 수 있는 스킬의 모듈 클래스.
  *
  * @param <T> {@link SummonEntity}를 상속받는 소환 가능한 엔티티
  */
-public final class EntityModule<T extends SummonEntity<?>> {
+public final class SummonModule<T extends SummonEntity<?>> {
     /** 소환한 엔티티 */
     @Nullable
     private T summonEntity = null;
 
     /**
-     * 소환 엔티티 모듈 인스턴스를 생성한다.
+     * 엔티티 소환 모듈 인스턴스를 생성한다.
      *
      * @param skill 대상 스킬
      */
-    public EntityModule(@NonNull Summonable<T> skill) {
+    public SummonModule(@NonNull Skill skill) {
         skill.addOnReset(this::removeEntity);
     }
 

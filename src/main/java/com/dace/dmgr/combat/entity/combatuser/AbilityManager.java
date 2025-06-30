@@ -74,6 +74,20 @@ public final class AbilityManager {
     }
 
     /**
+     * 현재 사용 중인 무기를 반환한다.
+     *
+     * @return 사용 중인 무기
+     */
+    @NonNull
+    private Weapon getCurrentWeapon() {
+        Weapon realWeapon = getWeapon();
+        if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().isSwapped())
+            return ((Swappable<?>) realWeapon).getSubweapon();
+
+        return realWeapon;
+    }
+
+    /**
      * 지정한 능력 정보에 해당하는 능력을 반환한다.
      *
      * @param abilityInfo 능력 정보
@@ -108,44 +122,14 @@ public final class AbilityManager {
             if (combatUser.isDead() || action == null || combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION))
                 return;
 
-            if (action instanceof MeleeAttackAction && action.canUse(actionKey)) {
-                action.onUse(actionKey);
-                return;
-            }
-
-            Weapon realWeapon = getWeapon();
-            if (realWeapon instanceof Swappable && ((Swappable<?>) realWeapon).getSwapModule().isSwapped())
-                realWeapon = ((Swappable<?>) realWeapon).getSwapModule().getSubweapon();
-
             if (action instanceof Weapon)
-                handleUseWeapon(actionKey, realWeapon);
-            else if (action instanceof Skill)
-                handleUseSkill(actionKey, (Skill) action);
+                action = getCurrentWeapon();
+
+            if (action instanceof FullAuto && (((FullAuto) action).getFullAutoKey() == actionKey))
+                ((FullAuto) action).getFullAutoModule().onUse();
+            else if (action.canUse(actionKey))
+                action.onUse(actionKey);
         });
-    }
-
-    /**
-     * 무기 사용 로직을 처리한다.
-     *
-     * @param actionKey 동작 사용 키
-     * @param weapon    무기
-     */
-    private void handleUseWeapon(@NonNull ActionKey actionKey, @NonNull Weapon weapon) {
-        if (weapon instanceof FullAuto && (((FullAuto) weapon).getFullAutoModule().getFullAutoKey() == actionKey))
-            ((FullAuto) weapon).getFullAutoModule().use();
-        else if (weapon.canUse(actionKey))
-            weapon.onUse(actionKey);
-    }
-
-    /**
-     * 스킬 사용 로직을 처리한다.
-     *
-     * @param actionKey 동작 사용 키
-     * @param skill     스킬
-     */
-    private void handleUseSkill(@NonNull ActionKey actionKey, @NonNull Skill skill) {
-        if (skill.canUse(actionKey))
-            skill.onUse(actionKey);
     }
 
     /**
@@ -154,7 +138,7 @@ public final class AbilityManager {
      * @param attacker 공격자
      */
     public void cancelAction(@Nullable CombatUser attacker) {
-        getWeapon().cancel();
+        getCurrentWeapon().cancel();
         cancelSkill(attacker);
     }
 

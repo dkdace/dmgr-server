@@ -28,7 +28,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
 
     public PalasUlt(@NonNull CombatUser combatUser, @NonNull PalasUltInfo skillInfo) {
         super(combatUser, skillInfo, Timespan.MAX, PalasUltInfo.COST);
-        this.targetModule = new TargetModule<>(this, PalasUltInfo.MAX_DISTANCE);
+        this.targetModule = new TargetModule<>(this);
     }
 
     @Override
@@ -60,6 +60,11 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    public int getMaxDistance() {
+        return PalasUltInfo.MAX_DISTANCE;
     }
 
     @Override

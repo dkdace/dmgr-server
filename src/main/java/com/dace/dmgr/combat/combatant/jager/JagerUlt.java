@@ -4,10 +4,9 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
-import com.dace.dmgr.combat.ability.skill.Summonable;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -34,19 +33,18 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
-public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt.JagerUltEntity>, HasBonusScore {
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final EntityModule<JagerUltEntity> entityModule;
+public final class JagerUlt extends UltimateSkill implements HasBonusScore {
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<JagerUltEntity> summonModule;
     /** 보너스 점수 모듈 */
     @NonNull
+    @Getter
     private final BonusScoreModule bonusScoreModule;
 
     public JagerUlt(@NonNull CombatUser combatUser, @NonNull JagerUltInfo skillInfo) {
         super(combatUser, skillInfo, Timespan.MAX, JagerUltInfo.COST);
 
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
         this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", JagerUltInfo.KILL_SCORE);
     }
 
@@ -66,7 +64,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(JagerUltInfo.READY_DURATION);
 
-        entityModule.removeEntity();
+        summonModule.removeEntity();
 
         JagerUltInfo.Effects.USE.play(combatUser.getLocation());
 
@@ -90,6 +88,15 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         setDuration(Timespan.ZERO);
     }
 
+    /**
+     * 눈폭풍 발생기가 생성된 상태인지 확인한다.
+     *
+     * @return 생성 여부
+     */
+    boolean isEntityCreated() {
+        return summonModule.get() != null;
+    }
+
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
             super(JagerUlt.this, JagerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
@@ -100,7 +107,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
         @Override
         protected void onDestroy(@NonNull Location location, boolean isForce) {
             if (!isForce)
-                entityModule.set(new JagerUltEntity(location));
+                summonModule.set(new JagerUltEntity(location));
         }
 
         @Override
@@ -127,7 +134,7 @@ public final class JagerUlt extends UltimateSkill implements Summonable<JagerUlt
     /**
      * 눈폭풍 발생기 클래스.
      */
-    public final class JagerUltEntity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
+    private final class JagerUltEntity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
         @Getter

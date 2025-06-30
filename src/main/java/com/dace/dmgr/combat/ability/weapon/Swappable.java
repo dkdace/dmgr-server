@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.ability.weapon;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.weapon.module.SwapModule;
 import lombok.NonNull;
 
@@ -14,6 +15,22 @@ public interface Swappable<T extends Weapon> extends Weapon {
      */
     @NonNull
     SwapModule<@NonNull T> getSwapModule();
+
+    /**
+     * 보조무기를 반환한다.
+     *
+     * @return 보조무기 인스턴스
+     */
+    @NonNull
+    T getSubweapon();
+
+    /**
+     * 무기 교체 시간을 반환한다.
+     *
+     * @return 무기 교체 시간
+     */
+    @NonNull
+    Timespan getSwapDuration();
 
     /**
      * 무기 전환을 시작할 때 실행할 작업.

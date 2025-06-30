@@ -19,9 +19,6 @@ public final class AimModule {
     /** 무기 인스턴스 */
     @NonNull
     private final Aimable weapon;
-    /** 확대 레벨 */
-    @NonNull
-    private final Aimable.ZoomLevel zoomLevel;
 
     /** 틱 작업을 처리하는 태스크 */
     @Nullable
@@ -40,10 +37,9 @@ public final class AimModule {
         }
 
         isAiming = true;
-
         weapon.onAimEnable();
 
-        onTickTask = new IntervalTask((LongConsumer) i -> weapon.getCombatUser().setFovValue(zoomLevel.getValue()), 1);
+        onTickTask = new IntervalTask((LongConsumer) i -> weapon.getCombatUser().setFovValue(weapon.getZoomLevel().getValue()), 1);
         weapon.addTask(onTickTask);
     }
 

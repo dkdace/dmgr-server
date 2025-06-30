@@ -35,7 +35,7 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
 
     public No7Weapon(@NonNull CombatUser combatUser, @NonNull No7WeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, Timespan.ZERO);
-        this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, No7WeaponInfo.FIRE_RATE);
+        this.fullAutoModule = new FullAutoModule(this);
     }
 
     @Override
@@ -72,6 +72,18 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
      */
     boolean canSprint() {
         return slowTimestamp.isBefore(Timestamp.now());
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getFullAutoKey() {
+        return ActionKey.RIGHT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public FireRate getFireRate() {
+        return No7WeaponInfo.FIRE_RATE;
     }
 
     private final class No7WeaponHitscan extends Hitscan<Damageable> {

@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.ability.skill.module;
 
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.Confirmable;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
@@ -19,12 +18,6 @@ public abstract class ConfirmModule {
     /** 스킬 인스턴스 */
     @NonNull
     protected final Confirmable skill;
-    /** 수락 키 */
-    @NonNull
-    protected final ActionKey acceptKey;
-    /** 취소 키 */
-    @NonNull
-    protected final ActionKey cancelKey;
 
     /** 확인 중 상태 */
     @Getter
@@ -43,17 +36,16 @@ public abstract class ConfirmModule {
         }
 
         isChecking = true;
-
-        skill.onCheckEnable();
         onCheckEnable();
 
-        onTickTask = new IntervalTask(i -> {
-            skill.onCheckTick(i);
-            onCheckTick(i);
-        }, 1);
-
+        onTickTask = new IntervalTask(this::onCheckTick, 1);
         skill.addTask(onTickTask);
     }
+
+    /**
+     * 스킬의 확인 모드를 수락한다.
+     */
+    public abstract void accept();
 
     /**
      * 스킬의 확인 모드를 취소한다.
@@ -68,23 +60,22 @@ public abstract class ConfirmModule {
             onTickTask.stop();
 
         onCheckDisable();
-        skill.onCheckDisable();
     }
 
     /**
-     * 모듈에서 확인 모드 활성화 시 실행할 작업.
+     * 확인 모드 활성화 시 실행할 작업.
      */
     protected abstract void onCheckEnable();
 
     /**
-     * 모듈에서 확인 중에 매 틱마다 실행할 작업.
+     * 확인 중에 매 틱마다 실행할 작업.
      *
      * @param i 인덱스
      */
     protected abstract void onCheckTick(long i);
 
     /**
-     * 모듈에서 확인 모드 비활성화 시 실행할 작업.
+     * 확인 모드 비활성화 시 실행할 작업.
      */
     protected abstract void onCheckDisable();
 }

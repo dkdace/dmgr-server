@@ -20,8 +20,6 @@ public final class TargetModule<T extends CombatEntity> {
     /** 스킬 인스턴스 */
     @NonNull
     private final Targeted<T> skill;
-    /** 최대 거리 (단위: 블록) */
-    private final double maxDistance;
 
     /** 찾은 엔티티 */
     @Nullable
@@ -37,7 +35,7 @@ public final class TargetModule<T extends CombatEntity> {
     public boolean findTarget() {
         currentTarget = null;
 
-        new Target<T>(skill.getCombatUser(), maxDistance, skill.getEntityCondition()) {
+        new Target<T>(skill.getCombatUser(), skill.getMaxDistance(), skill.getEntityCondition()) {
             @Override
             protected void onFindEntity(@NonNull T target) {
                 currentTarget = target;

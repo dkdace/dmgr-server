@@ -31,7 +31,7 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
 
     public NeaceA3(@NonNull CombatUser combatUser, @NonNull NeaceA3Info skillInfo) {
         super(combatUser, skillInfo, NeaceA3Info.COOLDOWN, NeaceA3Info.DURATION);
-        this.targetModule = new TargetModule<>(this, NeaceA3Info.MAX_DISTANCE);
+        this.targetModule = new TargetModule<>(this);
     }
 
     @Override
@@ -97,6 +97,11 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+    }
+
+    @Override
+    public int getMaxDistance() {
+        return NeaceA3Info.MAX_DISTANCE;
     }
 
     @Override

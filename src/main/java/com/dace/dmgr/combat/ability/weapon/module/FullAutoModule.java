@@ -2,10 +2,8 @@ package com.dace.dmgr.combat.ability.weapon.module;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
@@ -20,13 +18,6 @@ public class FullAutoModule {
     /** 무기 인스턴스 */
     @NonNull
     protected final FullAuto weapon;
-    /** 연사 기능을 적용할 동작 사용 키 */
-    @NonNull
-    @Getter
-    private final ActionKey fullAutoKey;
-    /** 연사속도 */
-    @NonNull
-    private final FullAuto.FireRate fireRate;
 
     /** 연사 무기 사용을 처리하는 태스크 */
     @Nullable
@@ -41,13 +32,13 @@ public class FullAutoModule {
      * @return 발사 가능 여부
      */
     private boolean isFireTick(long tick) {
-        return (fireRate.getTickFlag() & 1 << tick % 20) != 0;
+        return (weapon.getFireRate().getTickFlag() & 1 << tick % 20) != 0;
     }
 
     /**
-     * 무기의 연사 기능을 사용한다.
+     * 무기를 사용했을 때 실행할 작업.
      */
-    public final void use() {
+    public void onUse() {
         Timestamp expiration = Timestamp.now().plus(Timespan.ofTicks(6));
 
         if (fullAutoTask != null && !fullAutoTask.isStopped()) {
@@ -61,8 +52,8 @@ public class FullAutoModule {
             if (cooldownTimestamp.isBefore(Timestamp.now()))
                 return false;
 
-            if (weapon.canUse(fullAutoKey) && !weapon.getCombatUser().isDead() && weapon.getCombatUser().isGlobalCooldownFinished() && isFireTick(i))
-                weapon.onUse(fullAutoKey);
+            if (weapon.canUse(weapon.getFullAutoKey()) && weapon.getCombatUser().isGlobalCooldownFinished() && isFireTick(i))
+                weapon.onUse(weapon.getFullAutoKey());
 
             return true;
         }, 1);

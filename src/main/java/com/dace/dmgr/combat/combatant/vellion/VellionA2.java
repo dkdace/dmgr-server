@@ -55,7 +55,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     public VellionA2(@NonNull CombatUser combatUser, @NonNull VellionA2Info skillInfo) {
         super(combatUser, skillInfo, VellionA2Info.COOLDOWN, Timespan.MAX);
 
-        this.targetModule = new TargetModule<>(this, VellionA2Info.MAX_DISTANCE);
+        this.targetModule = new TargetModule<>(this);
         this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);
 
         addOnReset(this::forceCancel);
@@ -165,6 +165,11 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
 
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().removeModifier(SPEED_MODIFIER);
+    }
+
+    @Override
+    public int getMaxDistance() {
+        return VellionA2Info.MAX_DISTANCE;
     }
 
     @Override

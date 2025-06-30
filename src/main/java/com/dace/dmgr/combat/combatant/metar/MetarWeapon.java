@@ -46,8 +46,8 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
     public MetarWeapon(@NonNull CombatUser combatUser, @NonNull MetarWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, Timespan.ZERO);
 
-        this.reloadModule = new ReloadModule(this, MetarWeaponInfo.CAPACITY, MetarWeaponInfo.RELOAD_DURATION);
-        this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, MetarWeaponInfo.FIRE_RATE);
+        this.reloadModule = new ReloadModule(this);
+        this.fullAutoModule = new FullAutoModule(this);
     }
 
     @Override
@@ -66,16 +66,13 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case RIGHT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!reloadModule.consume(1))
                     return;
-                }
 
                 isOpposite = !isOpposite;
 
                 new MetarWeaponProjectile(isOpposite).shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), MetarWeaponInfo.SPREAD));
 
-                reloadModule.consume(1);
                 combatUser.getMoveModule().addModifier(MODIFIER);
 
                 if (slowTimestamp.isBefore(Timestamp.now())) {
@@ -89,7 +86,7 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -102,17 +99,28 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         reloadModule.cancel();
     }
 
+    /**
+     * 달리기 가능 여부를 확인한다.
+     *
+     * @return 달리기 가능 여부
+     */
+    boolean canSprint() {
+        return slowTimestamp.isBefore(Timestamp.now());
+    }
+
     @Override
-    public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < reloadModule.getCapacity();
+    public int getCapacity() {
+        return MetarWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return MetarWeaponInfo.RELOAD_DURATION;
     }
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
         reloadModule.reload();
     }
 
@@ -126,13 +134,16 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
         // 미사용
     }
 
-    /**
-     * 달리기 가능 여부를 확인한다.
-     *
-     * @return 달리기 가능 여부
-     */
-    boolean canSprint() {
-        return slowTimestamp.isBefore(Timestamp.now());
+    @Override
+    @NonNull
+    public ActionKey getFullAutoKey() {
+        return ActionKey.RIGHT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public FireRate getFireRate() {
+        return MetarWeaponInfo.FIRE_RATE;
     }
 
     private final class MetarWeaponProjectile extends Projectile<Damageable> {

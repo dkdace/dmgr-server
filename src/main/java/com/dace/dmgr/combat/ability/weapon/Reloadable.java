@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.ability.weapon;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import lombok.NonNull;
 
@@ -14,13 +15,28 @@ public interface Reloadable extends Weapon {
     ReloadModule getReloadModule();
 
     /**
+     * 장탄수를 반환한다.
+     *
+     * @return 장탄수
+     */
+    int getCapacity();
+
+    /**
+     * 장전 시간을 반환한다.
+     *
+     * @return 장전 시간
+     */
+    @NonNull
+    Timespan getReloadDuration();
+
+    /**
      * 무기를 재장전할 수 있는지 확인한다.
      *
      * @return 재장전 가능 여부
-     * @implSpec {@code true}
+     * @implSpec {@link ReloadModule#getRemainingAmmo()} &lt; {@link Reloadable#getCapacity()}
      */
     default boolean canReload() {
-        return true;
+        return getReloadModule().getRemainingAmmo() < getCapacity();
     }
 
     /**

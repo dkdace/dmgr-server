@@ -3,10 +3,9 @@ package com.dace.dmgr.combat.combatant.ched;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
-import com.dace.dmgr.combat.ability.skill.Summonable;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
@@ -31,14 +30,12 @@ import org.bukkit.util.Vector;
 
 import java.util.function.LongConsumer;
 
-public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.ChedUltFireFloor>, HasBonusScore {
+public final class ChedUlt extends UltimateSkill implements HasBonusScore {
     /** 수정자 ID */
     private static final Modifier MODIFIER = new Modifier(-ChedUltInfo.READY_SLOW);
 
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    @Getter
-    private final EntityModule<ChedUltFireFloor> entityModule;
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<ChedUltFireFloor> summonModule;
     /** 보너스 점수 모듈 */
     @NonNull
     @Getter
@@ -49,7 +46,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     public ChedUlt(@NonNull CombatUser combatUser, @NonNull ChedUltInfo skillInfo) {
         super(combatUser, skillInfo, Timespan.MAX, ChedUltInfo.COST);
 
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
         this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
         this.burning = new Burning(combatUser, ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
     }
@@ -130,7 +127,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
                 Location loc = target.getHitboxCenter().add(0, 0.1, 0);
                 new ChedUltArea().emit(loc);
 
-                entityModule.set(new ChedUltFireFloor(loc));
+                summonModule.set(new ChedUltFireFloor(loc));
 
                 for (Location loc2 : LocationUtil.getLine(location, loc, 0.4))
                     ChedUltInfo.Effects.HIT_ENTITY.play(loc2);
@@ -171,7 +168,7 @@ public final class ChedUlt extends UltimateSkill implements Summonable<ChedUlt.C
     /**
      * 화염 지대 클래스.
      */
-    public final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
+    private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
             super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false);
             addOnTick(this::onTick);

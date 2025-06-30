@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.inferno;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
@@ -43,8 +44,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     public InfernoWeapon(@NonNull CombatUser combatUser, @NonNull InfernoWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, InfernoWeaponInfo.Fireball.COOLDOWN);
 
-        this.reloadModule = new ReloadModule(this, InfernoWeaponInfo.CAPACITY, InfernoWeaponInfo.RELOAD_DURATION);
-        this.fullAutoModule = new FullAutoModule(this, ActionKey.RIGHT_CLICK, FireRate.RPM_1200);
+        this.reloadModule = new ReloadModule(this);
+        this.fullAutoModule = new FullAutoModule(this);
         this.burning = new Burning(combatUser, InfernoWeaponInfo.FIRE_DAMAGE_PER_SECOND, true);
     }
 
@@ -68,34 +69,25 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     public void onUse(@NonNull ActionKey actionKey) {
+        boolean isUlt = !combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished();
+
         switch (actionKey) {
             case RIGHT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!isUlt && !reloadModule.consume(1))
                     return;
-                }
 
                 new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
 
-                if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished())
-                    reloadModule.consume(1);
-
                 InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
-
                 break;
             }
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() < InfernoWeaponInfo.Fireball.CAPACITY_CONSUME) {
-                    onAmmoEmpty();
+                if (!isUlt && !reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME))
                     return;
-                }
 
                 setCooldown();
 
                 new InfernoWeaponLProjectile().shot();
-
-                if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished())
-                    reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME);
 
                 InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);
                 InfernoWeaponInfo.Effects.FIREBALL_USE.play(combatUser.getLocation());
@@ -103,7 +95,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -117,16 +109,18 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     }
 
     @Override
-    public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < InfernoWeaponInfo.CAPACITY;
+    public int getCapacity() {
+        return InfernoWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return InfernoWeaponInfo.RELOAD_DURATION;
     }
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
         reloadModule.reload();
     }
 
@@ -138,6 +132,18 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     @Override
     public void onReloadFinished() {
         // 미사용
+    }
+
+    @Override
+    @NonNull
+    public ActionKey getFullAutoKey() {
+        return ActionKey.RIGHT_CLICK;
+    }
+
+    @Override
+    @NonNull
+    public FireRate getFireRate() {
+        return FireRate.RPM_1200;
     }
 
     private final class InfernoWeaponRProjectile extends Projectile<Damageable> {

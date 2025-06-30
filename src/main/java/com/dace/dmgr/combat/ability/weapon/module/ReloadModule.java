@@ -21,11 +21,6 @@ import java.text.MessageFormat;
 public final class ReloadModule {
     /** 무기 인스턴스 */
     private final Reloadable weapon;
-    /** 장탄수 */
-    @Getter
-    private final int capacity;
-    /** 장전 시간 */
-    private final Timespan reloadDuration;
 
     /** 재장전 작업을 처리하는 태스크 */
     @Nullable
@@ -41,18 +36,11 @@ public final class ReloadModule {
     /**
      * 재장전 모듈 인스턴스를 생성한다.
      *
-     * @param weapon         대상 무기
-     * @param capacity       장탄수. 1 이상의 값
-     * @param reloadDuration 장전 시간
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param weapon 대상 무기
      */
-    public ReloadModule(@NonNull Reloadable weapon, int capacity, @NonNull Timespan reloadDuration) {
-        Validate.isTrue(capacity >= 1, "capacity >= 1 (%d)", capacity);
-
+    public ReloadModule(@NonNull Reloadable weapon) {
         this.weapon = weapon;
-        this.remainingAmmo = capacity;
-        this.capacity = capacity;
-        this.reloadDuration = reloadDuration;
+        this.remainingAmmo = weapon.getCapacity();
 
         weapon.addOnReset(this::resetRemainingAmmo);
     }
@@ -62,17 +50,26 @@ public final class ReloadModule {
      *
      * <p>탄약을 전부 소진하면 {@link Reloadable#onAmmoEmpty()}를 호출한다.</p>
      *
-     * @param amount 탄약 소모량. 1 이상의 값
+     * @param amount 탄약 소모량. 0 이상의 값
+     * @return 탄약 소모 시 {@code true} 반환
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public void consume(int amount) {
-        Validate.isTrue(amount >= 1, "amount >= 1 (%d)", amount);
+    public boolean consume(int amount) {
+        Validate.isTrue(amount >= 0, "amount >= 0 (%d)", amount);
 
-        remainingAmmo = Math.max(0, remainingAmmo - amount);
-        if (isReloading)
-            cancel();
-        else if (remainingAmmo == 0)
-            weapon.onAmmoEmpty();
+        if (remainingAmmo > 0 && remainingAmmo - amount >= 0) {
+            remainingAmmo -= amount;
+
+            if (isReloading)
+                cancel();
+            else if (remainingAmmo == 0)
+                weapon.onAmmoEmpty();
+
+            return true;
+        }
+
+        weapon.onAmmoEmpty();
+        return false;
     }
 
     /**
@@ -82,9 +79,10 @@ public final class ReloadModule {
         if (!weapon.canReload() || isReloading)
             return;
 
+        weapon.cancel();
         isReloading = true;
 
-        long durationTicks = reloadDuration.toTicks();
+        long durationTicks = weapon.getReloadDuration().toTicks();
 
         reloadTask = new IntervalTask(i -> {
             String message = MessageFormat.format("§c§l재장전... {0} §f[{1}초]",
@@ -95,10 +93,9 @@ public final class ReloadModule {
             weapon.onReloadTick(i);
         }, () -> {
             cancel();
+            resetRemainingAmmo();
 
             weapon.getCombatUser().getUser().sendActionBar("§a§l재장전 완료", Timespan.ofTicks(6));
-
-            resetRemainingAmmo();
             weapon.onReloadFinished();
         }, 1, durationTicks);
 
@@ -109,7 +106,7 @@ public final class ReloadModule {
      * 무기의 남은 탄약 수를 최대 장탄수로 초기화한다.
      */
     public void resetRemainingAmmo() {
-        remainingAmmo = capacity;
+        remainingAmmo = weapon.getCapacity();
     }
 
     /**

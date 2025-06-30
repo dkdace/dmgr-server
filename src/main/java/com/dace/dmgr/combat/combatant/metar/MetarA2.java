@@ -3,9 +3,8 @@ package com.dace.dmgr.combat.combatant.metar;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionKey;
-import com.dace.dmgr.combat.ability.skill.MultiSummonable;
 import com.dace.dmgr.combat.ability.skill.StackableSkill;
-import com.dace.dmgr.combat.ability.skill.module.MultiEntityModule;
+import com.dace.dmgr.combat.ability.skill.module.MultiSummonModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -14,7 +13,6 @@ import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,15 +23,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Getter
-public final class MetarA2 extends StackableSkill implements MultiSummonable<MetarA2.MetarA2Entity> {
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final MultiEntityModule<MetarA2Entity> multiEntityModule;
+public final class MetarA2 extends StackableSkill {
+    /** 다중 엔티티 소환 모듈 */
+    private final MultiSummonModule<MetarA2Entity> multiSummonModule;
 
     public MetarA2(@NonNull CombatUser combatUser, @NonNull MetarA2Info skillInfo) {
         super(combatUser, skillInfo, MetarA2Info.COOLDOWN, MetarA2Info.STACK_COOLDOWN, Timespan.MAX, MetarA2Info.MAX_STACK);
-        this.multiEntityModule = new MultiEntityModule<>(this, MetarA2Info.MAX_STACK);
+        this.multiSummonModule = new MultiSummonModule<>(this, MetarA2Info.MAX_STACK);
     }
 
     @Override
@@ -50,7 +46,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
         MetarA2Info.Effects.USE.play(combatUser.getLocation());
 
         Location loc = combatUser.getLocation().add(0, 0.75, 0);
-        multiEntityModule.add(new MetarA2Entity(loc));
+        multiSummonModule.add(new MetarA2Entity(loc));
     }
 
     @Override
@@ -61,7 +57,7 @@ public final class MetarA2 extends StackableSkill implements MultiSummonable<Met
     /**
      * 에너지 방벽 클래스.
      */
-    public final class MetarA2Entity extends Barrier {
+    private final class MetarA2Entity extends Barrier {
         private MetarA2Entity(@NonNull Location spawnLocation) {
             super(spawnLocation, combatUser.getName() + "의 방벽", combatUser, MetarA2Info.HEALTH, MetarA2Info.DEATH_SCORE,
                     Hitbox.builder(7, 4, 0.3).axisOffsetY(1.5).build());

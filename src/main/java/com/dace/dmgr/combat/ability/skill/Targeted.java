@@ -20,6 +20,13 @@ public interface Targeted<T extends CombatEntity> extends Skill {
     TargetModule<T> getTargetModule();
 
     /**
+     * 대상 엔티티를 찾는 최대 거리를 반환한다.
+     *
+     * @return 최대 거리 (단위: 블록)
+     */
+    int getMaxDistance();
+
+    /**
      * 대상 엔티티를 찾는 조건을 반환한다.
      *
      * @return 대상 엔티티를 찾는 조건

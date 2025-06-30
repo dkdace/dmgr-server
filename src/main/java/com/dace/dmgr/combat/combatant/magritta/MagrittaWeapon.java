@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.combatant.magritta;
 
+import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
@@ -23,15 +24,15 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Set;
 
+@Getter
 public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     /** 재장전 모듈 */
     @NonNull
-    @Getter
     private final ReloadModule reloadModule;
 
     public MagrittaWeapon(@NonNull CombatUser combatUser, @NonNull MagrittaWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, MagrittaWeaponInfo.COOLDOWN);
-        this.reloadModule = new ReloadModule(this, MagrittaWeaponInfo.CAPACITY, MagrittaWeaponInfo.RELOAD_DURATION);
+        this.reloadModule = new ReloadModule(this);
     }
 
     @Override
@@ -49,7 +50,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     @Override
     @NonNull
     public ActionBarDisplay getActionBarDisplay() {
-        return ActionBarDisplay.builder(this).ammoBar(reloadModule.getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL).build();
+        return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL).build();
     }
 
     @Override
@@ -63,15 +64,11 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     public void onUse(@NonNull ActionKey actionKey) {
         switch (actionKey) {
             case LEFT_CLICK: {
-                if (reloadModule.getRemainingAmmo() == 0) {
-                    onAmmoEmpty();
+                if (!reloadModule.consume(1))
                     return;
-                }
 
                 setCooldown();
                 shot(false);
-
-                reloadModule.consume(1);
 
                 MagrittaWeaponInfo.RECOIL.send(combatUser);
 
@@ -83,7 +80,7 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
                 break;
             }
             case DROP: {
-                onAmmoEmpty();
+                reloadModule.reload();
                 break;
             }
             default:
@@ -97,16 +94,18 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
     }
 
     @Override
-    public boolean canReload() {
-        return reloadModule.getRemainingAmmo() < MagrittaWeaponInfo.CAPACITY;
+    public int getCapacity() {
+        return MagrittaWeaponInfo.CAPACITY;
+    }
+
+    @Override
+    @NonNull
+    public Timespan getReloadDuration() {
+        return MagrittaWeaponInfo.RELOAD_DURATION;
     }
 
     @Override
     public void onAmmoEmpty() {
-        if (reloadModule.isReloading())
-            return;
-
-        cancel();
         reloadModule.reload();
     }
 

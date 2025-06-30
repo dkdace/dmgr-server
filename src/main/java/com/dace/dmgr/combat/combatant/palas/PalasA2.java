@@ -34,7 +34,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
 
     public PalasA2(@NonNull CombatUser combatUser, @NonNull PalasA2Info skillInfo) {
         super(combatUser, skillInfo, PalasA2Info.COOLDOWN, Timespan.MAX);
-        this.targetModule = new TargetModule<>(this, PalasA2Info.MAX_DISTANCE);
+        this.targetModule = new TargetModule<>(this);
     }
 
     @Override
@@ -71,6 +71,11 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     @Override
     public boolean isCancellable() {
         return false;
+    }
+
+    @Override
+    public int getMaxDistance() {
+        return PalasA2Info.MAX_DISTANCE;
     }
 
     @Override

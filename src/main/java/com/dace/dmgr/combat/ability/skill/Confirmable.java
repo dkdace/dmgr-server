@@ -1,5 +1,6 @@
 package com.dace.dmgr.combat.ability.skill;
 
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.module.ConfirmModule;
 import lombok.NonNull;
 
@@ -14,19 +15,23 @@ public interface Confirmable extends Skill {
     ConfirmModule getConfirmModule();
 
     /**
-     * 확인 모드 활성화 시 실행할 작업.
-     */
-    void onCheckEnable();
-
-    /**
-     * 확인 모드 중에 매 틱마다 실행할 작업.
+     * 확인 수락에 사용할 수락 키를 반환한다.
      *
-     * @param i 인덱스
+     * @return 수락 키
      */
-    void onCheckTick(long i);
+    @NonNull
+    ActionKey getAcceptKey();
 
     /**
-     * 확인 모드 비활성화 시 실행할 작업.
+     * 확인 취소에 사용할 취소 키를 반환한다.
+     *
+     * @return 취소 키
      */
-    void onCheckDisable();
+    @NonNull
+    ActionKey getCancelKey();
+
+    /**
+     * 확인 수락 시 실행할 작업.
+     */
+    void onAccept();
 }

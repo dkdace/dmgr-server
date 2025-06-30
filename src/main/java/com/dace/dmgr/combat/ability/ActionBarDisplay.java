@@ -6,7 +6,6 @@ import com.dace.dmgr.combat.ability.skill.Skill;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
 import com.dace.dmgr.combat.ability.weapon.Swappable;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
-import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.util.StringFormUtil;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -341,8 +340,7 @@ public final class ActionBarDisplay {
             Validate.isTrue(length >= 1, "length >= 1 (%d)", length);
             Validate.isTrue(ability instanceof Reloadable, "ability가 Reloadable을 상속받지 않음");
 
-            ReloadModule reloadModule = ((Reloadable) ability).getReloadModule();
-            progressBar(reloadModule.getRemainingAmmo(), reloadModule.getCapacity(), length, symbol);
+            progressBar(((Reloadable) ability).getReloadModule().getRemainingAmmo(), ((Reloadable) ability).getCapacity(), length, symbol);
 
             String prefix = TextIcon.CAPACITY.toString();
 

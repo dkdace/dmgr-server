@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.ability.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.Confirmable;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -38,13 +37,11 @@ public final class LocationConfirmModule extends ConfirmModule {
      * 위치 확인 모듈 인스턴스를 생성한다.
      *
      * @param skill       대상 스킬
-     * @param acceptKey   수락 키
-     * @param cancelKey   취소 키
      * @param maxDistance 최대 거리. (단위: 블록). 0 이상의 값
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    public LocationConfirmModule(@NonNull Confirmable skill, @NonNull ActionKey acceptKey, @NonNull ActionKey cancelKey, int maxDistance) {
-        super(skill, acceptKey, cancelKey);
+    public LocationConfirmModule(@NonNull Confirmable skill, int maxDistance) {
+        super(skill);
         Validate.isTrue(maxDistance >= 0, "maxDistance >= 0 (%d)", maxDistance);
 
         this.maxDistance = maxDistance;
@@ -57,11 +54,21 @@ public final class LocationConfirmModule extends ConfirmModule {
     }
 
     /**
+     * 현재 지정 위치를 반환한다.
+     *
+     * @return 현재 지정 위치
+     */
+    @NonNull
+    public Location getCurrentLocation() {
+        return currentLocation.clone();
+    }
+
+    /**
      * 위치를 지정할 수 있는지 확인한다.
      *
      * @return 위치 지정 가능 여부
      */
-    public boolean isValid() {
+    private boolean isValid() {
         Player player = skill.getCombatUser().getEntity();
         if (!isChecking || currentLocation.equals(player.getLocation())
                 || !currentLocation.getBlock().isEmpty()
@@ -74,14 +81,13 @@ public final class LocationConfirmModule extends ConfirmModule {
         return player.getEyeLocation().getY() > currentLocation.getY() || LocationUtil.canPass(loc, player.getEyeLocation());
     }
 
-    /**
-     * 현재 지정 위치를 반환한다.
-     *
-     * @return 현재 지정 위치
-     */
-    @NonNull
-    public Location getCurrentLocation() {
-        return currentLocation.clone();
+    @Override
+    public void accept() {
+        if (!isValid())
+            return;
+
+        toggleCheck();
+        skill.onAccept();
     }
 
     @Override
@@ -120,9 +126,9 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.setAI(false);
 
         String message = MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
-                acceptKey,
+                skill.getAcceptKey(),
                 (isValid() ? ChatColor.WHITE : ChatColor.RED),
-                cancelKey);
+                skill.getCancelKey());
 
         skill.getCombatUser().getUser().sendTitle("", message, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
         skill.getCombatUser().getUser().getGlowingManager().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));

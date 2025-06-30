@@ -129,7 +129,7 @@ public final class Jager extends Marksman {
 
     @Override
     public boolean canChargeUlt(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getAbility(JagerUltInfo.getInstance()).getEntityModule().get() == null;
+        return !combatUser.getAbilityManager().getAbility(JagerUltInfo.getInstance()).isEntityCreated();
     }
 
     @Override

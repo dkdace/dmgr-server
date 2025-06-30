@@ -5,8 +5,7 @@ import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
-import com.dace.dmgr.combat.ability.skill.Summonable;
-import com.dace.dmgr.combat.ability.skill.module.EntityModule;
+import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -14,7 +13,6 @@ import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.item.ItemBuilder;
 import com.dace.dmgr.util.location.LocationUtil;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,17 +22,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 
-@Getter
-public final class QuakerA1 extends ChargeableSkill implements Summonable<QuakerA1.QuakerA1Entity> {
+public final class QuakerA1 extends ChargeableSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-QuakerA1Info.USE_SLOW);
-    /** 소환 엔티티 모듈 */
-    @NonNull
-    private final EntityModule<QuakerA1Entity> entityModule;
+    /** 엔티티 소환 모듈 */
+    private final SummonModule<QuakerA1Entity> summonModule;
 
     public QuakerA1(@NonNull CombatUser combatUser, @NonNull QuakerA1Info skillInfo) {
         super(combatUser, skillInfo, QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH);
-        this.entityModule = new EntityModule<>(this);
+        this.summonModule = new SummonModule<>(this);
     }
 
     @Override
@@ -81,7 +77,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
 
         QuakerA1Info.Effects.ON.play(combatUser.getLocation());
 
-        entityModule.set(new QuakerA1Entity(combatUser.getLocation()));
+        summonModule.set(new QuakerA1Entity(combatUser.getLocation()));
     }
 
     @Override
@@ -94,7 +90,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().removeModifier(MODIFIER);
 
-        entityModule.removeEntity();
+        summonModule.removeEntity();
 
         QuakerA1Info.Effects.OFF.play(combatUser.getLocation());
     }
@@ -102,7 +98,7 @@ public final class QuakerA1 extends ChargeableSkill implements Summonable<Quaker
     /**
      * 불굴의 방패 클래스.
      */
-    public final class QuakerA1Entity extends Barrier {
+    private final class QuakerA1Entity extends Barrier {
         private QuakerA1Entity(@NonNull Location spawnLocation) {
             super(spawnLocation, combatUser.getName() + "의 방패", combatUser, QuakerA1Info.HEALTH, QuakerA1Info.DEATH_SCORE,
                     Hitbox.builder(6, 3.5, 0.3).axisOffsetY(1.4).build());
