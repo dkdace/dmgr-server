@@ -2,27 +2,17 @@ package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
-import com.dace.dmgr.combat.ability.skill.PassiveSkill;
+import com.dace.dmgr.combat.ability.skill.WallClimbSkill;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class ChedP1 extends PassiveSkill {
-    /** 벽타기 남은 횟수 */
-    private int wallRideCount = ChedP1Info.USE_COUNT;
+public final class ChedP1 extends WallClimbSkill {
     /** 매달리기 남은 시간 (tick) */
     private long hangTick = ChedP1Info.HANG_DURATION.toTicks();
     /** 매달리기 활성화 여부 */
@@ -30,18 +20,12 @@ public final class ChedP1 extends PassiveSkill {
     private boolean isHanging = false;
 
     public ChedP1(@NonNull CombatUser combatUser, @NonNull ChedP1Info skillInfo) {
-        super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
+        super(combatUser, skillInfo, ChedP1Info.USE_COUNT);
     }
 
     @Override
     public int getPriority() {
         return 1;
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK);
     }
 
     @Override
@@ -54,118 +38,14 @@ public final class ChedP1 extends PassiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && canActivate();
-    }
-
-    /**
-     * 스킬 활성화 조건을 확인한다.
-     *
-     * @param yaw 원본 Yaw 값
-     * @return 활성화 조건
-     */
-    private boolean canActivate(float yaw) {
-        if (wallRideCount <= 0 || !LocationUtil.isNonSolid(combatUser.getEntity().getEyeLocation().add(0, 0.5, 0)))
-            return false;
-
-        Location loc = combatUser.getEntity().getEyeLocation().subtract(0, 0.1, 0);
-        loc.setYaw(yaw);
-        loc.setPitch(0);
-        loc.add(loc.getDirection().multiply(0.75));
-
-        return !LocationUtil.isNonSolid(loc);
-    }
-
-    /**
-     * 스킬 활성화 조건을 확인한다.
-     *
-     * @return 활성화 조건
-     */
-    private boolean canActivate() {
-        return canActivate(combatUser.getLocation().getYaw());
+    protected double getSpeed() {
+        return ChedP1Info.PUSH;
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        setDuration();
-        combatUser.addYawAndPitch(0, 0);
+    protected void onWallClimbStart() {
+        combatUser.getAbilityManager().getWeapon().setVisible(false);
 
-        AbilityManager abilityManager = combatUser.getAbilityManager();
-        ChedWeapon weapon = abilityManager.getWeapon();
-        weapon.setVisible(false);
-
-        Location location = combatUser.getEntity().getEyeLocation();
-        double distance = location.distance(combatUser.getEntity().getTargetBlock(null, 1).getLocation());
-        if (distance < 1)
-            combatUser.getMoveModule().teleport(LocationUtil.getLocationFromOffset(combatUser.getLocation(), 0, 0, -1 + distance));
-
-        float yaw = location.getYaw();
-
-        addActionTask(new IntervalTask(i -> {
-            if (combatUser.getKnockbackModule().isKnockbacked())
-                return false;
-
-            if (combatUser.getEntity().isSneaking() && hangTick > 0)
-                return canActivate(yaw);
-            if (!canActivate())
-                return false;
-
-            if (isHanging)
-                setHanging(false);
-
-            weapon.setCanShoot(false);
-
-            abilityManager.getAbility(ChedA3Info.getInstance()).cancel();
-            abilityManager.getAbility(ChedUltInfo.getInstance()).cancel();
-
-            combatUser.getMoveModule().push(new Vector(0, ChedP1Info.PUSH, 0), true);
-            combatUser.getEntity().setFallDistance(0);
-
-            combatUser.getUser().sendTitle("", StringFormUtil.getProgressBar(--wallRideCount, 10, ChatColor.WHITE), Timespan.ZERO,
-                    Timespan.ofTicks(10), Timespan.ofTicks(5));
-            ChedP1Info.Effects.USE.play(combatUser.getLocation());
-
-            return true;
-        }, () -> {
-            cancel();
-
-            wallRideCount--;
-
-            Location loc = combatUser.getLocation();
-            loc.setPitch(-65);
-            combatUser.getMoveModule().push(loc.getDirection().multiply(ChedP1Info.PUSH), true);
-        }, 3));
-
-        runHangTask();
-    }
-
-    @Override
-    public boolean isCancellable() {
-        return !isDurationFinished();
-    }
-
-    @Override
-    protected void onCancelled() {
-        setDuration(Timespan.ZERO);
-
-        addTask(new IntervalTask(i -> !combatUser.getEntity().isOnGround(), () -> {
-            wallRideCount = ChedP1Info.USE_COUNT;
-            hangTick = ChedP1Info.HANG_DURATION.toTicks();
-        }, 1));
-
-        if (isHanging) {
-            setHanging(false);
-
-            ChedP1Info.Effects.HANG_USE.play(combatUser.getLocation());
-            ChedP1Info.Effects.HANG_OFF.play(combatUser.getLocation());
-        } else
-            combatUser.getAbilityManager().getWeapon().setVisible(true);
-    }
-
-    /**
-     * 매달리기 사용 태스크를 실행한다.
-     */
-    private void runHangTask() {
         addActionTask(new IntervalTask(i -> {
             if (hangTick <= 0)
                 return false;
@@ -187,6 +67,46 @@ public final class ChedP1 extends PassiveSkill {
 
             return true;
         }, 1));
+    }
+
+    @Override
+    protected boolean canWallClimb() {
+        return !combatUser.getEntity().isSneaking() || hangTick <= 0;
+    }
+
+    @Override
+    protected void onWallClimbTick() {
+        if (isHanging)
+            setHanging(false);
+
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+
+        ((ChedWeapon) abilityManager.getWeapon()).setCanShoot(false);
+        abilityManager.getAbility(ChedA3Info.getInstance()).cancel();
+        abilityManager.getAbility(ChedUltInfo.getInstance()).cancel();
+
+        ChedP1Info.Effects.USE.play(combatUser.getLocation());
+    }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
+
+        if (isHanging) {
+            setHanging(false);
+
+            ChedP1Info.Effects.HANG_USE.play(combatUser.getLocation());
+            ChedP1Info.Effects.HANG_OFF.play(combatUser.getLocation());
+
+            return;
+        }
+
+        combatUser.getAbilityManager().getWeapon().setVisible(true);
+    }
+
+    @Override
+    protected void onLand() {
+        hangTick = ChedP1Info.HANG_DURATION.toTicks();
     }
 
     /**

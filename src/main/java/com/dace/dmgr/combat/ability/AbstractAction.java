@@ -63,7 +63,6 @@ public abstract class AbstractAction extends AbstractAbility implements Action {
      * 쿨타임({@link Action#getCooldown()})을 무시하는 사용 키 목록을 반환한다.
      *
      * @return 쿨타임 무시 사용 키 목록
-     * @implSpec {@link Collections#emptySet()}
      */
     @NonNull
     protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
