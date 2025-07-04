@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.arkace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -20,27 +21,24 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class ArkaceA1 extends ActiveSkill {
+public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
     public ArkaceA1(@NonNull CombatUser combatUser, @NonNull ArkaceA1Info skillInfo) {
         super(combatUser, skillInfo, ArkaceA1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();
@@ -52,6 +50,11 @@ public final class ArkaceA1 extends ActiveSkill {
 
             ArkaceA1Info.Effects.SHOOT.play(loc);
         }, () -> addActionTask(new DelayTask(this::cancel, 4)), 5, 3));
+    }
+
+    @Override
+    public void onLeftClick() {
+        onSlot();
     }
 
     @Override

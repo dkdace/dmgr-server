@@ -5,6 +5,7 @@ import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -29,10 +30,7 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class JagerA3 extends ActiveSkill {
+public final class JagerA3 extends ActiveSkill implements LeftClickHandler {
     /** 폭발 타임스탬프 */
     private Timestamp explodeTimestamp = Timestamp.now();
     /** 활성화 완료 여부 */
@@ -48,12 +46,6 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
@@ -63,18 +55,22 @@ public final class JagerA3 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getAbilityManager().getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking();
+    protected boolean canUse() {
+        return super.canUse() && !combatUser.getAbilityManager().getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             onThrow();
             return;
         }
-        if (actionKey != ActionKey.SLOT_3)
-            return;
 
         setDuration();
         combatUser.setGlobalCooldown(JagerA3Info.READY_DURATION);
@@ -101,6 +97,12 @@ public final class JagerA3 extends ActiveSkill {
                 onExplode(loc, null);
             }, 1, JagerA3Info.EXPLODE_DURATION.toTicks()));
         }, JagerA3Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    public void onLeftClick() {
+        if (!isDurationFinished())
+            onThrow();
     }
 
     @Override

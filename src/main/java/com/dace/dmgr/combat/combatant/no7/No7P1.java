@@ -8,23 +8,9 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class No7P1 extends PassiveSkill {
     public No7P1(@NonNull CombatUser combatUser, @NonNull No7P1Info skillInfo) {
         super(combatUser, skillInfo, No7P1Info.COOLDOWN, Timespan.MAX);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
     }
 
     @Override
@@ -37,7 +23,12 @@ public final class No7P1 extends PassiveSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() < No7P1Info.SHIELD;
+    }
+
+    @Override
+    protected void onUse() {
         setCooldown();
 
         if (!combatUser.getDamageModule().isLowHealth())
@@ -62,6 +53,6 @@ public final class No7P1 extends PassiveSkill {
      */
     void onTick() {
         if (combatUser.getDamageModule().isLowHealth())
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+            use(ActionKey.SYSTEM);
     }
 }

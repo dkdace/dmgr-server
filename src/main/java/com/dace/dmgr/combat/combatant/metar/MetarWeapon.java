@@ -3,7 +3,7 @@ package com.dace.dmgr.combat.combatant.metar;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
@@ -23,10 +23,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto {
+public final class MetarWeapon extends AbstractWeapon implements Reloadable, FullAuto, DropHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-MetarWeaponInfo.SLOW);
 
@@ -52,46 +49,39 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).ammoBar(10, StringFormUtil.PROGRESS_DEFAULT_SYMBOL).build();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case RIGHT_CLICK: {
-                if (!reloadModule.consume(1))
-                    return;
+    public void onRightClick() {
+        if (!reloadModule.consume(1))
+            return;
 
-                isOpposite = !isOpposite;
+        isOpposite = !isOpposite;
 
-                new MetarWeaponProjectile(isOpposite).shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), MetarWeaponInfo.SPREAD));
+        new MetarWeaponProjectile(isOpposite).shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), MetarWeaponInfo.SPREAD));
 
-                combatUser.getMoveModule().addModifier(MODIFIER);
+        combatUser.getMoveModule().addModifier(MODIFIER);
 
-                if (slowTimestamp.isBefore(Timestamp.now())) {
-                    slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
-                    addTask(new IntervalTask(i -> slowTimestamp.isAfter(Timestamp.now()), () ->
-                            combatUser.getMoveModule().removeModifier(MODIFIER), 1));
-                } else
-                    slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
+        if (slowTimestamp.isBefore(Timestamp.now())) {
+            slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
+            addTask(new IntervalTask(i -> slowTimestamp.isAfter(Timestamp.now()), () ->
+                    combatUser.getMoveModule().removeModifier(MODIFIER), 1));
+        } else
+            slowTimestamp = Timestamp.now().plus(MetarWeaponInfo.SLOW_DURATION);
 
-                MetarWeaponInfo.Effects.USE.play(combatUser.getLocation());
-                break;
-            }
-            case DROP: {
-                reloadModule.reload();
-                break;
-            }
-            default:
-                break;
-        }
+        MetarWeaponInfo.Effects.USE.play(combatUser.getLocation());
+    }
+
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        reloadModule.reload();
     }
 
     @Override
@@ -132,12 +122,6 @@ public final class MetarWeapon extends AbstractWeapon implements Reloadable, Ful
     @Override
     public void onReloadFinished() {
         // 미사용
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getFullAutoKey() {
-        return ActionKey.RIGHT_CLICK;
     }
 
     @Override

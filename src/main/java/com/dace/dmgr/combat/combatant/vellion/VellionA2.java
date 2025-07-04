@@ -29,9 +29,6 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>, HasBonusScore {
     /** 이동 속도 수정자 */
     private static final Modifier SPEED_MODIFIER = new Modifier(-VellionA2Info.READY_SLOW);
@@ -62,12 +59,6 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
@@ -77,14 +68,20 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished() && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             forceCancel();
             return;

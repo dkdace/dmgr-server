@@ -19,9 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 
 public final class SiliaA1 extends ActiveSkill {
     public SiliaA1(@NonNull CombatUser combatUser, @NonNull SiliaA1Info skillInfo) {
@@ -29,19 +27,18 @@ public final class SiliaA1 extends ActiveSkill {
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(SiliaA1Info.DURATION);

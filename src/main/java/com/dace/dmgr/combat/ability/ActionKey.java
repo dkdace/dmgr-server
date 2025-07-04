@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.ability;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 /**
  * 동작 사용 키 목록.
@@ -29,35 +30,42 @@ public enum ActionKey {
     SPACE("SPACE"),
     /** 웅크리기(SHIFT) */
     SNEAK("SHIFT"),
-    /** 자동 사용 1번 */
-    PERIODIC_1(""),
-    /** 자동 사용 2번 */
-    PERIODIC_2(""),
-    /** 자동 사용 3번 */
-    PERIODIC_3("");
+    /** 시스템. 플레이어가 직접 사용하지 않으며, 패시브 스킬 등을 자동으로 호출할 때 사용 */
+    SYSTEM("");
 
     /** 키 이름 */
     private final String name;
 
-    /**
-     * 동작 사용 키가 슬롯 키인지 확인한다.
-     *
-     * @return 슬롯 키 여부
-     */
-    public boolean isSlot() {
-        switch (this) {
-            case SLOT_1:
-            case SLOT_2:
-            case SLOT_3:
-            case SLOT_4:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     @Override
     public String toString() {
         return name;
+    }
+
+    /**
+     * 액티브 스킬에서 사용되는 슬롯 동작 사용 키 목록.
+     */
+    @AllArgsConstructor
+    public enum Slot {
+        /** 1번 슬롯 */
+        SLOT_1(ActionKey.SLOT_1),
+        /** 2번 슬롯 */
+        SLOT_2(ActionKey.SLOT_2),
+        /** 3번 슬롯 */
+        SLOT_3(ActionKey.SLOT_3),
+        /** 4번 슬롯 */
+        SLOT_4(ActionKey.SLOT_4);
+
+        /** 동작 사용 키 */
+        private final ActionKey actionKey;
+
+        /**
+         * 해당하는 동작 사용 키를 반환한다.
+         *
+         * @return 동작 사용 키
+         */
+        @NonNull
+        public ActionKey toActionKey() {
+            return actionKey;
+        }
     }
 }

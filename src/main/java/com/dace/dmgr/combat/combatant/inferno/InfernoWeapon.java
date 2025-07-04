@@ -2,7 +2,8 @@ package com.dace.dmgr.combat.combatant.inferno;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
@@ -26,10 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto {
+public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto, LeftClickHandler, DropHandler {
     /** 재장전 모듈 */
     @NonNull
     @Getter
@@ -51,56 +49,42 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.LEFT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return EnumSet.of(ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).ammoBar(10, StringFormUtil.PROGRESS_DEFAULT_SYMBOL).build();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        boolean isUlt = !combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished();
+    public void onRightClick() {
+        if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished() && !reloadModule.consume(1))
+            return;
 
-        switch (actionKey) {
-            case RIGHT_CLICK: {
-                if (!isUlt && !reloadModule.consume(1))
-                    return;
+        new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
 
-                new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
+        InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
+    }
 
-                InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
-                break;
-            }
-            case LEFT_CLICK: {
-                if (!isUlt && !reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME))
-                    return;
+    @Override
+    public void onLeftClick() {
+        if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished()
+                && !reloadModule.consume(InfernoWeaponInfo.Fireball.CAPACITY_CONSUME))
+            return;
 
-                setCooldown();
+        setCooldown();
 
-                new InfernoWeaponLProjectile().shot();
+        new InfernoWeaponLProjectile().shot();
 
-                InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);
-                InfernoWeaponInfo.Effects.FIREBALL_USE.play(combatUser.getLocation());
+        InfernoWeaponInfo.Fireball.RECOIL.send(combatUser);
+        InfernoWeaponInfo.Effects.FIREBALL_USE.play(combatUser.getLocation());
+    }
 
-                break;
-            }
-            case DROP: {
-                reloadModule.reload();
-                break;
-            }
-            default:
-                break;
-        }
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        reloadModule.reload();
     }
 
     @Override
@@ -132,12 +116,6 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     @Override
     public void onReloadFinished() {
         // 미사용
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getFullAutoKey() {
-        return ActionKey.RIGHT_CLICK;
     }
 
     @Override

@@ -22,9 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 
 public final class QuakerA3 extends ActiveSkill {
     /** 수정자 */
@@ -35,19 +33,18 @@ public final class QuakerA3 extends ActiveSkill {
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(QuakerA3Info.GLOBAL_COOLDOWN);

@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -33,14 +32,12 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

@@ -13,27 +13,18 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class No7P2 extends PassiveSkill {
     public No7P2(@NonNull CombatUser combatUser, @NonNull No7P2Info skillInfo) {
         super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_2);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() > 0;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).getShield() > 0;
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         new No7P2Area().emit(combatUser.getEntity().getLocation().add(0, 1, 0));
     }
 
@@ -49,7 +40,7 @@ public final class No7P2 extends PassiveSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_2);
+            use(ActionKey.SYSTEM);
     }
 
     private final class No7P2Area extends Area<Damageable> {

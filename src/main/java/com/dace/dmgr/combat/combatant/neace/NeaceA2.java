@@ -13,9 +13,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class NeaceA2 extends ChargeableSkill {
     /** 공격력 수정자 */
     private static final Modifier DAMAGE_MODIFIER = new Modifier(NeaceA2Info.DAMAGE_INCREMENT);
@@ -24,12 +21,6 @@ public final class NeaceA2 extends ChargeableSkill {
 
     public NeaceA2(@NonNull CombatUser combatUser, @NonNull NeaceA2Info skillInfo) {
         super(combatUser, skillInfo, NeaceA2Info.COOLDOWN, NeaceA2Info.MAX_DURATION.toSeconds());
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
     }
 
     @Override
@@ -55,7 +46,13 @@ public final class NeaceA2 extends ChargeableSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             forceCancel();
             return;

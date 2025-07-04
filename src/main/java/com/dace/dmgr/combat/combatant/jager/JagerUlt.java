@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -49,16 +48,14 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

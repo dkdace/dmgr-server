@@ -3,7 +3,8 @@ package com.dace.dmgr.combat.combatant.magritta;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
 import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
@@ -20,12 +21,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
 
 @Getter
-public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
+public final class MagrittaWeapon extends AbstractWeapon implements Reloadable, LeftClickHandler, DropHandler {
     /** 재장전 모듈 */
     @NonNull
     private final ReloadModule reloadModule;
@@ -37,55 +36,41 @@ public final class MagrittaWeapon extends AbstractWeapon implements Reloadable {
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return EnumSet.of(ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL).build();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
+        return super.canUse() && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                if (!reloadModule.consume(1))
-                    return;
+    public void onLeftClick() {
+        if (!reloadModule.consume(1))
+            return;
 
-                setCooldown();
-                shot(false);
+        setCooldown();
+        shot(false);
 
-                MagrittaWeaponInfo.RECOIL.send(combatUser);
+        MagrittaWeaponInfo.RECOIL.send(combatUser);
 
-                Location loc = combatUser.getLocation();
-                MagrittaWeaponInfo.Effects.USE.play(loc);
+        Location loc = combatUser.getLocation();
+        MagrittaWeaponInfo.Effects.USE.play(loc);
 
-                addTask(new DelayTask(() -> MagrittaWeaponInfo.Effects.BULLET_SHELL.play(loc), 8));
+        addTask(new DelayTask(() -> MagrittaWeaponInfo.Effects.BULLET_SHELL.play(loc), 8));
+    }
 
-                break;
-            }
-            case DROP: {
-                reloadModule.reload();
-                break;
-            }
-            default:
-                break;
-        }
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        reloadModule.reload();
     }
 
     @Override

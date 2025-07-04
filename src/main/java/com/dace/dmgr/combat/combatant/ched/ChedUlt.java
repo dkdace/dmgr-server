@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -52,15 +51,13 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
-        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
+        return super.canUse() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(ChedUltInfo.READY_DURATION);

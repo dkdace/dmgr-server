@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -16,30 +17,28 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
-public final class SiliaA2 extends ActiveSkill {
+public final class SiliaA2 extends ActiveSkill implements RightClickHandler {
     public SiliaA2(@NonNull CombatUser combatUser, @NonNull SiliaA2Info skillInfo) {
         super(combatUser, skillInfo, SiliaA2Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2, ActionKey.RIGHT_CLICK);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(SiliaP2Info.getInstance()).isDurationFinished()
+        return super.canUse() && isDurationFinished() && abilityManager.getAbility(SiliaP2Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
         combatUser.setGlobalCooldown(SiliaA2Info.GLOBAL_COOLDOWN);
 
@@ -54,6 +53,11 @@ public final class SiliaA2 extends ActiveSkill {
 
             SiliaA2Info.Effects.USE_READY.play(combatUser.getLocation());
         }, 1, SiliaA2Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    public void onRightClick() {
+        onSlot();
     }
 
     @Override

@@ -2,8 +2,8 @@ package com.dace.dmgr.combat.combatant.neace;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
@@ -22,10 +22,8 @@ import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
-import java.util.EnumSet;
-import java.util.Set;
 
-public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
+public final class NeaceWeapon extends AbstractWeapon implements FullAuto, LeftClickHandler {
     /** 연사 모듈 */
     @NonNull
     @Getter
@@ -45,60 +43,47 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(NeaceUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(NeaceUltInfo.getInstance()).isDurationFinished();
+    public void onRightClick() {
+        if (target != null && (!target.canBeTargeted() || target.isRemoved() || targetResetTimestamp.isBefore(Timestamp.now())
+                || blockResetTimestamp.isBefore(Timestamp.now())
+                || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.Heal.MAX_DISTANCE))
+            target = null;
+
+        if (target == null)
+            new NeaceWeaponRTarget().shot();
+        if (target == null)
+            return;
+
+        targetResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
+        if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
+            blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.Heal.BLOCK_RESET_DELAY);
+
+        String title = MessageFormat.format("{0} : {1}§e{2}",
+                (combatUser.getAbilityManager().getAbility(NeaceA2Info.getInstance()).isDurationFinished()
+                        ? MessageFormat.format("§a{0} §f치유 중", TextIcon.HEAL)
+                        : MessageFormat.format("§b{0} §f강화 중", TextIcon.DAMAGE_INCREASE)),
+                (target instanceof CombatUser ? ((CombatUser) target).getCombatantType().getCombatant().getIcon() + " " : ""),
+                target.getName());
+        combatUser.getUser().sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
+
+        NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
+
+        healTarget(target);
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                setCooldown();
-                combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
+    public void onLeftClick() {
+        setCooldown();
+        combatUser.playMeleeAttackAnimation(-3, Timespan.ofTicks(6), MainHand.RIGHT);
 
-                new NeaceWeaponLProjectile().shot();
+        new NeaceWeaponLProjectile().shot();
 
-                NeaceWeaponInfo.Effects.USE.play(combatUser.getLocation());
-
-                break;
-            }
-            case RIGHT_CLICK: {
-                if (target != null && (!target.canBeTargeted() || target.isRemoved() || targetResetTimestamp.isBefore(Timestamp.now())
-                        || blockResetTimestamp.isBefore(Timestamp.now())
-                        || combatUser.getEntity().getEyeLocation().distance(target.getCenterLocation()) > NeaceWeaponInfo.Heal.MAX_DISTANCE))
-                    target = null;
-
-                if (target == null)
-                    new NeaceWeaponRTarget().shot();
-                if (target == null)
-                    return;
-
-                targetResetTimestamp = Timestamp.now().plus(Timespan.ofTicks(4));
-                if (LocationUtil.canPass(combatUser.getEntity().getEyeLocation(), target.getCenterLocation()))
-                    blockResetTimestamp = Timestamp.now().plus(NeaceWeaponInfo.Heal.BLOCK_RESET_DELAY);
-
-                String title = MessageFormat.format("{0} : {1}§e{2}",
-                        (combatUser.getAbilityManager().getAbility(NeaceA2Info.getInstance()).isDurationFinished()
-                                ? MessageFormat.format("§a{0} §f치유 중", TextIcon.HEAL)
-                                : MessageFormat.format("§b{0} §f강화 중", TextIcon.DAMAGE_INCREASE)),
-                        (target instanceof CombatUser ? ((CombatUser) target).getCombatantType().getCombatant().getIcon() + " " : ""),
-                        target.getName());
-                combatUser.getUser().sendTitle("", title, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
-
-                NeaceWeaponInfo.Effects.HEAL_USE_SOUND.play(combatUser.getLocation());
-
-                healTarget(target);
-                break;
-            }
-            default:
-                break;
-        }
+        NeaceWeaponInfo.Effects.USE.play(combatUser.getLocation());
     }
 
     /**
@@ -127,12 +112,6 @@ public final class NeaceWeapon extends AbstractWeapon implements FullAuto {
     boolean isHealing(@NonNull Healable target) {
         return combatUser.getAbilityManager().getAbility(NeaceA2Info.getInstance()).isDurationFinished() && this.target == target
                 && targetResetTimestamp.isAfter(Timestamp.now());
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getFullAutoKey() {
-        return ActionKey.RIGHT_CLICK;
     }
 
     @Override

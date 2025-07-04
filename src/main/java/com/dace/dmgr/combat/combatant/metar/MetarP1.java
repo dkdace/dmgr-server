@@ -10,9 +10,6 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Silence;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class MetarP1 extends PassiveSkill {
     /** 중기갑 */
     private double heavyArmor = MetarP1Info.MAX;
@@ -26,23 +23,17 @@ public final class MetarP1 extends PassiveSkill {
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).title().progressBar((int) heavyArmor, MetarP1Info.MAX).build();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         setDuration();
         combatUser.getKnockbackModule().addModifier(modifier);
 
@@ -75,7 +66,7 @@ public final class MetarP1 extends PassiveSkill {
      */
     void onTick() {
         addValue(MetarP1Info.RECOVER_PER_SECOND / 20.0);
-        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+        use(ActionKey.SYSTEM);
     }
 
     /**

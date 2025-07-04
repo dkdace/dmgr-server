@@ -27,14 +27,6 @@ public interface Action extends Ability {
     }
 
     /**
-     * 기본 사용 키 목록을 반환한다.
-     *
-     * @return 기본 사용 키 목록
-     */
-    @NonNull
-    Set<@NonNull ActionKey> getDefaultActionKeys();
-
-    /**
      * 동작에서 실행하는 새로운 태스크를 추가한다.
      *
      * <p>동작이 끊겼을 때 ({@link Action#cancel()} 호출 시) 모든 태스크가 중단된다.</p>
@@ -115,6 +107,14 @@ public interface Action extends Ability {
     boolean isCooldownFinished();
 
     /**
+     * 동작 사용 키 목록을 반환한다.
+     *
+     * @return 동작 사용 키 목록
+     */
+    @NonNull
+    Set<@NonNull ActionKey> getActionKeys();
+
+    /**
      * 동작을 사용할 수 있는지 확인한다.
      *
      * @param actionKey 사용 키
@@ -123,11 +123,11 @@ public interface Action extends Ability {
     boolean canUse(@NonNull ActionKey actionKey);
 
     /**
-     * 동작 사용 시 실행할 작업.
+     * 동작을 사용한다.
      *
      * @param actionKey 사용 키
      */
-    void onUse(@NonNull ActionKey actionKey);
+    void use(@NonNull ActionKey actionKey);
 
     /**
      * 사용 중인 동작을 강제로 취소할 수 있는지 확인한다.

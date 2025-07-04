@@ -26,9 +26,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class JagerA2 extends ActiveSkill {
     /** 엔티티 소환 모듈 */
     private final SummonModule<JagerA2Entity> summonModule;
@@ -39,20 +36,20 @@ public final class JagerA2 extends ActiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

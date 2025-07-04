@@ -21,9 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 @Getter
 public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     /** 보너스 점수 모듈 */
@@ -36,18 +33,18 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.combatant.no7;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
@@ -15,24 +16,16 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
-public final class No7A2 extends ActiveSkill {
+public final class No7A2 extends ActiveSkill implements LeftClickHandler {
     /** 엔티티 소환 모듈 */
     private final SummonModule<No7A2Entity> summonModule;
 
     public No7A2(@NonNull CombatUser combatUser, @NonNull No7A2Info skillInfo) {
         super(combatUser, skillInfo, No7A2Info.COOLDOWN, No7A2Info.DURATION);
         this.summonModule = new SummonModule<>(this);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2, ActionKey.LEFT_CLICK);
     }
 
     @Override
@@ -45,14 +38,20 @@ public final class No7A2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getAbility(No7A1Info.getInstance()).isDurationFinished()
+        return super.canUse() && abilityManager.getAbility(No7A1Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             cancel();
             return;
@@ -70,6 +69,11 @@ public final class No7A2 extends ActiveSkill {
 
         addActionTask(new IntervalTask((LongConsumer) i -> No7A2Info.Effects.playTick(i, combatUser.getLocation(), loc), 1,
                 No7A2Info.DURATION.toTicks()));
+    }
+
+    @Override
+    public void onLeftClick() {
+        onSlot();
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.ability;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
+import com.dace.dmgr.combat.ability.handler.SwapHandHandler;
 import com.dace.dmgr.combat.entity.*;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
@@ -16,13 +17,10 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * 기본 근접 공격 동작 클래스.
  */
-public final class MeleeAttackAction extends AbstractAction {
+public final class MeleeAttackAction extends AbstractAction implements SwapHandHandler {
     /** 사용 효과음 */
     private static final SoundEffect USE_SOUND =
             SoundEffect.builder(Sound.ENTITY_PLAYER_ATTACK_SWEEP).volume(0.6).pitch(1.1).pitchVariance(0.1).build();
@@ -65,21 +63,13 @@ public final class MeleeAttackAction extends AbstractAction {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SWAP_HAND);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getCombatantType().getCombatant().canUseMeleeAttack(combatUser)
+                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.MELEE_ATTACK) && combatUser.isGlobalCooldownFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey)
-                && combatUser.getCombatantType().getCombatant().canUseMeleeAttack(combatUser)
-                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.MELEE_ATTACK)
-                && combatUser.isGlobalCooldownFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSwapHand() {
         combatUser.getAbilityManager().getWeapon().cancel();
         combatUser.setGlobalCooldown(COOLDOWN);
         setCooldown();

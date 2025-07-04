@@ -3,7 +3,9 @@ package com.dace.dmgr.combat.combatant.palas;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.Aimable;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
@@ -23,10 +25,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable {
+public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aimable, LeftClickHandler, RightClickHandler, DropHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-PalasWeaponInfo.AIM_SLOW);
 
@@ -50,67 +49,58 @@ public final class PalasWeapon extends AbstractWeapon implements Reloadable, Aim
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_BIG_SYMBOL)
                 .suffix(isActionCooldown ? "§a■" : "§c□").build();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                if (!reloadModule.consume(0))
-                    return;
-                if (!isActionCooldown) {
-                    action();
-                    break;
-                }
-
-                setCooldown();
-
-                new PalasWeaponHitscan(aimModule.isAiming()).shot();
-                new PalasWeaponHealHitscan(aimModule.isAiming()).shot();
-
-                reloadModule.cancel();
-                isActionCooldown = false;
-
-                PalasWeaponInfo.RECOIL.send(combatUser);
-                PalasWeaponInfo.Effects.USE.play(combatUser.getLocation());
-
-                addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));
-
-                break;
-            }
-            case RIGHT_CLICK: {
-                if (aimModule.isAiming()) {
-                    cancel();
-                    return;
-                }
-
-                cancel();
-                aimModule.toggleAim();
-
-                break;
-            }
-            case DROP: {
-                reloadModule.reload();
-                break;
-            }
-            default:
-                break;
+    public void onLeftClick() {
+        if (!reloadModule.consume(0))
+            return;
+        if (!isActionCooldown) {
+            action();
+            return;
         }
+
+        setCooldown();
+
+        new PalasWeaponHitscan(aimModule.isAiming()).shot();
+        new PalasWeaponHealHitscan(aimModule.isAiming()).shot();
+
+        reloadModule.cancel();
+        isActionCooldown = false;
+
+        PalasWeaponInfo.RECOIL.send(combatUser);
+        PalasWeaponInfo.Effects.USE.play(combatUser.getLocation());
+
+        addActionTask(new DelayTask(this::action, getDefaultCooldown().toTicks()));
+    }
+
+    @Override
+    public boolean isRightClickIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onRightClick() {
+        if (aimModule.isAiming()) {
+            cancel();
+            return;
+        }
+
+        cancel();
+        aimModule.toggleAim();
+    }
+
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        reloadModule.reload();
     }
 
     @Override

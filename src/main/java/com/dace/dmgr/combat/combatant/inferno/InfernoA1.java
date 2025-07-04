@@ -18,27 +18,24 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class InfernoA1 extends ActiveSkill {
     public InfernoA1(@NonNull CombatUser combatUser, @NonNull InfernoA1Info skillInfo) {
         super(combatUser, skillInfo, InfernoA1Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

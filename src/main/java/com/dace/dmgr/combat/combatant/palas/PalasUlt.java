@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.palas;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.Targeted;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.TargetModule;
@@ -32,14 +31,12 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && targetModule.findTarget();
+    protected boolean canUse() {
+        return super.canUse() && targetModule.findTarget();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setCooldown();
         combatUser.getAbilityManager().getWeapon().cancel();
 

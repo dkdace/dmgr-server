@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.ability;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.ability.handler.*;
 import com.dace.dmgr.combat.ability.skill.AbstractSkill;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.CombatRestriction;
@@ -9,6 +10,7 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import com.dace.dmgr.util.task.Task;
 import com.dace.dmgr.util.task.TaskManager;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Set;
 
 /**
@@ -38,6 +41,8 @@ public abstract class AbstractAction extends AbstractAbility implements Action {
     private final ArrayList<Runnable> onResets = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
     private final ArrayList<Runnable> onRemoves = new ArrayList<>();
+    /** 동작 사용 키별 이벤트 처리기 목록 (사용 키 : 이벤트 처리기) */
+    private final EnumMap<ActionKey, UseHandler> useHandlerMap = new EnumMap<>(ActionKey.class);
 
     /** 틱 작업을 처리하는 태스크 */
     @Nullable
@@ -56,17 +61,28 @@ public abstract class AbstractAction extends AbstractAbility implements Action {
      */
     protected AbstractAction(@NonNull CombatUser combatUser, @NonNull String name, @NonNull Timespan defaultCooldown) {
         super(combatUser, name);
+
         this.defaultCooldown = defaultCooldown;
+        init();
     }
 
-    /**
-     * 쿨타임({@link Action#getCooldown()})을 무시하는 사용 키 목록을 반환한다.
-     *
-     * @return 쿨타임 무시 사용 키 목록
-     */
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return Collections.emptySet();
+    private void init() {
+        if (this instanceof LeftClickHandler)
+            useHandlerMap.put(ActionKey.LEFT_CLICK, new UseHandler(((LeftClickHandler) this).isLeftClickIgnoreCooldown(),
+                    ((LeftClickHandler) this)::onLeftClick));
+        if (this instanceof RightClickHandler)
+            useHandlerMap.put(ActionKey.RIGHT_CLICK, new UseHandler(((RightClickHandler) this).isRightClickIgnoreCooldown(),
+                    ((RightClickHandler) this)::onRightClick));
+        if (this instanceof DropHandler)
+            useHandlerMap.put(ActionKey.DROP, new UseHandler(((DropHandler) this).isDropIgnoreCooldown(), ((DropHandler) this)::onDrop));
+        if (this instanceof SwapHandHandler)
+            useHandlerMap.put(ActionKey.SWAP_HAND, new UseHandler(false, ((SwapHandHandler) this)::onSwapHand));
+        if (this instanceof SpaceHandler)
+            useHandlerMap.put(ActionKey.SPACE, new UseHandler(false, ((SpaceHandler) this)::onSpace));
+        if (this instanceof SlotHandler)
+            useHandlerMap.put(((SlotHandler) this).getSlot().toActionKey(), new UseHandler(false, ((SlotHandler) this)::onSlot));
+        if (this instanceof SystemHandler)
+            useHandlerMap.put(ActionKey.SYSTEM, new UseHandler(false, ((SystemHandler) this)::onSystemUse));
     }
 
     @Override
@@ -177,10 +193,44 @@ public abstract class AbstractAction extends AbstractAbility implements Action {
     }
 
     @Override
+    @NonNull
+    public final Set<@NonNull ActionKey> getActionKeys() {
+        return Collections.unmodifiableSet(useHandlerMap.keySet());
+    }
+
+    /**
+     * 동작을 사용할 수 있는지 확인한다.
+     *
+     * @return 사용 가능 여부
+     */
     @MustBeInvokedByOverriders
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return (getCooldownIgnoreActionKeys().contains(actionKey) || isCooldownFinished())
-                && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
+    protected boolean canUse() {
+        return !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION);
+    }
+
+    @Override
+    public final boolean canUse(@NonNull ActionKey actionKey) {
+        UseHandler useHandler = useHandlerMap.get(actionKey);
+        return (useHandler == null ? isCooldownFinished() : useHandler.isIgnoreCooldown || isCooldownFinished()) && canUse();
+    }
+
+    /**
+     * 동작 사용 시 실행할 작업.
+     */
+    protected void onUse() {
+        // 미사용
+    }
+
+    @Override
+    public final void use(@NonNull ActionKey actionKey) {
+        if (combatUser.isDead() || !canUse(actionKey))
+            return;
+
+        onUse();
+
+        UseHandler useHandler = useHandlerMap.get(actionKey);
+        if (useHandler != null)
+            useHandler.onUse.run();
     }
 
     @Override
@@ -235,5 +285,17 @@ public abstract class AbstractAction extends AbstractAbility implements Action {
         taskManager.stop();
 
         isRemoved = true;
+    }
+
+    /**
+     * 사용 이벤트 처리기 클래스.
+     */
+    @AllArgsConstructor
+    private static final class UseHandler {
+        /** 동작 사용 시 쿨타임({@link Action#getCooldown()}) 무시 여부 */
+        private final boolean isIgnoreCooldown;
+        /** 동작 사용 시 실행할 작업 */
+        @NonNull
+        private final Runnable onUse;
     }
 }

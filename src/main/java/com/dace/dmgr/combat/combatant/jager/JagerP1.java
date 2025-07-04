@@ -7,9 +7,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class JagerP1 extends PassiveSkill {
     /** 현재 사용 대상 */
     private Damageable target = null;
@@ -19,18 +16,12 @@ public final class JagerP1 extends PassiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
+    protected boolean canUse() {
+        return super.canUse() && target.isCreature();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && target.isCreature();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         combatUser.setGlowing(target, JagerP1Info.DURATION);
     }
 
@@ -46,6 +37,6 @@ public final class JagerP1 extends PassiveSkill {
      */
     void use(@NonNull Damageable target) {
         this.target = target;
-        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+        use(ActionKey.SYSTEM);
     }
 }

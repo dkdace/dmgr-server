@@ -7,7 +7,9 @@ import com.dace.dmgr.PlayerSkin;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.ability.Action;
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.TextIcon;
+import com.dace.dmgr.combat.ability.handler.SpaceHandler;
 import com.dace.dmgr.combat.ability.info.SkillInfo;
 import com.dace.dmgr.combat.ability.info.WeaponInfo;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
@@ -376,7 +378,20 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 비행 가능 여부를 설정한다.
      */
     private void setCanFly() {
-        entity.setAllowFlight(!isDead && combatant.canFly(this) && !statusEffectModule.hasRestriction(CombatRestriction.FLY));
+        entity.setAllowFlight(canFly());
+    }
+
+    /**
+     * 플레이어가 비행할 수 있는지 확인한다.
+     *
+     * @return 비행 가능 여부
+     */
+    private boolean canFly() {
+        for (Action action : abilityManager.getActions())
+            if (action instanceof SpaceHandler && action.canUse(ActionKey.SPACE))
+                return true;
+
+        return !isDead && combatant.canFly(this) && !statusEffectModule.hasRestriction(CombatRestriction.FLY);
     }
 
     /**

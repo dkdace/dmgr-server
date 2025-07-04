@@ -10,9 +10,6 @@ import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class SiliaA3 extends ChargeableSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(SiliaA3Info.SPEED);
@@ -21,12 +18,6 @@ public final class SiliaA3 extends ChargeableSkill {
 
     public SiliaA3(@NonNull CombatUser combatUser, @NonNull SiliaA3Info skillInfo) {
         super(combatUser, skillInfo, SiliaA3Info.COOLDOWN, SiliaA3Info.MAX_DURATION.toSeconds());
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override
@@ -52,12 +43,18 @@ public final class SiliaA3 extends ChargeableSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(SiliaUltInfo.getInstance()).isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(SiliaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             cancel();
             return;

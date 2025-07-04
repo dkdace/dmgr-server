@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -37,16 +36,14 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(No7A2Info.getInstance()).isDurationFinished()
+        return super.canUse() && isDurationFinished() && abilityManager.getAbility(No7A2Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(No7A3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

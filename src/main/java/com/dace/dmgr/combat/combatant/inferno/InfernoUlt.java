@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.combatant.inferno;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
@@ -34,16 +33,14 @@ public final class InfernoUlt extends UltimateSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && abilityManager.getAbility(InfernoA1Info.getInstance()).isDurationFinished()
+        return super.canUse() && isDurationFinished() && abilityManager.getAbility(InfernoA1Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(InfernoA2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         AbilityManager abilityManager = combatUser.getAbilityManager();

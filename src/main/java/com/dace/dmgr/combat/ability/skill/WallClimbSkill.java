@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.ability.skill;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.StringFormUtil;
@@ -13,13 +13,10 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * 벽타기 패시브 스킬 클래스.
  */
-public abstract class WallClimbSkill extends PassiveSkill {
+public abstract class WallClimbSkill extends PassiveSkill implements LeftClickHandler {
     /** 최대 벽타기 횟수 */
     private final int maxWallClimbCount;
     /** 남은 벽타기 횟수 */
@@ -40,14 +37,8 @@ public abstract class WallClimbSkill extends PassiveSkill {
     }
 
     @Override
-    @NonNull
-    public final Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK);
-    }
-
-    @Override
-    public final boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && canActivate(combatUser.getLocation());
+    protected final boolean canUse() {
+        return super.canUse() && isDurationFinished() && canActivate(combatUser.getLocation());
     }
 
     /**
@@ -67,7 +58,7 @@ public abstract class WallClimbSkill extends PassiveSkill {
     }
 
     @Override
-    public final void onUse(@NonNull ActionKey actionKey) {
+    public final void onLeftClick() {
         setDuration();
 
         combatUser.addYawAndPitch(0, 0);

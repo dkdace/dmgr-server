@@ -3,7 +3,6 @@ package com.dace.dmgr.combat.ability.skill;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.ability.AbstractAction;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.info.SkillInfo;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -55,8 +54,8 @@ public abstract class AbstractSkill extends AbstractAction implements Skill {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_SKILL);
+    protected boolean canUse() {
+        return super.canUse() && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_SKILL);
     }
 
     @Override

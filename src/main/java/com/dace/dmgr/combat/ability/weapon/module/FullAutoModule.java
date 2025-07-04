@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.ability.weapon.module;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -52,8 +53,8 @@ public class FullAutoModule {
             if (cooldownTimestamp.isBefore(Timestamp.now()))
                 return false;
 
-            if (weapon.canUse(weapon.getFullAutoKey()) && weapon.getCombatUser().isGlobalCooldownFinished() && isFireTick(i))
-                weapon.onUse(weapon.getFullAutoKey());
+            if (weapon.getCombatUser().isGlobalCooldownFinished() && isFireTick(i))
+                weapon.use(ActionKey.RIGHT_CLICK);
 
             return true;
         }, 1);

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.SpaceHandler;
 import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -10,28 +10,18 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class SiliaP1 extends PassiveSkill {
+public final class SiliaP1 extends PassiveSkill implements SpaceHandler {
     public SiliaP1(@NonNull CombatUser combatUser, @NonNull SiliaP1Info skillInfo) {
         super(combatUser, skillInfo, Timespan.ZERO, Timespan.MAX);
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SPACE);
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSpace() {
         setDuration();
 
         Location location = combatUser.getLocation();

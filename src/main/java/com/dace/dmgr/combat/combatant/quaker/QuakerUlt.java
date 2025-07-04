@@ -1,7 +1,6 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -46,20 +45,18 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         QuakerA1 skill1 = combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance());
         if (skill1.isDurationFinished()) {
             combatUser.getUser().sendAlertActionBar(skill1.getDisplayName() + " 를 활성화한 상태에서만 사용할 수 있습니다.");
             return false;
         }
 
-        return super.canUse(actionKey) && isDurationFinished();
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(QuakerUltInfo.GLOBAL_COOLDOWN);

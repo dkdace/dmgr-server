@@ -8,9 +8,6 @@ import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class ArkaceP1 extends PassiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(ArkaceP1Info.SPRINT_SPEED);
@@ -20,19 +17,12 @@ public final class ArkaceP1 extends PassiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && !((ArkaceWeapon) combatUser.getAbilityManager().getWeapon()).getReloadModule().isReloading();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && !((ArkaceWeapon) combatUser.getAbilityManager().getWeapon()).getReloadModule().isReloading();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         setDuration();
         combatUser.getMoveModule().addModifier(MODIFIER);
 
@@ -61,6 +51,6 @@ public final class ArkaceP1 extends PassiveSkill {
      */
     void onTick() {
         if (combatUser.getEntity().isSprinting())
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+            use(ActionKey.SYSTEM);
     }
 }

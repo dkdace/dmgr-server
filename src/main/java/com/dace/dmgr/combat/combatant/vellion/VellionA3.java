@@ -2,6 +2,8 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
+import com.dace.dmgr.combat.ability.handler.SlotHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.ability.skill.Confirmable;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
@@ -22,10 +24,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonusScore {
+public final class VellionA3 extends ActiveSkill implements HasBonusScore, Confirmable, SlotHandler, LeftClickHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-VellionA3Info.READY_SLOW);
 
@@ -54,31 +53,24 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(VellionUltInfo.getInstance()).isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3, ActionKey.LEFT_CLICK);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getAbility(VellionUltInfo.getInstance()).isDurationFinished();
+    public void onSlot() {
+        confirmModule.toggleCheck();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case SLOT_3: {
-                confirmModule.toggleCheck();
-                break;
-            }
-            case LEFT_CLICK: {
-                confirmModule.accept();
-                break;
-            }
-            default:
-                break;
-        }
+    public void onLeftClick() {
+        confirmModule.accept();
     }
 
     @Override
@@ -121,18 +113,6 @@ public final class VellionA3 extends ActiveSkill implements Confirmable, HasBonu
             setDuration(Timespan.ZERO);
             combatUser.getMoveModule().removeModifier(MODIFIER);
         }
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getAcceptKey() {
-        return ActionKey.LEFT_CLICK;
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getCancelKey() {
-        return ActionKey.SLOT_3;
     }
 
     @Override

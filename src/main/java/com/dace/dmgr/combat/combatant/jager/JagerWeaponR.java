@@ -3,7 +3,9 @@ package com.dace.dmgr.combat.combatant.jager;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
 import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
@@ -18,10 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
+public final class JagerWeaponR extends AbstractWeapon implements Reloadable, LeftClickHandler, RightClickHandler, DropHandler {
     /** 주무기 인스턴스 */
     private final JagerWeaponL mainWeapon;
     /** 재장전 모듈 */
@@ -43,48 +42,40 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    public void onLeftClick() {
+        if (!reloadModule.consume(1))
+            return;
+
+        setCooldown();
+
+        new JagerWeaponRHitscan().shot();
+
+        JagerWeaponInfo.Scope.RECOIL.send(combatUser);
+
+        Location loc = combatUser.getLocation();
+        JagerWeaponInfo.Effects.SCOPE_USE.play(loc);
+
+        addTask(new DelayTask(() -> JagerWeaponInfo.Effects.SCOPE_BULLET_SHELL.play(loc), 8));
     }
 
     @Override
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
+    public boolean isRightClickIgnoreCooldown() {
+        return true;
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                if (!reloadModule.consume(1))
-                    return;
+    public void onRightClick() {
+        cancel();
+    }
 
-                setCooldown();
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
 
-                new JagerWeaponRHitscan().shot();
-
-                JagerWeaponInfo.Scope.RECOIL.send(combatUser);
-
-                Location loc = combatUser.getLocation();
-                JagerWeaponInfo.Effects.SCOPE_USE.play(loc);
-
-                addTask(new DelayTask(() -> JagerWeaponInfo.Effects.SCOPE_BULLET_SHELL.play(loc), 8));
-
-                break;
-            }
-            case RIGHT_CLICK: {
-                cancel();
-                break;
-            }
-            case DROP: {
-                onAmmoEmpty();
-                break;
-            }
-            default:
-                break;
-        }
+    @Override
+    public void onDrop() {
+        onAmmoEmpty();
     }
 
     @Override

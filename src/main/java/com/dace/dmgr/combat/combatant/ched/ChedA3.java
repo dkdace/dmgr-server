@@ -18,8 +18,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
 @Getter
@@ -36,19 +34,19 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
-        return super.canUse(actionKey) && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
+        return super.canUse() && isDurationFinished() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(ChedA3Info.READY_DURATION);
@@ -70,7 +68,8 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
             ChedA3Info.Effects.USE_READY.play(loc);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> ChedA3Info.Effects.playUseTick(i + durationTicks, loc), 1, durationTicks));
+            addActionTask(new IntervalTask((LongConsumer) i -> ChedA3Info.Effects.playUseTick(i + durationTicks, loc), 1,
+                    durationTicks));
         }, 1, durationTicks));
     }
 

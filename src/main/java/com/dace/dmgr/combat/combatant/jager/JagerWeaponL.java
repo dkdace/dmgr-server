@@ -2,7 +2,9 @@ package com.dace.dmgr.combat.combatant.jager;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.DropHandler;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.Aimable;
 import com.dace.dmgr.combat.ability.weapon.Reloadable;
@@ -22,11 +24,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 @Getter
-public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable {
+public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Swappable<JagerWeaponR>, Aimable, LeftClickHandler, RightClickHandler, DropHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-JagerWeaponInfo.AIM_SLOW);
 
@@ -56,60 +55,51 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK, ActionKey.RIGHT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
-    protected Set<@NonNull ActionKey> getCooldownIgnoreActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.DROP);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         return ActionBarDisplay.builder(this).ammoBar(getCapacity(), '*').build();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case LEFT_CLICK: {
-                if (!reloadModule.consume(1))
-                    return;
+    public void onLeftClick() {
+        if (!reloadModule.consume(1))
+            return;
 
-                setCooldown();
+        setCooldown();
 
-                new JagerWeaponLProjectile().shot();
+        new JagerWeaponLProjectile().shot();
 
-                JagerWeaponInfo.RECOIL.send(combatUser);
-                JagerWeaponInfo.Effects.USE.play(combatUser.getLocation());
+        JagerWeaponInfo.RECOIL.send(combatUser);
+        JagerWeaponInfo.Effects.USE.play(combatUser.getLocation());
+    }
 
-                break;
-            }
-            case RIGHT_CLICK: {
-                cancel();
+    @Override
+    public boolean isRightClickIgnoreCooldown() {
+        return true;
+    }
 
-                aimModule.toggleAim();
-                swapModule.swap();
+    @Override
+    public void onRightClick() {
+        cancel();
 
-                break;
-            }
-            case DROP: {
-                reloadModule.reload();
-                break;
-            }
-            default:
-                break;
-        }
+        aimModule.toggleAim();
+        swapModule.swap();
+    }
+
+    @Override
+    public boolean isDropIgnoreCooldown() {
+        return true;
+    }
+
+    @Override
+    public void onDrop() {
+        reloadModule.reload();
     }
 
     @Override

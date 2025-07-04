@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.SpaceHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -10,28 +11,26 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
-public final class ChedA2 extends ActiveSkill {
+public final class ChedA2 extends ActiveSkill implements SpaceHandler {
     public ChedA2(@NonNull CombatUser combatUser, @NonNull ChedA2Info skillInfo) {
         super(combatUser, skillInfo, ChedA2Info.COOLDOWN, Timespan.MAX);
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance()).isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2, ActionKey.SPACE);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setCooldown();
 
         Location location = combatUser.getLocation();
@@ -66,6 +65,11 @@ public final class ChedA2 extends ActiveSkill {
         }, 1, 2));
 
         addActionTask(new IntervalTask((LongConsumer) i -> ChedA2Info.Effects.USE_TICK.play(combatUser.getLocation()), 1, 10));
+    }
+
+    @Override
+    public void onSpace() {
+        onSlot();
     }
 
     @Override

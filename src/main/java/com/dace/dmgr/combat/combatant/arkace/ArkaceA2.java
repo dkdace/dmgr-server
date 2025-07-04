@@ -9,18 +9,9 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class ArkaceA2 extends ActiveSkill {
     public ArkaceA2(@NonNull CombatUser combatUser, @NonNull ArkaceA2Info skillInfo) {
         super(combatUser, skillInfo, ArkaceA2Info.COOLDOWN, ArkaceA2Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override
@@ -33,12 +24,18 @@ public final class ArkaceA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         ArkaceA2Info.Effects.USE.play(combatUser.getLocation());

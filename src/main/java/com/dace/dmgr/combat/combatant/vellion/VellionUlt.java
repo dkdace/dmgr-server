@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
@@ -55,15 +54,13 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished()
                 && !combatUser.getAbilityManager().getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        super.onUse(actionKey);
-
+    public void onSlot() {
         setDuration(Timespan.MAX);
 
         combatUser.setGlobalCooldown(VellionUltInfo.READY_DURATION);

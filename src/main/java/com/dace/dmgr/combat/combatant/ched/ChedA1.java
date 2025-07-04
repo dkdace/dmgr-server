@@ -21,9 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class ChedA1 extends StackableSkill {
     /** 화염 상태 효과 */
     private final Burning burning;
@@ -37,12 +34,6 @@ public final class ChedA1 extends StackableSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
@@ -52,13 +43,19 @@ public final class ChedA1 extends StackableSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
-        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
+        return super.canUse() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             forceCancel();
             return;

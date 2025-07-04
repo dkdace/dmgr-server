@@ -20,9 +20,6 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class MetarA2 extends StackableSkill {
     /** 다중 엔티티 소환 모듈 */
     private final MultiSummonModule<MetarA2Entity> multiSummonModule;
@@ -34,12 +31,12 @@ public final class MetarA2 extends StackableSkill {
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setCooldown();
         addStack(-1);
 

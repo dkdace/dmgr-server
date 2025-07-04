@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.ability.skill;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
@@ -70,8 +69,8 @@ public abstract class StackableSkill extends ActiveSkill {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && stack > 0;
+    protected boolean canUse() {
+        return super.canUse() && stack > 0;
     }
 
     /**

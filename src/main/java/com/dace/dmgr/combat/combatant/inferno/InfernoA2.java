@@ -22,9 +22,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-InfernoA2Info.HEAL_DECREMENT);
@@ -43,12 +40,6 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished())
@@ -58,12 +49,18 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         InfernoA2Info.Effects.USE.play(combatUser.getLocation());

@@ -1,6 +1,6 @@
 package com.dace.dmgr.combat.ability.weapon;
 
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,20 +9,12 @@ import lombok.NonNull;
 /**
  * 쿨타임이 5틱 이하인 연사가 가능한 무기의 인터페이스.
  */
-public interface FullAuto extends Weapon {
+public interface FullAuto extends Weapon, RightClickHandler {
     /**
      * @return 연사 모듈
      */
     @NonNull
     FullAutoModule getFullAutoModule();
-
-    /**
-     * 연사 기능을 적용할 동작 사용 키를 반환한다.
-     *
-     * @return 연사 동작 사용 키
-     */
-    @NonNull
-    ActionKey getFullAutoKey();
 
     /**
      * 연사속도를 반환한다.

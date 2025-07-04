@@ -7,8 +7,6 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
 public final class NeaceP1 extends PassiveSkill {
@@ -17,18 +15,12 @@ public final class NeaceP1 extends PassiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         setDuration();
 
         addActionTask(new IntervalTask((LongConsumer) i ->
@@ -52,6 +44,6 @@ public final class NeaceP1 extends PassiveSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+            use(ActionKey.SYSTEM);
     }
 }

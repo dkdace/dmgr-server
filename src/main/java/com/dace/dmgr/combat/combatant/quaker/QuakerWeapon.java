@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.quaker;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -17,12 +17,10 @@ import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.IntConsumer;
 
-public final class QuakerWeapon extends AbstractWeapon {
+public final class QuakerWeapon extends AbstractWeapon implements LeftClickHandler {
     /** 휘두르는 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
@@ -31,18 +29,12 @@ public final class QuakerWeapon extends AbstractWeapon {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(QuakerA1Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onLeftClick() {
         setCooldown();
         setVisible(false);
 

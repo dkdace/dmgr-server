@@ -13,9 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * 궁극기 스킬의 상태를 관리하는 클래스.
  */
@@ -50,12 +47,6 @@ public abstract class UltimateSkill extends ActiveSkill {
     }
 
     @Override
-    @NonNull
-    public final Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_4);
-    }
-
-    @Override
     @MustBeInvokedByOverriders
     protected void onCooldownFinished() {
         super.onCooldownFinished();
@@ -63,8 +54,14 @@ public abstract class UltimateSkill extends ActiveSkill {
     }
 
     @Override
+    @NonNull
+    public final ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_4;
+    }
+
+    @Override
     @MustBeInvokedByOverriders
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         combatUser.setUltGaugePercent(0);
         ULTIMATE_USE_SOUND.play(combatUser.getLocation());
 

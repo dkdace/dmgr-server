@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.ability.weapon;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.AbstractAction;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.info.WeaponInfo;
 import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -60,9 +59,8 @@ public abstract class AbstractWeapon extends AbstractAction implements Weapon {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey)
-                && combatUser.isGlobalCooldownFinished()
+    protected boolean canUse() {
+        return super.canUse() && combatUser.isGlobalCooldownFinished()
                 && !combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_WEAPON);
     }
 

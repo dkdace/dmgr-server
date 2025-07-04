@@ -18,9 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 @Getter
 public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     /** 상태 효과 저항 수정자 */
@@ -38,18 +35,18 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && targetModule.findTarget();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && targetModule.findTarget();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setCooldown();
         combatUser.getAbilityManager().getWeapon().cancel();
 

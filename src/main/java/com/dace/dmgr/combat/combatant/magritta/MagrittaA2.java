@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.combatant.magritta;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
@@ -12,22 +13,14 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
-public final class MagrittaA2 extends ActiveSkill {
+public final class MagrittaA2 extends ActiveSkill implements RightClickHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(MagrittaA2Info.SPEED);
 
     public MagrittaA2(@NonNull CombatUser combatUser, @NonNull MagrittaA2Info skillInfo) {
         super(combatUser, skillInfo, MagrittaA2Info.COOLDOWN, MagrittaA2Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_2, ActionKey.RIGHT_CLICK);
     }
 
     @Override
@@ -40,13 +33,18 @@ public final class MagrittaA2 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished()
-                && combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_2;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         combatUser.getMoveModule().addModifier(MODIFIER);
@@ -61,6 +59,11 @@ public final class MagrittaA2 extends ActiveSkill {
 
         addActionTask(new IntervalTask((LongConsumer) i -> MagrittaA2Info.Effects.playTick(combatUser.getLocation()), 1,
                 MagrittaA2Info.DURATION.toTicks()));
+    }
+
+    @Override
+    public void onRightClick() {
+        onSlot();
     }
 
     @Override

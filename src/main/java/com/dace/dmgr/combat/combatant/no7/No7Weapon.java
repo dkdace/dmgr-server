@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.combatant.no7;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.module.FullAutoModule;
@@ -18,9 +17,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 public final class No7Weapon extends AbstractWeapon implements FullAuto {
     /** 수정자 */
@@ -39,18 +35,12 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onRightClick() {
         Bullet.shotgun(i -> new No7WeaponHitscan(i == 0), No7WeaponInfo.PELLET_AMOUNT, No7WeaponInfo.SPREAD);
 
         combatUser.getMoveModule().addModifier(MODIFIER);
@@ -72,12 +62,6 @@ public final class No7Weapon extends AbstractWeapon implements FullAuto {
      */
     boolean canSprint() {
         return slowTimestamp.isBefore(Timestamp.now());
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getFullAutoKey() {
-        return ActionKey.RIGHT_CLICK;
     }
 
     @Override

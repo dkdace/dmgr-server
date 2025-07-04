@@ -14,18 +14,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class No7A3 extends ActiveSkill {
     public No7A3(@NonNull CombatUser combatUser, @NonNull No7A3Info skillInfo) {
         super(combatUser, skillInfo, No7A3Info.COOLDOWN, No7A3Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
     }
 
     @Override
@@ -38,12 +29,18 @@ public final class No7A3 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished() && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished() && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
         combatUser.getAbilityManager().getWeapon().cancel();
 

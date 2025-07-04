@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.skill.ChargeableSkill;
 import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.Attacker;
@@ -19,10 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class QuakerA1 extends ChargeableSkill {
+public final class QuakerA1 extends ChargeableSkill implements RightClickHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-QuakerA1Info.USE_SLOW);
     /** 엔티티 소환 모듈 */
@@ -31,12 +29,6 @@ public final class QuakerA1 extends ChargeableSkill {
     public QuakerA1(@NonNull CombatUser combatUser, @NonNull QuakerA1Info skillInfo) {
         super(combatUser, skillInfo, QuakerA1Info.COOLDOWN, QuakerA1Info.HEALTH);
         this.summonModule = new SummonModule<>(this);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
     }
 
     @Override
@@ -61,7 +53,13 @@ public final class QuakerA1 extends ChargeableSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
+
+    @Override
+    public void onSlot() {
         combatUser.getAbilityManager().getWeapon().cancel();
 
         if (!isDurationFinished()) {
@@ -78,6 +76,11 @@ public final class QuakerA1 extends ChargeableSkill {
         QuakerA1Info.Effects.ON.play(combatUser.getLocation());
 
         summonModule.set(new QuakerA1Entity(combatUser.getLocation()));
+    }
+
+    @Override
+    public void onRightClick() {
+        onSlot();
     }
 
     @Override

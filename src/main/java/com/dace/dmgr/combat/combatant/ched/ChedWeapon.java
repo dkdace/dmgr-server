@@ -2,6 +2,8 @@ package com.dace.dmgr.combat.combatant.ched;
 
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
+import com.dace.dmgr.combat.ability.handler.SystemHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -16,10 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class ChedWeapon extends AbstractWeapon {
+public final class ChedWeapon extends AbstractWeapon implements RightClickHandler, SystemHandler {
     /** 활 충전량 */
     private double power;
 
@@ -28,54 +27,40 @@ public final class ChedWeapon extends AbstractWeapon {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.RIGHT_CLICK, ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         ChedP1 skillp1 = combatUser.getAbilityManager().getAbility(ChedP1Info.getInstance());
-        return super.canUse(actionKey) && (skillp1.isDurationFinished() || skillp1.isHanging());
+        return super.canUse() && (skillp1.isDurationFinished() || skillp1.isHanging());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case RIGHT_CLICK: {
-                AbilityManager abilityManager = combatUser.getAbilityManager();
-                ChedA1 skill1 = abilityManager.getAbility(ChedA1Info.getInstance());
+    public void onRightClick() {
+        AbilityManager abilityManager = combatUser.getAbilityManager();
+        ChedA1 skill1 = abilityManager.getAbility(ChedA1Info.getInstance());
 
-                if (skill1.isEnabled()) {
-                    setCooldown(ChedA1Info.COOLDOWN);
+        if (skill1.isEnabled()) {
+            setCooldown(ChedA1Info.COOLDOWN);
 
-                    skill1.shot();
-                } else {
-                    setCooldown();
-                    setCanShoot(true);
+            skill1.shot();
+        } else {
+            setCooldown();
+            setCanShoot(true);
 
-                    if (combatUser.getEntity().isHandRaised()) {
-                        Weapon weapon = abilityManager.getWeapon();
-                        weapon.setVisible(false);
-                        weapon.setVisible(true);
-                    }
-
-                    ChedWeaponInfo.Effects.CHARGE.play(combatUser.getLocation());
-                }
-
-                break;
+            if (combatUser.getEntity().isHandRaised()) {
+                Weapon weapon = abilityManager.getWeapon();
+                weapon.setVisible(false);
+                weapon.setVisible(true);
             }
-            case PERIODIC_1: {
-                new ChedWeaponProjectile(power).shot();
-                setCanShoot(false);
 
-                ChedWeaponInfo.Effects.SHOOT.apply(power).play(combatUser.getLocation());
-
-                break;
-            }
-            default:
-                break;
+            ChedWeaponInfo.Effects.CHARGE.play(combatUser.getLocation());
         }
+    }
+
+    @Override
+    public void onSystemUse() {
+        new ChedWeaponProjectile(power).shot();
+        setCanShoot(false);
+
+        ChedWeaponInfo.Effects.SHOOT.apply(power).play(combatUser.getLocation());
     }
 
     /**
@@ -94,7 +79,7 @@ public final class ChedWeapon extends AbstractWeapon {
      */
     public void beforeShoot(double power) {
         this.power = power;
-        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+        use(ActionKey.SYSTEM);
     }
 
     private final class ChedWeaponProjectile extends Projectile<Damageable> {

@@ -23,9 +23,6 @@ import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class MagrittaA1 extends ActiveSkill {
     /** 화염 상태 효과 */
     private final Burning burning;
@@ -36,20 +33,20 @@ public final class MagrittaA1 extends ActiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
+        return super.canUse() && abilityManager.getAbility(MagrittaA2Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(MagrittaUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();

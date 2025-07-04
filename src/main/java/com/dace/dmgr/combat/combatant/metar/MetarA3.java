@@ -23,9 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public final class MetarA3 extends ActiveSkill implements HasBonusScore {
@@ -46,12 +44,6 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished() || !isEnabled)
@@ -61,7 +53,13 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             forceCancel();
             MetarA3Info.Effects.DETONATE.play(combatUser.getLocation());

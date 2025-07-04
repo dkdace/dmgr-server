@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.ability.skill.module;
 
 import com.comphenix.packetwrapper.WrapperPlayServerEntityDestroy;
 import com.dace.dmgr.Timespan;
+import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.skill.Confirmable;
 import com.dace.dmgr.util.EntityUtil;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -126,9 +127,9 @@ public final class LocationConfirmModule extends ConfirmModule {
         pointer.setAI(false);
 
         String message = MessageFormat.format("§7§l[{0}] {1}설치     §7§l[{2}] §f취소",
-                skill.getAcceptKey(),
+                ActionKey.LEFT_CLICK,
                 (isValid() ? ChatColor.WHITE : ChatColor.RED),
-                skill.getCancelKey());
+                skill.getSlot().toActionKey());
 
         skill.getCombatUser().getUser().sendTitle("", message, Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(5));
         skill.getCombatUser().getUser().getGlowingManager().setGlowing(pointer, (isValid() ? ChatColor.GREEN : ChatColor.RED));

@@ -7,9 +7,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class VellionP2 extends PassiveSkill {
     /** 최근 피해량 */
     private double damageAmount;
@@ -19,13 +16,7 @@ public final class VellionP2 extends PassiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         combatUser.getHealModule().heal(combatUser, damageAmount * VellionP2Info.HEAL_DAMAGE_RATIO, false);
     }
 
@@ -45,6 +36,6 @@ public final class VellionP2 extends PassiveSkill {
             return;
 
         damageAmount = damage;
-        combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+        use(ActionKey.SYSTEM);
     }
 }

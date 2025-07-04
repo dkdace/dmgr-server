@@ -15,9 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class InfernoP1 extends PassiveSkill {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(InfernoP1Info.DEFENSE_INCREMENT);
@@ -26,12 +23,6 @@ public final class InfernoP1 extends PassiveSkill {
 
     public InfernoP1(@NonNull CombatUser combatUser, @NonNull InfernoP1Info skillInfo) {
         super(combatUser, skillInfo, Timespan.ZERO, InfernoP1Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -44,8 +35,8 @@ public final class InfernoP1 extends PassiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && canActivate();
+    protected boolean canUse() {
+        return super.canUse() && canActivate();
     }
 
     /**
@@ -61,7 +52,7 @@ public final class InfernoP1 extends PassiveSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         setDuration();
         combatUser.getDamageModule().addModifier(MODIFIER);
     }
@@ -89,7 +80,7 @@ public final class InfernoP1 extends PassiveSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+            use(ActionKey.SYSTEM);
     }
 
     private final class InfernoP1Area extends Area<Damageable> {

@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.metar;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -21,11 +22,9 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.LongConsumer;
 
-public final class MetarA1 extends ActiveSkill {
+public final class MetarA1 extends ActiveSkill implements LeftClickHandler {
     /** 발사 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
@@ -34,18 +33,18 @@ public final class MetarA1 extends ActiveSkill {
     }
 
     @Override
+    protected boolean canUse() {
+        return super.canUse() && isDurationFinished();
+    }
+
+    @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1, ActionKey.LEFT_CLICK);
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onSlot() {
         setDuration();
 
         combatUser.getAbilityManager().getWeapon().cancel();
@@ -66,6 +65,11 @@ public final class MetarA1 extends ActiveSkill {
 
             MetarA1Info.Effects.SHOOT.play(loc);
         }, this::cancel, 3, 6)), MetarA1Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    public void onLeftClick() {
+        onSlot();
     }
 
     @Override

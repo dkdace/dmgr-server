@@ -414,7 +414,7 @@ public final class ActionBarDisplay {
         @NonNull
         public Builder keyInfo(@NonNull String description) {
             Validate.isTrue(ability instanceof Action, "ability가 Action을 상속받지 않음");
-            return keyInfo(description, ((Action) ability).getDefaultActionKeys().toArray(new ActionKey[0]));
+            return keyInfo(description, ((Action) ability).getActionKeys().toArray(new ActionKey[0]));
         }
 
         /**

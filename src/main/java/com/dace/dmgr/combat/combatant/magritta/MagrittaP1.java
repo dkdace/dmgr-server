@@ -15,21 +15,12 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 public final class MagrittaP1 extends PassiveSkill {
     /** 활성화 가능 여부 */
     private boolean canActivate = false;
 
     public MagrittaP1(@NonNull CombatUser combatUser, @NonNull MagrittaP1Info skillInfo) {
         super(combatUser, skillInfo, Timespan.ZERO, MagrittaP1Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.PERIODIC_1);
     }
 
     @Override
@@ -42,8 +33,8 @@ public final class MagrittaP1 extends PassiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && canActivate();
+    protected boolean canUse() {
+        return super.canUse() && canActivate();
     }
 
     /**
@@ -59,7 +50,7 @@ public final class MagrittaP1 extends PassiveSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected void onUse() {
         if (isDurationFinished()) {
             setDuration();
 
@@ -89,7 +80,7 @@ public final class MagrittaP1 extends PassiveSkill {
      */
     void onTick(long i) {
         if (i % 5 == 0)
-            combatUser.getAbilityManager().useAction(ActionKey.PERIODIC_1);
+            use(ActionKey.SYSTEM);
     }
 
     private final class MagrittaP1Area extends Area<Damageable> {

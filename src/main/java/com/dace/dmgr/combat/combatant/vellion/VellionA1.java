@@ -2,6 +2,7 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.RightClickHandler;
 import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.DamageType;
@@ -26,11 +27,9 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Set;
 
-public final class VellionA1 extends ActiveSkill {
+public final class VellionA1 extends ActiveSkill implements RightClickHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(-VellionA1Info.READY_SLOW);
 
@@ -50,20 +49,20 @@ public final class VellionA1 extends ActiveSkill {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1, ActionKey.RIGHT_CLICK);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && isDurationFinished() && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && isDurationFinished() && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
+
+    @Override
+    public void onSlot() {
         setDuration();
 
         combatUser.setGlobalCooldown(VellionA1Info.GLOBAL_COOLDOWN);
@@ -79,6 +78,11 @@ public final class VellionA1 extends ActiveSkill {
 
             VellionA1Info.Effects.USE_READY.play(loc);
         }, 1, VellionA1Info.READY_DURATION.toTicks()));
+    }
+
+    @Override
+    public void onRightClick() {
+        onSlot();
     }
 
     @Override

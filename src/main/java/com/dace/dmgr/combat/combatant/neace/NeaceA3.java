@@ -20,9 +20,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 @Getter
 public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     /** 타겟 모듈 */
@@ -35,12 +32,6 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_3);
-    }
-
-    @Override
     @Nullable
     public ActionBarDisplay getActionBarDisplay() {
         if (isDurationFinished())
@@ -50,12 +41,18 @@ public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && (!isDurationFinished() || targetModule.findTarget());
+    protected boolean canUse() {
+        return super.canUse() && (!isDurationFinished() || targetModule.findTarget());
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_3;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             combatUser.getMoveModule().push(combatUser.getLocation().getDirection().multiply(0.5), true);
             onEnd();

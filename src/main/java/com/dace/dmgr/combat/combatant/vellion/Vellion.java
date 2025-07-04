@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
@@ -143,9 +142,7 @@ public final class Vellion extends Controller {
 
     @Override
     public boolean canFly(@NonNull CombatUser combatUser) {
-        AbilityManager abilityManager = combatUser.getAbilityManager();
-        return abilityManager.getAbility(VellionP1Info.getInstance()).canUse(ActionKey.SPACE)
-                && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
+        return !combatUser.getAbilityManager().getAbility(VellionP1Info.getInstance()).isDurationFinished();
     }
 
     @Override

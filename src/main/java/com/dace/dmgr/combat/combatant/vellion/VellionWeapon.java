@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -14,29 +14,20 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class VellionWeapon extends AbstractWeapon {
+public final class VellionWeapon extends AbstractWeapon implements LeftClickHandler {
     public VellionWeapon(@NonNull CombatUser combatUser, @NonNull VellionWeaponInfo weaponInfo) {
         super(combatUser, weaponInfo, VellionWeaponInfo.COOLDOWN);
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK);
-    }
-
-    @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
-        return super.canUse(actionKey) && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
+        return super.canUse() && !abilityManager.getAbility(VellionA3Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(VellionUltInfo.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onLeftClick() {
         setCooldown();
         combatUser.playMeleeAttackAnimation(-4, Timespan.ofTicks(8), MainHand.RIGHT);
 

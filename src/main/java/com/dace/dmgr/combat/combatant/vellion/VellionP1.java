@@ -2,7 +2,7 @@ package com.dace.dmgr.combat.combatant.vellion;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.ActionBarDisplay;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.SpaceHandler;
 import com.dace.dmgr.combat.ability.skill.PassiveSkill;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
@@ -15,21 +15,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class VellionP1 extends PassiveSkill {
+public final class VellionP1 extends PassiveSkill implements SpaceHandler {
     /** 수정자 */
     private static final Modifier MODIFIER = new Modifier(VellionP1Info.SPEED);
 
     public VellionP1(@NonNull CombatUser combatUser, @NonNull VellionP1Info skillInfo) {
         super(combatUser, skillInfo, VellionP1Info.COOLDOWN, VellionP1Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SPACE);
     }
 
     @Override
@@ -46,7 +37,12 @@ public final class VellionP1 extends PassiveSkill {
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(VellionUltInfo.getInstance()).isDurationFinished();
+    }
+
+    @Override
+    public void onSpace() {
         if (!isDurationFinished()) {
             cancel();
             return;

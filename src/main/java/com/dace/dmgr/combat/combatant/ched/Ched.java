@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.combatant.ched;
 
-import com.dace.dmgr.combat.ability.ActionKey;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
@@ -124,11 +123,6 @@ public final class Ched extends Marksman {
         AbilityManager abilityManager = combatUser.getAbilityManager();
         return abilityManager.getAbility(ChedA3Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(ChedUltInfo.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public boolean canFly(@NonNull CombatUser combatUser) {
-        return combatUser.getAbilityManager().getAbility(ChedA2Info.getInstance()).canUse(ActionKey.SLOT_2);
     }
 
     @Override

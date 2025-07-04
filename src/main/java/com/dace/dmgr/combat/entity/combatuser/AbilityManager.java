@@ -12,11 +12,11 @@ import com.dace.dmgr.combat.ability.weapon.FullAuto;
 import com.dace.dmgr.combat.ability.weapon.Swappable;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.combatant.Combatant;
-import com.dace.dmgr.combat.entity.CombatRestriction;
 import com.dace.dmgr.combat.entity.Damageable;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 
@@ -31,6 +31,8 @@ public final class AbilityManager {
     private final HashMap<AbilityInfo<?>, Ability> abilityMap = new HashMap<>();
     /** 동작 사용 키 매핑 목록 (동작 사용 키 : 동작 목록) */
     private final EnumMap<ActionKey, TreeSet<Action>> actionsMap = new EnumMap<>(ActionKey.class);
+    /** 동작 목록 */
+    private final HashSet<Action> actions = new HashSet<>();
     /** 플레이어 인스턴스 */
     private final CombatUser combatUser;
 
@@ -57,9 +59,23 @@ public final class AbilityManager {
         });
 
         abilities.forEach(ability -> {
-            if (ability instanceof Action)
-                ((Action) ability).getDefaultActionKeys().forEach(actionKey -> actionsMap.get(actionKey).add((Action) ability));
+            if (!(ability instanceof Action))
+                return;
+
+            actions.add((Action) ability);
+            ((Action) ability).getActionKeys().forEach(actionKey -> actionsMap.get(actionKey).add((Action) ability));
         });
+    }
+
+    /**
+     * 동작 목록을 반환한다.
+     *
+     * @return 동작 목록
+     */
+    @NonNull
+    @UnmodifiableView
+    Set<@NonNull Action> getActions() {
+        return Collections.unmodifiableSet(actions);
     }
 
     /**
@@ -119,16 +135,13 @@ public final class AbilityManager {
      */
     public void useAction(@NonNull ActionKey actionKey) {
         actionsMap.get(actionKey).forEach(action -> {
-            if (combatUser.isDead() || action == null || combatUser.getStatusEffectModule().hasRestriction(CombatRestriction.USE_ACTION))
-                return;
-
             if (action instanceof Weapon)
                 action = getCurrentWeapon();
 
-            if (action instanceof FullAuto && (((FullAuto) action).getFullAutoKey() == actionKey))
+            if (action instanceof FullAuto && actionKey == ActionKey.RIGHT_CLICK)
                 ((FullAuto) action).getFullAutoModule().onUse();
-            else if (action.canUse(actionKey))
-                action.onUse(actionKey);
+            else
+                action.use(actionKey);
         });
     }
 
@@ -176,19 +189,13 @@ public final class AbilityManager {
      * 무기와 모든 스킬의 {@link Action#reset()}을 호출한다.
      */
     void reset() {
-        abilityMap.values().forEach(ability -> {
-            if (ability instanceof Action)
-                ((Action) ability).reset();
-        });
+        actions.forEach(Action::reset);
     }
 
     /**
      * 무기와 모든 스킬의 {@link Action#remove()}을 호출한다.
      */
     void remove() {
-        abilityMap.values().forEach(ability -> {
-            if (ability instanceof Action)
-                ((Action) ability).remove();
-        });
+        actions.forEach(Action::remove);
     }
 }

@@ -27,10 +27,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class JagerA1 extends ChargeableSkill implements Confirmable, HasBonusScore {
+public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Confirmable {
     /** 엔티티 소환 모듈 */
     private final SummonModule<JagerA1Entity> summonModule;
     /** 위치 확인 모듈 */
@@ -57,12 +54,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, HasBo
 
     @Override
     @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1, ActionKey.LEFT_CLICK);
-    }
-
-    @Override
-    @NonNull
     public ActionBarDisplay getActionBarDisplay() {
         ActionBarDisplay.Builder builder = ActionBarDisplay.builder(this).title().progressBar();
 
@@ -83,31 +74,30 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, HasBo
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(JagerA3Info.getInstance()).isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
-        switch (actionKey) {
-            case SLOT_1: {
-                if (isDurationFinished()) {
-                    combatUser.getAbilityManager().getWeapon().cancel();
-                    confirmModule.toggleCheck();
-                } else {
-                    setDuration(Timespan.ZERO);
-                    summonModule.removeEntity();
-                }
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
 
-                break;
-            }
-            case LEFT_CLICK: {
-                confirmModule.accept();
-                break;
-            }
-            default:
-                break;
+    @Override
+    public void onSlot() {
+        if (isDurationFinished()) {
+            combatUser.getAbilityManager().getWeapon().cancel();
+            confirmModule.toggleCheck();
+        } else {
+            setDuration(Timespan.ZERO);
+            summonModule.removeEntity();
         }
+    }
+
+    @Override
+    public void onLeftClick() {
+        confirmModule.accept();
     }
 
     @Override
@@ -126,18 +116,6 @@ public final class JagerA1 extends ChargeableSkill implements Confirmable, HasBo
     @Override
     protected void onCancelled() {
         confirmModule.cancel();
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getAcceptKey() {
-        return ActionKey.LEFT_CLICK;
-    }
-
-    @Override
-    @NonNull
-    public ActionKey getCancelKey() {
-        return ActionKey.SLOT_1;
     }
 
     /**

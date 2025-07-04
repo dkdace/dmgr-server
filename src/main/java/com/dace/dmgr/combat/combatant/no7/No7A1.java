@@ -16,19 +16,11 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
 
 public final class No7A1 extends ActiveSkill {
     public No7A1(@NonNull CombatUser combatUser, @NonNull No7A1Info skillInfo) {
         super(combatUser, skillInfo, No7A1Info.COOLDOWN, No7A1Info.DURATION);
-    }
-
-    @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.SLOT_1);
     }
 
     @Override
@@ -41,12 +33,18 @@ public final class No7A1 extends ActiveSkill {
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(No7A2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    @NonNull
+    public ActionKey.Slot getSlot() {
+        return ActionKey.Slot.SLOT_1;
+    }
+
+    @Override
+    public void onSlot() {
         if (!isDurationFinished()) {
             cancel();
             return;

@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.ability.skill;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.SlotHandler;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.effect.SoundEffect;
@@ -18,7 +18,7 @@ import java.util.function.LongConsumer;
 /**
  * 인벤토리 슬롯에서 사용하는 액티브 스킬의 상태를 관리하는 클래스.
  */
-public abstract class ActiveSkill extends AbstractSkill {
+public abstract class ActiveSkill extends AbstractSkill implements SlotHandler {
     /** 스킬 준비 효과음 */
     static final SoundEffect READY_SOUND = SoundEffect.builder(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).volume(0.2).pitch(2).build();
 
@@ -32,13 +32,10 @@ public abstract class ActiveSkill extends AbstractSkill {
     /**
      * 액티브 스킬 인스턴스를 생성한다.
      *
-     * <p>{@link ActiveSkill#getDefaultActionKeys()}이 슬롯 키({@link ActionKey#isSlot()})를 하나 포함하도록 구현해야 한다.</p>
-     *
      * @param combatUser      사용자 플레이어
      * @param activeSkillInfo 액티브 스킬 정보 인스턴스
      * @param defaultCooldown 기본 쿨타임
      * @param defaultDuration 기본 지속시간
-     * @throws IllegalArgumentException {@link ActiveSkill#getDefaultActionKeys()}가 슬롯 키를 포함하지 않으면 발생
      */
     protected ActiveSkill(@NonNull CombatUser combatUser, @NonNull ActiveSkillInfo<?> activeSkillInfo, @NonNull Timespan defaultCooldown,
                           @NonNull Timespan defaultDuration) {
@@ -46,12 +43,7 @@ public abstract class ActiveSkill extends AbstractSkill {
 
         this.originalItemStack = activeSkillInfo.getDefinedItem().getItemStack();
         this.itemStack = originalItemStack.clone();
-
-        ActionKey actionKey = getDefaultActionKeys().stream()
-                .filter(ActionKey::isSlot)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("getDefaultActionKeys()가 슬롯 키를 포함하지 않음"));
-        slot = Integer.parseInt(actionKey.toString()) - 1;
+        this.slot = Integer.parseInt(getSlot().toActionKey().toString()) - 1;
 
         addTask(new IntervalTask((LongConsumer) i -> onTick(), 1));
         addOnRemove(() -> combatUser.getEntity().getInventory().clear(slot));
@@ -84,8 +76,8 @@ public abstract class ActiveSkill extends AbstractSkill {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.isGlobalCooldownFinished();
+    protected boolean canUse() {
+        return super.canUse() && combatUser.isGlobalCooldownFinished();
     }
 
     /**

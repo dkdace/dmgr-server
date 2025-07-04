@@ -1,7 +1,7 @@
 package com.dace.dmgr.combat.combatant.silia;
 
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.combat.ability.ActionKey;
+import com.dace.dmgr.combat.ability.handler.LeftClickHandler;
 import com.dace.dmgr.combat.ability.weapon.AbstractWeapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
@@ -12,10 +12,7 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.inventory.MainHand;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-public final class SiliaWeapon extends AbstractWeapon {
+public final class SiliaWeapon extends AbstractWeapon implements LeftClickHandler {
     /** 검기 방향의 반대 방향 여부 */
     private boolean isOpposite = true;
 
@@ -24,18 +21,12 @@ public final class SiliaWeapon extends AbstractWeapon {
     }
 
     @Override
-    @NonNull
-    public Set<@NonNull ActionKey> getDefaultActionKeys() {
-        return EnumSet.of(ActionKey.LEFT_CLICK);
+    protected boolean canUse() {
+        return super.canUse() && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
     }
 
     @Override
-    public boolean canUse(@NonNull ActionKey actionKey) {
-        return super.canUse(actionKey) && combatUser.getAbilityManager().getAbility(SiliaP2Info.getInstance()).isDurationFinished();
-    }
-
-    @Override
-    public void onUse(@NonNull ActionKey actionKey) {
+    public void onLeftClick() {
         isOpposite = !isOpposite;
 
         if (!combatUser.getAbilityManager().getAbility(SiliaT2Info.getInstance()).useStrike(isOpposite)) {
