@@ -1,9 +1,7 @@
 package com.dace.dmgr.game;
 
 import com.dace.dmgr.ConsoleLogger;
-import com.dace.dmgr.GeneralConfig;
 import com.dace.dmgr.Timespan;
-import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.effect.SoundEffect;
 import com.dace.dmgr.user.UserData;
 import com.dace.dmgr.util.StringFormUtil;
@@ -212,68 +210,132 @@ public final class ResultManager {
         return userData.getMoney() - money;
     }
 
+
     /**
-     * 일반 매치 종료 후 결과에 따라 플레이어의 MMR을 조정한다.
+     * 게임에 참가 중인 모든 유저의 평균 랭크 점수를 구한다.
+     *
+     * @return 평균 랭크 점수
+     */
+    private double getAverageScore() {
+        return game.getGameUsers().stream().mapToDouble(GameUser::getScore).average().orElse(0);
+    }
+
+    /**
+     * 게임에 참가 중인 모든 유저의 평균 KDA를 구한다.
+     *
+     * @return 평균 KDA
+     */
+    private double getAverageKDA() {
+        return game.getGameUsers().stream().mapToDouble(GameUser::getKDARatio).average().orElse(0);
+    }
+
+    /**
+     * tanh 계산 함수
+     *
+     * @return tanh
+     */
+    private static double tanh(double x) {
+        return Math.tanh(x);
+    }
+
+    /**
+     * RR과 MMR의 최저점과 최고점을 넘어서지 않도록 고정한다.
+     *
+     * @return 0(최저) ~ 1000(최고)
+     */
+    private static int clamp(int v) {
+        return Math.max(0, Math.min(1000, v));
+    }
+
+    /**
+     * 일반 매치의 MMR을 계산하여 반환한다.
+     *
+     * @param gameUser 대상 플레이어
+     * @return 계산된 MMR (0~1000)
+     */
+    private int getFinalMMR(GameUser gameUser) {
+        UserData userData = gameUser.getUser().getUserData();
+        int curMMR        = userData.getMatchMakingRate();
+        int avgMMR        = (int) getAverage(UserData::getMatchMakingRate);
+        double score      = gameUser.getScore();
+        double avgScore   = getAverageScore();
+        double kda        = gameUser.getKDARatio();
+        double avgKDA     = getAverageKDA();
+        boolean isWin     = (winnerTeam != null && winnerTeam == gameUser.getTeam());
+
+        double deltaMMR    = curMMR - avgMMR;
+        double deltaScore  = score  - avgScore;
+        double deltaKDA100 = (kda - avgKDA) * 100;
+        double winCoef     = isWin ? 1.0 : -0.8;
+
+        long termMMR   = Math.round(deltaMMR * 0.25);
+        long termScore = Math.round(0.8 * 100 * tanh(0.008 / 3.14 * deltaScore));
+        long termKDA   = Math.round(0.2 * 100 * tanh(0.008 / 3.14 * deltaKDA100));
+        double termWin = winCoef * 20;
+
+        int sumR       = (int)(termScore + termKDA - termMMR + termWin);
+        int rawNewMMR  = curMMR + sumR;
+        int finalMMR   = (int)Math.round(curMMR * 0.8 + rawNewMMR * 0.2);
+
+        return clamp(finalMMR);
+    }
+
+    /**
+     * 랭크 매치의 RR을 계산하여 반환한다.
+     *
+     * @param gameUser 대상 플레이어
+     * @param newMMR   갱신된 MMR 값
+     * @return 계산된 RR (0~1000)
+     */
+    private int getFinalRR(GameUser gameUser, int newMMR) {
+        UserData userData = gameUser.getUser().getUserData();
+        int curRR         = userData.getRankRate();
+        int avgRR         = (int) getAverage(UserData::getRankRate);
+        boolean isWin     = (winnerTeam != null && winnerTeam == gameUser.getTeam());
+        double winCoef    = isWin ? 1.0 : -0.8;
+        double termWin    = winCoef * 20;
+
+        double deltaRR    = curRR - avgRR;
+        long expDelta     = Math.round(10 * tanh(deltaRR / 150.0));
+        long mmrToRR      = Math.round((newMMR - curRR) * 0.1);
+        int deltaRank     = (int)(termWin - expDelta + mmrToRR);
+        int finalRR       = curRR + deltaRank;
+
+        return clamp(finalRR);
+    }
+
+    /**
+     * 매치 종료 후 결과에 따라 플레이어의 MMR을 업데이트한다.
      *
      * @param gameUser 대상 플레이어
      */
     private void updateMMR(@NonNull GameUser gameUser) {
         UserData userData = gameUser.getUser().getUserData();
-
-        int mmr = userData.getMatchMakingRate();
-        int normalPlayCount = userData.getNormalPlayCount();
-        double kda = gameUser.getKDARatio();
-        double score = gameUser.getScore();
-        Timespan playTime = gameUser.getStartTime().until(Timestamp.now());
-        int gameAverageMMR = (int) getAverage(UserData::getMatchMakingRate);
-
-        userData.setMatchMakingRate(getFinalMMR(mmr, normalPlayCount, kda, score, playTime, gameAverageMMR));
+        int newMMR        = getFinalMMR(gameUser);
+        userData.setMatchMakingRate(newMMR);
         userData.addNormalPlayCount();
-
-        ConsoleLogger.info("{0}의 유저 MMR 변동됨: {1} -> {2}, 일반 매치 플레이 횟수: {3}",
-                gameUser.getPlayer().getName(),
-                mmr, userData.getMatchMakingRate(),
-                normalPlayCount + 1);
+        ConsoleLogger.info("{} MMR: {} -> {}", gameUser.getPlayer().getName(), userData.getMatchMakingRate(), newMMR);
     }
 
     /**
-     * 랭크 매치 종료 후 결과에 따라 플레이어의 랭크 점수와 MMR을 조정한다.
+     * 매치 종료 후 결과에 따라 플레이어의 RR을 업데이트한다.
      *
      * @param gameUser 대상 플레이어
-     * @return 랭크 점수 획득량
+     * @return 획득한 RR 변화량
      */
     private int updateRankRate(@NonNull GameUser gameUser) {
         UserData userData = gameUser.getUser().getUserData();
-
-        int mmr = userData.getMatchMakingRate();
-        int rr = userData.getRankRate();
-        int rankPlayCount = userData.getRankPlayCount();
-        double kda = gameUser.getKDARatio();
-        double score = gameUser.getScore();
-        Timespan playTime = gameUser.getStartTime().until(Timestamp.now());
-        int gameAverageMMR = (int) getAverage(UserData::getMatchMakingRate);
-        int gameAverageRR = (int) getAverage(UserData::getRankRate);
-
-        userData.setMatchMakingRate(getFinalMMR(mmr, rankPlayCount, kda, score, playTime, gameAverageMMR));
+        int newMMR        = getFinalMMR(gameUser);
+        userData.setMatchMakingRate(newMMR);
+        int oldRR         = userData.getRankRate();
+        int newRR         = getFinalRR(gameUser, newMMR);
+        userData.setRankRate(newRR);
         userData.addRankPlayCount();
-
-        if (!userData.isRanked()) {
-            if (rankPlayCount + 1 >= GeneralConfig.getGameConfig().getRankPlacementPlayCount()) {
-                userData.setRankRate(getFinalRankRate(mmr));
-                userData.setRanked(true);
-            }
-        } else {
-            userData.setRankRate(getFinalRankRateRanked(mmr, rr, kda, score, playTime, gameAverageRR,
-                    winnerTeam == null ? null : winnerTeam == gameUser.getTeam()));
-            ConsoleLogger.info("{0}의 RR 변동됨: {1} -> {2}, 랭크 매치 플레이 횟수: {3}",
-                    gameUser.getPlayer().getName(),
-                    rr,
-                    userData.getRankRate(),
-                    rankPlayCount + 1);
-        }
-
-        return userData.getRankRate() - rr;
+        ConsoleLogger.info("{} RR: {} -> {}", gameUser.getPlayer().getName(), oldRR, newRR);
+        return newRR - oldRR;
     }
+
+
 
     /**
      * 게임 참여자들의 특정 수치의 평균을 반환한다.
@@ -318,106 +380,6 @@ public final class ResultManager {
             finalScore += 200;
 
         return finalScore;
-    }
-
-    /**
-     * 게임 결과에 따른 최종 MMR을 반환한다.
-     *
-     * @param mmr        현재 MMR
-     * @param playCount  플레이 횟수
-     * @param kda        킬/데스
-     * @param score      점수
-     * @param playTime   플레이 시간
-     * @param averageMMR 게임 참여자들의 MMR 평균
-     * @return 최종 MMR
-     */
-    private int getFinalMMR(int mmr, int playCount, double kda, double score, @NonNull Timespan playTime, int averageMMR) {
-        int value = (int) Math.min(((getKDARatioCorrection(kda) + getScoreCorrection(score, playTime)) * 10 + averageMMR), 1000);
-
-        double finalMMR;
-        if (playCount < GeneralConfig.getGameConfig().getMmrPlayCountThreshold())
-            finalMMR = (mmr * playCount / (playCount + 1.0)) + value * (1 / (playCount + 1.0));
-        else {
-            playCount = GeneralConfig.getGameConfig().getMmrPlayCountThreshold();
-            finalMMR = (mmr * (playCount - 1.0) / (playCount)) + value * (1.0 / (playCount));
-        }
-
-        return (int) finalMMR;
-    }
-
-    /**
-     * 게임 결과에 따른 최종 랭크 점수를 반환한다. (배치 미완료)
-     *
-     * @param mmr 현재 MMR
-     * @return 최종 랭크 점수
-     */
-    private int getFinalRankRate(int mmr) {
-        return (int) Math.min(mmr * 0.9, GeneralConfig.getGameConfig().getMaxPlacementRankRate());
-    }
-
-    /**
-     * 게임 결과에 따른 최종 랭크 점수를 반환한다. (배치 완료)
-     *
-     * @param mmr       현재 MMR
-     * @param rr        현재 랭크 점수
-     * @param kda       킬/데스
-     * @param score     점수
-     * @param playTime  플레이 시간
-     * @param averageRR 게임 참여자들의 랭크 점수 평균
-     * @param isWin     승리 여부. {@code null}로 지정 시 무승부를 나타냄
-     * @return 최종 랭크 점수
-     */
-    private int getFinalRankRateRanked(int mmr, int rr, double kda, double score, @NonNull Timespan playTime, int averageRR, @Nullable Boolean isWin) {
-        return (int) (rr + Math.round(getKDARatioCorrection(kda) + getScoreCorrection(score, playTime) + getWinCorrection(isWin) +
-                getPointCorrection(mmr, rr, averageRR)));
-    }
-
-    /**
-     * 킬/데스 보정치를 반환한다.
-     *
-     * @param kda 킬/데스
-     * @return 킬/데스 보정치
-     */
-    private double getKDARatioCorrection(double kda) {
-        return (kda / GeneralConfig.getGameConfig().getExpectedAverageKDARatio()) * 20;
-    }
-
-    /**
-     * 게임 점수 보정치를 반환한다.
-     *
-     * @param score    점수
-     * @param playTime 플레이 시간
-     * @return 게임 점수 보정치
-     */
-    private double getScoreCorrection(double score, @NonNull Timespan playTime) {
-        return ((score / GeneralConfig.getGameConfig().getExpectedAverageScorePerMinute()) / playTime.toSeconds() / 60) * 20;
-    }
-
-    /**
-     * 승패 보정치를 반환한다.
-     *
-     * @param isWin 승리 여부. {@code null}로 지정 시 무승부를 나타냄
-     * @return 승패 보정치
-     */
-    private double getWinCorrection(@Nullable Boolean isWin) {
-        if (isWin == null)
-            return 0;
-        return isWin ? 10 : -8;
-    }
-
-    /**
-     * MMR, 랭크 점수 보정치를 반환한다.
-     *
-     * @param mmr       MMR
-     * @param rr        랭크 점수
-     * @param averageRR 게임 참여자들의 랭크 점수 평균
-     * @return MMR, 랭크 점수 보정치
-     */
-    private double getPointCorrection(int mmr, int rr, int averageRR) {
-        double averageDiffValue = (GeneralConfig.getGameConfig().getExpectedAverageRankRate() + averageRR) / 2.0 - rr;
-        int weightValue = mmr - rr;
-
-        return averageDiffValue * 0.04 + weightValue * 0.1;
     }
 
     /**
