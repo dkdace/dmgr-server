@@ -15,7 +15,6 @@ import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Hitscan;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import lombok.Getter;
@@ -49,25 +48,41 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         return ActionBarDisplay.builder(this).ammoBar(getCapacity(), ActionBarDisplay.AMMO_BAR_SYMBOL).build();
     }
 
+    /**
+     * 우클릭 가능 여부를 반환한다.
+     *
+     * @return 우클릭 가능 여부
+     */
+    private boolean canRightClick() {
+        ArkaceP1 skillp1 = combatUser.getAbilityManager().getAbility(ArkaceP1Info.getInstance());
+        boolean canUse;
+
+        if (skillp1.cancel()) {
+            setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
+            canUse = false;
+        } else
+            canUse = true;
+
+        skillp1.setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION.plus(Timespan.ofTicks(2)));
+        return canUse;
+    }
+
     @Override
     public void onRightClick() {
-        if (cancelP1()) {
-            setCooldown(ArkaceWeaponInfo.SPRINT_READY_DURATION);
+        if (!canRightClick())
             return;
-        }
 
         boolean isUlt = !combatUser.getAbilityManager().getAbility(ArkaceUltInfo.getInstance()).isDurationFinished();
         if (!isUlt && !reloadModule.consume(1))
             return;
 
-        Location loc = combatUser.getLocation();
-        if (isUlt) {
-            new ArkaceWeaponHitscan(true).shot();
-            ArkaceUltInfo.Effects.SHOOT.play(loc);
-        } else {
-            new ArkaceWeaponHitscan(false)
-                    .shot(VectorUtil.getSpreadedVector(loc.getDirection(), gradualSpreadModule.increaseSpread()));
+        new ArkaceWeaponHitscan(isUlt).shot();
 
+        Location loc = combatUser.getLocation();
+
+        if (isUlt)
+            ArkaceUltInfo.Effects.SHOOT.play(loc);
+        else {
             ArkaceWeaponInfo.RECOIL.send(combatUser);
             ArkaceWeaponInfo.Effects.USE.play(loc);
 
@@ -88,24 +103,6 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
     @Override
     protected void onCancelled() {
         reloadModule.cancel();
-    }
-
-    /**
-     * 패시브 1번 스킬을 취소시킨다.
-     *
-     * @return 무기 사용 취소 여부
-     */
-    private boolean cancelP1() {
-        ArkaceP1 skillp1 = combatUser.getAbilityManager().getAbility(ArkaceP1Info.getInstance());
-        Timespan skillp1Cooldown = ArkaceWeaponInfo.SPRINT_READY_DURATION.plus(Timespan.ofTicks(2));
-
-        if (skillp1.cancel()) {
-            skillp1.setCooldown(skillp1Cooldown);
-            return true;
-        }
-
-        skillp1.setCooldown(skillp1Cooldown);
-        return false;
     }
 
     @Override
@@ -144,7 +141,8 @@ public final class ArkaceWeapon extends AbstractWeapon implements Reloadable, Fu
         private final boolean isUlt;
 
         private ArkaceWeaponHitscan(boolean isUlt) {
-            super(combatUser, EntityCondition.enemy(combatUser));
+            super(combatUser, EntityCondition.enemy(combatUser),
+                    (isUlt ? Option.builder() : Option.builder().spread(gradualSpreadModule.increaseSpread())).build());
             this.isUlt = isUlt;
         }
 

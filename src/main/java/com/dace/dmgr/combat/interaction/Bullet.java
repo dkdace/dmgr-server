@@ -45,6 +45,8 @@ public abstract class Bullet<T extends CombatEntity> {
     protected final double maxDistance;
     /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록) */
     protected final double size;
+    /** 발사 시 탄퍼짐. (단위: ×0.01블록/블록) */
+    protected final double spread;
     /** 대상 엔티티를 찾는 조건 */
     protected final EntityCondition<T> entityCondition;
     /** 피격자 목록 */
@@ -87,18 +89,22 @@ public abstract class Bullet<T extends CombatEntity> {
      * @param startDistance   발사 위치로부터 총알이 생성되는 거리. (단위: 블록). 0 이상의 값
      * @param maxDistance     총알의 최대 사거리. (단위: 블록). {@code startDistance} 이상의 값
      * @param size            총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록). 0 이상의 값
+     * @param spread          발사 시 탄퍼짐. (단위: ×0.01블록/블록). 0 이상의 값
      * @param entityCondition 대상 엔티티를 찾는 조건
      * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, @NonNull EntityCondition<T> entityCondition) {
+    protected Bullet(@NonNull CombatEntity shooter, double startDistance, double maxDistance, double size, double spread,
+                     @NonNull EntityCondition<T> entityCondition) {
         Validate.isTrue(startDistance >= 0, "startDistance >= 0 (%f)", startDistance);
         Validate.isTrue(maxDistance >= 0, "maxDistance >= %f (%f)", startDistance, maxDistance);
         Validate.isTrue(size >= 0, "size >= 0 (%f)", size);
+        Validate.isTrue(spread >= 0, "spread >= 0 (%f)", spread);
 
         this.shooter = shooter;
         this.startDistance = startDistance;
         this.maxDistance = maxDistance;
         this.size = size;
+        this.spread = spread;
         this.entityCondition = entityCondition;
     }
 
@@ -302,6 +308,7 @@ public abstract class Bullet<T extends CombatEntity> {
         hitEntityHandler = getHitEntityHandler();
 
         startLocation = start.clone();
+        direction = VectorUtil.getSpreadedVector(direction, spread);
         location = start.clone().add(direction.clone().normalize().multiply(startDistance));
         velocity = direction.clone().normalize().multiply(HITBOX_INTERVAL);
 

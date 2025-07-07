@@ -53,7 +53,7 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
      */
     Projectile(@NonNull CombatEntity shooter, @Nullable Action action, int speed, @NonNull EntityCondition<T> entityCondition,
                @NonNull Option option) {
-        super(shooter, option.startDistance, option.maxDistance, option.size, entityCondition);
+        super(shooter, option.startDistance, option.maxDistance, option.size, option.spread, entityCondition);
         Validate.isTrue(speed >= 0, "speed >= 0 (%d)", speed);
 
         this.duration = option.duration;
@@ -199,6 +199,9 @@ public abstract class Projectile<T extends CombatEntity> extends Bullet<T> {
         /** 총알의 판정 크기. 판정의 엄격함에 영향을 미침. (단위: 블록). 0 이상의 값 */
         @Builder.Default
         private final double size = 0.13;
+        /** 발사 시 탄퍼짐. (단위: ×0.01블록/블록). 0 이상의 값 */
+        @Builder.Default
+        private final double spread = 0;
         /** 투사체가 유지되는 시간 */
         @Builder.Default
         @NonNull

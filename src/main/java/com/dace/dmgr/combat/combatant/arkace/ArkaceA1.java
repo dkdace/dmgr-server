@@ -7,19 +7,17 @@ import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
-import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
     public ArkaceA1(@NonNull CombatUser combatUser, @NonNull ArkaceA1Info skillInfo) {
@@ -97,15 +95,11 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
-                    if (target instanceof Movable) {
-                        Vector dir = getVelocity().normalize().multiply(ArkaceA1Info.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir);
-                    }
+                    KnockbackModule.knockback(target, getVelocity(), ArkaceA1Info.KNOCKBACK);
 
                     if (target.isGoalTarget())
                         combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
                 }
-
 
                 return false;
             };
@@ -126,10 +120,8 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
                 double damage = ArkaceA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(center.distance(location));
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target instanceof Movable && !ArkaceA1Projectile.this.getHitTargets().contains(target)) {
-                    Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(ArkaceA1Info.KNOCKBACK);
-                    ((Movable) target).getKnockbackModule().knockback(dir);
-                }
+                        && !ArkaceA1Projectile.this.getHitTargets().contains(target))
+                    KnockbackModule.knockback(target, center, location, ArkaceA1Info.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }

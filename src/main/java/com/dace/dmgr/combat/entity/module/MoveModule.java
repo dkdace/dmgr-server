@@ -113,7 +113,7 @@ public final class MoveModule extends CombatEntityModule<Movable> {
      * 엔티티를 지정한 속도로 밀어낸다. (이동기).
      *
      * @param velocity 속도
-     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화.
+     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화
      */
     public void push(@NonNull Vector velocity, boolean isReset) {
         if (!(combatEntity instanceof Damageable) || !combatEntity.getKnockbackModule().isKnockbacked()
