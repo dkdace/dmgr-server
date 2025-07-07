@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public final class Vellion extends Controller {
     /** 치유 점수 */
-    public static final int HEAL_SCORE = 40;
+    public static final CombatScore HEAL_SCORE = new CombatScore("치유", 40);
     @Getter
     private static final Vellion instance = new Vellion();
 
@@ -127,7 +128,7 @@ public final class Vellion extends Controller {
     @Override
     public void onGiveHeal(@NonNull CombatUser provider, @NonNull Healable target, double amount) {
         if (provider != target && target.isGoalTarget())
-            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
+            provider.addScore(HEAL_SCORE.multiplyScore(amount / target.getDamageModule().getMaxHealth()));
     }
 
     @Override

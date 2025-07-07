@@ -25,7 +25,7 @@ import java.util.*;
  */
 public final class AbilityManager {
     /** 궁극기 차단 점수 */
-    static final int ULT_BLOCK_SCORE = 50;
+    static final CombatScore ULT_BLOCK_SCORE = new CombatScore("궁극기 차단", 50);
 
     /** 능력 정보별 능력 목록 (능력 정보 : 능력) */
     private final HashMap<AbilityInfo<?>, Ability> abilityMap = new HashMap<>();
@@ -167,7 +167,7 @@ public final class AbilityManager {
                 return;
 
             if (attacker != null && !combatUser.isDead() && skill instanceof UltimateSkill)
-                attacker.addScore("궁극기 차단", ULT_BLOCK_SCORE);
+                attacker.addScore(ULT_BLOCK_SCORE);
         });
     }
 

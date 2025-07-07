@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -28,7 +29,7 @@ public final class SiliaT2Info extends TraitInfo<SiliaT2> {
     public static final double KNOCKBACK = 1;
 
     /** 피해 점수 */
-    public static final int DAMAGE_SCORE = 5;
+    public static final CombatScore DAMAGE_SCORE = new CombatScore("일격", 5);
 
     @Getter
     private static final SiliaT2Info instance = new SiliaT2Info();

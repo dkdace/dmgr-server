@@ -89,7 +89,7 @@ public final class MetarA2 extends StackableSkill {
         public void onDamage(@Nullable Attacker attacker, double damage, double reducedDamage, @Nullable Location location, boolean isCrit) {
             super.onDamage(attacker, damage, reducedDamage, location, isCrit);
 
-            combatUser.addScore("피해 막음", damage * MetarA2Info.BLOCK_SCORE / MetarA2Info.HEALTH);
+            combatUser.addScore(MetarA2Info.BLOCK_SCORE.multiplyScore(damage));
 
             MetarA2Info.Effects.DAMAGE.apply(location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }

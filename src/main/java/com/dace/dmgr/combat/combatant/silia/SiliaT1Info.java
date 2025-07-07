@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.combatant.silia;
 import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import lombok.Getter;
 
 public final class SiliaT1Info extends TraitInfo<SiliaT1> {
@@ -10,7 +11,7 @@ public final class SiliaT1Info extends TraitInfo<SiliaT1> {
     public static final int CRIT_MULTIPLIER = 2;
 
     /** 치명타 점수 */
-    public static final int CRIT_SCORE = 3;
+    public static final CombatScore CRIT_SCORE = new CombatScore("백어택", 3);
 
     @Getter
     private static final SiliaT1Info instance = new SiliaT1Info();

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -27,7 +28,7 @@ public final class ArkaceA2Info extends ActiveSkillInfo<ArkaceA2> {
     public static final Timespan DURATION = Timespan.ofSeconds(2.5);
 
     /** 치유 점수 */
-    public static final int HEAL_SCORE = 8;
+    public static final CombatScore HEAL_SCORE = new CombatScore("회복", 8);
 
     @Getter
     private static final ArkaceA2Info instance = new ArkaceA2Info();

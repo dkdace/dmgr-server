@@ -55,11 +55,11 @@ public final class No7A3 extends ActiveSkill {
             Location loc = combatUser.getLocation().add(0, 0.1, 0);
             area.emit(loc);
 
-            int size = area.getHitTargets().size();
+            double size = area.getHitTargets().size();
             combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).addShield(No7A3Info.SHIELD * (size + 1.0) / durationTicks);
 
             if (size > 0)
-                combatUser.addScore("보호막 획득", (double) (No7A3Info.SHIELD_SCORE * size) / durationTicks);
+                combatUser.addScore(No7A3Info.SHIELD_SCORE.multiplyScore(size / durationTicks));
 
             No7A3Info.Effects.playTick(i, combatUser.getLocation());
         }, 1, durationTicks));

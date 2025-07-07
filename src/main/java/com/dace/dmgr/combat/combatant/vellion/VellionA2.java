@@ -14,6 +14,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
@@ -53,7 +54,7 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
         super(combatUser, skillInfo, VellionA2Info.COOLDOWN, Timespan.MAX);
 
         this.targetModule = new TargetModule<>(this);
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA2Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
 
         addOnReset(this::forceCancel);
     }
@@ -174,6 +175,12 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     public EntityCondition<Damageable> getEntityCondition() {
         return EntityCondition.enemy(combatUser).and(combatEntity ->
                 combatEntity.isCreature() && !combatEntity.getStatusEffectModule().has(VellionA2Mark.instance));
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return VellionA2Info.ASSIST_SCORE;
     }
 
     @Override

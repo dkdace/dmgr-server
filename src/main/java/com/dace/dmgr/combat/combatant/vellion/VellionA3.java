@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.ability.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.HealBlock;
@@ -43,7 +44,7 @@ public final class VellionA3 extends ActiveSkill implements HasBonusScore, Confi
         super(combatUser, skillInfo, VellionA3Info.COOLDOWN, Timespan.MAX);
 
         this.confirmModule = new LocationConfirmModule(this, VellionA3Info.MAX_DISTANCE);
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionA3Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.silence = new Silence(combatUser);
     }
 
@@ -116,6 +117,12 @@ public final class VellionA3 extends ActiveSkill implements HasBonusScore, Confi
     }
 
     @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return VellionA3Info.ASSIST_SCORE;
+    }
+
+    @Override
     public boolean isAssistMode() {
         return true;
     }
@@ -137,7 +144,7 @@ public final class VellionA3 extends ActiveSkill implements HasBonusScore, Confi
                 target.getStatusEffectModule().apply(silence, Timespan.ofTicks(10));
 
                 if (target.isGoalTarget()) {
-                    combatUser.addScore("적 침묵", VellionA3Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
+                    combatUser.addScore(VellionA3Info.EFFECT_SCORE_PER_SECOND.multiplyScore(4.0 / 20));
                     bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
                 }
             }

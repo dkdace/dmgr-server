@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -38,7 +39,7 @@ public final class JagerA1Info extends ActiveSkillInfo<JagerA1> {
     public static final Timespan RECOVER_DURATION = Timespan.ofSeconds(6);
 
     /** 처치 점수 */
-    public static final int KILL_SCORE = 15;
+    public static final CombatScore KILL_SCORE = new CombatScore("설랑 보너스", 15);
     /** 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(10);
     /** 사망 점수 */

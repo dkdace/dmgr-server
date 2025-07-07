@@ -115,6 +115,6 @@ public final class InfernoUlt extends UltimateSkill {
      */
     void onKill(@NonNull Damageable victim, double contributionScore) {
         if (victim.isGoalTarget() && !isDurationFinished())
-            combatUser.addScore("궁극기 보너스", InfernoUltInfo.KILL_SCORE * contributionScore);
+            combatUser.addScore(InfernoUltInfo.KILL_SCORE.multiplyScore(contributionScore));
     }
 }

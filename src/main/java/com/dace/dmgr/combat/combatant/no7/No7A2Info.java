@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -28,7 +29,7 @@ public final class No7A2Info extends ActiveSkillInfo<No7A2> {
     public static final Timespan DURATION = Timespan.ofSeconds(2.5);
 
     /** 방어 점수 */
-    public static final int BLOCK_SCORE = 5;
+    public static final CombatScore BLOCK_SCORE = new CombatScore("피해 흡수", 5);
 
     @Getter
     private static final No7A2Info instance = new No7A2Info();

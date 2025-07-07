@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -43,7 +44,7 @@ public final class JagerUltInfo extends UltimateSkillInfo<JagerUlt> {
     public static final Timespan DURATION = Timespan.ofSeconds(20);
 
     /** 궁극기 처치 점수 */
-    public static final int KILL_SCORE = 30;
+    public static final CombatScore KILL_SCORE = new CombatScore("궁극기 보너스", 30);
     /** 궁극기 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
     /** 파괴 점수 */

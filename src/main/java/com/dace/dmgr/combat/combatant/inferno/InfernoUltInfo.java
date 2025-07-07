@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -28,7 +29,7 @@ public final class InfernoUltInfo extends UltimateSkillInfo<InfernoUlt> {
     public static final Timespan DURATION = Timespan.ofSeconds(10);
 
     /** 궁극기 처치 점수 */
-    public static final int KILL_SCORE = 20;
+    public static final CombatScore KILL_SCORE = new CombatScore("궁극기 보너스", 20);
 
     @Getter
     private static final InfernoUltInfo instance = new InfernoUltInfo();

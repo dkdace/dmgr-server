@@ -5,6 +5,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -22,7 +23,7 @@ public final class MagrittaT1Info extends TraitInfo<MagrittaT1> {
     public static final int MAX = 4;
 
     /** 최대치 피해 점수 */
-    public static final double MAX_DAMAGE_SCORE = 1;
+    public static final CombatScore MAX_DAMAGE_SCORE = new CombatScore("파쇄", 1);
 
     @Getter
     private static final MagrittaT1Info instance = new MagrittaT1Info();

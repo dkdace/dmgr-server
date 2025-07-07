@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
 import com.dace.dmgr.combat.entity.DistantTimespan;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -45,7 +46,7 @@ public final class MagrittaA1Info extends ActiveSkillInfo<MagrittaA1> {
     public static final double KNOCKBACK = 0.5;
 
     /** 부착 점수 */
-    public static final int STUCK_SCORE = 8;
+    public static final CombatScore STUCK_SCORE = new CombatScore("부착", 8);
 
     @Getter
     private static final MagrittaA1Info instance = new MagrittaA1Info();

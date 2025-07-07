@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.AttackerModule;
 import com.dace.dmgr.combat.entity.module.DamageModule;
@@ -44,7 +45,7 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
         super(combatUser, skillInfo, Timespan.MAX, JagerUltInfo.COST);
 
         this.summonModule = new SummonModule<>(this);
-        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", JagerUltInfo.KILL_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -92,6 +93,12 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
      */
     boolean isEntityCreated() {
         return summonModule.get() != null;
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return JagerUltInfo.KILL_SCORE;
     }
 
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {

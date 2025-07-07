@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -47,9 +48,9 @@ public final class QuakerUltInfo extends UltimateSkillInfo<QuakerUlt> {
     public static final ScreenShake SHAKE = new ScreenShake(10, 8, Timespan.ofTicks(6));
 
     /** 피해 점수 */
-    public static final int DAMAGE_SCORE = 15;
+    public static final CombatScore DAMAGE_SCORE = new CombatScore("적 기절시킴", 15);
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 30;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 30);
 
     @Getter
     private static final QuakerUltInfo instance = new QuakerUltInfo();

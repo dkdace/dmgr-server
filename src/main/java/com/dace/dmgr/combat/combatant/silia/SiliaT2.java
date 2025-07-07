@@ -152,7 +152,7 @@ public final class SiliaT2 extends Trait {
                         }
 
                         if (combatUser.getAbilityManager().getAbility(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
-                            combatUser.addScore("일격", SiliaT2Info.DAMAGE_SCORE);
+                            combatUser.addScore(SiliaT2Info.DAMAGE_SCORE);
                     }
 
                     SiliaT2Info.Effects.HIT_ENTITY.play(location);

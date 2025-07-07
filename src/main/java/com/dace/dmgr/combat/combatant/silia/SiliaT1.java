@@ -39,6 +39,6 @@ public final class SiliaT1 extends Trait {
      */
     void onAttack(@NonNull Damageable victim, boolean isCrit) {
         if (combatUser != victim && victim.isGoalTarget() && isCrit)
-            combatUser.addScore("백어택", SiliaT1Info.CRIT_SCORE);
+            combatUser.addScore(SiliaT1Info.CRIT_SCORE);
     }
 }

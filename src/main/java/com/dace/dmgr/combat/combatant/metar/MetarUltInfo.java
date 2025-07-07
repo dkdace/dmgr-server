@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -32,7 +33,7 @@ public final class MetarUltInfo extends UltimateSkillInfo<MetarUlt> {
     public static final Timespan DURATION = Timespan.ofSeconds(7);
 
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 25;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 25);
 
     @Getter
     private static final MetarUltInfo instance = new MetarUltInfo();

@@ -1,6 +1,7 @@
 package com.dace.dmgr.combat.ability.skill;
 
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import lombok.NonNull;
 
 /**
@@ -12,6 +13,14 @@ public interface HasBonusScore extends Skill {
      */
     @NonNull
     BonusScoreModule getBonusScoreModule();
+
+    /**
+     * 보너스 전투 점수를 반환한다.
+     *
+     * @return 보너스 전투 점수
+     */
+    @NonNull
+    CombatScore getCombatScore();
 
     /**
      * 어시스트 모드 여부를 반환한다.

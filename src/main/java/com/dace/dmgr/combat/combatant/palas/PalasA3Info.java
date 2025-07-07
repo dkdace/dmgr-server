@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -34,9 +35,9 @@ public final class PalasA3Info extends ActiveSkillInfo<PalasA3> {
     public static final Timespan DURATION = Timespan.ofSeconds(6);
 
     /** 효과 점수 */
-    public static final int EFFECT_SCORE = 3;
+    public static final CombatScore EFFECT_SCORE = new CombatScore("생체 제어 수류탄", 3);
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 10;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 10);
 
     @Getter
     private static final PalasA3Info instance = new PalasA3Info();

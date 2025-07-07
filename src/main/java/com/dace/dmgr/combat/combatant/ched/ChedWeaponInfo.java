@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.WeaponInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public final class ChedWeaponInfo extends WeaponInfo<ChedWeapon> {
     public static final int ARROW_INVENTORY_SLOT = 30;
 
     /** 치명타 점수 */
-    public static final int CRIT_SCORE = 6;
+    public static final CombatScore CRIT_SCORE = new CombatScore("치명타", 6);
 
     @Getter
     private static final ChedWeaponInfo instance = new ChedWeaponInfo();

@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -46,7 +47,7 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
         super(combatUser, skillInfo, Timespan.MAX, ChedUltInfo.COST);
 
         this.summonModule = new SummonModule<>(this);
-        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", ChedUltInfo.KILL_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.burning = new Burning(combatUser, ChedUltInfo.FIRE_DAMAGE_PER_SECOND, false);
     }
 
@@ -92,6 +93,12 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().removeModifier(MODIFIER);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return ChedUltInfo.KILL_SCORE;
     }
 
     private final class ChedUltProjectile extends Projectile<Damageable> {

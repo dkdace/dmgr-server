@@ -240,7 +240,7 @@ public final class JagerA3 extends ActiveSkill implements LeftClickHandler {
                     combatUser.getAbilityManager().getAbility(JagerP1Info.getInstance()).use(target);
 
                     if (target != combatUser && target.isGoalTarget())
-                        combatUser.addScore("적 얼림", JagerA3Info.SNARE_SCORE);
+                        combatUser.addScore(JagerA3Info.SNARE_SCORE);
                 }
             }
 

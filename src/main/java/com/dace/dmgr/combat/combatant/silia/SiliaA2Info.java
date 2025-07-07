@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -41,7 +42,7 @@ public final class SiliaA2Info extends ActiveSkillInfo<SiliaA2> {
     public static final double SIZE = 0.8;
 
     /** 피해 점수 */
-    public static final int DAMAGE_SCORE = 8;
+    public static final CombatScore DAMAGE_SCORE = new CombatScore("적 띄움", 8);
 
     @Getter
     private static final SiliaA2Info instance = new SiliaA2Info();

@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -47,7 +48,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     public static final double FIRE_FLOOR_HEIGHT = 1.5;
 
     /** 궁극기 처치 점수 */
-    public static final int KILL_SCORE = 20;
+    public static final CombatScore KILL_SCORE = new CombatScore("궁극기 보너스", 20);
     /** 궁극기 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2);
 

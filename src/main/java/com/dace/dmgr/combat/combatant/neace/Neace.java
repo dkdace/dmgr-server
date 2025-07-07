@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
@@ -32,7 +33,7 @@ import java.util.List;
  */
 public final class Neace extends Support {
     /** 치유 점수 */
-    public static final int HEAL_SCORE = 60;
+    public static final CombatScore HEAL_SCORE = new CombatScore("치유", 60);
     @Getter
     private static final Neace instance = new Neace();
 
@@ -131,7 +132,7 @@ public final class Neace extends Support {
         super.onGiveHeal(provider, target, amount);
 
         if (provider != target && target.isGoalTarget())
-            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
+            provider.addScore(HEAL_SCORE.multiplyScore(amount / target.getDamageModule().getMaxHealth()));
     }
 
     @Override

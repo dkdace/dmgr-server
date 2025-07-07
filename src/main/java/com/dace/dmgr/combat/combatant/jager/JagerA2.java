@@ -182,7 +182,7 @@ public final class JagerA2 extends ActiveSkill {
                 target.getStatusEffectModule().apply(Snare.getInstance(), JagerA2Info.SNARE_DURATION);
 
                 if (target.isGoalTarget())
-                    combatUser.addScore("곰덫", JagerA2Info.SNARE_SCORE);
+                    combatUser.addScore(JagerA2Info.SNARE_SCORE);
             }
 
             JagerA2Info.Effects.TRIGGER.play(getLocation());

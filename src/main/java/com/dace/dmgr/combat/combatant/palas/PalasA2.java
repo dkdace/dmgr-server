@@ -60,7 +60,7 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
             ((CombatUser) target).addKillHelper(combatUser, PalasA2.this, PalasA2Info.ASSIST_SCORE, PalasA2Info.DURATION);
         }
         if (target.isGoalTarget())
-            combatUser.addScore("해로운 효과 면역", PalasA2Info.USE_SCORE);
+            combatUser.addScore(PalasA2Info.USE_SCORE);
 
         PalasA2Info.Effects.playUse(combatUser.getLocation(), combatUser.getArmLocation(MainHand.LEFT), target.getCenterLocation());
     }

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.ability.skill.UltimateSkill;
 import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.ability.weapon.Weapon;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -30,7 +31,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
     public MagrittaUlt(@NonNull CombatUser combatUser, @NonNull MagrittaUltInfo skillInfo) {
         super(combatUser, skillInfo, MagrittaUltInfo.DURATION, MagrittaUltInfo.COST);
-        this.bonusScoreModule = new BonusScoreModule(this, "궁극기 보너스", MagrittaUltInfo.KILL_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -115,5 +116,11 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
             MagrittaUltInfo.Effects.USE.play(combatUser.getLocation());
         }, weaponCooldown.toTicks()));
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return MagrittaUltInfo.KILL_SCORE;
     }
 }

@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -35,7 +36,7 @@ public final class QuakerA1Info extends ActiveSkillInfo<QuakerA1> {
     public static final int USE_SLOW = 25;
 
     /** 방어 점수 */
-    public static final int BLOCK_SCORE = 50;
+    public static final CombatScore BLOCK_SCORE = new CombatScore("피해 막음", 50.0 / HEALTH);
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 20;
 

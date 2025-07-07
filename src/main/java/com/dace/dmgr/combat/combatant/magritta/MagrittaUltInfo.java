@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.ScreenRecoil;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
@@ -35,7 +36,7 @@ public final class MagrittaUltInfo extends UltimateSkillInfo<MagrittaUlt> {
     public static final ScreenShake SHAKE = new ScreenShake(10, 8, Timespan.ofTicks(7));
 
     /** 궁극기 처치 점수 */
-    public static final int KILL_SCORE = 20;
+    public static final CombatScore KILL_SCORE = new CombatScore("궁극기 보너스", 20);
     /** 궁극기 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(1);
 

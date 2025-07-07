@@ -98,7 +98,7 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
                     KnockbackModule.knockback(target, getVelocity(), ArkaceA1Info.KNOCKBACK);
 
                     if (target.isGoalTarget())
-                        combatUser.addScore("미사일 직격", ArkaceA1Info.DIRECT_HIT_SCORE);
+                        combatUser.addScore(ArkaceA1Info.DIRECT_HIT_SCORE);
                 }
 
                 return false;

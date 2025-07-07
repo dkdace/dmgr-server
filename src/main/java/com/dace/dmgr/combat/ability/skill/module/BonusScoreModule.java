@@ -4,6 +4,7 @@ import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
 import com.dace.dmgr.combat.ability.skill.HasBonusScore;
 import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -19,11 +20,6 @@ public final class BonusScoreModule {
     /** 스킬 인스턴스 */
     @NonNull
     private final HasBonusScore skill;
-    /** 점수 항목 */
-    @NonNull
-    private final String scoreContext;
-    /** 점수 */
-    private final int bonusScore;
     /** 처치 점수 제한시간 타임스탬프 목록 (피격자 : 종료 시점) */
     private final WeakHashMap<Damageable, Timestamp> timeLimitTimestampMap = new WeakHashMap<>();
 
@@ -50,7 +46,11 @@ public final class BonusScoreModule {
         Timestamp expiration = timeLimitTimestampMap.get(victim);
 
         if (expiration != null && expiration.isAfter(Timestamp.now())) {
-            skill.getCombatUser().addScore(scoreContext, (skill.isAssistMode() ? bonusScore : bonusScore * contributionScore));
+            CombatScore combatScore = skill.getCombatScore();
+            if (!skill.isAssistMode())
+                combatScore = combatScore.multiplyScore(contributionScore);
+
+            skill.getCombatUser().addScore(combatScore);
             timeLimitTimestampMap.remove(victim);
         }
     }

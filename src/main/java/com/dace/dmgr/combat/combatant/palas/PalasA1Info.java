@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.ScreenShake;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -36,9 +37,9 @@ public final class PalasA1Info extends ActiveSkillInfo<PalasA1> {
     public static final ScreenShake SHAKE = new ScreenShake(20, 20, Timespan.ofTicks(1));
 
     /** 피해 점수 */
-    public static final int DAMAGE_SCORE = 8;
+    public static final CombatScore DAMAGE_SCORE = new CombatScore("적 기절시킴", 8);
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 20;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 20);
 
     @Getter
     private static final PalasA1Info instance = new PalasA1Info();

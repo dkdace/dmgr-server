@@ -126,7 +126,7 @@ public final class No7A2 extends ActiveSkill implements LeftClickHandler {
             No7A2Info.Effects.DAMAGE.play(location);
 
             if (bulletClasses.add(bullet.getClass()))
-                combatUser.addScore("피해 흡수", No7A2Info.BLOCK_SCORE);
+                combatUser.addScore(No7A2Info.BLOCK_SCORE);
         }
     }
 }

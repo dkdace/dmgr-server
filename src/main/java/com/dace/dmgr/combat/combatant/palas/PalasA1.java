@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -29,7 +30,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     public PalasA1(@NonNull CombatUser combatUser, @NonNull PalasA1Info skillInfo) {
         super(combatUser, skillInfo, PalasA1Info.COOLDOWN, Timespan.MAX);
 
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA1Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.stun = new PalasA1Stun();
     }
 
@@ -74,6 +75,12 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getAbilityManager().getWeapon().setVisible(true);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return PalasA1Info.ASSIST_SCORE;
     }
 
     @Override
@@ -132,7 +139,7 @@ public final class PalasA1 extends ActiveSkill implements HasBonusScore {
                     PalasA1Info.Effects.HIT_ENTITY_SOUND.play(location);
 
                     if (target.isGoalTarget()) {
-                        combatUser.addScore("적 기절시킴", PalasA1Info.DAMAGE_SCORE);
+                        combatUser.addScore(PalasA1Info.DAMAGE_SCORE);
                         bonusScoreModule.addTarget(target, PalasA1Info.STUN_DURATION);
                     }
                 }

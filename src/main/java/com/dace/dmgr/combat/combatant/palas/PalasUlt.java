@@ -49,7 +49,7 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
             ((CombatUser) target).addKillHelper(combatUser, PalasUlt.this, PalasUltInfo.ASSIST_SCORE, PalasUltInfo.DURATION);
         }
         if (target.isGoalTarget())
-            combatUser.addScore("아군 강화", PalasUltInfo.USE_SCORE);
+            combatUser.addScore(PalasUltInfo.USE_SCORE);
 
         PalasUltInfo.Effects.playUse(combatUser.getLocation(), combatUser.getArmLocation(MainHand.LEFT), target.getCenterLocation());
     }

@@ -97,6 +97,6 @@ public final class SiliaUlt extends UltimateSkill {
             return;
 
         addDuration(SiliaUltInfo.DURATION_ADD_ON_KILL);
-        combatUser.addScore("궁극기 보너스", SiliaUltInfo.KILL_SCORE * contributionScore);
+        combatUser.addScore(SiliaUltInfo.KILL_SCORE.multiplyScore(contributionScore));
     }
 }

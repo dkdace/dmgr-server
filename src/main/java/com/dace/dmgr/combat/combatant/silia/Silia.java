@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Scuffler;
 import com.dace.dmgr.combat.entity.Attacker;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public final class Silia extends Scuffler {
     /** 암살 점수 */
-    public static final int FAST_KILL_SCORE = 20;
+    public static final CombatScore FAST_KILL_SCORE = new CombatScore("암살", 20);
     /** 암살 점수 제한시간 */
     public static final Timespan FAST_KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(2.5);
 
@@ -141,7 +142,7 @@ public final class Silia extends Scuffler {
         super.onKill(attacker, victim, contributionScore, isFinalHit);
 
         if (victim instanceof CombatUser && ((CombatUser) victim).getKillContributionElapsedTime(attacker).compareTo(FAST_KILL_SCORE_TIME_LIMIT) <= 0)
-            attacker.addScore("암살", FAST_KILL_SCORE * contributionScore);
+            attacker.addScore(FAST_KILL_SCORE.multiplyScore(contributionScore));
 
         AbilityManager abilityManager = attacker.getAbilityManager();
         abilityManager.getAbility(SiliaA1Info.getInstance()).onKill(victim);

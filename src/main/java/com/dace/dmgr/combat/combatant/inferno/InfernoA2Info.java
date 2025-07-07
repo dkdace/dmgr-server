@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -31,9 +32,9 @@ public final class InfernoA2Info extends ActiveSkillInfo<InfernoA2> {
     public static final Timespan DURATION = Timespan.ofSeconds(2.5);
 
     /** 초당 효과 점수 */
-    public static final int EFFECT_SCORE_PER_SECOND = 3;
+    public static final CombatScore EFFECT_SCORE_PER_SECOND = new CombatScore("적 고정", 3);
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 15;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 15);
 
     @Getter
     private static final InfernoA2Info instance = new InfernoA2Info();

@@ -44,7 +44,7 @@ public final class ArkaceA2 extends ActiveSkill {
 
         addActionTask(new IntervalTask(i -> {
             if (combatUser.getHealModule().heal(combatUser, (double) ArkaceA2Info.HEAL / durationTicks, true))
-                combatUser.addScore("회복", (double) ArkaceA2Info.HEAL_SCORE / durationTicks);
+                combatUser.addScore(ArkaceA2Info.HEAL_SCORE.divideScore(durationTicks));
 
             ArkaceA2Info.Effects.playTick(i, combatUser.getLocation());
         }, 1, durationTicks));

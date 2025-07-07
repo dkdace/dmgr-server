@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Movable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -40,7 +41,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
     public MetarA3(@NonNull CombatUser combatUser, @NonNull MetarA3Info skillInfo) {
         super(combatUser, skillInfo, MetarA3Info.COOLDOWN, Timespan.MAX);
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", MetarA3Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -97,6 +98,12 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
 
         if (projectile != null && !projectile.isDestroyed())
             projectile.destroy();
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return MetarA3Info.ASSIST_SCORE;
     }
 
     @Override
@@ -178,7 +185,7 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
                         target.getDamageModule().damage(MetarA3Projectile.this, 1, DamageType.NORMAL, null, false, true);
 
                         if (target != combatUser && target.isGoalTarget()) {
-                            combatUser.addScore("적 끌어당김", MetarA3Info.EFFECT_SCORE);
+                            combatUser.addScore(MetarA3Info.EFFECT_SCORE);
                             bonusScoreModule.addTarget(target, MetarA3Info.ASSIST_SCORE_TIME_LIMIT);
                         }
                     }

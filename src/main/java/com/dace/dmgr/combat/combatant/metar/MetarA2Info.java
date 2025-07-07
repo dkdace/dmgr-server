@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -30,7 +31,7 @@ public final class MetarA2Info extends ActiveSkillInfo<MetarA2> {
     public static final Timespan DURATION = Timespan.ofSeconds(10);
 
     /** 방어 점수 */
-    public static final int BLOCK_SCORE = 20;
+    public static final CombatScore BLOCK_SCORE = new CombatScore("피해 막음", 20.0 / HEALTH);
     /** 파괴 점수 */
     public static final int DEATH_SCORE = 8;
 

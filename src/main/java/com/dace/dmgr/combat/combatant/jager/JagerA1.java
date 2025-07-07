@@ -11,6 +11,7 @@ import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.ability.skill.module.LocationConfirmModule;
 import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.*;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
@@ -44,7 +45,7 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
 
         this.summonModule = new SummonModule<>(this);
         this.confirmModule = new LocationConfirmModule(this, JagerA1Info.SUMMON_MAX_DISTANCE);
-        this.bonusScoreModule = new BonusScoreModule(this, "설랑 보너스", JagerA1Info.KILL_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -116,6 +117,12 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
     @Override
     protected void onCancelled() {
         confirmModule.cancel();
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return JagerA1Info.KILL_SCORE;
     }
 
     /**

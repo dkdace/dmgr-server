@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Slow;
@@ -46,7 +47,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
     public QuakerA2(@NonNull CombatUser combatUser, @NonNull QuakerA2Info skillInfo) {
         super(combatUser, skillInfo, QuakerA2Info.COOLDOWN, Timespan.MAX);
 
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", QuakerA2Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.stun = new Stun(combatUser);
     }
 
@@ -116,6 +117,12 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
         combatUser.getMoveModule().removeModifier(MODIFIER);
 
         combatUser.getAbilityManager().getWeapon().setVisible(true);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return QuakerA2Info.ASSIST_SCORE;
     }
 
     @Override
@@ -226,7 +233,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
                         target.getStatusEffectModule().apply(SLOW, QuakerA2Info.SLOW_DURATION);
 
                         if (target.isGoalTarget()) {
-                            combatUser.addScore("적 기절시킴", QuakerA2Info.DAMAGE_SCORE);
+                            combatUser.addScore(QuakerA2Info.DAMAGE_SCORE);
                             bonusScoreModule.addTarget(target, QuakerA2Info.SLOW_DURATION);
                         }
                     }

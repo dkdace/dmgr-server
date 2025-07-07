@@ -134,7 +134,7 @@ public final class QuakerA3 extends ActiveSkill {
                 target.getStatusEffectModule().apply(Snare.getInstance(), QuakerA3Info.SNARE_DURATION);
 
                 if (target.isGoalTarget())
-                    combatUser.addScore("돌풍 강타", QuakerA3Info.DAMAGE_SCORE);
+                    combatUser.addScore(QuakerA3Info.DAMAGE_SCORE);
             }
 
             QuakerA3Info.Effects.HIT_ENTITY.play(location);

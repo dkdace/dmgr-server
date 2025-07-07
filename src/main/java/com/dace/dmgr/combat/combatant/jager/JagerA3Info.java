@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.DistantDamage;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -43,7 +44,7 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     public static final double KNOCKBACK = 0.6;
 
     /** 속박 점수 */
-    public static final int SNARE_SCORE = 8;
+    public static final CombatScore SNARE_SCORE = new CombatScore("적 속박", 8);
 
     @Getter
     private static final JagerA3Info instance = new JagerA3Info();

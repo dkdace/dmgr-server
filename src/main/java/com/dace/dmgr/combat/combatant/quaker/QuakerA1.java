@@ -138,7 +138,7 @@ public final class QuakerA1 extends ChargeableSkill implements RightClickHandler
 
             setStateValue(damageModule.getHealth());
 
-            combatUser.addScore("피해 막음", damage * QuakerA1Info.BLOCK_SCORE / QuakerA1Info.HEALTH);
+            combatUser.addScore(QuakerA1Info.BLOCK_SCORE.multiplyScore(damage));
 
             QuakerA1Info.Effects.DAMAGE.apply(this, location, damage).play(CombatEffectUtil.getHitLocation(this, location));
         }

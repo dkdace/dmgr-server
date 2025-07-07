@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.AbilityManager;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.Stun;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -31,7 +32,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
     public No7Ult(@NonNull CombatUser combatUser, @NonNull No7UltInfo skillInfo) {
         super(combatUser, skillInfo, Timespan.MAX, No7UltInfo.COST);
 
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", No7UltInfo.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.stun = new Stun(combatUser);
     }
 
@@ -72,6 +73,12 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
     }
 
     @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return No7UltInfo.ASSIST_SCORE;
+    }
+
+    @Override
     public boolean isAssistMode() {
         return true;
     }
@@ -92,7 +99,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(stun, No7UltInfo.STUN_DURATION);
 
                 if (target.isGoalTarget()) {
-                    combatUser.addScore("적 기절시킴", No7UltInfo.DAMAGE_SCORE);
+                    combatUser.addScore(No7UltInfo.DAMAGE_SCORE);
                     bonusScoreModule.addTarget(target, No7UltInfo.STUN_DURATION);
                 }
             }

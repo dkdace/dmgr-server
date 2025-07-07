@@ -120,7 +120,7 @@ public final class MagrittaA1 extends ActiveSkill {
                 combatUser.getUser().sendTitle("§b§l부착", "", Timespan.ZERO, Timespan.ofTicks(5), Timespan.ofTicks(10));
 
                 if (target.isGoalTarget())
-                    combatUser.addScore("부착", MagrittaA1Info.STUCK_SCORE);
+                    combatUser.addScore(MagrittaA1Info.STUCK_SCORE);
             }
 
             addTask(new IntervalTask(i -> {

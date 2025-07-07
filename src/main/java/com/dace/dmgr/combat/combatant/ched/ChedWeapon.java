@@ -121,7 +121,7 @@ public final class ChedWeapon extends AbstractWeapon implements RightClickHandle
             return createCritHitEntityHandler((location, target, isCrit) -> {
                 if (target.getDamageModule().damage(this, power * ChedWeaponInfo.MAX_DAMAGE, DamageType.NORMAL, location, isCrit, true)
                         && target.isGoalTarget() && isCrit)
-                    combatUser.addScore("치명타", power * ChedWeaponInfo.CRIT_SCORE);
+                    combatUser.addScore(ChedWeaponInfo.CRIT_SCORE.multiplyScore(power));
 
                 return false;
             });

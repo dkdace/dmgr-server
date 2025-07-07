@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.entity.DistantDamage;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -43,7 +44,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     public static final double KNOCKBACK = 0.45;
 
     /** 직격 점수 */
-    public static final int DIRECT_HIT_SCORE = 1;
+    public static final CombatScore DIRECT_HIT_SCORE = new CombatScore("미사일 직격", 1);
 
     @Getter
     private static final MetarA1Info instance = new MetarA1Info();

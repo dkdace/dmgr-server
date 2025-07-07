@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -29,7 +30,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
     public PalasA3(@NonNull CombatUser combatUser, @NonNull PalasA3Info skillInfo) {
         super(combatUser, skillInfo, PalasA3Info.COOLDOWN, Timespan.MAX);
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", PalasA3Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -70,6 +71,12 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return PalasA3Info.ASSIST_SCORE;
     }
 
     @Override
@@ -210,7 +217,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
                         onHitTeamer((Healable) target);
 
                     if (target != combatUser && target.isGoalTarget())
-                        combatUser.addScore("생체 제어 수류탄", PalasA3Info.EFFECT_SCORE);
+                        combatUser.addScore(PalasA3Info.EFFECT_SCORE);
                 }
 
                 return !target.isEnemy(combatUser) || !(target instanceof Barrier);
@@ -240,7 +247,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(new PalasA3HealthIncrease(), PalasA3Info.DURATION);
 
                 if (target instanceof CombatUser && target != combatUser)
-                    ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE, PalasA3Info.DURATION);
+                    ((CombatUser) target).addKillHelper(combatUser, PalasA3.this, PalasA3Info.ASSIST_SCORE.getScore(), PalasA3Info.DURATION);
             }
         }
     }

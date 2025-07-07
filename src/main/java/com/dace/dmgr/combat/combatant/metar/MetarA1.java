@@ -133,7 +133,7 @@ public final class MetarA1 extends ActiveSkill implements LeftClickHandler {
                     }
 
                     if (target.isGoalTarget())
-                        combatUser.addScore("미사일 직격", MetarA1Info.DIRECT_HIT_SCORE);
+                        combatUser.addScore(MetarA1Info.DIRECT_HIT_SCORE);
                 }
 
                 return false;

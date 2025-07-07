@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -39,7 +40,7 @@ public final class VellionA2Info extends ActiveSkillInfo<VellionA2> {
     public static final Timespan BLOCK_RESET_DELAY = Timespan.ofSeconds(2);
 
     /** 처치 지원 점수 */
-    public static final int ASSIST_SCORE = 20;
+    public static final CombatScore ASSIST_SCORE = new CombatScore("처치 지원", 20);
 
     @Getter
     private static final VellionA2Info instance = new VellionA2Info();

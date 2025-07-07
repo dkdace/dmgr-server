@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.UltimateSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.FireworkEffect;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -32,7 +33,7 @@ public final class PalasUltInfo extends UltimateSkillInfo<PalasUlt> {
     public static final Timespan DURATION = Timespan.ofSeconds(7);
 
     /** 사용 점수 */
-    public static final int USE_SCORE = 10;
+    public static final CombatScore USE_SCORE = new CombatScore("아군 강화", 10);
     /** 처치 지원 점수 */
     public static final int ASSIST_SCORE = 30;
 

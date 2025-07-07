@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -42,7 +43,7 @@ public final class VellionA1Info extends ActiveSkillInfo<VellionA1> {
     public static final double RADIUS = 2.5;
 
     /** 효과 점수 */
-    public static final int EFFECT_SCORE = 1;
+    public static final CombatScore EFFECT_SCORE = new CombatScore("마력 집중", 1);
 
     @Getter
     private static final VellionA1Info instance = new VellionA1Info();

@@ -6,6 +6,7 @@ import com.dace.dmgr.combat.ability.TextIcon;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore;
 import com.dace.dmgr.combat.ability.info.AbilityInfoLore.Section.Format;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
 import com.dace.dmgr.effect.SoundEffect;
@@ -35,9 +36,9 @@ public final class ChedA3Info extends ActiveSkillInfo<ChedA3> {
     public static final Timespan DETECT_DURATION = Timespan.ofSeconds(6);
 
     /** 탐지 점수 */
-    public static final int DETECT_SCORE = 5;
+    public static final CombatScore DETECT_SCORE = new CombatScore("적 탐지", 5);
     /** 처치 점수 */
-    public static final int KILL_SCORE = 10;
+    public static final CombatScore KILL_SCORE = new CombatScore("탐지 보너스", 10);
     /** 처치 점수 제한시간 */
     public static final Timespan KILL_SCORE_TIME_LIMIT = Timespan.ofSeconds(7);
 

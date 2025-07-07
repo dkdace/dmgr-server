@@ -140,7 +140,7 @@ public final class SiliaA2 extends ActiveSkill implements RightClickHandler {
             combatUser.getMoveModule().push(new Vector(0, SiliaA2Info.PUSH, 0), true);
 
             if (target.isGoalTarget())
-                combatUser.addScore("적 띄움", SiliaA2Info.DAMAGE_SCORE);
+                combatUser.addScore(SiliaA2Info.DAMAGE_SCORE);
         }
     }
 }

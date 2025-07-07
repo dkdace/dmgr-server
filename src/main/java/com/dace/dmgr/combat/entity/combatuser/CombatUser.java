@@ -66,11 +66,17 @@ import java.util.stream.Collectors;
  */
 public final class CombatUser extends AbstractCombatEntity<Player> implements Healable, Attacker, Healer, HasCritHitbox, Movable {
     /** 결정타 점수 */
-    private static final int FINAL_HIT_SCORE = 20;
+    private static final CombatScore FINAL_HIT_SCORE = new CombatScore("결정타", 20);
     /** 추락사 점수 */
-    private static final int FALL_ZONE_KILL_SCORE = 30;
+    private static final CombatScore FALL_ZONE_KILL_SCORE = new CombatScore("추락사", 30);
+    /** 처치 점수 */
+    private static final CombatScore KILL_SCORE = new CombatScore("§e{0}§f {1}", 0);
+    /** 처치 도움 점수 */
+    private static final CombatScore KILL_ASSIST_SCORE = new CombatScore("§e{0}§f 처치 도움", 0);
+    /** 처치 지원 점수 */
+    private static final CombatScore KILL_HELP_SCORE = new CombatScore("처치 지원", 0);
     /** 연속 처치 점수 */
-    private static final int KILLSTREAK_SCORE = 25;
+    private static final CombatScore KILLSTREAK_SCORE = new CombatScore("{0}명 연속 처치", 25);
     /** 연속 처치 제한시간 */
     private static final Timespan KILL_STREAK_TIME_LIMIT = Timespan.ofSeconds(8);
     /** 획득 점수 표시 유지시간 */
@@ -615,7 +621,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         int score = victim instanceof CombatUser
                 ? ((CombatUser) victim).killContributorManager.getScore(this)
                 : victim.getScore();
-        addScore(MessageFormat.format("§e{0}§f {1}", victim.getName(), (victim.isCreature() ? "처치" : "파괴")), score);
+        addScore(KILL_SCORE.formatName(victim.getName(), victim.isCreature() ? "처치" : "파괴").setScore(score));
 
         if (victim.isGoalTarget())
             onKillGoalTarget(victim, contributionScore);
@@ -636,7 +642,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * @param contributionScore 처치 기여도
      */
     private void onKillGoalTarget(@NonNull Damageable victim, double contributionScore) {
-        addScore("결정타", FINAL_HIT_SCORE);
+        addScore(FINAL_HIT_SCORE);
 
         abilityManager.handleBonusScoreSkill(victim, contributionScore);
 
@@ -645,13 +651,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
 
         killStreakTimeLimitTimestamp = Timestamp.now().plus(KILL_STREAK_TIME_LIMIT);
         if (killStreak++ > 0)
-            addScore(killStreak + "명 연속 처치", KILLSTREAK_SCORE * (killStreak - 1.0));
+            addScore(KILLSTREAK_SCORE.formatName(killStreak).multiplyScore(killStreak - 1.0));
 
         if (victim instanceof CombatUser) {
             CombatUser combatUserVictim = (CombatUser) victim;
 
             if (!(combatUserVictim.getAbilityManager().getUltimateSkill().isDurationFinished()))
-                addScore("궁극기 차단", AbilityManager.ULT_BLOCK_SCORE);
+                addScore(AbilityManager.ULT_BLOCK_SCORE);
 
             sendPlayerKillMent(combatUserVictim);
             combatUserVictim.sendPlayerDeathMent(this);
@@ -668,13 +674,13 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      */
     private void onAssist(@NonNull CombatUser victim) {
         if (victim.fallZoneTimestamp.isAfter(Timestamp.now()))
-            addScore("추락사", FALL_ZONE_KILL_SCORE);
+            addScore(FALL_ZONE_KILL_SCORE);
 
         double contributionScore = victim.killContributorManager.getContributionScore(this);
         combatant.onKill(this, victim, contributionScore, false);
 
         int score = victim.killContributorManager.getScore(this);
-        addScore(MessageFormat.format("§e{0}§f 처치 도움", victim.getName()), score);
+        addScore(KILL_ASSIST_SCORE.formatName(victim.getName()).setScore(score));
 
         abilityManager.handleBonusScoreSkill(victim, contributionScore);
 
@@ -884,19 +890,16 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     }
 
     /**
-     * 지정한 양만큼 플레이어의 점수를 증가시키고 사이드바를 표시한다.
+     * 지정한 전투 점수를 플레이어에게 지급하고 사이드바를 표시한다.
      *
      * <p>게임 참여 중이 아니면 점수 획득 표시만 한다.</p>
      *
-     * @param context 항목
-     * @param score   추가할 점수. 0 이상의 값
-     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
+     * @param combatScore 전투 점수
+     * @see CombatScore
      */
-    public void addScore(@NonNull String context, double score) {
-        Validate.isTrue(score >= 0, "score >= 0 (%f)", score);
-
+    public void addScore(@NonNull CombatScore combatScore) {
         if (gameUser != null)
-            gameUser.addScore(score);
+            gameUser.addScore(combatScore.getScore());
 
         Timestamp expiration = Timestamp.now().plus(SCORE_DISPLAY_DURATION);
         if (scoreDisplayTimestamp.isBefore(Timestamp.now())) {
@@ -910,8 +913,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         } else
             scoreDisplayTimestamp = expiration;
 
-        scoreStreakSum += score;
-        scoreMap.put(context, scoreMap.getOrDefault(context, 0.0) + score);
+        scoreStreakSum += combatScore.getScore();
+        scoreMap.put(combatScore.getName(), scoreMap.getOrDefault(combatScore.getName(), 0.0) + combatScore.getScore());
 
         sendScoreSidebar();
     }
@@ -1317,7 +1320,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         private void onAssist() {
             getScoreInfoMap().forEach((targetAttacker, scoreInfo) -> {
                 for (double score : scoreInfo.getScores())
-                    targetAttacker.addScore("처치 지원", score);
+                    targetAttacker.addScore(KILL_HELP_SCORE.setScore(score));
             });
         }
 

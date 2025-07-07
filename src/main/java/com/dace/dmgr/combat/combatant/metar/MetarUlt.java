@@ -7,6 +7,7 @@ import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Hitscan;
@@ -28,7 +29,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
     public MetarUlt(@NonNull CombatUser combatUser, @NonNull MetarUltInfo skillInfo) {
         super(combatUser, skillInfo, Timespan.MAX, MetarUltInfo.COST);
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", MetarUltInfo.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -72,6 +73,12 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
         combatUser.getMoveModule().removeModifier(MODIFIER);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return MetarUltInfo.ASSIST_SCORE;
     }
 
     @Override

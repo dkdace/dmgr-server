@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public final class Palas extends Support {
     /** 치유 점수 */
-    public static final int HEAL_SCORE = 40;
+    public static final CombatScore HEAL_SCORE = new CombatScore("치유", 40);
     @Getter
     private static final Palas instance = new Palas();
 
@@ -133,7 +134,7 @@ public final class Palas extends Support {
         super.onGiveHeal(provider, target, amount);
 
         if (provider != target && target.isGoalTarget())
-            provider.addScore("치유", HEAL_SCORE * amount / target.getDamageModule().getMaxHealth());
+            provider.addScore(HEAL_SCORE.multiplyScore(amount / target.getDamageModule().getMaxHealth()));
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
@@ -35,7 +36,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     public InfernoA2(@NonNull CombatUser combatUser, @NonNull InfernoA2Info skillInfo) {
         super(combatUser, skillInfo, InfernoA2Info.COOLDOWN, InfernoA2Info.DURATION);
 
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", InfernoA2Info.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.burning = new InfernoA2Burning();
     }
 
@@ -84,6 +85,12 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
     }
 
     @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return InfernoA2Info.ASSIST_SCORE;
+    }
+
+    @Override
     public boolean isAssistMode() {
         return true;
     }
@@ -126,7 +133,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
 
                 if (target.isGoalTarget()) {
-                    combatUser.addScore("적 고정", InfernoA2Info.EFFECT_SCORE_PER_SECOND * 4 / 20.0);
+                    combatUser.addScore(InfernoA2Info.EFFECT_SCORE_PER_SECOND.multiplyScore(4.0 / 20));
                     bonusScoreModule.addTarget(target, Timespan.ofTicks(10));
                 }
             }

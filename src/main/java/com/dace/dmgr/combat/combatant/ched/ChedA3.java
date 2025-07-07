@@ -9,6 +9,7 @@ import com.dace.dmgr.combat.entity.CombatEntityRegistry;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -30,7 +31,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     public ChedA3(@NonNull CombatUser combatUser, @NonNull ChedA3Info skillInfo) {
         super(combatUser, skillInfo, ChedA3Info.COOLDOWN, Timespan.MAX);
-        this.bonusScoreModule = new BonusScoreModule(this, "탐지 보너스", ChedA3Info.KILL_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
     }
 
     @Override
@@ -84,6 +85,12 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
         combatUser.getMoveModule().removeModifier(MODIFIER);
     }
 
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return ChedA3Info.KILL_SCORE;
+    }
+
     private final class ChedA3Projectile extends Projectile<Damageable> {
         private ChedA3Projectile() {
             super(ChedA3.this, ChedA3Info.VELOCITY, EntityCondition.enemy(combatUser).and(Damageable::isCreature),
@@ -116,7 +123,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
                             .forEach(teamTarget -> ((CombatUser) teamTarget).setGlowing(target, ChedA3Info.DETECT_DURATION));
 
                     if (target.isGoalTarget()) {
-                        combatUser.addScore("적 탐지", ChedA3Info.DETECT_SCORE);
+                        combatUser.addScore(ChedA3Info.DETECT_SCORE);
                         bonusScoreModule.addTarget(target, ChedA3Info.KILL_SCORE_TIME_LIMIT);
                     }
                 }

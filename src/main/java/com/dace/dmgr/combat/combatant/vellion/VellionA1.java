@@ -188,7 +188,7 @@ public final class VellionA1 extends ActiveSkill implements RightClickHandler {
                         target.getStatusEffectModule().apply(heal, target.getStatusEffectModule().getDuration(heal).plus(VellionA1Info.EFFECT_DURATION));
 
                     if (target.isGoalTarget())
-                        combatUser.addScore("마력 집중", VellionA1Info.EFFECT_SCORE);
+                        combatUser.addScore(VellionA1Info.EFFECT_SCORE);
                 }
 
                 return true;

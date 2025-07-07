@@ -8,6 +8,7 @@ import com.dace.dmgr.combat.ability.skill.module.BonusScoreModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Grounding;
@@ -40,7 +41,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     public VellionUlt(@NonNull CombatUser combatUser, @NonNull VellionUltInfo skillInfo) {
         super(combatUser, skillInfo, VellionUltInfo.DURATION, VellionUltInfo.COST);
 
-        this.bonusScoreModule = new BonusScoreModule(this, "처치 지원", VellionUltInfo.ASSIST_SCORE);
+        this.bonusScoreModule = new BonusScoreModule(this);
         this.stun = new Stun(combatUser);
     }
 
@@ -92,6 +93,12 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
     @Override
     protected void onCancelled() {
         setDuration(Timespan.ZERO);
+    }
+
+    @Override
+    @NonNull
+    public CombatScore getCombatScore() {
+        return VellionUltInfo.ASSIST_SCORE;
     }
 
     @Override
@@ -167,7 +174,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
                 target.getStatusEffectModule().apply(stun, VellionUltInfo.STUN_DURATION);
 
                 if (target.isGoalTarget()) {
-                    combatUser.addScore("결계 발동", VellionUltInfo.DAMAGE_SCORE);
+                    combatUser.addScore(VellionUltInfo.DAMAGE_SCORE);
                     bonusScoreModule.addTarget(target, VellionUltInfo.STUN_DURATION);
                 }
             }

@@ -40,7 +40,7 @@ public final class MagrittaT1 extends Trait {
             MagrittaT1Info.Effects.MAX.play(victim.getLocation());
 
             if (victim.isGoalTarget())
-                attacker.addScore("파쇄", MagrittaT1Info.MAX_DAMAGE_SCORE);
+                attacker.addScore(MagrittaT1Info.MAX_DAMAGE_SCORE);
         }
 
         MagrittaT1Info.Effects.USE.play(victim.getLocation());
