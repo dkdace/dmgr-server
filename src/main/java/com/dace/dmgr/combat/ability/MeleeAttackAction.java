@@ -3,8 +3,12 @@ package com.dace.dmgr.combat.ability;
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.CombatEffectUtil;
 import com.dace.dmgr.combat.ability.handler.SwapHandHandler;
-import com.dace.dmgr.combat.entity.*;
+import com.dace.dmgr.combat.entity.CombatRestriction;
+import com.dace.dmgr.combat.entity.DamageType;
+import com.dace.dmgr.combat.entity.Damageable;
+import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.interaction.MeleeHitscan;
 import com.dace.dmgr.effect.ParticleEffect;
 import com.dace.dmgr.effect.PlayableEffect;
@@ -110,9 +114,8 @@ public final class MeleeAttackAction extends AbstractAction implements SwapHandH
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true)
-                        && target instanceof Movable)
-                    ((Movable) target).getKnockbackModule().knockback(getVelocity().normalize().multiply(KNOCKBACK));
+                if (target.getDamageModule().damage(combatUser, DAMAGE, DamageType.NORMAL, location, false, true))
+                    KnockbackModule.knockback(target, getVelocity(), KNOCKBACK);
 
                 HIT_ENTITY_EFFECT.play(location);
                 return false;
