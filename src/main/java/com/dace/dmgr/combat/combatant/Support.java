@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
+import com.dace.dmgr.combat.interaction.Target;
 import lombok.NonNull;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -150,6 +151,26 @@ public abstract class Support extends Combatant {
         private void onGiveHeal(@NonNull Healable target) {
             if (combatUser != target)
                 lastGiveHealTimestamp = Timestamp.now();
+        }
+    }
+
+    /**
+     * 아군 하이라이트 타겟팅 히트스캔 클래스.
+     */
+    protected static final class TeamTarget extends Target<Healable> {
+        /**
+         * 아군 하이라이트 타겟팅 히트스캔 인스턴스를 생성한다.
+         *
+         * @param combatUser  발사자
+         * @param maxDistance 최대 사거리. (단위: 블록). 0 이상의 값
+         */
+        public TeamTarget(@NonNull CombatUser combatUser, double maxDistance) {
+            super(combatUser, maxDistance, EntityCondition.team(combatUser).exclude(combatUser));
+        }
+
+        @Override
+        protected void onFindEntity(@NonNull Healable target) {
+            ((CombatUser) shooter).setGlowing(target, Timespan.ofTicks(3));
         }
     }
 }

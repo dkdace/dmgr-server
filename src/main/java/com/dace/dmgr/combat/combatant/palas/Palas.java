@@ -1,17 +1,14 @@
 package com.dace.dmgr.combat.combatant.palas;
 
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Role;
 import com.dace.dmgr.combat.combatant.Support;
-import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -126,7 +123,7 @@ public final class Palas extends Support {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        new PalasTarget(combatUser).shot();
+        new TeamTarget(combatUser, PalasA2Info.MAX_DISTANCE).shot();
     }
 
     @Override
@@ -170,16 +167,5 @@ public final class Palas extends Support {
     @NonNull
     public PalasUltInfo getUltimateSkillInfo() {
         return PalasUltInfo.getInstance();
-    }
-
-    private static final class PalasTarget extends Target<Healable> {
-        private PalasTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, PalasA2Info.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
-        }
-
-        @Override
-        protected void onFindEntity(@NonNull Healable target) {
-            ((CombatUser) shooter).setGlowing(target, Timespan.ofTicks(3));
-        }
     }
 }

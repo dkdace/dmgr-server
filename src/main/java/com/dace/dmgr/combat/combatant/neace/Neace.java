@@ -1,17 +1,14 @@
 package com.dace.dmgr.combat.combatant.neace;
 
-import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.ability.info.ActiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.PassiveSkillInfo;
 import com.dace.dmgr.combat.ability.info.TraitInfo;
 import com.dace.dmgr.combat.combatant.CombatantType;
 import com.dace.dmgr.combat.combatant.Support;
 import com.dace.dmgr.combat.entity.Attacker;
-import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.interaction.Target;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -116,7 +113,7 @@ public final class Neace extends Support {
     public void onTick(@NonNull CombatUser combatUser, long i) {
         super.onTick(combatUser, i);
 
-        new NeaceTarget(combatUser).shot();
+        new TeamTarget(combatUser, NeaceA1Info.MAX_DISTANCE).shot();
 
         combatUser.getAbilityManager().getAbility(NeaceP1Info.getInstance()).onTick(i);
     }
@@ -174,16 +171,5 @@ public final class Neace extends Support {
     @NonNull
     public NeaceUltInfo getUltimateSkillInfo() {
         return NeaceUltInfo.getInstance();
-    }
-
-    private static final class NeaceTarget extends Target<Healable> {
-        private NeaceTarget(@NonNull CombatUser combatUser) {
-            super(combatUser, NeaceA1Info.MAX_DISTANCE, EntityCondition.team(combatUser).exclude(combatUser));
-        }
-
-        @Override
-        protected void onFindEntity(@NonNull Healable target) {
-            ((CombatUser) shooter).setGlowing(target, Timespan.ofTicks(3));
-        }
     }
 }
