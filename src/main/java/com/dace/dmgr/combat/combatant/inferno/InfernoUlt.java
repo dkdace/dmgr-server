@@ -35,6 +35,7 @@ public final class InfernoUlt extends UltimateSkill {
     @Override
     protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
+
         return super.canUse() && isDurationFinished() && abilityManager.getAbility(InfernoA1Info.getInstance()).isDurationFinished()
                 && abilityManager.getAbility(InfernoA2Info.getInstance()).isDurationFinished();
     }
@@ -55,7 +56,7 @@ public final class InfernoUlt extends UltimateSkill {
         shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
 
         addActionTask(new IntervalTask(i -> {
-            if (shield != null && shield.getHealth() == 0)
+            if (shield == null || shield.getHealth() == 0)
                 return false;
 
             Location loc = combatUser.getLocation();

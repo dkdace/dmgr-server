@@ -6,8 +6,8 @@ import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.util.location.LocationUtil;
@@ -92,11 +92,8 @@ public final class InfernoA1 extends ActiveSkill {
 
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
-            if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true)
-                    && target instanceof Movable) {
-                Vector dir = LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)).multiply(InfernoA1Info.KNOCKBACK);
-                ((Movable) target).getKnockbackModule().knockback(dir);
-            }
+            if (target.getDamageModule().damage(combatUser, InfernoA1Info.DAMAGE, DamageType.NORMAL, null, false, true))
+                KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)), InfernoA1Info.KNOCKBACK);
 
             InfernoA1Info.Effects.HIT_ENTITY.play(location);
 

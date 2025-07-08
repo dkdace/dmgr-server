@@ -129,8 +129,8 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
         @Override
         protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
             if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, true)) {
-                target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
-                target.getStatusEffectModule().apply(Grounding.getInstance(), Timespan.ofTicks(10));
+                target.getStatusEffectModule().apply(burning);
+                target.getStatusEffectModule().apply(Grounding.getInstance());
 
                 if (target.isGoalTarget()) {
                     combatUser.addScore(InfernoA2Info.EFFECT_SCORE_PER_SECOND.multiplyScore(4.0 / 20));

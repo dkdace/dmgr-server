@@ -12,20 +12,18 @@ import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.StringFormUtil;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 
 public final class InfernoWeapon extends AbstractWeapon implements Reloadable, FullAuto, LeftClickHandler, DropHandler {
     /** 재장전 모듈 */
@@ -58,7 +56,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         if (combatUser.getAbilityManager().getAbility(InfernoUltInfo.getInstance()).isDurationFinished() && !reloadModule.consume(1))
             return;
 
-        new InfernoWeaponRProjectile().shot(VectorUtil.getSpreadedVector(combatUser.getLocation().getDirection(), InfernoWeaponInfo.SPREAD));
+        new InfernoWeaponRProjectile().shot();
 
         InfernoWeaponInfo.Effects.USE.play(combatUser.getLocation());
     }
@@ -127,7 +125,7 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
     private final class InfernoWeaponRProjectile extends Projectile<Damageable> {
         private InfernoWeaponRProjectile() {
             super(InfernoWeapon.this, InfernoWeaponInfo.VELOCITY, EntityCondition.enemy(combatUser),
-                    Option.builder().size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).build());
+                    Option.builder().size(InfernoWeaponInfo.SIZE).maxDistance(InfernoWeaponInfo.DISTANCE).spread(InfernoWeaponInfo.SPREAD).build());
         }
 
         @Override
@@ -207,11 +205,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)
-                        && target instanceof Movable) {
-                    Vector dir = getVelocity().normalize().multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
-                    ((Movable) target).getKnockbackModule().knockback(dir);
-                }
+                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true))
+                    KnockbackModule.knockback(target, getVelocity(), InfernoWeaponInfo.Fireball.KNOCKBACK);
 
                 return false;
             };
@@ -235,10 +230,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                         InfernoWeaponInfo.Fireball.DISTANT_DAMAGE_EXPLODE.getDamage(distance), DamageType.NORMAL, null, false, true)) {
                     target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.Fireball.DISTANT_FIRE_DURATION.getTimespan(distance));
 
-                    if (target instanceof Movable && !InfernoWeaponLProjectile.this.getHitTargets().contains(target)) {
-                        Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(InfernoWeaponInfo.Fireball.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir);
-                    }
+                    if (!InfernoWeaponLProjectile.this.getHitTargets().contains(target))
+                        KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)),
+                                InfernoWeaponInfo.Fireball.KNOCKBACK);
                 }
 
                 return !(target instanceof Barrier);
