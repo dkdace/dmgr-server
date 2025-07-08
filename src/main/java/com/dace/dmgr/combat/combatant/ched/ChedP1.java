@@ -54,8 +54,6 @@ public final class ChedP1 extends WallClimbSkill {
 
             if (!isHanging) {
                 setHanging(true);
-
-                ChedP1Info.Effects.HANG_USE.play(combatUser.getLocation());
                 ChedP1Info.Effects.HANG_ON.play(combatUser.getLocation());
             }
 
@@ -64,7 +62,6 @@ public final class ChedP1 extends WallClimbSkill {
             combatUser.getMoveModule().push(new Vector(), true);
 
             ChedP1Info.Effects.playHangTick(combatUser.getLocation());
-
             return true;
         }, 1));
     }
@@ -95,9 +92,7 @@ public final class ChedP1 extends WallClimbSkill {
         if (isHanging) {
             setHanging(false);
 
-            ChedP1Info.Effects.HANG_USE.play(combatUser.getLocation());
             ChedP1Info.Effects.HANG_OFF.play(combatUser.getLocation());
-
             return;
         }
 

@@ -57,20 +57,21 @@ public final class ChedP1Info extends PassiveSkillInfo<ChedP1> {
         /** 사용 */
         public static final SoundEffect USE =
                 SoundEffect.builder(Sound.BLOCK_STONE_STEP).volume(1).pitch(0.525).pitchVariance(0.05).build();
-        /** 매달리기 - 사용 */
-        public static final ParticleEffect HANG_USE =
-                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(40).horizontalSpread(0.65).build();
         /** 매달리기 - 활성화 */
         public static final PlayableEffect HANG_ON = PlayableEffect.list(
                 SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.7).build(),
-                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.85).build());
+                SoundEffect.builder(Sound.ENTITY_EVOCATION_ILLAGER_CAST_SPELL).volume(0.6).pitch(0.85).build(),
+
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(40).horizontalSpread(0.65).build());
         /** 매달리기 - 틱 효과 */
         public static final ParticleEffect HANG_TICK =
                 ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, COLOR).horizontalSpread(0.24).build();
         /** 매달리기 - 비활성화 */
         public static final PlayableEffect HANG_OFF = PlayableEffect.list(
                 SoundEffect.builder("new.entity.phantom.flap").volume(1).pitch(1.8).build(),
-                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build());
+                SoundEffect.builder(Sound.ENTITY_LLAMA_SWAG).volume(0.6).pitch(1.4).build(),
+
+                ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.SPELL_MOB, COLOR).count(40).horizontalSpread(0.65).build());
 
         /**
          * 매달리기 - 틱 효과를 재생한다.

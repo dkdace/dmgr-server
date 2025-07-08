@@ -128,13 +128,13 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
                 ParticleEffect.Normal.builder(Particle.SMOKE_NORMAL).count(600).horizontalSpread(0.4).verticalSpread(0.4).speed(0.4).build(),
                 ParticleEffect.Normal.builder(Particle.LAVA).count(150).horizontalSpread(3).verticalSpread(3).build(),
                 ParticleEffect.Normal.builder(Particle.FLAME).count(400).horizontalSpread(0.2).verticalSpread(0.2).speed(0.25).build());
-        /** 화염 지대 틱 효과음 */
-        public static final SoundEffect FIRE_FLOOR_TICK_SOUND =
-                SoundEffect.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.75).pitchVariance(0.1).build();
-        /** 화염 지대 틱 입자 효과 */
-        public static final PlayableEffect FIRE_FLOOR_TICK_PARTICLE = PlayableEffect.list(
+        /** 화염 지대 틱 효과 - 1 */
+        public static final PlayableEffect FIRE_FLOOR_TICK_1 = PlayableEffect.list(
                 ParticleEffect.Normal.builder(Particle.FLAME).count(20).horizontalSpread(4).build(),
                 ParticleEffect.Normal.builder(Particle.SMOKE_LARGE).count(6).horizontalSpread(4).build());
+        /** 화염 지대 틱 효과 - 2 */
+        public static final SoundEffect FIRE_FLOOR_TICK_2 =
+                SoundEffect.builder(Sound.BLOCK_FIRE_AMBIENT).volume(2).pitch(0.75).pitchVariance(0.1).build();
 
         /**
          * 사용 시 틱 효과를 재생한다.
@@ -216,6 +216,18 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
                 BULLET_TRAIL_4.apply(vec).play(loc1);
                 BULLET_TRAIL_4.apply(vec).play(loc2);
             }
+        }
+
+        /**
+         * 화염 지대 틱 효과를 재생한다.
+         *
+         * @param i        인덱스
+         * @param location 위치
+         */
+        public static void playFireFloorTick(long i, @NonNull Location location) {
+            FIRE_FLOOR_TICK_1.play(location);
+            if (i % 4 == 0)
+                FIRE_FLOOR_TICK_2.play(location);
         }
     }
 }

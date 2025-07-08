@@ -39,7 +39,6 @@ public final class ChedWeapon extends AbstractWeapon implements RightClickHandle
 
         if (skill1.isEnabled()) {
             setCooldown(ChedA1Info.COOLDOWN);
-
             skill1.shot();
         } else {
             setCooldown();

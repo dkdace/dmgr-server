@@ -8,9 +8,9 @@ import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -19,6 +19,7 @@ import com.dace.dmgr.combat.entity.temporary.spawnhandler.ArmorStandSpawnHandler
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
+import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,7 +27,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 
 import java.util.function.LongConsumer;
 
@@ -137,7 +137,6 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
                     ChedUltInfo.Effects.HIT_ENTITY.play(loc2);
 
                 ChedUltInfo.Effects.EXPLODE.play(loc);
-
                 return false;
             };
         }
@@ -159,10 +158,8 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
                     bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 if (target.getDamageModule().damage(ChedUltProjectile.this, ChedUltInfo.DISTANT_DAMAGE.getDamage(center.distance(location)),
-                        DamageType.NORMAL, null, false, false) && target instanceof Movable) {
-                    Vector dir = LocationUtil.getDirection(location, location.clone().add(0, 1, 0)).multiply(ChedUltInfo.KNOCKBACK);
-                    ((Movable) target).getKnockbackModule().knockback(dir);
-                }
+                        DamageType.NORMAL, null, false, false))
+                    KnockbackModule.knockback(target, LocationUtil.getDirection(location, location.clone().add(0, 1, 0)), ChedUltInfo.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }
@@ -175,19 +172,16 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
     private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
             super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false);
+
             addOnTick(this::onTick);
+            addTask(new DelayTask(this::remove, ChedUltInfo.FIRE_FLOOR_DURATION.toTicks()));
         }
 
         private void onTick(long i) {
             Location loc = getLocation().add(0, 0.1, 0);
             new ChedUltFireFloorArea().emit(loc);
 
-            if (i % 4 == 0)
-                ChedUltInfo.Effects.FIRE_FLOOR_TICK_SOUND.play(loc);
-            ChedUltInfo.Effects.FIRE_FLOOR_TICK_PARTICLE.play(loc);
-
-            if (i >= ChedUltInfo.FIRE_FLOOR_DURATION.toTicks())
-                remove();
+            ChedUltInfo.Effects.playFireFloorTick(i, loc);
         }
 
         private final class ChedUltFireFloorArea extends Area<Damageable> {
@@ -204,13 +198,13 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(combatUser, 0, DamageType.NORMAL, null, false, false)) {
-                    target.getStatusEffectModule().apply(burning, Timespan.ofTicks(10));
+                    target.getStatusEffectModule().apply(burning);
 
                     if (target.isGoalTarget())
                         bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
                 }
 
-                return !(target instanceof Barrier);
+                return true;
             }
         }
     }

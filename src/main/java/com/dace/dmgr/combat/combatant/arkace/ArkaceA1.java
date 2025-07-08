@@ -12,6 +12,7 @@ import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
+import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
@@ -121,7 +122,7 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
                         && !ArkaceA1Projectile.this.getHitTargets().contains(target))
-                    KnockbackModule.knockback(target, center, location, ArkaceA1Info.KNOCKBACK);
+                    KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)), ArkaceA1Info.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }

@@ -69,8 +69,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
             ChedA3Info.Effects.USE_READY.play(loc);
 
-            addActionTask(new IntervalTask((LongConsumer) i -> ChedA3Info.Effects.playUseTick(i + durationTicks, loc), 1,
-                    durationTicks));
+            addActionTask(new IntervalTask((LongConsumer) i -> ChedA3Info.Effects.playUseTick(i + durationTicks, loc), 1, durationTicks));
         }, 1, durationTicks));
     }
 

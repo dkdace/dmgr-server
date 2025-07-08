@@ -20,6 +20,8 @@ import java.util.HashSet;
  * @see Damageable
  */
 public final class StatusEffectModule extends CombatEntityModule<Damageable> {
+    /** 상태 효과의 기본 지속시간 */
+    private static final Timespan DEFAULT_DURATION = Timespan.ofTicks(10);
     /** 적용된 상태 효과 정보 목록 (상태 효과 : 상태 효과 정보) */
     private final HashMap<StatusEffect, StatusEffectInfo> statusEffectInfoMap = new HashMap<>();
 
@@ -73,6 +75,15 @@ public final class StatusEffectModule extends CombatEntityModule<Damageable> {
         StatusEffectInfo statusEffectInfo = statusEffectInfoMap.computeIfAbsent(statusEffect, k ->
                 new StatusEffectInfo(statusEffect, expiration));
         statusEffectInfo.expiration = expiration;
+    }
+
+    /**
+     * 엔티티에게 상태 효과를 적용한다.
+     *
+     * @param statusEffect 적용할 상태 효과
+     */
+    public void apply(@NonNull StatusEffect statusEffect) {
+        apply(statusEffect, DEFAULT_DURATION);
     }
 
     /**

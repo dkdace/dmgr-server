@@ -40,27 +40,16 @@ public final class ChedA2 extends ActiveSkill implements SpaceHandler {
 
         addActionTask(new IntervalTask(i -> {
             Location loc = combatUser.getLocation();
+            loc.setY(location.getY());
 
             if (location.distance(loc) > 0) {
-                location.setY(loc.getY());
-
-                Vector vec = (location.distance(loc) == 0) ? location.getDirection() : LocationUtil.getDirection(location, loc);
-                vec.multiply(ChedA2Info.PUSH_SIDE);
-                vec.setY(ChedA2Info.PUSH_UP);
-
-                combatUser.getMoveModule().push(vec, true);
-
+                location.setDirection(LocationUtil.getDirection(location, loc));
                 return false;
             }
 
             return true;
         }, isCancelled -> {
-            if (isCancelled)
-                return;
-
-            Vector vec = location.getDirection().multiply(ChedA2Info.PUSH_SIDE);
-            vec.setY(ChedA2Info.PUSH_UP);
-
+            Vector vec = location.getDirection().multiply(ChedA2Info.PUSH_SIDE).setY(ChedA2Info.PUSH_UP);
             combatUser.getMoveModule().push(vec, true);
         }, 1, 2));
 
