@@ -101,7 +101,7 @@ public final class No7A2 extends ActiveSkill implements LeftClickHandler {
         private final HashSet<Class<?>> bulletClasses = new HashSet<>();
 
         private No7A2Entity(@NonNull Location spawnLocation) {
-            super(spawnLocation, combatUser.getName() + "의 능동방어 자기장", combatUser,
+            super(spawnLocation, "능동방어 자기장", combatUser,
                     Hitbox.builder(No7A2Info.SIZE, No7A2Info.SIZE, No7A2Info.SIZE).axisOffsetY(1).pitchFixed().build());
             onInit();
         }

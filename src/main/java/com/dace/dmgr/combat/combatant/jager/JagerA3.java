@@ -11,8 +11,8 @@ import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
-import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
+import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -27,7 +27,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class JagerA3 extends ActiveSkill implements LeftClickHandler {
@@ -229,10 +228,7 @@ public final class JagerA3 extends ActiveSkill implements LeftClickHandler {
                     : target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
             if (isDamaged) {
-                if (target instanceof Movable) {
-                    Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(JagerA3Info.KNOCKBACK);
-                    ((Movable) target).getKnockbackModule().knockback(dir);
-                }
+                KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)), JagerA3Info.KNOCKBACK);
 
                 if (JagerT1.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);

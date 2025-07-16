@@ -171,7 +171,7 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
      */
     private final class ChedUltFireFloor extends SummonEntity<ArmorStand> {
         private ChedUltFireFloor(@NonNull Location spawnLocation) {
-            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 화염 지대", combatUser, false);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, "화염 지대", combatUser, false);
 
             addOnTick(this::onTick);
             addTask(new DelayTask(this::remove, ChedUltInfo.FIRE_FLOOR_DURATION.toTicks()));

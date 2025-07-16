@@ -56,7 +56,7 @@ public final class MetarA2 extends StackableSkill {
      */
     private final class MetarA2Entity extends Barrier {
         private MetarA2Entity(@NonNull Location spawnLocation) {
-            super(spawnLocation, combatUser.getName() + "의 방벽", combatUser, MetarA2Info.HEALTH, MetarA2Info.DEATH_SCORE,
+            super(spawnLocation, "방벽", combatUser, MetarA2Info.HEALTH, MetarA2Info.DEATH_SCORE,
                     Hitbox.builder(7, 4, 0.3).axisOffsetY(1.5).build());
             onInit();
         }

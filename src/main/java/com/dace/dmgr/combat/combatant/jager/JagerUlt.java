@@ -24,6 +24,7 @@ import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -51,6 +52,7 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
     @Override
     protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
+
         return super.canUse() && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
@@ -104,8 +106,7 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
     private final class JagerUltProjectile extends BouncingProjectile<Damageable> {
         private JagerUltProjectile() {
             super(JagerUlt.this, JagerUltInfo.VELOCITY, EntityCondition.enemy(combatUser),
-                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
-                    Option.builder().bounceVelocityMultiplier(0.35).build());
+                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(), Option.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
@@ -138,24 +139,20 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
     /**
      * 눈폭풍 발생기 클래스.
      */
+    @Getter
     private final class JagerUltEntity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
-        @Getter
         private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
-        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
-        @Getter
         private final StatusEffectModule statusEffectModule;
-        /** 준비 완료 여부 */
-        private boolean isReady = false;
 
         private JagerUltEntity(@NonNull Location spawnLocation) {
-            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 눈폭풍 발생기", combatUser, true,
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, "눈폭풍 발생기", combatUser, true,
                     Hitbox.builder(0.7, 0.2, 0.7).offsetY(0.1).pitchFixed().build());
 
             this.attackerModule = new AttackerModule(this);
@@ -171,22 +168,20 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
             owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             JagerUltInfo.Effects.SUMMON.play(getLocation());
 
-            addOnTick(this::onTick);
-            addTask(new DelayTask(() -> isReady = true, JagerUltInfo.SUMMON_DURATION.toTicks()));
+            addOnTick(i -> JagerUltInfo.Effects.DISPLAY.play(getLocation()));
+            addTask(new IntervalTask(this::onTickBeforeReady, () -> addOnTick(this::onTickAfterReady), 1, JagerUltInfo.SUMMON_DURATION.toTicks()));
+            addTask(new DelayTask(this::remove, JagerUltInfo.DURATION.toTicks()));
         }
 
-        private void onTick(long i) {
-            JagerUltInfo.Effects.DISPLAY.play(getLocation());
+        private void onTickBeforeReady(long i) {
+            Location loc = getLocation().add(0, 0.2, 0);
+            if (LocationUtil.isNonSolid(loc))
+                entity.teleport(loc);
 
-            if (!isReady) {
-                if (LocationUtil.isNonSolid(getLocation().add(0, 0.2, 0)))
-                    entity.teleport(getLocation().add(0, 0.2, 0));
+            JagerUltInfo.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
+        }
 
-                JagerUltInfo.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-
-                return;
-            }
-
+        private void onTickAfterReady(long i) {
             double minRadius = JagerUltInfo.MIN_RADIUS;
             double maxRadius = JagerUltInfo.MAX_RADIUS;
             double range = Math.min(minRadius + ((double) i / JagerUltInfo.MAX_RADIUS_DURATION.toTicks()) * (maxRadius - minRadius), maxRadius);
@@ -195,9 +190,6 @@ public final class JagerUlt extends UltimateSkill implements HasBonusScore {
 
             if (i % 4 == 0)
                 new JagerUltArea(range).emit(getLocation());
-
-            if (i >= JagerUltInfo.DURATION.toTicks())
-                remove();
         }
 
         @Override

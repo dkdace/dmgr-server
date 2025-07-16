@@ -140,7 +140,7 @@ public final class VellionA1 extends ActiveSkill implements RightClickHandler {
         private long returnTime = VellionA1Info.RETURN_DURATION.toTicks();
 
         private VellionA1Entity(@NonNull Location spawnLocation) {
-            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 마력 응집체", combatUser, false);
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, "마력 응집체", combatUser, false);
 
             entity.setGravity(false);
             addOnTick(this::onTick);

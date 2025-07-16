@@ -37,7 +37,7 @@ public final class JagerT1 extends Trait {
     /**
      * 빙결 수치 상태 효과 클래스.
      */
-    public static final class ValueEffect extends Slow {
+    static final class ValueEffect extends Slow {
         private ValueEffect() {
             super(0);
         }

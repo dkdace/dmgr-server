@@ -18,13 +18,14 @@ import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.SummonEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
-import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,13 +88,15 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
 
     @Override
     public void onSlot() {
-        if (isDurationFinished()) {
-            combatUser.getAbilityManager().getWeapon().cancel();
-            confirmModule.toggleCheck();
-        } else {
+        if (!isDurationFinished()) {
             setDuration(Timespan.ZERO);
             summonModule.removeEntity();
+
+            return;
         }
+
+        combatUser.getAbilityManager().getWeapon().cancel();
+        confirmModule.toggleCheck();
     }
 
     @Override
@@ -128,33 +131,27 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
     /**
      * 설랑 클래스.
      */
-    public final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Movable {
+    @Getter
+    private final class JagerA1Entity extends SummonEntity<Wolf> implements Damageable, Attacker, Movable {
         /** 공격 모듈 */
         @NonNull
-        @Getter
         private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
-        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
-        @Getter
         private final StatusEffectModule statusEffectModule;
         /** 이동 모듈 */
         @NonNull
-        @Getter
         private final MoveModule moveModule;
         /** 넉백 모듈 */
         @NonNull
-        @Getter
         private final KnockbackModule knockbackModule;
-        /** 준비 완료 여부 */
-        private boolean isReady = false;
 
         private JagerA1Entity(@NonNull Location spawnLocation) {
-            super(EntitySpawnHandler.getDefaultSpawnHandler(Wolf.class), spawnLocation, combatUser.getName() + "의 설랑", combatUser,
-                    true, Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
+            super(EntitySpawnHandler.getDefaultSpawnHandler(Wolf.class), spawnLocation, "설랑", combatUser, true,
+                    Hitbox.builder(0.4, 0.8, 1.2).offsetY(0.4).pitchFixed().build());
 
             this.attackerModule = new AttackerModule(this);
             this.damageModule = new DamageModule(this, JagerA1Info.HEALTH, true);
@@ -172,33 +169,30 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
             entity.setSitting(true);
             entity.setOwner(owner.getEntity());
             entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(40);
+
             damageModule.setHealth(getStateValue());
 
             owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             CombatEffectUtil.ENTITY_SUMMON_SOUND.play(getLocation());
 
-            addOnTick(this::onTick);
-            addTask(new DelayTask(() -> {
-                isReady = true;
-
+            addTask(new IntervalTask(i -> JagerA1Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation()), () -> {
                 entity.setAI(true);
                 JagerA1Info.Effects.SUMMON_READY.play(getLocation());
-            }, JagerA1Info.SUMMON_DURATION.toTicks()));
+
+                addOnTick(this::onTickAfterReady);
+            }, 1, JagerA1Info.SUMMON_DURATION.toTicks()));
         }
 
-        private void onTick(long i) {
-            if (!isReady) {
-                JagerA1Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-                return;
-            }
+        private void onTickAfterReady(long i) {
             if (i % 10 != 0)
                 return;
 
-            if (entity.getTarget() == null) {
-                entity.setAngry(false);
-                entity.setSitting(true);
-                entity.setTamed(true);
+            LivingEntity entityTarget = entity.getTarget();
+            entity.setAngry(entityTarget != null);
+            entity.setSitting(entityTarget == null);
+            entity.setTamed(entityTarget == null);
 
+            if (entityTarget == null) {
                 Damageable target = CombatEntityRegistry.getNearCombatEntity(getLocation(), JagerA1Info.ENEMY_DETECT_RADIUS,
                         EntityCondition.enemy(this).and(Damageable::isCreature));
 
@@ -207,11 +201,7 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
                     JagerA1Info.Effects.ENEMY_DETECT.play(getLocation());
                 }
             } else {
-                entity.setAngry(true);
-                entity.setSitting(false);
-                entity.setTamed(false);
-
-                CombatEntity targetCombatEntity = CombatEntity.fromEntity(entity.getTarget());
+                CombatEntity targetCombatEntity = CombatEntity.fromEntity(entityTarget);
                 if (targetCombatEntity == null || targetCombatEntity.isRemoved()
                         || targetCombatEntity instanceof CombatUser && ((CombatUser) targetCombatEntity).isDead())
                     entity.setTarget(null);

@@ -62,6 +62,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
+
         return super.canUse() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
@@ -152,6 +153,7 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
     @Override
     public void onSwapStart(boolean isSwapped) {
         setCooldown(JagerWeaponInfo.SWAP_DURATION);
+        combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
     }
 
     @Override
@@ -167,17 +169,13 @@ public final class JagerWeaponL extends AbstractWeapon implements Reloadable, Sw
 
     @Override
     public void onAimEnable() {
-        combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().addModifier(MODIFIER);
-
         JagerWeaponInfo.Effects.AIM_ON.play(combatUser.getLocation());
     }
 
     @Override
     public void onAimDisable() {
-        combatUser.setGlobalCooldown(JagerWeaponInfo.SWAP_DURATION);
         combatUser.getMoveModule().removeModifier(MODIFIER);
-
         JagerWeaponInfo.Effects.AIM_OFF.play(combatUser.getLocation());
     }
 

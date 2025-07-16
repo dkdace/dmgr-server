@@ -103,7 +103,7 @@ public final class QuakerA1 extends ChargeableSkill implements RightClickHandler
      */
     private final class QuakerA1Entity extends Barrier {
         private QuakerA1Entity(@NonNull Location spawnLocation) {
-            super(spawnLocation, combatUser.getName() + "의 방패", combatUser, QuakerA1Info.HEALTH, QuakerA1Info.DEATH_SCORE,
+            super(spawnLocation, "방패", combatUser, QuakerA1Info.HEALTH, QuakerA1Info.DEATH_SCORE,
                     Hitbox.builder(6, 3.5, 0.3).axisOffsetY(1.4).build());
             onInit();
         }

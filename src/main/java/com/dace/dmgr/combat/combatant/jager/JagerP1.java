@@ -16,11 +16,6 @@ public final class JagerP1 extends PassiveSkill {
     }
 
     @Override
-    protected boolean canUse() {
-        return super.canUse() && target.isCreature();
-    }
-
-    @Override
     protected void onUse() {
         combatUser.setGlowing(target, JagerP1Info.DURATION);
     }
@@ -36,6 +31,9 @@ public final class JagerP1 extends PassiveSkill {
      * @param target 사용 대상
      */
     void use(@NonNull Damageable target) {
+        if (!target.isCreature())
+            return;
+
         this.target = target;
         use(ActionKey.SYSTEM);
     }

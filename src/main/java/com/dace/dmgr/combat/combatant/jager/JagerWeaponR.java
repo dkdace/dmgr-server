@@ -24,8 +24,8 @@ public final class JagerWeaponR extends AbstractWeapon implements Reloadable, Le
     /** 주무기 인스턴스 */
     private final JagerWeaponL mainWeapon;
     /** 재장전 모듈 */
-    @Getter
     @NonNull
+    @Getter
     private final ReloadModule reloadModule;
 
     JagerWeaponR(@NonNull CombatUser combatUser, @NonNull JagerWeaponInfo weaponInfo, @NonNull JagerWeaponL mainWeapon) {

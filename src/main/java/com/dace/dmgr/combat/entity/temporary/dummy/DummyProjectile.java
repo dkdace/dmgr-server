@@ -13,7 +13,7 @@ import org.bukkit.Sound;
 /**
  * 더미가 사용하는 투사체 총알 클래스.
  */
-final class DummyProjectile extends Projectile<Damageable> {
+public final class DummyProjectile extends Projectile<Damageable> {
     /** 적 총알 궤적 입자 효과 */
     private static final ParticleEffect ENEMY_BULLET_TRAIL_PARTICLE =
             ParticleEffect.Colored.builder(ParticleEffect.Colored.ParticleType.REDSTONE, Color.fromRGB(255, 60, 60)).count(3)

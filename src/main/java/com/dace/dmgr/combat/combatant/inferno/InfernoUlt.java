@@ -56,7 +56,7 @@ public final class InfernoUlt extends UltimateSkill {
         shield = combatUser.getDamageModule().createShield(InfernoUltInfo.SHIELD);
 
         addActionTask(new IntervalTask(i -> {
-            if (shield == null || shield.getHealth() == 0)
+            if (shield != null && shield.getHealth() == 0)
                 return false;
 
             Location loc = combatUser.getLocation();

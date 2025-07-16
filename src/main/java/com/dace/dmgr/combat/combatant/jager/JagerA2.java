@@ -18,6 +18,7 @@ import com.dace.dmgr.combat.interaction.BouncingProjectile;
 import com.dace.dmgr.combat.interaction.Hitbox;
 import com.dace.dmgr.combat.interaction.Projectile;
 import com.dace.dmgr.util.task.DelayTask;
+import com.dace.dmgr.util.task.IntervalTask;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -38,6 +39,7 @@ public final class JagerA2 extends ActiveSkill {
     @Override
     protected boolean canUse() {
         AbilityManager abilityManager = combatUser.getAbilityManager();
+
         return super.canUse() && isDurationFinished() && !abilityManager.getAbility(JagerA1Info.getInstance()).getConfirmModule().isChecking()
                 && abilityManager.getAbility(JagerA3Info.getInstance()).isDurationFinished();
     }
@@ -82,8 +84,7 @@ public final class JagerA2 extends ActiveSkill {
     private final class JagerA2Projectile extends BouncingProjectile<Damageable> {
         private JagerA2Projectile() {
             super(JagerA2.this, JagerA2Info.VELOCITY, EntityCondition.enemy(combatUser),
-                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(),
-                    Option.builder().bounceVelocityMultiplier(0.35).build());
+                    Projectile.Option.builder().duration(Timespan.ofSeconds(5)).build(), Option.builder().bounceVelocityMultiplier(0.35).build());
         }
 
         @Override
@@ -116,24 +117,20 @@ public final class JagerA2 extends ActiveSkill {
     /**
      * 곰덫 클래스.
      */
+    @Getter
     private final class JagerA2Entity extends SummonEntity<ArmorStand> implements Damageable, Attacker {
         /** 공격 모듈 */
         @NonNull
-        @Getter
         private final AttackerModule attackerModule;
         /** 피해 모듈 */
         @NonNull
-        @Getter
         private final DamageModule damageModule;
         /** 상태 효과 모듈 */
         @NonNull
-        @Getter
         private final StatusEffectModule statusEffectModule;
-        /** 준비 완료 여부 */
-        private boolean isReady = false;
 
         private JagerA2Entity(@NonNull Location spawnLocation) {
-            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, combatUser.getName() + "의 곰덫", combatUser, true,
+            super(ArmorStandSpawnHandler.getInstance(), spawnLocation, "곰덫", combatUser, true,
                     Hitbox.builder(0.8, 0.1, 0.8).offsetY(0.05).pitchFixed().build());
 
             this.attackerModule = new AttackerModule(this);
@@ -149,21 +146,15 @@ public final class JagerA2 extends ActiveSkill {
             owner.getUser().getGlowingManager().setGlowing(entity, ChatColor.WHITE);
             JagerA2Info.Effects.SUMMON.play(getLocation());
 
-            addOnTick(this::onTick);
-            addTask(new DelayTask(() -> {
-                isReady = true;
+            addOnTick(i -> JagerA2Info.Effects.playDisplay(getLocation()));
+
+            addTask(new IntervalTask(i -> JagerA2Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation()), () -> {
                 JagerA2Info.Effects.SUMMON_READY.play(getLocation());
-            }, JagerA2Info.SUMMON_DURATION.toTicks()));
+                addOnTick(this::onTickAfterReady);
+            }, 1, JagerA2Info.SUMMON_DURATION.toTicks()));
         }
 
-        private void onTick(long i) {
-            JagerA2Info.Effects.playDisplay(getLocation());
-
-            if (!isReady) {
-                JagerA2Info.Effects.SUMMON_BEFORE_READY_TICK.play(getLocation());
-                return;
-            }
-
+        private void onTickAfterReady(long i) {
             Damageable target = CombatEntityRegistry.getNearCombatEntity(getLocation().add(0, 0.5, 0), 0.8,
                     EntityCondition.enemy(this).and(Damageable::isCreature));
 

@@ -15,6 +15,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
+
 /**
  * 전투에서 일시적으로 사용하는 엔티티 중 플레이어가 소환할 수 있는 엔티티 클래스.
  *
@@ -42,7 +44,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
      */
     protected SummonEntity(@NonNull EntitySpawnHandler<T> entitySpawnHandler, @NonNull Location spawnLocation, @NonNull String name,
                            @NonNull CombatUser owner, boolean hasNameTag, @NonNull Hitbox @NonNull ... hitboxes) {
-        super(entitySpawnHandler, spawnLocation, name, hitboxes);
+        super(entitySpawnHandler, spawnLocation, MessageFormat.format("{0}의 {1}", owner.getName(), name), hitboxes);
         this.owner = owner;
 
         if (hasNameTag) {
@@ -50,7 +52,7 @@ public abstract class SummonEntity<T extends Entity> extends TemporaryEntity<T> 
                     nameTagHologram = new TextHologram(entity, player -> {
                         CombatUser targetCombatUser = CombatUser.fromUser(User.fromPlayer(player));
                         return targetCombatUser == null || !owner.isEnemy(targetCombatUser);
-                    }, 1, "§n" + name), 3));
+                    }, 1, "§n" + this.name), 3));
             addOnRemove(() -> {
                 if (nameTagHologram != null)
                     nameTagHologram.remove();
