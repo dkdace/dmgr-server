@@ -39,27 +39,22 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     private final ArrayList<LongConsumer> onTicks = new ArrayList<>();
     /** 제거 시 실행할 작업 목록 */
     private final ArrayList<Runnable> onRemoves = new ArrayList<>();
-
-    /** 히트박스 목록 */
-    protected Hitbox[] hitboxes;
     /** 히트박스 기준 위치 */
     private Location hitboxBaseLocation;
 
     /**
      * 전투 시스템의 엔티티 인스턴스를 생성한다.
      *
-     * @param entity   대상 엔티티
-     * @param name     이름
-     * @param hitboxes 히트박스 목록
+     * @param entity 대상 엔티티
+     * @param name   이름
      * @throws IllegalStateException 해당 {@code entity}의 CombatEntity가 이미 존재하면 발생
      */
-    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name, @NonNull Hitbox @NonNull ... hitboxes) {
+    protected AbstractCombatEntity(@NonNull T entity, @NonNull String name) {
         Validate.validState(CombatEntityRegistry.get(entity) == null, "CombatEntity가 이미 존재함");
 
         this.entity = entity;
         this.name = name;
         this.world = entity.getWorld();
-        this.hitboxes = hitboxes;
         this.hitboxBaseLocation = entity.getLocation();
 
         entity.setCustomName(ChatColor.WHITE + name);
@@ -115,6 +110,14 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     }
 
     /**
+     * 엔티티의 히트박스 목록을 반환한다.
+     *
+     * @return 히트박스 목록
+     */
+    @NonNull
+    protected abstract Hitbox @NonNull [] getHitboxes();
+
+    /**
      * 엔티티의 히트박스를 업데이트한다.
      */
     private void updateHitboxTick() {
@@ -122,7 +125,7 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
 
         new DelayTask(() -> {
             hitboxBaseLocation = oldLoc;
-            for (Hitbox hitbox : hitboxes)
+            for (Hitbox hitbox : getHitboxes())
                 hitbox.setBaseLocation(hitboxBaseLocation);
         }, 3);
     }
@@ -144,13 +147,8 @@ public abstract class AbstractCombatEntity<T extends Entity> implements CombatEn
     }
 
     @Override
-    public final void setHitboxes(@NonNull Hitbox @NonNull ... hitboxes) {
-        this.hitboxes = hitboxes;
-    }
-
-    @Override
     public final boolean isInHitbox(@NonNull Location location, double radius) {
-        for (Hitbox hitbox : hitboxes)
+        for (Hitbox hitbox : getHitboxes())
             if (hitbox.isInHitbox(location, radius))
                 return true;
 

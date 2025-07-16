@@ -126,13 +126,6 @@ public interface CombatEntity {
     Location getHitboxCenter();
 
     /**
-     * 엔티티의 히트박스를 새로 설정한다.
-     *
-     * @param hitboxes 히트박스 목록
-     */
-    void setHitboxes(@NonNull Hitbox @NonNull ... hitboxes);
-
-    /**
      * 지정한 위치의 구체와 접하고 있는 히트박스가 있는지 확인한다.
      *
      * @param location 확인할 위치

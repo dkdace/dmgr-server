@@ -140,6 +140,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     @Nullable
     @Getter
     private final Team team;
+    /** 원본 히트박스 목록 */
+    private final Hitbox[] originalHitboxes;
     /** 선택한 전투원 종류 */
     @NonNull
     @Getter
@@ -166,8 +168,10 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         }
     };
 
-    /** 현재 히트박스 목록 */
-    private Hitbox[] currentHitboxes;
+    /** 히트박스 목록 */
+    @NonNull
+    @Getter
+    private Hitbox @NonNull [] hitboxes;
     /** 누적 자가 피해량. 자가 피해 치유 시 궁극기 충전 방지를 위해 사용 */
     private double selfHarmDamage = 0;
     /** 연속으로 획득한 점수의 합 */
@@ -227,6 +231,8 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         this.team = gameUser == null ? null : gameUser.getTeam();
         this.combatantType = combatantType;
         this.combatant = combatantType.getCombatant();
+        this.originalHitboxes = Hitbox.createDefaultPlayerHitboxes(combatant.getHitboxMultiplier());
+        this.hitboxes = originalHitboxes;
         this.killContributorManager = new KillContributorManager(this);
         this.killHelperManager = new KillHelperManager();
 
@@ -408,7 +414,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
     private void onTickLive(long i) {
         user.sendActionBar(combatant.getActionBarString(this));
 
-        if (currentHitboxes == hitboxes) {
+        if (originalHitboxes == hitboxes) {
             hitboxes[2].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
             hitboxes[3].setAxisOffsetY(entity.isSneaking() ? 1.15 : 1.4);
         }
@@ -489,10 +495,19 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
         return target.isEnemy(this);
     }
 
+    /**
+     * 플레이어의 히트박스 목록을 설정한다.
+     *
+     * @param hitboxes 히트박스 목록
+     */
+    public void setHitboxes(@NonNull Hitbox @NonNull ... hitboxes) {
+        this.hitboxes = hitboxes;
+    }
+
     @Override
     @Nullable
     public Hitbox getCritHitbox() {
-        return currentHitboxes == hitboxes ? hitboxes[3] : null;
+        return originalHitboxes == hitboxes ? hitboxes[3] : null;
     }
 
     @Override
@@ -1006,8 +1021,7 @@ public final class CombatUser extends AbstractCombatEntity<Player> implements He
      * 플레이어의 히트박스를 기본 히트박스로 재설정한다.
      */
     public void resetHitboxes() {
-        setHitboxes(Hitbox.createDefaultPlayerHitboxes(combatant.getHitboxMultiplier()));
-        currentHitboxes = hitboxes;
+        hitboxes = originalHitboxes;
     }
 
     /**

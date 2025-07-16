@@ -169,9 +169,9 @@ public final class Dummy extends TemporaryEntity<Player> implements Attacker, He
     }
 
     @Override
-    @Nullable
+    @NonNull
     public Hitbox getCritHitbox() {
-        return hitboxes[3];
+        return getHitboxes()[3];
     }
 
     @Override

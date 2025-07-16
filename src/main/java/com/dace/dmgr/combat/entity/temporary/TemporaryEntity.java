@@ -3,6 +3,7 @@ package com.dace.dmgr.combat.entity.temporary;
 import com.dace.dmgr.combat.entity.AbstractCombatEntity;
 import com.dace.dmgr.combat.entity.temporary.spawnhandler.EntitySpawnHandler;
 import com.dace.dmgr.combat.interaction.Hitbox;
+import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,12 @@ import org.bukkit.entity.Entity;
  * @param <T> {@link Entity}를 상속받는 엔티티 타입
  * @see SummonEntity
  */
+@Getter
 public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEntity<T> {
+    /** 히트박스 목록 */
+    @NonNull
+    private final Hitbox @NonNull [] hitboxes;
+
     /**
      * 일시적 엔티티 인스턴스를 생성한다.
      *
@@ -28,7 +34,9 @@ public abstract class TemporaryEntity<T extends Entity> extends AbstractCombatEn
      */
     protected TemporaryEntity(@NonNull EntitySpawnHandler<T> entitySpawnHandler, @NonNull Location spawnLocation, @NonNull String name,
                               @NonNull Hitbox @NonNull ... hitboxes) {
-        super(entitySpawnHandler.createEntity(spawnLocation), name, hitboxes);
+        super(entitySpawnHandler.createEntity(spawnLocation), name);
+
+        this.hitboxes = hitboxes;
 
         entitySpawnHandler.onSpawn(this);
         addOnRemove(entity::remove);
