@@ -7,8 +7,8 @@ import com.dace.dmgr.combat.ability.skill.ActiveSkill;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
 import com.dace.dmgr.combat.interaction.Projectile;
@@ -96,7 +96,8 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, ArkaceA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
-                    KnockbackModule.knockback(target, getVelocity(), ArkaceA1Info.KNOCKBACK);
+                    if (target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(getVelocity(), ArkaceA1Info.KNOCKBACK);
 
                     if (target.isGoalTarget())
                         combatUser.addScore(ArkaceA1Info.DIRECT_HIT_SCORE);
@@ -121,8 +122,9 @@ public final class ArkaceA1 extends ActiveSkill implements LeftClickHandler {
                 double damage = ArkaceA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(center.distance(location));
 
                 if (target.getDamageModule().damage(ArkaceA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && !ArkaceA1Projectile.this.getHitTargets().contains(target))
-                    KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)), ArkaceA1Info.KNOCKBACK);
+                        && !ArkaceA1Projectile.this.getHitTargets().contains(target) && target instanceof Movable)
+                    ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)),
+                            ArkaceA1Info.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }

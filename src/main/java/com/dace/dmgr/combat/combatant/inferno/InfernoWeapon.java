@@ -12,8 +12,8 @@ import com.dace.dmgr.combat.ability.weapon.module.ReloadModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -205,8 +205,9 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
         @NonNull
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
-                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true))
-                    KnockbackModule.knockback(target, getVelocity(), InfernoWeaponInfo.Fireball.KNOCKBACK);
+                if (target.getDamageModule().damage(combatUser, InfernoWeaponInfo.Fireball.DAMAGE_DIRECT, DamageType.NORMAL, location,
+                        false, true) && target instanceof Movable)
+                    ((Movable) target).getKnockbackModule().knockback(getVelocity(), InfernoWeaponInfo.Fireball.KNOCKBACK);
 
                 return false;
             };
@@ -230,8 +231,8 @@ public final class InfernoWeapon extends AbstractWeapon implements Reloadable, F
                         InfernoWeaponInfo.Fireball.DISTANT_DAMAGE_EXPLODE.getDamage(distance), DamageType.NORMAL, null, false, true)) {
                     target.getStatusEffectModule().apply(burning, InfernoWeaponInfo.Fireball.DISTANT_FIRE_DURATION.getTimespan(distance));
 
-                    if (!InfernoWeaponLProjectile.this.getHitTargets().contains(target))
-                        KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)),
+                    if (!InfernoWeaponLProjectile.this.getHitTargets().contains(target) && target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)),
                                 InfernoWeaponInfo.Fireball.KNOCKBACK);
                 }
 

@@ -11,8 +11,8 @@ import com.dace.dmgr.combat.ability.weapon.Weapon;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.statuseffect.Snare;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
 import com.dace.dmgr.combat.interaction.Area;
@@ -228,7 +228,9 @@ public final class JagerA3 extends ActiveSkill implements LeftClickHandler {
                     : target.getDamageModule().damage(projectile, damage, DamageType.NORMAL, null, false, true);
 
             if (isDamaged) {
-                KnockbackModule.knockback(target, LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)), JagerA3Info.KNOCKBACK);
+                if (target instanceof Movable)
+                    ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(center, location.clone().add(0, 0.5, 0)),
+                            JagerA3Info.KNOCKBACK);
 
                 if (JagerT1.addValue(target, (int) JagerA3Info.DISTANT_FREEZE.getDamage(distance)).getValue() >= JagerT1Info.MAX) {
                     target.getStatusEffectModule().apply(Freeze.instance, JagerA3Info.SNARE_DURATION);

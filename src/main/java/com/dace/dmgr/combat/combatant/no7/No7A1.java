@@ -111,7 +111,7 @@ public final class No7A1 extends ActiveSkill {
                         combatUser.getAbilityManager().getAbility(No7T1Info.getInstance()).addShield(No7A1Info.SHIELD);
 
                         if (target instanceof Movable)
-                            ((Movable) target).getKnockbackModule().knockback(getVelocity().normalize().multiply(No7A1Info.KNOCKBACK));
+                            ((Movable) target).getKnockbackModule().knockback(getVelocity(), No7A1Info.KNOCKBACK);
                     }
 
                     No7A1Info.Effects.HIT_ENTITY.play(location);

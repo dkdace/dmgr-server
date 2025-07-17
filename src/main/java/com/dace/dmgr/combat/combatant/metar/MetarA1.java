@@ -19,7 +19,6 @@ import com.dace.dmgr.util.task.IntervalTask;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.LongConsumer;
@@ -127,10 +126,8 @@ public final class MetarA1 extends ActiveSkill implements LeftClickHandler {
         protected HitEntityHandler<Damageable> getHitEntityHandler() {
             return (location, target) -> {
                 if (target.getDamageModule().damage(this, MetarA1Info.DAMAGE_DIRECT, DamageType.NORMAL, location, false, true)) {
-                    if (target instanceof Movable) {
-                        Vector dir = getVelocity().normalize().multiply(MetarA1Info.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir);
-                    }
+                    if (target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(getVelocity(), MetarA1Info.KNOCKBACK);
 
                     if (target.isGoalTarget())
                         combatUser.addScore(MetarA1Info.DIRECT_HIT_SCORE);
@@ -174,10 +171,9 @@ public final class MetarA1 extends ActiveSkill implements LeftClickHandler {
                 double damage = MetarA1Info.DISTANT_DAMAGE_EXPLODE.getDamage(center.distance(location));
 
                 if (target.getDamageModule().damage(MetarA1Projectile.this, damage, DamageType.NORMAL, null, false, true)
-                        && target != combatUser && target instanceof Movable && !MetarA1Projectile.this.getHitTargets().contains(target)) {
-                    Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MetarA1Info.KNOCKBACK);
-                    ((Movable) target).getKnockbackModule().knockback(dir);
-                }
+                        && target != combatUser && !MetarA1Projectile.this.getHitTargets().contains(target) && target instanceof Movable)
+                    ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)),
+                            MetarA1Info.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }

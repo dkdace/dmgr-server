@@ -146,10 +146,8 @@ public final class SiliaT2 extends Trait {
                     if (target.getDamageModule().damage(combatUser, SiliaT2Info.DAMAGE, DamageType.NORMAL, location,
                             SiliaT1.getCritMultiplier(combatUser.getLocation().getDirection(), target), true)) {
 
-                        if (target instanceof Movable) {
-                            Vector dir = combatUser.getLocation().getDirection().normalize().multiply(SiliaT2Info.KNOCKBACK);
-                            ((Movable) target).getKnockbackModule().knockback(dir);
-                        }
+                        if (target instanceof Movable)
+                            ((Movable) target).getKnockbackModule().knockback(combatUser.getLocation().getDirection(), SiliaT2Info.KNOCKBACK);
 
                         if (combatUser.getAbilityManager().getAbility(SiliaUltInfo.getInstance()).isDurationFinished() && target.isGoalTarget())
                             combatUser.addScore(SiliaT2Info.DAMAGE_SCORE);

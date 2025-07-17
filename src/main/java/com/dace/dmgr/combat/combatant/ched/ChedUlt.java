@@ -8,9 +8,9 @@ import com.dace.dmgr.combat.ability.skill.module.SummonModule;
 import com.dace.dmgr.combat.entity.DamageType;
 import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.EntityCondition;
+import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatScore;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.combat.entity.module.KnockbackModule;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.Burning;
 import com.dace.dmgr.combat.entity.temporary.Barrier;
@@ -158,8 +158,9 @@ public final class ChedUlt extends UltimateSkill implements HasBonusScore {
                     bonusScoreModule.addTarget(target, ChedUltInfo.KILL_SCORE_TIME_LIMIT);
 
                 if (target.getDamageModule().damage(ChedUltProjectile.this, ChedUltInfo.DISTANT_DAMAGE.getDamage(center.distance(location)),
-                        DamageType.NORMAL, null, false, false))
-                    KnockbackModule.knockback(target, LocationUtil.getDirection(location, location.clone().add(0, 1, 0)), ChedUltInfo.KNOCKBACK);
+                        DamageType.NORMAL, null, false, false) && target instanceof Movable)
+                    ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(location, location.clone().add(0, 1, 0)),
+                            ChedUltInfo.KNOCKBACK);
 
                 return !(target instanceof Barrier);
             }

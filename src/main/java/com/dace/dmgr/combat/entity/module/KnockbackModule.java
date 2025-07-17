@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.entity.module;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.Timestamp;
-import com.dace.dmgr.combat.entity.Damageable;
 import com.dace.dmgr.combat.entity.Movable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import lombok.NonNull;
@@ -24,53 +23,25 @@ public final class KnockbackModule extends CombatEntityModule<Movable> {
         super(combatEntity);
     }
 
-    /**
-     * 지정한 엔티티가 {@link Movable}인 경우 특정 방향과 속도로 밀쳐낸다.
-     *
-     * <p>주로 넉백 스킬에 사용된다.</p>
-     *
-     * @param combatEntity 대상 엔티티
-     * @param direction    방향
-     * @param speed        속도
-     * @param isReset      초기화 여부. {@code true}로 지정 시 기존 속도 초기화
-     * @see KnockbackModule#knockback(Vector, boolean)
-     */
-    public static void knockback(@NonNull Damageable combatEntity, @NonNull Vector direction, double speed, boolean isReset) {
-        if (combatEntity instanceof Movable)
-            ((Movable) combatEntity).getKnockbackModule().knockback(direction.clone().normalize().multiply(speed), isReset);
-    }
-
-    /**
-     * 지정한 엔티티가 {@link Movable}인 경우 특정 방향과 속도로 밀쳐낸다.
-     *
-     * <p>주로 넉백 스킬에 사용된다.</p>
-     *
-     * @param combatEntity 대상 엔티티
-     * @param direction    방향
-     * @param speed        속도
-     * @see KnockbackModule#knockback(Vector)
-     */
-    public static void knockback(@NonNull Damageable combatEntity, @NonNull Vector direction, double speed) {
-        knockback(combatEntity, direction, speed, false);
-    }
-
     @Override
     protected double getBaseValue() {
         return 1;
     }
 
     /**
-     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
+     * 엔티티를 지정한 방향과 속력으로 밀쳐낸다. (넉백 효과).
      *
      * <p>또한 잠시동안 이동기({@link MoveModule#push(Vector, boolean)})의 사용을 제한한다.</p>
      *
-     * @param velocity 속도
-     * @param isReset  초기화 여부. {@code true}로 지정 시 기존 속도 초기화
+     * @param direction 방향
+     * @param speed     속력
+     * @param isReset   초기화 여부. {@code true}로 지정 시 기존 속도 초기화
      * @see MoveModule#push(Vector, boolean)
      */
-    public void knockback(@NonNull Vector velocity, boolean isReset) {
+    public void knockback(@NonNull Vector direction, double speed, boolean isReset) {
         knockbackTimestamp = Timestamp.now().plus(Timespan.ofTicks(3));
 
+        Vector velocity = direction.clone().normalize().multiply(speed);
         Vector finalVelocity = velocity.clone().multiply(Math.max(0, 2 - getValue()));
         combatEntity.getEntity().setVelocity(isReset ? finalVelocity : combatEntity.getEntity().getVelocity().add(finalVelocity));
 
@@ -79,15 +50,16 @@ public final class KnockbackModule extends CombatEntityModule<Movable> {
     }
 
     /**
-     * 엔티티를 지정한 속도로 강제로 밀쳐낸다. (넉백 효과).
+     * 엔티티를 지정한 방향과 속력으로 밀쳐낸다. (넉백 효과).
      *
-     * <p>또한 잠시동안 이동기({@link MoveModule#push(Vector)})의 사용을 제한한다.</p>
+     * <p>또한 잠시동안 이동기({@link MoveModule#push(Vector, boolean)})의 사용을 제한한다.</p>
      *
-     * @param velocity 속도
+     * @param direction 방향
+     * @param speed     속력
      * @see MoveModule#push(Vector)
      */
-    public void knockback(@NonNull Vector velocity) {
-        knockback(velocity, false);
+    public void knockback(@NonNull Vector direction, double speed) {
+        knockback(direction, speed, false);
     }
 
     /**

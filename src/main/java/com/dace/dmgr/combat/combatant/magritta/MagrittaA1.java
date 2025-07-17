@@ -20,7 +20,6 @@ import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.MainHand;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public final class MagrittaA1 extends ActiveSkill {
@@ -165,10 +164,9 @@ public final class MagrittaA1 extends ActiveSkill {
                         DamageType.NORMAL, null, false, true)) {
                     target.getStatusEffectModule().apply(burning, MagrittaA1Info.DISTANT_FIRE_DURATION.getTimespan(distance));
 
-                    if (target instanceof Movable) {
-                        Vector dir = LocationUtil.getDirection(center, location.add(0, 0.5, 0)).multiply(MagrittaA1Info.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir);
-                    }
+                    if (target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(center, location.add(0, 0.5, 0)),
+                                MagrittaA1Info.KNOCKBACK);
 
                     MagrittaT1.addValue(combatUser, target);
                 }

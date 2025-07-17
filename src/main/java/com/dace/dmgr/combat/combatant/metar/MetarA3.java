@@ -176,10 +176,9 @@ public final class MetarA3 extends ActiveSkill implements HasBonusScore {
             @Override
             protected boolean onHitEntity(@NonNull Location center, @NonNull Location location, @NonNull Damageable target) {
                 if (target.getDamageModule().damage(MetarA3Projectile.this, 0, DamageType.NORMAL, null, false, true)) {
-                    if (target instanceof Movable) {
-                        Vector dir = LocationUtil.getDirection(target.getLocation(), center).multiply(MetarA3Info.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir, true);
-                    }
+                    if (target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(target.getLocation(), center),
+                                MetarA3Info.KNOCKBACK, true);
 
                     if (targets.add(target)) {
                         target.getDamageModule().damage(MetarA3Projectile.this, 1, DamageType.NORMAL, null, false, true);

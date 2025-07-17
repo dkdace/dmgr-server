@@ -141,11 +141,9 @@ public final class QuakerWeapon extends AbstractWeapon implements LeftClickHandl
             return (location, target) -> {
                 if (!isUlt && targets.add(target)) {
                     if (target.getDamageModule().damage(combatUser, QuakerWeaponInfo.DAMAGE, DamageType.NORMAL, location, false, true)
-                            && target instanceof Movable) {
-                        Vector dir = VectorUtil.getPitchAxis(combatUser.getLocation())
-                                .multiply(isOpposite ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK);
-                        ((Movable) target).getKnockbackModule().knockback(dir);
-                    }
+                            && target instanceof Movable)
+                        ((Movable) target).getKnockbackModule().knockback(VectorUtil.getPitchAxis(combatUser.getLocation()),
+                                isOpposite ? -QuakerWeaponInfo.KNOCKBACK : QuakerWeaponInfo.KNOCKBACK);
 
                     QuakerWeaponInfo.Effects.HIT_ENTITY.play(location);
                 }

@@ -151,7 +151,7 @@ public final class QuakerA3 extends ActiveSkill {
                     return false;
 
                 if (i < 3)
-                    target.getKnockbackModule().knockback(getVelocity().normalize().multiply(QuakerA3Info.KNOCKBACK), true);
+                    target.getKnockbackModule().knockback(getVelocity(), QuakerA3Info.KNOCKBACK, true);
 
                 Location loc = target.getCenterLocation().add(0, 0.1, 0);
                 new QuakerA3Area().emit(loc);
@@ -161,7 +161,7 @@ public final class QuakerA3 extends ActiveSkill {
                 Location hitLoc = loc.clone().add(getVelocity().normalize());
                 if (!LocationUtil.isNonSolid(hitLoc)) {
                     onHitEnemy(hitLoc, (Damageable) target);
-                    target.getKnockbackModule().knockback(new Vector(), true);
+                    target.getKnockbackModule().knockback(new Vector(), 0, true);
 
                     QuakerA3Info.Effects.HIT_ENTITY_WALL.apply(hitLoc.getBlock()).play(loc);
 

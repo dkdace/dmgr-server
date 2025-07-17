@@ -154,11 +154,9 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
                         target.getStatusEffectModule().apply(stun, QuakerUltInfo.STUN_DURATION);
                         target.getStatusEffectModule().apply(SLOW, QuakerUltInfo.SLOW_DURATION);
 
-                        if (target instanceof Movable) {
-                            Vector dir = LocationUtil.getDirection(combatUser.getLocation(), target.getLocation().add(0, 1, 0))
-                                    .multiply(QuakerUltInfo.KNOCKBACK);
-                            ((Movable) target).getKnockbackModule().knockback(dir);
-                        }
+                        if (target instanceof Movable)
+                            ((Movable) target).getKnockbackModule().knockback(LocationUtil.getDirection(combatUser.getLocation(),
+                                    target.getLocation().add(0, 1, 0)), QuakerUltInfo.KNOCKBACK);
 
                         if (target.isGoalTarget()) {
                             combatUser.addScore(QuakerUltInfo.DAMAGE_SCORE);
