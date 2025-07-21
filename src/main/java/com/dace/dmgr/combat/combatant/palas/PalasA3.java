@@ -75,7 +75,7 @@ public final class PalasA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return PalasA3Info.ASSIST_SCORE;
     }
 

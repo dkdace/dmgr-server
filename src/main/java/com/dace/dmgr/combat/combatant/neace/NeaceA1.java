@@ -54,13 +54,13 @@ public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     }
 
     @Override
-    public int getMaxDistance() {
+    public int getTargetMaxDistance() {
         return NeaceA1Info.MAX_DISTANCE;
     }
 
     @Override
     @NonNull
-    public EntityCondition<Healable> getEntityCondition() {
+    public EntityCondition<Healable> getTargetEntityCondition() {
         return EntityCondition.team(combatUser).exclude(combatUser)
                 .and(combatEntity -> !combatEntity.getStatusEffectModule().has(ValueEffect.class));
     }

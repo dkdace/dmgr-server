@@ -124,7 +124,7 @@ public final class JagerA1 extends ChargeableSkill implements HasBonusScore, Con
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return JagerA1Info.KILL_SCORE;
     }
 

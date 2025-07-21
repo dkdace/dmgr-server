@@ -20,7 +20,7 @@ public interface HasBonusScore extends Skill {
      * @return 보너스 전투 점수
      */
     @NonNull
-    CombatScore getCombatScore();
+    CombatScore getBonusCombatScore();
 
     /**
      * 어시스트 모드 여부를 반환한다.

@@ -97,7 +97,7 @@ public final class VellionUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return VellionUltInfo.ASSIST_SCORE;
     }
 

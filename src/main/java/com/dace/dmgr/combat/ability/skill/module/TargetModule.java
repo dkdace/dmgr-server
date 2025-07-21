@@ -35,7 +35,7 @@ public final class TargetModule<T extends CombatEntity> {
     public boolean findTarget() {
         currentTarget = null;
 
-        new Target<T>(skill.getCombatUser(), skill.getMaxDistance(), skill.getEntityCondition()) {
+        new Target<T>(skill.getCombatUser(), skill.getTargetMaxDistance(), skill.getTargetEntityCondition()) {
             @Override
             protected void onFindEntity(@NonNull T target) {
                 currentTarget = target;

@@ -118,7 +118,7 @@ public final class VellionA3 extends ActiveSkill implements HasBonusScore, Confi
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return VellionA3Info.ASSIST_SCORE;
     }
 

@@ -86,7 +86,7 @@ public final class QuakerUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return QuakerUltInfo.ASSIST_SCORE;
     }
 

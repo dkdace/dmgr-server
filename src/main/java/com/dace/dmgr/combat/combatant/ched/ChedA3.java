@@ -86,7 +86,7 @@ public final class ChedA3 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return ChedA3Info.KILL_SCORE;
     }
 

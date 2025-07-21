@@ -46,7 +46,7 @@ public final class BonusScoreModule {
         Timestamp expiration = timeLimitTimestampMap.get(victim);
 
         if (expiration != null && expiration.isAfter(Timestamp.now())) {
-            CombatScore combatScore = skill.getCombatScore();
+            CombatScore combatScore = skill.getBonusCombatScore();
             if (!skill.isAssistMode())
                 combatScore = combatScore.multiplyScore(contributionScore);
 

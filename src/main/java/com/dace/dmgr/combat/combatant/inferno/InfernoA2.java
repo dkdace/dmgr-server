@@ -86,7 +86,7 @@ public final class InfernoA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return InfernoA2Info.ASSIST_SCORE;
     }
 

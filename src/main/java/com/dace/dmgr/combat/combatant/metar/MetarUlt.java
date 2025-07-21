@@ -77,7 +77,7 @@ public final class MetarUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return MetarUltInfo.ASSIST_SCORE;
     }
 

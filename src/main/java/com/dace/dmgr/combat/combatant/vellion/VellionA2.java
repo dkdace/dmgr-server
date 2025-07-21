@@ -164,20 +164,20 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     }
 
     @Override
-    public int getMaxDistance() {
+    public int getTargetMaxDistance() {
         return VellionA2Info.MAX_DISTANCE;
     }
 
     @Override
     @NonNull
-    public EntityCondition<Damageable> getEntityCondition() {
+    public EntityCondition<Damageable> getTargetEntityCondition() {
         return EntityCondition.enemy(combatUser).and(combatEntity ->
                 combatEntity.isCreature() && !combatEntity.getStatusEffectModule().has(VellionA2Mark.instance));
     }
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return VellionA2Info.ASSIST_SCORE;
     }
 

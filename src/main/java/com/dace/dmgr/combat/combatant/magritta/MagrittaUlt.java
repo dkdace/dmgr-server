@@ -120,7 +120,7 @@ public final class MagrittaUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return MagrittaUltInfo.KILL_SCORE;
     }
 }

@@ -121,7 +121,7 @@ public final class QuakerA2 extends ActiveSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return QuakerA2Info.ASSIST_SCORE;
     }
 

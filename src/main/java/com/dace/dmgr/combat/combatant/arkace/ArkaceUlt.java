@@ -51,7 +51,7 @@ public final class ArkaceUlt extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return ArkaceUltInfo.KILL_SCORE;
     }
 }

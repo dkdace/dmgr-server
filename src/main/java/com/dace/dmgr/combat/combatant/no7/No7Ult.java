@@ -74,7 +74,7 @@ public final class No7Ult extends UltimateSkill implements HasBonusScore {
 
     @Override
     @NonNull
-    public CombatScore getCombatScore() {
+    public CombatScore getBonusCombatScore() {
         return No7UltInfo.ASSIST_SCORE;
     }
 
