@@ -2,7 +2,6 @@ package com.dace.dmgr.combat.entity.temporary.dummy;
 
 import com.dace.dmgr.Timespan;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
-import com.dace.dmgr.util.VectorUtil;
 import com.dace.dmgr.util.location.LocationUtil;
 import lombok.NonNull;
 import org.apache.commons.lang3.RandomUtils;
@@ -36,8 +35,7 @@ public final class ArenaRangedDummyBehavior extends ArenaDummyBehavior {
 
     @Override
     protected void onAttack(@NonNull Dummy dummy) {
-        Vector dir = VectorUtil.getSpreadedVector(LocationUtil.getDirection(dummy.getEntity().getEyeLocation(), target.getHitboxCenter()), 30);
-        new DummyProjectile(dummy, damage).shot(dir);
+        new DummyProjectile(dummy, damage, 30).shot(LocationUtil.getDirection(dummy.getEntity().getEyeLocation(), target.getHitboxCenter()));
     }
 
     @Override

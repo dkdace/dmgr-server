@@ -14,7 +14,7 @@ public final class ShootingBehavior implements DummyBehavior {
     @Override
     public void onInit(@NonNull Dummy dummy) {
         if (!dummy.getStatusEffectModule().hasRestriction(CombatRestriction.USE_WEAPON))
-            new DummyProjectile(dummy, 100).shot();
+            new DummyProjectile(dummy, 100, 0).shot();
 
         dummy.addTask(new DelayTask(() -> onInit(dummy), RandomUtils.nextInt(20, 30)));
     }

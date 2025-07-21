@@ -34,9 +34,11 @@ public final class DummyProjectile extends Projectile<Damageable> {
      *
      * @param shooter 발사자
      * @param damage  피해량
+     * @param spread  탄퍼짐. 0 이상의 값
+     * @throws IllegalArgumentException 인자값이 유효하지 않으면 발생
      */
-    DummyProjectile(@NonNull Dummy shooter, int damage) {
-        super(shooter, 30, EntityCondition.enemy(shooter));
+    DummyProjectile(@NonNull Dummy shooter, int damage, double spread) {
+        super(shooter, 30, EntityCondition.enemy(shooter), Option.builder().spread(spread).build());
 
         this.damage = damage;
         SHOOT_SOUND.play(shooter.getLocation());
