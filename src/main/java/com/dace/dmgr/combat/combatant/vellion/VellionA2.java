@@ -37,8 +37,6 @@ public final class VellionA2 extends ActiveSkill implements Targeted<Damageable>
     private static final Modifier DEFENSE_MODIFIER = new Modifier(-VellionA2Info.DEFENSE_DECREMENT);
 
     /** 타겟 모듈 */
-    @NonNull
-    @Getter
     private final TargetModule<Damageable> targetModule;
     /** 보너스 점수 모듈 */
     @NonNull

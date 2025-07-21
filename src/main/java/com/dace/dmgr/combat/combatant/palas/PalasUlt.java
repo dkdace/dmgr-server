@@ -9,12 +9,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.inventory.MainHand;
 
-@Getter
 public final class PalasUlt extends UltimateSkill implements Targeted<Healable> {
     /** 공격력 수정자 */
     private static final Modifier DAMAGE_MODIFIER = new Modifier(PalasUltInfo.DAMAGE_INCREMENT);
@@ -22,7 +20,6 @@ public final class PalasUlt extends UltimateSkill implements Targeted<Healable> 
     private static final Modifier SPEED_MODIFIER = new Modifier(PalasUltInfo.SPEED_INCREMENT);
 
     /** 타겟 모듈 */
-    @NonNull
     private final TargetModule<Healable> targetModule;
 
     public PalasUlt(@NonNull CombatUser combatUser, @NonNull PalasUltInfo skillInfo) {

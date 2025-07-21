@@ -13,12 +13,10 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.Modifier;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.inventory.MainHand;
 
-@Getter
 public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     /** 상태 효과 저항 수정자 */
     private static final Modifier STATUS_EFFECT_RESISTANCE_MODIFIER = new Modifier(100);
@@ -26,7 +24,6 @@ public final class PalasA2 extends ActiveSkill implements Targeted<Healable> {
     private static final Modifier KNOCKBACK_RESISTANCE_MODIFIER = new Modifier(100);
 
     /** 타겟 모듈 */
-    @NonNull
     private final TargetModule<Healable> targetModule;
 
     public PalasA2(@NonNull CombatUser combatUser, @NonNull PalasA2Info skillInfo) {

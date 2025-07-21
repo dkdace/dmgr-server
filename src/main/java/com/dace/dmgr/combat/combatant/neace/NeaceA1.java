@@ -10,14 +10,11 @@ import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.entity.Healable;
 import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.combat.entity.module.statuseffect.StatusEffect;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.inventory.MainHand;
 
-@Getter
 public final class NeaceA1 extends ActiveSkill implements Targeted<Healable> {
     /** 타겟 모듈 */
-    @NonNull
     private final TargetModule<Healable> targetModule;
 
     public NeaceA1(@NonNull CombatUser combatUser, @NonNull NeaceA1Info skillInfo) {

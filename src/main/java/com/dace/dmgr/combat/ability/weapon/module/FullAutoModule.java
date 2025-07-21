@@ -15,10 +15,10 @@ import org.jetbrains.annotations.Nullable;
  * @see FullAuto
  */
 @RequiredArgsConstructor
-public class FullAutoModule {
+public final class FullAutoModule {
     /** 무기 인스턴스 */
     @NonNull
-    protected final FullAuto weapon;
+    private final FullAuto weapon;
 
     /** 연사 무기 사용을 처리하는 태스크 */
     @Nullable

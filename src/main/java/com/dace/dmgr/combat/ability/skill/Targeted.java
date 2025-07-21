@@ -1,6 +1,5 @@
 package com.dace.dmgr.combat.ability.skill;
 
-import com.dace.dmgr.combat.ability.skill.module.TargetModule;
 import com.dace.dmgr.combat.entity.CombatEntity;
 import com.dace.dmgr.combat.entity.EntityCondition;
 import com.dace.dmgr.combat.interaction.Target;
@@ -13,12 +12,6 @@ import lombok.NonNull;
  * @see Target
  */
 public interface Targeted<T extends CombatEntity> extends Skill {
-    /**
-     * @return 타겟 모듈
-     */
-    @NonNull
-    TargetModule<T> getTargetModule();
-
     /**
      * 대상 엔티티를 찾는 최대 거리를 반환한다.
      *

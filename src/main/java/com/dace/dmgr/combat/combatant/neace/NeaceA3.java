@@ -12,7 +12,6 @@ import com.dace.dmgr.combat.entity.combatuser.CombatUser;
 import com.dace.dmgr.util.location.LocationUtil;
 import com.dace.dmgr.util.task.DelayTask;
 import com.dace.dmgr.util.task.IntervalTask;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.potion.PotionEffect;
@@ -20,10 +19,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 public final class NeaceA3 extends ActiveSkill implements Targeted<Healable> {
     /** 타겟 모듈 */
-    @NonNull
     private final TargetModule<Healable> targetModule;
 
     public NeaceA3(@NonNull CombatUser combatUser, @NonNull NeaceA3Info skillInfo) {
