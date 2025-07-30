@@ -25,7 +25,7 @@ public final class MetarWeaponInfo extends WeaponInfo<MetarWeapon> {
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 30;
     /** 거리별 피해량 */
-    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE);
     /** 투사체 속력 (단위: 블록/s) */
     public static final int VELOCITY = 60;
     /** 탄퍼짐 */

@@ -27,7 +27,7 @@ public final class MagrittaWeaponInfo extends WeaponInfo<MagrittaWeapon> {
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 16;
     /** 거리별 피해량 */
-    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE);
     /** 산탄 수 */
     public static final int PELLET_AMOUNT = 8;
     /** 탄퍼짐 */

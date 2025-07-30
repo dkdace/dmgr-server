@@ -35,9 +35,9 @@ public final class JagerA3Info extends ActiveSkillInfo<JagerA3> {
     /** 빙결량 */
     public static final int FREEZE = 100;
     /** 거리별 피해량 (폭발) */
-    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS);
     /** 거리별 빙결량 */
-    public static final DistantDamage DISTANT_FREEZE = new DistantDamage(FREEZE, RADIUS / 2);
+    public static final DistantDamage DISTANT_FREEZE = new DistantDamage(FREEZE, RADIUS);
     /** 속박 시간 */
     public static final Timespan SNARE_DURATION = Timespan.ofSeconds(1.2);
     /** 넉백 강도 */

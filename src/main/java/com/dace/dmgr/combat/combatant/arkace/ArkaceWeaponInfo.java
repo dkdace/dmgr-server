@@ -21,10 +21,10 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
     public static final FullAuto.FireRate FIRE_RATE = FullAuto.FireRate.RPM_600;
     /** 피해량 */
     public static final int DAMAGE = 75;
-    /** 피해량 감소 시작 거리 (단위: 블록) */
-    public static final int DAMAGE_WEAKENING_DISTANCE = 25;
+    /** 최대 피해 감소 거리 (단위: 블록) */
+    public static final int MAX_DISTANCE = 50;
     /** 거리별 피해량 */
-    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DAMAGE_WEAKENING_DISTANCE);
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, MAX_DISTANCE);
     /** 장탄수 */
     public static final int CAPACITY = 30;
     /** 재장전 시간 */
@@ -42,7 +42,7 @@ public final class ArkaceWeaponInfo extends WeaponInfo<ArkaceWeapon> {
                 new AbilityInfoLore(AbilityInfoLore.Section
                         .builder("뛰어난 안정성을 가진 전자동 돌격소총입니다. 사격하여 <:DAMAGE:피해>를 입힙니다.")
                         .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
-                                DAMAGE, DAMAGE / 2, DAMAGE_WEAKENING_DISTANCE, DAMAGE_WEAKENING_DISTANCE * 2)
+                                DAMAGE, DAMAGE / 2, MAX_DISTANCE / 2, MAX_DISTANCE)
                         .addValueInfo(TextIcon.ATTACK_SPEED, Format.TIME_WITH_RPM,
                                 60.0 / FIRE_RATE.getRoundsPerMinute(), FIRE_RATE.getRoundsPerMinute())
                         .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, CAPACITY)

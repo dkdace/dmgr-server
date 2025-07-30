@@ -65,7 +65,7 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
                         new AbilityInfoLore.NamedSection("저격탄", AbilityInfoLore.Section
                                 .builder("저격탄을 사격하여 <:DAMAGE:피해>를 입힙니다.")
                                 .addValueInfo(TextIcon.DAMAGE, Format.VARIABLE_WITH_DISTANCE,
-                                        Scope.DAMAGE, Scope.DAMAGE / 2, Scope.DAMAGE_WEAKENING_DISTANCE, Scope.DAMAGE_WEAKENING_DISTANCE * 2)
+                                        Scope.DAMAGE, Scope.DAMAGE / 2, Scope.MAX_DISTANCE / 2, Scope.MAX_DISTANCE)
                                 .addValueInfo(TextIcon.CAPACITY, Format.CAPACITY, Scope.CAPACITY)
                                 .build())));
     }
@@ -77,10 +77,10 @@ public final class JagerWeaponInfo extends WeaponInfo<JagerWeaponL> {
     public static final class Scope {
         /** 피해량 */
         public static final int DAMAGE = 240;
-        /** 피해량 감소 시작 거리 (단위: 블록) */
-        public static final int DAMAGE_WEAKENING_DISTANCE = 30;
+        /** 최대 피해 감소 거리 (단위: 블록) */
+        public static final int MAX_DISTANCE = 60;
         /** 거리별 피해량 */
-        public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DAMAGE_WEAKENING_DISTANCE);
+        public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, MAX_DISTANCE);
         /** 장탄수 */
         public static final int CAPACITY = 7;
         /** 확대 레벨 */

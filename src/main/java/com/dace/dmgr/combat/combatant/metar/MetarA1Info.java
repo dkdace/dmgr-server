@@ -39,7 +39,7 @@ public final class MetarA1Info extends ActiveSkillInfo<MetarA1> {
     /** 피해 범위 (단위: 블록) */
     public static final double RADIUS = 3;
     /** 거리별 피해량 (폭발) */
-    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+    public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 0.45;
 

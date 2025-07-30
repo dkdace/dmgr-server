@@ -88,9 +88,9 @@ public final class InfernoWeaponInfo extends WeaponInfo<InfernoWeapon> {
         /** 피해 범위 (단위: 블록) */
         public static final double RADIUS = 2.5;
         /** 거리별 피해량 (폭발) */
-        public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS / 2);
+        public static final DistantDamage DISTANT_DAMAGE_EXPLODE = new DistantDamage(DAMAGE_EXPLODE, RADIUS);
         /** 거리별 화염 지속 시간 */
-        public static final DistantTimespan DISTANT_FIRE_DURATION = new DistantTimespan(FIRE_DURATION, RADIUS / 2);
+        public static final DistantTimespan DISTANT_FIRE_DURATION = new DistantTimespan(FIRE_DURATION, RADIUS);
         /** 탄환 소모량 */
         public static final int CAPACITY_CONSUME = 50;
         /** 넉백 강도 */

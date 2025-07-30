@@ -25,7 +25,7 @@ public final class No7WeaponInfo extends WeaponInfo<No7Weapon> {
     /** 사거리 (단위: 블록) */
     public static final int DISTANCE = 20;
     /** 거리별 피해량 */
-    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE / 2.0);
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, DISTANCE);
     /** 산탄 수 */
     public static final int PELLET_AMOUNT = 5;
     /** 탄퍼짐 */

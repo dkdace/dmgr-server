@@ -35,7 +35,7 @@ public final class ChedUltInfo extends UltimateSkillInfo<ChedUlt> {
     /** 투사체 크기 (단위: 블록) */
     public static final double SIZE = 7;
     /** 거리별 피해량 */
-    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, SIZE / 2);
+    public static final DistantDamage DISTANT_DAMAGE = new DistantDamage(DAMAGE, SIZE);
     /** 넉백 강도 */
     public static final double KNOCKBACK = 1;
     /** 초당 화염 피해량 */
